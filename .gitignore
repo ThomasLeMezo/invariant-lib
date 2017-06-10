@@ -35,8 +35,6 @@ flex.pyc
 build
 build_win
 build_win32
-build-debug
-build-release
 
 # qtcreator project
 CMakeLists.txt.user
