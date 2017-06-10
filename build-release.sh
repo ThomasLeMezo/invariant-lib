@@ -13,6 +13,6 @@ cd $INVARIANTLIB_DIR
 
 mkdir build/build-release -p
 cd build/build-release
-cmake -DCMAKE_INSTALL_PREFIX=~/ -DIBEX_ROOT=~/ibex -DCMAKE_BUILD_TYPE=Release ../..
+cmake -DCMAKE_INSTALL_PREFIX=~/ -DIBEX_ROOT=~/ibex -DCMAKE_BUILD_TYPE=Release $INVARIANTLIB_DIR
 make -j
 cd ..

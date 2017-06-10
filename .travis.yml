@@ -42,13 +42,10 @@ install:
   - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
 
 script:
-  - mkdir build
-  - cd build
   #- if [ $TRAVIS_OS_NAME == osx ]; then
   #    CC=clang-omp CXX=clang-omp++ cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DBUILD_TESTS=ON ../ ;
   #  fi
   - if [ $TRAVIS_OS_NAME == linux ]; then
-      cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ../ ;
+      sh buid-debug.sh
     fi
-  - make -j
   
