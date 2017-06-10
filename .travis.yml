@@ -1,0 +1,54 @@
+# ==================================================================
+#  invariant-lib - travis test script
+# ==================================================================
+
+language: c++
+sudo: false
+
+notifications:
+  email: false
+    # on_success: never
+    # on_failure: never
+
+addons:
+  apt:
+    sources:
+    - deadsnakes
+    - ubuntu-toolchain-r-test
+    - chef-current-precise
+
+    packages:
+    - cmake
+    - time
+    - pkg-config
+    - gcc
+
+cache:
+  directories:
+  - $HOME/ibex
+
+matrix:
+  include:
+  #- os: osx
+  #  compiler: clang
+  - os: linux
+    compiler: gcc
+
+#before_install:
+#  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install clang-omp; fi
+
+install:
+  - sh ./cmake/build_IbexLib.sh
+  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
+
+script:
+  - mkdir build
+  - cd build
+  #- if [ $TRAVIS_OS_NAME == osx ]; then
+  #    CC=clang-omp CXX=clang-omp++ cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DBUILD_TESTS=ON ../ ;
+  #  fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then
+      cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ../ ;
+    fi
+  - make -j
+  
