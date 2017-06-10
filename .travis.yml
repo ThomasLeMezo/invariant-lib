@@ -45,7 +45,5 @@ script:
   #- if [ $TRAVIS_OS_NAME == osx ]; then
   #    CC=clang-omp CXX=clang-omp++ cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DBUILD_TESTS=ON ../ ;
   #  fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then
-      sh buid-debug.sh
-    fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sh ./build-debug.sh; fi
   
