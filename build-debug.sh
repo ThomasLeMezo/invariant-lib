@@ -13,6 +13,6 @@ cd $INVARIANTLIB_DIR
 
 mkdir build/build-debug -p
 cd build/build-debug
-cmake -DCMAKE_INSTALL_PREFIX=~/ -DIBEX_ROOT=~/ibex -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ../..
+cmake -DCMAKE_INSTALL_PREFIX=~/ -DIBEX_ROOT=~/ibex -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON $INVARIANTLIB_DIR
 make -j
 cd ..
