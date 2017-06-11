@@ -3,8 +3,13 @@
 
 #include <ibex.h>
 #include "face.h"
+#include <fstream>
+#include "graph.h"
 
 namespace invariant {
+class Face; // declared only for friendship
+class Graph; // declared only for friendship
+
 class Pave
 {
 public:
@@ -12,7 +17,8 @@ public:
      * @brief Create a Pave with coordinates
      * @param coordinates of the Pave
      */
-    Pave(const ibex::IntervalVector &coordinates);
+    Pave(const ibex::IntervalVector &coordinates, Graph* g);
+    Pave(Graph* g);
     Pave():m_coordinates(0), m_faces(0){}
 
     ~Pave();
@@ -29,19 +35,24 @@ public:
      */
     std::vector< std::array<Face *, 2>> faces() const;
 
-    int getSerialization_id() const;
-    void setSerialization_id(int value);
+    size_t getSerialization_id() const;
+    void setSerialization_id(size_t &value);
 
     void serialize(std::ofstream &binFile) const;
     void deserialize(std::ifstream& binFile);
+
+    bool operator==(const Pave& p) const;
+    bool operator!=(const Pave& p) const;
+    const std::array<Face*, 2>& operator[](std::size_t i) const;
 
 private:
 
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Pave coordinates
     std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
+    Graph*                    m_graph;
 
-    int serialization_id;
+    size_t m_serialization_id;
 };
 
     /**

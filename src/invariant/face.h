@@ -2,12 +2,18 @@
 #define FACE_H
 
 #include <ibex.h>
+#include <fstream>
+#include "pave.h"
 
 namespace invariant {
+class Pave; // declared only for friendship
 class Face
 {
 public:
-    Face(const ibex::IntervalVector &coordinates, const ibex::IntervalVector &orientation);
+    Face(const ibex::IntervalVector &coordinates, const ibex::IntervalVector &orientation, Pave* p);
+    Face(Pave* p);
+
+    ~Face();
 
     /**
      * @brief Return the coordinates of the Face
@@ -17,6 +23,11 @@ public:
 
     void serialize(std::ofstream &binFile) const;
     void deserialize(std::ifstream& binFile);
+
+    bool operator==(const Face& f) const;
+    bool operator!=(const Face& f) const;
+
+    ibex::IntervalVector orientation() const;
 
 private:
     /** Class Variable **/
@@ -28,6 +39,7 @@ private:
      * the Face in the Pave
      */
     ibex::IntervalVector      m_orientation;
+    Pave*                     m_pave;
 };
 
     /**

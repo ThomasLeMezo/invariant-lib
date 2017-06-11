@@ -49,14 +49,6 @@ void serializeInterval(ofstream& binFile, const Interval& intv)
     }
 }
 
-void serializeIntervalVector(std::ofstream& binFile, const ibex::IntervalVector& intv)
-{
-    binFile.write((const char*) intv.size(), sizeof(int));
-    for(int dim=0; dim<intv.size(); dim++){
-        serializeInterval(binFile, intv[dim]);
-    }
-}
-
 void deserializeInterval(ifstream& binFile, Interval& intv)
 {
     char intv_type;
@@ -89,6 +81,15 @@ void deserializeInterval(ifstream& binFile, Interval& intv)
 
     default:
         cout << "Tube::deserializeInterval(...): unhandled case" << endl;
+    }
+}
+
+void serializeIntervalVector(std::ofstream& binFile, const ibex::IntervalVector& intv)
+{
+    int size = intv.size();
+    binFile.write((const char*) &size, sizeof(int));
+    for(int dim=0; dim<intv.size(); dim++){
+        serializeInterval(binFile, intv[dim]);
     }
 }
 
