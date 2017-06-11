@@ -2,7 +2,7 @@
 #define PAVE_H
 
 #include <ibex.h>
-#include <face.h>
+#include "face.h"
 
 namespace invariant {
 class Pave
@@ -13,6 +13,7 @@ public:
      * @param coordinates of the Pave
      */
     Pave(const ibex::IntervalVector &coordinates);
+    Pave():m_coordinates(0), m_faces(0){}
 
     ~Pave();
 
@@ -28,11 +29,19 @@ public:
      */
     std::vector< std::array<Face *, 2>> faces() const;
 
+    int getSerialization_id() const;
+    void setSerialization_id(int value);
+
+    void serialize(std::ofstream &binFile) const;
+    void deserialize(std::ifstream& binFile);
+
 private:
 
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Pave coordinates
     std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
+
+    int serialization_id;
 };
 
     /**

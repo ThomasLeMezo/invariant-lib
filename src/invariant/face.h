@@ -15,10 +15,10 @@ public:
      */
     ibex::IntervalVector coordinates() const;
 
-
+    void serialize(std::ofstream &binFile) const;
+    void deserialize(std::ifstream& binFile);
 
 private:
-
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Face coordinates
 

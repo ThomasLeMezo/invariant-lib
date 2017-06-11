@@ -2,7 +2,7 @@
 #define GRAPH_H
 
 #include <ibex.h>
-#include <pave.h>
+#include "pave.h"
 
 namespace invariant {
 class Graph
@@ -27,6 +27,9 @@ public:
      * @return A list of pointer to the paves
      */
     std::vector<Pave *> paves() const;
+
+    void serialize(std::ofstream &binFile) const;
+    void deserialize(std::ifstream& binFile);
 
 private:
     /** Class Variable **/

@@ -20,7 +20,7 @@
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
   add_library(invariant-core ${SRC})
-  # target_link_libraries(tubex-core ${LIBS} tubex-tools)
+  target_link_libraries(invariant-core ${LIBS} invariant-tools)
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")
   install(TARGETS invariant-core DESTINATION lib)

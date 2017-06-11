@@ -3,11 +3,10 @@
 namespace invariant {
 
 Face::Face(const ibex::IntervalVector &coordinates, const ibex::IntervalVector &orientation):
-    m_coordinates(coordinates.size()),
-    m_orientation(coordinates.size())
+    m_coordinates(coordinates),
+    m_orientation(orientation)
 {
-    m_coordinates = coordinates;
-    m_orientation = orientation;
+
 }
 
 ibex::IntervalVector Face::coordinates() const
