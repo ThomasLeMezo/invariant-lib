@@ -59,7 +59,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3")
     #endif()
 
 # Sources
-    include_directories(./build/include)
+    include_directories(./build/build-release/include)
+    include_directories(./build/build-debug/include)
     add_subdirectory(src)
 
 # Tests
@@ -71,7 +72,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3")
 
 
 # Examples
-    # add_subdirectory(examples)
+     add_subdirectory(examples)
 
 # Uninstallation
     configure_file("${CMAKE_HOME_DIRECTORY}/cmake/Modules/cmake_uninstall.cmake.in" "cmake_uninstall.cmake" IMMEDIATE @ONLY)

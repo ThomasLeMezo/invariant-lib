@@ -6,11 +6,15 @@
 # Sources
 
   set(SRC
-    main.cpp
+    graph.cpp
+    pave.cpp
+    face.cpp
   )
 
   set(HEADERS
-    # ToDo
+    graph.h
+    pave.h
+    face.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
