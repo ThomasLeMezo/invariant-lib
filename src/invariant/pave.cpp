@@ -127,4 +127,75 @@ const std::array<Face*, 2>& Pave::operator[](std::size_t i) const{
     return m_faces[i];
 }
 
+void Pave::bisect(){
+    ibex::LargestFirst bisector(0, 0.5);
+    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_coordinates);
+
+    // Find the axe of bissection
+    size_t bisect_axis = 0;
+    for(int i=0; i<m_coordinates.size(); i++){
+        if(result_boxes.first[i] != m_coordinates[i]){
+            bisect_axis = (size_t)i;
+            break;
+        }
+    }
+
+    // Create new Paves
+    Pave *pave0 = new Pave(result_boxes.first, m_graph); // lb
+    Pave *pave1 = new Pave(result_boxes.second, m_graph); // ub
+    std::array<Pave*, 2> pave_result = {pave0, pave1};
+
+    // 1) Update paves neighbors with the new two paves
+    for(size_t face=0; face<m_faces.size(); face++){
+        for(int sens=0; sens<1; sens++){
+            for(Face *f:m_faces[face][sens]->neighbors()){
+                if(face==bisect_axis){
+                    Face *f0 = pave_result[sens]->faces()[face][sens];
+                    f->add_neighbor(f0);
+                }
+                else{
+                    Face *f1 = pave_result[0]->faces()[face][sens];
+                    Face *f2 = pave_result[1]->faces()[face][sens];
+                    f->add_neighbor(f1);
+                    f->add_neighbor(f2);
+                }
+                f->remove_neighbor(m_faces[face][sens]);
+            }
+        }
+    }
+
+    // 2) Copy brothers Pave (this) to pave1 and pave2
+    for(size_t face=0; face<m_faces.size(); face++){
+        for(size_t sens=0; sens<1; sens++){
+            for(Face *f:m_faces[face][sens]->neighbors()){
+                if(!(face==bisect_axis && sens==1))
+                    pave_result[0]->faces()[face][sens]->add_neighbor(f);
+                if(!(face==bisect_axis && sens==0))
+                    pave_result[1]->faces()[face][sens]->add_neighbor(f);
+            }
+        }
+    }
+
+    // 3) Add inter link
+    pave_result[0]->faces()[bisect_axis][1]->add_neighbor(pave_result[1]->faces()[bisect_axis][0]);
+    pave_result[1]->faces()[bisect_axis][0]->add_neighbor(pave_result[0]->faces()[bisect_axis][1]);
+
+    // Add Paves to the graph
+    m_graph->add_paves(pave_result[0]);
+    m_graph->add_paves(pave_result[1]);
+
+    // Save results in this pave
+    m_result_bisected[0] = pave_result[0];
+    m_result_bisected[1] = pave_result[1];
+}
+
+bool Pave::request_bisection(){
+    return true;
+}
+
+std::array<Pave *, 2> Pave::getResult_bisected()
+{
+    return m_result_bisected;
+}
+
 }

@@ -45,10 +45,14 @@ public:
 
     unsigned char dim() const;
 
+    void bisect();
+    void add_paves(Pave *p);
+
 private:
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Graph coordinates
     std::vector<Pave*>        m_paves; // Paves of the Graph
+    std::vector<Pave*>        m_paves_not_bisectable; // Paves of the Graph
     unsigned char             m_dim = 0; // Dimension of the space
 };
 

@@ -29,6 +29,15 @@ public:
 
     ibex::IntervalVector orientation() const;
 
+    /**
+     * @brief Add new neighbor to the Face if the coordinates intersection is not empty
+     * @param f
+     */
+    void add_neighbor(Face *f);
+    void remove_neighbor(Face *f);
+
+    std::vector<Face *> neighbors() const;
+
 private:
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Face coordinates
@@ -40,6 +49,8 @@ private:
      */
     ibex::IntervalVector      m_orientation;
     Pave*                     m_pave;
+
+    std::vector<Face *>       m_neighbors;
 };
 
     /**

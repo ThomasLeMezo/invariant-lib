@@ -58,4 +58,21 @@ ibex::IntervalVector Face::orientation() const
     return m_orientation;
 }
 
+void Face::add_neighbor(Face *f){
+    if(!(this->coordinates() & f->coordinates()).is_empty())
+        m_neighbors.push_back(f);
+}
+
+void Face::remove_neighbor(Face *f){
+    //https://stackoverflow.com/questions/26567687/how-to-erase-vector-element-by-pointer
+    // Sequential search for f and removed it
+    auto it = std::find(m_neighbors.begin(), m_neighbors.end(), f);
+        if (it != m_neighbors.end()) { m_neighbors.erase(it); }
+}
+
+std::vector<Face *> Face::neighbors() const
+{
+    return m_neighbors;
+}
+
 }

@@ -59,9 +59,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3")
     #endif()
 
 # Sources
+    add_subdirectory(src)
+
     include_directories(./build/build-release/include)
     include_directories(./build/build-debug/include)
-    add_subdirectory(src)
 
 # Tests
     if(BUILD_TESTS)

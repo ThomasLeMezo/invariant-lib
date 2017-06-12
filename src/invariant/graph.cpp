@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "serialization.h"
+#include <stdexcept>
 
 using namespace std;
 
@@ -12,7 +13,6 @@ Graph::Graph(const ibex::IntervalVector &coordinates):
     // Create one Pave
     Pave* p = new Pave(coordinates, this);
     m_paves.push_back(p);
-
 }
 
 Graph::~Graph(){
@@ -29,6 +29,10 @@ ibex::IntervalVector Graph::coordinates() const
 std::vector<Pave *> Graph::paves() const
 {
     return m_paves;
+}
+
+void Graph::add_paves(Pave *p){
+    m_paves.push_back(p);
 }
 
 void Graph::serialize(std::ofstream& binFile) const{
@@ -50,7 +54,10 @@ void Graph::serialize(std::ofstream& binFile) const{
 }
 
 void Graph::deserialize(std::ifstream& binFile){
-    m_paves.clear();
+    if(m_paves.size()!=0){
+        throw std::runtime_error("in [graph.cpp/deserialize] Graph is not empty");
+        return;
+    }
 
     binFile.read((char*)&m_dim, sizeof(unsigned char));
     size_t number_pave;
@@ -94,5 +101,35 @@ bool Graph::operator!=(const Graph& g) const{
 
 Pave* Graph::operator[](std::size_t i) const{
     return m_paves[i];
+}
+
+void Graph::bisect(){
+    vector<Pave*> m_bisectable_paves = m_paves;
+    vector<Pave*> m_bisected_paves;
+    m_paves.clear();
+
+    // Bisect the graph
+    while(m_bisectable_paves.size()>0){
+        Pave *p = m_bisectable_paves.back();
+        m_bisectable_paves.pop_back();
+
+        if(p->request_bisection()){
+            p->bisect(); // bisected added to m_paves
+            m_bisected_paves.push_back(p);
+        }
+        else{
+            // Store not bisectable paves
+            m_paves_not_bisectable.push_back(p);
+        }
+    }
+
+    // Call maze update (parallel loop possible)
+
+    /// **** TODO ***** //
+
+    // Delete parent of bisected paves
+    for(Pave* p:m_bisected_paves)
+        delete(p);
+
 }
 }
