@@ -6,14 +6,17 @@
 # Sources
 
   set(SRC
-    # ToDo
+    vibes/vibes.cpp
+    VibesFigure.cpp
+    VibesFigure_Graph.cpp
   )
 
   set(HEADERS
-    # ToDo
+    vibes/vibes.h
+    VibesFigure.h
+    VibesFigure_Graph.h
   )
 
-  include_directories(vibes)
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
   add_library(invariant-graphics ${SRC})

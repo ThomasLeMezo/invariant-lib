@@ -17,6 +17,8 @@
   target_link_libraries(van_der_pol
 	 ${LIBS}
 	 invariant-core
+         invariant-tools
+         invariant-graphics
   )
 
 

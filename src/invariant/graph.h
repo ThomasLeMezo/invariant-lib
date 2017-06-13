@@ -49,6 +49,8 @@ public:
     void add_paves(Pave *p);
     size_t size();
 
+    std::vector<Pave *> paves_not_bisectable() const;
+
 private:
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Graph coordinates

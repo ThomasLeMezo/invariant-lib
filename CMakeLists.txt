@@ -61,17 +61,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3")
 # Sources
     add_subdirectory(src)
 
-    IF(${CMAKE_BUILD_TYPE} MATCHES "DEBUG")
-        include_directories(./build/build-debug/include)
-        message("CMAKE_BUILD_TYPE = DEBUG")
-    ELSEIF(${CMAKE_BUILD_TYPE} MATCHES "RELEASE")
-        include_directories(./build/build-release/include)
-        message("CMAKE_BUILD_TYPE = RELEASE")
-    ELSE(${CMAKE_BUILD_TYPE} MATCHES "DEBUG")
-        message(FATAL_ERRORO "not mode selected (CMAKE_BUILD_TYPE)")
-    ENDIF(${CMAKE_BUILD_TYPE} MATCHES "DEBUG")
-
-
 # Tests
     if(BUILD_TESTS)
         enable_testing(true)

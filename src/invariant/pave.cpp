@@ -40,7 +40,7 @@ Pave::Pave(Graph *g):
     m_graph = g;
 }
 
-ibex::IntervalVector Pave::coordinates() const
+const ibex::IntervalVector& Pave::coordinates() const
 {
     return m_coordinates;
 }

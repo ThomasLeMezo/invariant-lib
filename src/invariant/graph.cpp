@@ -137,4 +137,9 @@ void Graph::bisect(){
 size_t Graph::size(){
     return m_paves.size() + m_paves_not_bisectable.size();
 }
+
+std::vector<Pave *> Graph::paves_not_bisectable() const
+{
+    return m_paves_not_bisectable;
+}
 }

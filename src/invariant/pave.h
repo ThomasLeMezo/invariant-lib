@@ -27,7 +27,7 @@ public:
      * @brief Return the coordinates of the Pave
      * @return an interval vector of the coordinates
      */
-    ibex::IntervalVector coordinates() const;
+    const ibex::IntervalVector &coordinates() const;
 
     /**
      * @brief Return the array of an array of Faces of the Pave
