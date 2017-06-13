@@ -14,27 +14,27 @@ using namespace std;
 
 TEST_CASE("Equality", "[graph]")
 {
-  SECTION("Test Graph1")
+  SECTION("Test Graph 2D")
   {
-    Graph g1 = graphTest1();
-    Graph g2 = graphTest1();
+    Graph g1 = graphTest_2D();
+    Graph g2 = graphTest_2D();
     REQUIRE((g1 == g1));
     REQUIRE((g1 == g2));
   }
 
-  SECTION("Test Graph2")
+  SECTION("Test Graph 5D")
   {
-      Graph g1 = graphTest2();
-      Graph g2 = graphTest2();
+      Graph g1 = graphTest_5D();
+      Graph g2 = graphTest_5D();
       REQUIRE(g1 == g1);
       REQUIRE(g1 == g2);
   }
 }
 
 TEST_CASE("Serialization", "[graph]"){
-    SECTION("Test Graph1")
+    SECTION("Test Graph 2D")
     {
-      Graph g1 = graphTest1();
+      Graph g1 = graphTest_2D();
       string file_name = "test";
       ofstream binFileWrite(file_name.c_str(), ios::out | ios::binary);
       g1.serialize(binFileWrite);
@@ -46,5 +46,15 @@ TEST_CASE("Serialization", "[graph]"){
       binFileRead.close();
 
       REQUIRE(g1 == g2);
+    }
+}
+
+TEST_CASE("Bisection", "[graph]"){
+    SECTION("Test number of paves while bisect Graph 2D norm"){
+        Graph g1 = graphTest_2D_Norm();
+        for(int i=0; i<10; i++){
+            g1.bisect();
+            REQUIRE(g1.size()==pow(2, i));
+        }
     }
 }

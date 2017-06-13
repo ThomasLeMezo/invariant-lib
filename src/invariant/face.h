@@ -19,7 +19,7 @@ public:
      * @brief Return the coordinates of the Face
      * @return an interval vector of the coordinates
      */
-    ibex::IntervalVector coordinates() const;
+    const ibex::IntervalVector &coordinates() const;
 
     void serialize(std::ofstream &binFile) const;
     void deserialize(std::ifstream& binFile);
@@ -27,7 +27,7 @@ public:
     bool operator==(const Face& f) const;
     bool operator!=(const Face& f) const;
 
-    ibex::IntervalVector orientation() const;
+    const ibex::IntervalVector &orientation() const;
 
     /**
      * @brief Add new neighbor to the Face if the coordinates intersection is not empty

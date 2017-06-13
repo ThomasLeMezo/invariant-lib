@@ -48,13 +48,16 @@ public:
     void bisect();
     bool request_bisection();
 
-    std::array<Pave *, 2> getResult_bisected();
+    std::array<Pave *, 2> &getResult_bisected();
+
+    std::vector<Face *> &getFaces_vector();
 
 private:
 
     /** Class Variable **/
     ibex::IntervalVector      m_coordinates; // Pave coordinates
     std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
+    std::vector<Face *> m_faces_vector; // Faces of the Pave
     Graph*                    m_graph;
 
     std::array<Pave*, 2>    m_result_bisected;

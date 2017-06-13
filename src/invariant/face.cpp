@@ -1,5 +1,8 @@
 #include "face.h"
 #include <serialization.h>
+#include <iostream>
+
+using namespace std;
 
 namespace invariant {
 
@@ -8,6 +11,8 @@ Face::Face(const ibex::IntervalVector &coordinates, const ibex::IntervalVector &
     m_orientation(orientation)
 {
     m_pave = p;
+    if(m_coordinates.size()==0)
+            cout << "ERROR" << endl;
 }
 
 Face::~Face(){
@@ -21,7 +26,7 @@ Face::Face(Pave *p):
     m_pave = p;
 }
 
-ibex::IntervalVector Face::coordinates() const
+const ibex::IntervalVector& Face::coordinates() const
 {
     return m_coordinates;
 }
@@ -53,13 +58,13 @@ bool Face::operator!=(const Face& f) const{
     return !(*this == f);
 }
 
-ibex::IntervalVector Face::orientation() const
+const ibex::IntervalVector& Face::orientation() const
 {
     return m_orientation;
 }
 
 void Face::add_neighbor(Face *f){
-    if(!(this->coordinates() & f->coordinates()).is_empty())
+    if(!(m_coordinates & f->coordinates()).is_empty())
         m_neighbors.push_back(f);
 }
 

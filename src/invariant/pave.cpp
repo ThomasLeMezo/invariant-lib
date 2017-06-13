@@ -29,6 +29,8 @@ Pave::Pave(const ibex::IntervalVector &coordinates, Graph *g):
 
         array<Face*, 2> face_array = {face_lb, face_ub};
         m_faces.push_back(face_array);
+        m_faces_vector.push_back(face_lb);
+        m_faces_vector.push_back(face_ub);
     }
 }
 
@@ -150,7 +152,12 @@ void Pave::bisect(){
         for(int sens=0; sens<1; sens++){
             for(Face *f:m_faces[face][sens]->neighbors()){
                 if(face==bisect_axis){
+                    if(f->coordinates().size()==0)
+                        cout << "error" << endl;
+
                     Face *f0 = pave_result[sens]->faces()[face][sens];
+                    cout << f0->coordinates() << '\t' ;
+                    cout << f->coordinates() << endl;
                     f->add_neighbor(f0);
                 }
                 else{
@@ -193,9 +200,14 @@ bool Pave::request_bisection(){
     return true;
 }
 
-std::array<Pave *, 2> Pave::getResult_bisected()
+std::array<Pave *, 2>& Pave::getResult_bisected()
 {
     return m_result_bisected;
+}
+
+std::vector<Face *>& Pave::getFaces_vector()
+{
+    return m_faces_vector;
 }
 
 }

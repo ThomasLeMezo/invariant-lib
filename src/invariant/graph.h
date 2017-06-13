@@ -47,6 +47,7 @@ public:
 
     void bisect();
     void add_paves(Pave *p);
+    size_t size();
 
 private:
     /** Class Variable **/

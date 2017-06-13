@@ -104,11 +104,12 @@ Pave* Graph::operator[](std::size_t i) const{
 }
 
 void Graph::bisect(){
+    cout << this->size() << endl;
     vector<Pave*> m_bisectable_paves = m_paves;
     vector<Pave*> m_bisected_paves;
     m_paves.clear();
 
-    // Bisect the graph
+    /// Bisect the graph ///
     while(m_bisectable_paves.size()>0){
         Pave *p = m_bisectable_paves.back();
         m_bisectable_paves.pop_back();
@@ -123,13 +124,17 @@ void Graph::bisect(){
         }
     }
 
-    // Call maze update (parallel loop possible)
+    /// Call maze update (parallel loop possible) ///
 
-    /// **** TODO ***** //
+    // ToDo
 
-    // Delete parent of bisected paves
+    /// Delete parent of bisected paves ///
     for(Pave* p:m_bisected_paves)
         delete(p);
 
+}
+
+size_t Graph::size(){
+    return m_paves.size() + m_paves_not_bisectable.size();
 }
 }
