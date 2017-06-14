@@ -15,6 +15,7 @@ public:
 
 private:
     invariant::Graph*  m_graph;
+    double             m_overhead_factor;
 
 };
 

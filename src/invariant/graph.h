@@ -24,8 +24,8 @@ public:
      * @param a Graph
      * @return true or false
      */
-    bool operator==(const Graph& g) const;
-    bool operator!=(const Graph& g) const;
+    bool is_equal(const Graph& g) const;
+    bool is_not_equal(const Graph& g) const;
     Pave* operator[](std::size_t i) const;
 
     /**

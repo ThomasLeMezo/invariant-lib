@@ -24,8 +24,8 @@ public:
     void serialize(std::ofstream &binFile) const;
     void deserialize(std::ifstream& binFile);
 
-    bool operator==(const Face& f) const;
-    bool operator!=(const Face& f) const;
+    bool is_equal(const Face& f) const;
+    bool is_not_equal(const Face& f) const;
 
     const ibex::IntervalVector &orientation() const;
 

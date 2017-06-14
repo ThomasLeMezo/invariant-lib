@@ -41,8 +41,8 @@ public:
     void serialize(std::ofstream &binFile) const;
     void deserialize(std::ifstream& binFile);
 
-    bool operator==(const Pave& p) const;
-    bool operator!=(const Pave& p) const;
+    bool is_equal(const Pave& p) const;
+    bool is_not_equal(const Pave& p) const;
     const std::array<Face*, 2>& operator[](std::size_t i) const;
 
     void bisect();
@@ -50,7 +50,7 @@ public:
 
     std::array<Pave *, 2> &getResult_bisected();
 
-    std::vector<Face *> &getFaces_vector();
+    std::vector<Face *> &faces_vector();
 
 private:
 

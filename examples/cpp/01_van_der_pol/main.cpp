@@ -4,6 +4,8 @@
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
+#include "graphiz_graph.h"
+#include <omp.h>
 
 using namespace std;
 using namespace ibex;
@@ -13,22 +15,21 @@ int main(int argc, char *argv[])
 {
 
     cout << "HELLO" << endl;
-    IntervalVector space(2);
+    IntervalVector space(3);
     space[0] = Interval(0,1);
     space[1] = Interval(0,1);
+    space[2] = Interval(0,1);
 
     Graph g(space);
 //    cout << g << endl;
-    for(int i=0; i<3; i++){
+    double t_start = omp_get_wtime();
+    for(int i=0; i<10; i++){
         g.bisect();
-        VibesFigure_Graph visu_g("graph " + to_string(i), &g);
-        visu_g.show();
-        for(Pave* p:g.paves()){
-            for(Face* f:p->getFaces_vector()){
-                if(f->coordinates().size()==0)
-                    cout << "error dim" << endl;
-            }
-        }
+//        VibesFigure_Graph visu_g("graph " + to_string(i), &g);
+//        visu_g.setProperties(0, 0, 512, 512);
+//        visu_g.show();
     }
+    cout << omp_get_wtime() - t_start << endl;
+    //Graphiz_Graph ggraph("graph.xdot", &g);
     cout << g << endl;
 }

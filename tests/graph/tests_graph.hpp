@@ -31,3 +31,14 @@ Graph graphTest_2D_Norm(){
     Graph g(coord);
     return g;
 }
+
+Graph graphTest_5D_Norm(){
+    IntervalVector coord(5);
+    coord[0] = Interval(-1,1);
+    coord[1] = Interval(-1,1);
+    coord[2] = Interval(-1,1);
+    coord[3] = Interval(-1,1);
+    coord[4] = Interval(-1,1);
+    Graph g(coord);
+    return g;
+}

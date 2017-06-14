@@ -83,20 +83,20 @@ std::ostream& operator<< (std::ostream& stream, const Graph& g) {
     return stream;
 }
 
-bool Graph::operator==(const Graph& g) const{
+bool Graph::is_equal(const Graph& g) const{
     if(m_coordinates != g.coordinates())
         return false;
     if(m_dim != g.dim())
         return false;
     for(size_t i=0; i<m_paves.size(); i++){
-        if(*(m_paves[i]) != *(g[i]))
+        if(m_paves[i]->is_not_equal(*(g[i])))
             return false;
     }
     return true;
 }
 
-bool Graph::operator!=(const Graph& g) const{
-    return !(*this == g);
+bool Graph::is_not_equal(const Graph& g) const{
+    return !is_equal(g);
 }
 
 Pave* Graph::operator[](std::size_t i) const{
@@ -104,7 +104,6 @@ Pave* Graph::operator[](std::size_t i) const{
 }
 
 void Graph::bisect(){
-    cout << this->size() << endl;
     vector<Pave*> m_bisectable_paves = m_paves;
     vector<Pave*> m_bisected_paves;
     m_paves.clear();

@@ -11,8 +11,6 @@ Face::Face(const ibex::IntervalVector &coordinates, const ibex::IntervalVector &
     m_orientation(orientation)
 {
     m_pave = p;
-    if(m_coordinates.size()==0)
-            cout << "ERROR" << endl;
 }
 
 Face::~Face(){
@@ -47,15 +45,15 @@ void Face::deserialize(std::ifstream& binFile){
     m_orientation = ibex_tools::deserializeIntervalVector(binFile);
 }
 
-bool Face::operator==(const Face& f) const{
+bool Face::is_equal(const Face& f) const{
     if(m_coordinates == f.coordinates() && this->m_orientation==f.orientation())
         return true;
     else
         return false;
 }
 
-bool Face::operator!=(const Face& f) const{
-    return !(*this == f);
+bool Face::is_not_equal(const Face& f) const{
+    return !is_equal(f);
 }
 
 const ibex::IntervalVector& Face::orientation() const
@@ -64,15 +62,27 @@ const ibex::IntervalVector& Face::orientation() const
 }
 
 void Face::add_neighbor(Face *f){
-    if(!(m_coordinates & f->coordinates()).is_empty())
+    ibex::IntervalVector r = m_coordinates & f->coordinates();
+    if(r.is_empty())
+        return;
+    int nb_not_flat = 0;
+    for(int i=0; i<r.size(); i++){
+        if(!r[i].is_degenerated())
+                nb_not_flat++;
+    }
+
+    if(nb_not_flat == m_coordinates.size()-1)
         m_neighbors.push_back(f);
 }
 
 void Face::remove_neighbor(Face *f){
-    //https://stackoverflow.com/questions/26567687/how-to-erase-vector-element-by-pointer
-    // Sequential search for f and removed it
-    auto it = std::find(m_neighbors.begin(), m_neighbors.end(), f);
-        if (it != m_neighbors.end()) { m_neighbors.erase(it); }
+    for(size_t i=0; i<m_neighbors.size(); i++){
+        if(m_neighbors[i] == f){ // pointer test
+            m_neighbors.erase(m_neighbors.begin()+i);
+            return;
+        }
+    }
+    throw std::runtime_error("in [face.cpp/remove_neighobr] neighbor face was not found which is not expected");
 }
 
 std::vector<Face *> Face::neighbors() const

@@ -18,16 +18,16 @@ TEST_CASE("Equality", "[graph]")
   {
     Graph g1 = graphTest_2D();
     Graph g2 = graphTest_2D();
-    REQUIRE((g1 == g1));
-    REQUIRE((g1 == g2));
+    REQUIRE(g1.is_equal(g1));
+    REQUIRE(g1.is_equal(g2));
   }
 
   SECTION("Test Graph 5D")
   {
       Graph g1 = graphTest_5D();
       Graph g2 = graphTest_5D();
-      REQUIRE(g1 == g1);
-      REQUIRE(g1 == g2);
+      REQUIRE(g1.is_equal(g1));
+      REQUIRE(g1.is_equal(g2));
   }
 }
 
@@ -45,7 +45,7 @@ TEST_CASE("Serialization", "[graph]"){
       g2.deserialize(binFileRead);
       binFileRead.close();
 
-      REQUIRE(g1 == g2);
+      REQUIRE(g1.is_equal(g2));
     }
 }
 
@@ -54,7 +54,15 @@ TEST_CASE("Bisection", "[graph]"){
         Graph g1 = graphTest_2D_Norm();
         for(int i=0; i<10; i++){
             g1.bisect();
-            REQUIRE(g1.size()==pow(2, i));
+            REQUIRE(g1.size()==pow(2, i+1));
+        }
+    }
+
+    SECTION("Test number of paves while bisect Graph 5D norm"){
+        Graph g1 = graphTest_5D_Norm();
+        for(int i=0; i<10; i++){
+            g1.bisect();
+            REQUIRE(g1.size()==pow(2, i+1));
         }
     }
 }

@@ -109,20 +109,20 @@ std::ostream& operator<< (std::ostream& stream, const Pave& p) {
     return stream;
 }
 
-bool Pave::operator==(const Pave& p) const{
+bool Pave::is_equal(const Pave& p) const{
     if(m_coordinates != p.coordinates())
         return false;
     for(size_t i=0; i<m_faces.size(); i++){
         for(size_t j=0; j<m_faces[i].size(); j++){
-            if(*(m_faces[i][j]) != *(p[i][j]))
+            if(m_faces[i][j]->is_not_equal(*(p[i][j])))
                 return false;
         }
     }
     return true;
 }
 
-bool Pave::operator!=(const Pave& p) const{
-    return !(*this == p);
+bool Pave::is_not_equal(const Pave& p) const{
+    return !is_equal(p);
 }
 
 const std::array<Face*, 2>& Pave::operator[](std::size_t i) const{
@@ -149,43 +149,36 @@ void Pave::bisect(){
 
     // 1) Update paves neighbors with the new two paves
     for(size_t face=0; face<m_faces.size(); face++){
-        for(int sens=0; sens<1; sens++){
+        for(int sens=0; sens<2; sens++){
             for(Face *f:m_faces[face][sens]->neighbors()){
-                if(face==bisect_axis){
-                    if(f->coordinates().size()==0)
-                        cout << "error" << endl;
+                f->remove_neighbor(m_faces[face][sens]);
 
-                    Face *f0 = pave_result[sens]->faces()[face][sens];
-                    cout << f0->coordinates() << '\t' ;
-                    cout << f->coordinates() << endl;
-                    f->add_neighbor(f0);
+                if(face==bisect_axis){
+                    f->add_neighbor(pave_result[sens]->faces()[face][sens]);
                 }
                 else{
-                    Face *f1 = pave_result[0]->faces()[face][sens];
-                    Face *f2 = pave_result[1]->faces()[face][sens];
-                    f->add_neighbor(f1);
-                    f->add_neighbor(f2);
+                    f->add_neighbor(pave_result[0]->faces()[face][sens]);
+                    f->add_neighbor(pave_result[1]->faces()[face][sens]);
                 }
-                f->remove_neighbor(m_faces[face][sens]);
             }
         }
     }
 
     // 2) Copy brothers Pave (this) to pave1 and pave2
     for(size_t face=0; face<m_faces.size(); face++){
-        for(size_t sens=0; sens<1; sens++){
+        for(size_t sens=0; sens<2; sens++){
             for(Face *f:m_faces[face][sens]->neighbors()){
-                if(!(face==bisect_axis && sens==1))
+                if(!(face==bisect_axis & sens==1))
                     pave_result[0]->faces()[face][sens]->add_neighbor(f);
-                if(!(face==bisect_axis && sens==0))
+                if(!(face==bisect_axis & sens==0))
                     pave_result[1]->faces()[face][sens]->add_neighbor(f);
             }
         }
     }
 
     // 3) Add inter link
-    pave_result[0]->faces()[bisect_axis][1]->add_neighbor(pave_result[1]->faces()[bisect_axis][0]);
     pave_result[1]->faces()[bisect_axis][0]->add_neighbor(pave_result[0]->faces()[bisect_axis][1]);
+    pave_result[0]->faces()[bisect_axis][1]->add_neighbor(pave_result[1]->faces()[bisect_axis][0]);
 
     // Add Paves to the graph
     m_graph->add_paves(pave_result[0]);
@@ -205,7 +198,7 @@ std::array<Pave *, 2>& Pave::getResult_bisected()
     return m_result_bisected;
 }
 
-std::vector<Face *>& Pave::getFaces_vector()
+std::vector<Face *>& Pave::faces_vector()
 {
     return m_faces_vector;
 }

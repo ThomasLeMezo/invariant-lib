@@ -51,12 +51,22 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3")
         message(FATAL_ERROR "Unable to find IBEX-lib. You may need to set IBEX_ROOT ${IBEX_ROOT}")
     endif()
 
+# Graphiz
+    pkg_search_module(LIBGVC libgvc)
+    if(LIBGVC_FOUND)
+        # https://cmake.org/Wiki/CMake:How_To_Find_Libraries
+        include_directories(${LIBGVC_INCLUDE_DIRS})
+        set(LIBS ${LIBS} ${LIBGVC_LIBRARIES})
+    else()
+        message(FATAL_ERROR "Unable to find LIBGVC")
+    endif()
+
 # OpenMP library
-    #find_package(OpenMP)
-    #if(OPENMP_FOUND)
-    #    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    #endif()
+    find_package(OpenMP)
+    if(OPENMP_FOUND)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    endif()
 
 # Sources
     add_subdirectory(src)
