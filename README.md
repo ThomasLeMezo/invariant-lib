@@ -9,7 +9,9 @@ Documentation
 ToDo
 Installation
 
+```{r, engine='bash'}
 sudo apt-get install libgvc6 libgvc6-plugins-gtk graphviz-dev
+```
 
 
 Licence

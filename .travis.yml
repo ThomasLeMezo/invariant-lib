@@ -23,7 +23,6 @@ addons:
     - pkg-config
     - gcc
     - graphviz-dev
-    - libgvc6
 
 cache:
   directories:
