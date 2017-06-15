@@ -7,20 +7,20 @@ using namespace ibex;
 namespace invariant {
 
 Pave::Pave(const ibex::IntervalVector &coordinates, Graph *g):
-    m_coordinates(coordinates)
+    m_position(coordinates)
 {
     m_graph = g;
     m_serialization_id = 0;
     unsigned char dim = g->dim();
     // Build the faces
     for(size_t i=0; i<dim; i++){
-        IntervalVector iv_lb(m_coordinates);
-        IntervalVector iv_ub(m_coordinates);
+        IntervalVector iv_lb(m_position);
+        IntervalVector iv_ub(m_position);
         IntervalVector orient_lb(dim, Interval(0, 1));
         IntervalVector orient_ub(dim, Interval(0,1));
 
-        iv_lb[i]=Interval(m_coordinates[i].lb());
-        iv_ub[i]=Interval(m_coordinates[i].ub());
+        iv_lb[i]=Interval(m_position[i].lb());
+        iv_ub[i]=Interval(m_position[i].ub());
         orient_lb[i] = Interval(0);
         orient_ub[i] = Interval(1);
 
@@ -35,27 +35,27 @@ Pave::Pave(const ibex::IntervalVector &coordinates, Graph *g):
 }
 
 Pave::Pave(Graph *g):
-    m_coordinates(0)
+    m_position(0)
 {
     m_graph = g;
 }
 
-const ibex::IntervalVector& Pave::coordinates() const
+const ibex::IntervalVector& Pave::get_position() const
 {
-    return m_coordinates;
+    return m_position;
 }
 
-std::vector<std::array<Face *, 2>> Pave::faces() const
+const std::vector<std::array<Face *, 2> > &Pave::get_faces() const
 {
     return m_faces;
 }
 
-size_t Pave::getSerialization_id() const
+const size_t& Pave::get_serialization_id() const
 {
     return m_serialization_id;
 }
 
-void Pave::setSerialization_id(size_t &value)
+void Pave::set_serialization_id(const size_t &value)
 {
     m_serialization_id = value;
 }
@@ -71,11 +71,11 @@ Pave::~Pave(){
 void Pave::serialize(std::ofstream& binFile) const{
     // *** Pave serialization ***
     // size_t           Serialization id
-    // IntervalVector   m_coordinates
+    // IntervalVector   m_position
     // [...] Faces
 
     binFile.write((const char*) &m_serialization_id, sizeof(size_t)); // Serialization id
-    ibex_tools::serializeIntervalVector(binFile, m_coordinates);
+    ibex_tools::serializeIntervalVector(binFile, m_position);
 
     // Faces serialization
     for(size_t i=0; i<m_faces.size(); i++){
@@ -87,7 +87,7 @@ void Pave::serialize(std::ofstream& binFile) const{
 
 void Pave::deserialize(std::ifstream& binFile){
     binFile.read((char*)&m_serialization_id, sizeof(size_t));
-    m_coordinates = ibex_tools::deserializeIntervalVector(binFile);
+    m_position = ibex_tools::deserializeIntervalVector(binFile);
 
     // Create Faces
     for(unsigned char i=0; i<m_graph->dim(); i++){
@@ -105,38 +105,34 @@ void Pave::deserialize(std::ifstream& binFile){
 }
 
 std::ostream& operator<< (std::ostream& stream, const Pave& p) {
-    stream << p.coordinates();
+    stream << p.get_position();
     return stream;
 }
 
-bool Pave::is_equal(const Pave& p) const{
-    if(m_coordinates != p.coordinates())
+const bool Pave::is_equal(const Pave& p) const{
+    if(m_position != p.get_position())
         return false;
     for(size_t i=0; i<m_faces.size(); i++){
         for(size_t j=0; j<m_faces[i].size(); j++){
-            if(m_faces[i][j]->is_not_equal(*(p[i][j])))
+            if(!(m_faces[i][j]->is_equal(*(p[i][j]))))
                 return false;
         }
     }
     return true;
 }
 
-bool Pave::is_not_equal(const Pave& p) const{
-    return !is_equal(p);
-}
-
-const std::array<Face*, 2>& Pave::operator[](std::size_t i) const{
+const std::array<Face*, 2>& Pave::operator[](const std::size_t& i) const{
     return m_faces[i];
 }
 
 void Pave::bisect(){
     ibex::LargestFirst bisector(0, 0.5);
-    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_coordinates);
+    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
 
     // Find the axe of bissection
     size_t bisect_axis = 0;
-    for(int i=0; i<m_coordinates.size(); i++){
-        if(result_boxes.first[i] != m_coordinates[i]){
+    for(int i=0; i<m_position.size(); i++){
+        if(result_boxes.first[i] != m_position[i]){
             bisect_axis = (size_t)i;
             break;
         }
@@ -150,15 +146,15 @@ void Pave::bisect(){
     // 1) Update paves neighbors with the new two paves
     for(size_t face=0; face<m_faces.size(); face++){
         for(int sens=0; sens<2; sens++){
-            for(Face *f:m_faces[face][sens]->neighbors()){
+            for(Face *f:m_faces[face][sens]->get_neighbors()){
                 f->remove_neighbor(m_faces[face][sens]);
 
                 if(face==bisect_axis){
-                    f->add_neighbor(pave_result[sens]->faces()[face][sens]);
+                    f->add_neighbor(pave_result[sens]->get_faces()[face][sens]);
                 }
                 else{
-                    f->add_neighbor(pave_result[0]->faces()[face][sens]);
-                    f->add_neighbor(pave_result[1]->faces()[face][sens]);
+                    f->add_neighbor(pave_result[0]->get_faces()[face][sens]);
+                    f->add_neighbor(pave_result[1]->get_faces()[face][sens]);
                 }
             }
         }
@@ -167,18 +163,18 @@ void Pave::bisect(){
     // 2) Copy brothers Pave (this) to pave1 and pave2
     for(size_t face=0; face<m_faces.size(); face++){
         for(size_t sens=0; sens<2; sens++){
-            for(Face *f:m_faces[face][sens]->neighbors()){
-                if(!(face==bisect_axis & sens==1))
-                    pave_result[0]->faces()[face][sens]->add_neighbor(f);
-                if(!(face==bisect_axis & sens==0))
-                    pave_result[1]->faces()[face][sens]->add_neighbor(f);
+            for(Face *f:m_faces[face][sens]->get_neighbors()){
+                if(!((face==bisect_axis) & (sens==1)))
+                    pave_result[0]->get_faces()[face][sens]->add_neighbor(f);
+                if(!((face==bisect_axis) & (sens==0)))
+                    pave_result[1]->get_faces()[face][sens]->add_neighbor(f);
             }
         }
     }
 
     // 3) Add inter link
-    pave_result[1]->faces()[bisect_axis][0]->add_neighbor(pave_result[0]->faces()[bisect_axis][1]);
-    pave_result[0]->faces()[bisect_axis][1]->add_neighbor(pave_result[1]->faces()[bisect_axis][0]);
+    pave_result[1]->get_faces()[bisect_axis][0]->add_neighbor(pave_result[0]->get_faces()[bisect_axis][1]);
+    pave_result[0]->get_faces()[bisect_axis][1]->add_neighbor(pave_result[1]->get_faces()[bisect_axis][0]);
 
     // Add Paves to the graph
     m_graph->add_paves(pave_result[0]);
@@ -189,16 +185,16 @@ void Pave::bisect(){
     m_result_bisected[1] = pave_result[1];
 }
 
-bool Pave::request_bisection(){
+const bool Pave::request_bisection(){
     return true;
 }
 
-std::array<Pave *, 2>& Pave::getResult_bisected()
+const std::array<Pave *, 2>& Pave::getResult_bisected()
 {
     return m_result_bisected;
 }
 
-std::vector<Face *>& Pave::faces_vector()
+const std::vector<Face *> &Pave::faces_vector()
 {
     return m_faces_vector;
 }

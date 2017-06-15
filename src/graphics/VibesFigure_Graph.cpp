@@ -22,13 +22,13 @@ void VibesFigure_Graph::show() const{
     params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
     for(Pave*p:m_graph->paves()){
-        ibex::IntervalVector box(p->coordinates());
+        ibex::IntervalVector box(p->get_position());
         vibes::drawBox(box, params_bisectable);
         bounding_box |= box;
     }
     for(Pave*p:m_graph->paves_not_bisectable()){
-        vibes::drawBox(p->coordinates(), params_not_bisectable);
-        bounding_box |= p->coordinates();
+        vibes::drawBox(p->get_position(), params_not_bisectable);
+        bounding_box |= p->get_position();
     }
 
     double overhead_x0 = bounding_box.diam()[0]*m_overhead_factor;

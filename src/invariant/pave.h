@@ -14,51 +14,112 @@ class Pave
 {
 public:
     /**
-     * @brief Create a Pave with coordinates
+     * @brief Construct a Pave with coordinates and a Graph
      * @param coordinates of the Pave
      */
     Pave(const ibex::IntervalVector &coordinates, Graph* g);
-    Pave(Graph* g);
-    Pave():m_coordinates(0), m_faces(0){}
 
+    /**
+     * @brief Construct an empty Pave link to a Graph
+     * @param g
+     */
+    Pave(Graph* g);
+
+    /**
+     * @brief Construct an empty Pave
+     */
+    Pave():m_position(0), m_faces(0){}
+
+    /**
+     * @brief Pave destructor
+     */
     ~Pave();
 
     /**
      * @brief Return the coordinates of the Pave
      * @return an interval vector of the coordinates
      */
-    const ibex::IntervalVector &coordinates() const;
+    const ibex::IntervalVector &get_position() const;
 
     /**
      * @brief Return the array of an array of Faces of the Pave
      * @return A two arrays of pointer to the faces
      */
-    std::vector< std::array<Face *, 2>> faces() const;
+    const std::vector< std::array<Face *, 2>>& get_faces() const;
 
-    size_t getSerialization_id() const;
-    void setSerialization_id(size_t &value);
+    /**
+     * @brief Get the Id of the Pave given by the serialization step
+     * (used to reconstruct pointers)
+     * @return Id
+     */
+    const size_t& get_serialization_id() const;
 
+    /**
+     * @brief Set an Id to the Pave for serialization
+     * (used to reconstruct pointers)
+     * @param value
+     */
+    void set_serialization_id(const size_t &value);
+
+    /**
+     * @brief Serialize the Pave
+     * @param binFile
+     */
     void serialize(std::ofstream &binFile) const;
+
+    /**
+     * @brief Deserialize the Pave
+     * @param binFile
+     */
     void deserialize(std::ifstream& binFile);
 
-    bool is_equal(const Pave& p) const;
-    bool is_not_equal(const Pave& p) const;
-    const std::array<Face*, 2>& operator[](std::size_t i) const;
+    /**
+     * @brief Test the equality between two paves
+     * @param p
+     * @return
+     */
+    const bool is_equal(const Pave& p) const;
 
+    /**
+     * @brief Return the two Faces of the Pave in the i-th dimension
+     * @param i
+     * @return
+     */
+    const std::array<Face*, 2>& operator[](const std::size_t& i) const;
+
+    /**
+     * @brief Bisect the Pave
+     * - add the result to the Graph
+     * - upate neighbors
+     */
     void bisect();
-    bool request_bisection();
 
-    std::array<Pave *, 2> &getResult_bisected();
+    /**
+     * @brief Return true if the Pave have to be bisected
+     * (temporary)
+     * @return
+     */
+    const bool request_bisection();
 
-    std::vector<Face *> &faces_vector();
+    /**
+     * @brief Return the two child Paves after calling bisection
+     * @return
+     */
+    const std::array<Pave *, 2> &getResult_bisected();
+
+    /**
+     * @brief Return all the Faces of the Pave in a vector
+     * @return
+     */
+    const std::vector<Face *> &faces_vector();
 
 private:
 
     /** Class Variable **/
-    ibex::IntervalVector      m_coordinates; // Pave coordinates
-    std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
-    std::vector<Face *> m_faces_vector; // Faces of the Pave
-    Graph*                    m_graph;
+    mutable ibex::IntervalVector      m_position; // Pave coordinates
+    mutable std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
+    mutable std::vector<Face *> m_faces_vector; // Faces of the Pave
+    mutable Graph*                    m_graph;
 
     std::array<Pave*, 2>    m_result_bisected;
 

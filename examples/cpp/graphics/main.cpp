@@ -13,24 +13,21 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    IntervalVector space(3);
+    IntervalVector space(2);
     space[0] = Interval(0,1);
     space[1] = Interval(0,1);
-    space[2] = Interval(0,1);
 
     Graph g(space);
-//    cout << g << endl;
     double t_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<4; i++){
         g.bisect();
-
     }
     cout << omp_get_wtime() - t_start << endl;
 
-    //        VibesFigure_Graph visu_g("graph " + to_string(i), &g);
-    //        visu_g.setProperties(0, 0, 512, 512);
-    //        visu_g.show();
+    VibesFigure_Graph visu_g("graph", &g);
+    visu_g.setProperties(0, 0, 512, 512);
+    visu_g.show();
 
-    //Graphiz_Graph ggraph("graph.xdot", &g);
+    Graphiz_Graph ggraph("graph.pdf", &g);
     cout << g << endl;
 }

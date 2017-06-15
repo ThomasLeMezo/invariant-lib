@@ -9,12 +9,14 @@
     graph.cpp
     pave.cpp
     face.cpp
+    pave_node.cpp
   )
 
   set(HEADERS
     graph.h
     pave.h
     face.h
+    pave_node.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

@@ -28,13 +28,13 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
     for(Pave* p:g->paves()){
         Agnode_t *n;
         std::stringstream node_param;
-        node_param << p->coordinates() << endl;
+        node_param << p->get_position() << endl;
         node_param << p << endl;
         n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
 
         std::stringstream node_pos;
-        node_pos << p->coordinates().mid()[0]*d_1 << ","
-                 << -(p->coordinates().mid()[1]*d_1) << "!";
+        node_pos << p->get_position().mid()[0]*d_1 << ","
+                 << -(p->get_position().mid()[1]*d_1) << "!";
         agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), "");
 
         map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
@@ -43,7 +43,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
     for(Pave* p:g->paves_not_bisectable()){
         Agnode_t *n;
         std::stringstream node_param;
-        node_param << p->coordinates() << endl;
+        node_param << p->get_position() << endl;
         node_param << p << endl;
         n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
         map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
@@ -54,20 +54,18 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
         for(Face *f:p->faces_vector()){
             Agnode_t *n;
             std::stringstream face_param;
-            face_param << f->coordinates() << endl;
+            face_param << f->get_position() << endl;
             face_param << f << endl;
             n = agnode(graphiz_graph, (char*)(face_param.str().c_str()), true);
             agsafeset(n, (char*)"shape", (char*)"rectangle", (char*)"");
 
             std::stringstream node_pos;
-            node_pos << p->coordinates().mid()[0]*(d_1-d_2) + f->coordinates().mid()[0]*d_2
+            node_pos << p->get_position().mid()[0]*(d_1-d_2) + f->get_position().mid()[0]*d_2
                     << ","
-                    << -(p->coordinates().mid()[1]*(d_1-d_2) + f->coordinates().mid()[1]*d_2)
+                    << -(p->get_position().mid()[1]*(d_1-d_2) + f->get_position().mid()[1]*d_2)
                     << "!";
             agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), "");
-
-            Agedge_t *e;
-            e = agedge(graphiz_graph, map_node[p], n, (char*)"t", 1);
+            agedge(graphiz_graph, map_node[p], n, (char*)"t", 1);
 
             map_face.insert(std::pair<Face*,Agnode_t *>(f, n));
         }
@@ -77,7 +75,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
 //        for(Face *f:p->faces_vector()){
 //            Agnode_t *n;
 //            std::stringstream face_param;
-//            face_param << f->coordinates() << endl;
+//            face_param << f->get_position() << endl;
 //            face_param << f << endl;
 //            n = agnode(graphiz_graph, (char*)(face_param.str().c_str()), true);
 //            agsafeset(n, (char*)"shape", (char*)"rectangle", (char*)"");
@@ -92,7 +90,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
 
     for(Pave* p:g->paves()){
         for(Face *f:p->faces_vector()){
-            for(Face *f_n:f->neighbors()){
+            for(Face *f_n:f->get_neighbors()){
                 Agedge_t *e;
                 e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"t", 1);
                 agsafeset(e, (char*)"color", (char*)"blue", (char*)"");
@@ -104,7 +102,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
 
 //    for(Pave* p:g->paves_not_bisectable()){
 //        for(Face *f:p->faces_vector()){
-//            for(Face *f_n:f->neighbors()){
+//            for(Face *f_n:f->get_neighbors()){
 //                Agedge_t *e;
 //                e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"", 1);
 //                agsafeset(e, (char*)"color", (char*)"red", (char*)"");

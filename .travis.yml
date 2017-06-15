@@ -22,7 +22,8 @@ addons:
     - time
     - pkg-config
     - gcc
-    - g++-5.4
+    - graphviz-dev
+    - libgvc6
 
 cache:
   directories:

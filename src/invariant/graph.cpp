@@ -6,7 +6,7 @@ using namespace std;
 
 namespace invariant {
 Graph::Graph(const ibex::IntervalVector &coordinates):
-    m_coordinates(coordinates)
+    m_position(coordinates)
 {
     m_dim = (unsigned char) coordinates.size();
 
@@ -21,12 +21,12 @@ Graph::~Graph(){
     }
 }
 
-ibex::IntervalVector Graph::coordinates() const
+const ibex::IntervalVector& Graph::get_position() const
 {
-    return m_coordinates;
+    return m_position;
 }
 
-std::vector<Pave *> Graph::paves() const
+const std::vector<Pave *> &Graph::paves() const
 {
     return m_paves;
 }
@@ -44,11 +44,11 @@ void Graph::serialize(std::ofstream& binFile) const{
     binFile.write((const char*)&m_dim, sizeof(unsigned char)); // dimension
     size_t size = m_paves.size();
     binFile.write((const char*)&size, sizeof(size_t)); // Number of paves
-    ibex_tools::serializeIntervalVector(binFile, m_coordinates);
+    ibex_tools::serializeIntervalVector(binFile, m_position);
 
     size_t cpt = 0;
     for(Pave *p:m_paves){
-        p->setSerialization_id(cpt); cpt++;
+        p->set_serialization_id(cpt); cpt++;
         p->serialize(binFile);
     }
 }
@@ -62,7 +62,7 @@ void Graph::deserialize(std::ifstream& binFile){
     binFile.read((char*)&m_dim, sizeof(unsigned char));
     size_t number_pave;
     binFile.read((char*)&number_pave, sizeof(size_t));
-    m_coordinates = ibex_tools::deserializeIntervalVector(binFile);
+    m_position = ibex_tools::deserializeIntervalVector(binFile);
     for(size_t i=0; i<number_pave; i++){
         Pave *p = new Pave(this);
         m_paves.push_back(p);
@@ -73,33 +73,29 @@ void Graph::deserialize(std::ifstream& binFile){
     }
 }
 
-unsigned char Graph::dim() const
+const unsigned char& Graph::dim() const
 {
     return m_dim;
 }
 
 std::ostream& operator<< (std::ostream& stream, const Graph& g) {
-    stream << g.coordinates() << " " << g.paves().size() << " paves";
+    stream << g.get_position() << " " << g.paves().size() << " paves";
     return stream;
 }
 
-bool Graph::is_equal(const Graph& g) const{
-    if(m_coordinates != g.coordinates())
+const bool Graph::is_equal(const Graph& g) const{
+    if(m_position != g.get_position())
         return false;
     if(m_dim != g.dim())
         return false;
     for(size_t i=0; i<m_paves.size(); i++){
-        if(m_paves[i]->is_not_equal(*(g[i])))
+        if(!(m_paves[i]->is_equal(*(g[i]))))
             return false;
     }
     return true;
 }
 
-bool Graph::is_not_equal(const Graph& g) const{
-    return !is_equal(g);
-}
-
-Pave* Graph::operator[](std::size_t i) const{
+const Pave* Graph::operator[](std::size_t i) const{
     return m_paves[i];
 }
 
@@ -133,11 +129,11 @@ void Graph::bisect(){
 
 }
 
-size_t Graph::size(){
+const size_t Graph::size() const{
     return m_paves.size() + m_paves_not_bisectable.size();
 }
 
-std::vector<Pave *> Graph::paves_not_bisectable() const
+const std::vector<Pave *> &Graph::paves_not_bisectable() const
 {
     return m_paves_not_bisectable;
 }

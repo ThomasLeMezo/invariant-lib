@@ -7,6 +7,9 @@ Documentation
 -------------
 
 ToDo
+Installation
+
+sudo apt-get install libgvc6 libgvc6-plugins-gtk graphviz-dev
 
 
 Licence
