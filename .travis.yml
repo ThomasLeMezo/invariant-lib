@@ -28,6 +28,7 @@ addons:
     - bison 
     - g++ 
     - make
+    - libcppunit-dev
 
 cache:
   directories:
@@ -38,7 +39,7 @@ matrix:
   #- os: osx
   #  compiler: clang
   - os: linux
-    compiler: g++
+    compiler: gcc
 
 #before_install:
 #  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install clang-omp; fi
