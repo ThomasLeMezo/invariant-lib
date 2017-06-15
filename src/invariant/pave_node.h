@@ -7,7 +7,7 @@
 
 namespace invariant{
 class Pave; // declare for friendchip
-
+class Face; // declare for friendchip
 class Pave_node
 {
 public:
@@ -56,6 +56,34 @@ public:
      * @param nc
      */
     void get_intersection_pave_inner(std::vector<Pave*> &l, ibex::Ctc &nc);
+
+    /**
+     * @brief Get all Faces that intersect a box (outer condition)
+     * @param vector of Pave*
+     * @param box
+     */
+    void get_intersection_face_outer(std::vector<Face*> &l, const ibex::IntervalVector &box);
+
+    /**
+     * @brief Get all Faces that are not contracted to emptyness by a given contractor
+     * @param vector of Pave*
+     * @param NumConstraint to fulfill (>0)
+     */
+    void get_intersection_face_outer(std::vector<Face*> &l, ibex::Ctc &nc);
+
+    /**
+     * @brief Get all Faces that are inside a box (inner condition)
+     * @param vector of Pave*
+     * @param box
+     */
+    void get_intersection_face_inner(std::vector<Face*> &l, const ibex::IntervalVector &box);
+
+    /**
+     * @brief Get all Faces that are not contracted by a given contractor
+     * @param l
+     * @param nc
+     */
+    void get_intersection_face_inner(std::vector<Face*> &l, ibex::Ctc &nc);
 
     /**
      * @brief Get the pave associated to this pave_node

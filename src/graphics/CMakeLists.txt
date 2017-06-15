@@ -9,7 +9,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/invariant/)
   set(SRC
     vibes/vibes.cpp
     VibesFigure.cpp
-    VibesFigure_Graph.cpp
+    vibes_graph.cpp
     graphiz_graph.cpp
   )
 
@@ -17,7 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/invariant/)
     vibes/vibes.h
     graphiz_graph.h
     VibesFigure.h
-    VibesFigure_Graph.h
+    vibes_graph.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

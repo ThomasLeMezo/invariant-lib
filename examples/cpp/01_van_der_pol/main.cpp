@@ -1,6 +1,6 @@
 #include "graph.h"
 #include "pave.h"
-#include "VibesFigure_Graph.h"
+#include "vibes_graph.h"
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
@@ -26,16 +26,23 @@ int main(int argc, char *argv[])
     }
 
     IntervalVector intersect(2);
-    intersect[0] = Interval(0.6, 0.7);
-    intersect[1] = Interval(0.6, 0.7);
+    intersect[0] = Interval(0.64, 0.75);
+    intersect[1] = Interval(0.61, 0.8);
 
     vector<Pave *> list_p;
     g.get_pave_node()->get_intersection_pave_outer(list_p, intersect);
     cout << list_p << endl;
 
+    vector<Face *> list_f;
+    g.get_pave_node()->get_intersection_face_outer(list_f, intersect);
+    cout << list_f << endl;
+
+    cout << "list_f size = " << list_f.size() << endl;
+    cout << "list_p size = " << list_p.size() << endl;
+
     cout << omp_get_wtime() - t_start << endl;
 
-    //        VibesFigure_Graph visu_g("graph " + to_string(i), &g);
+    //        Vibes_Graph visu_g("graph " + to_string(i), &g);
     //        visu_g.setProperties(0, 0, 512, 512);
     //        visu_g.show();
 

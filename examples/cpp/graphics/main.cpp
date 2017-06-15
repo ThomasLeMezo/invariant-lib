@@ -1,6 +1,6 @@
 #include "graph.h"
 #include "pave.h"
-#include "VibesFigure_Graph.h"
+#include "vibes_graph.h"
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     }
     cout << omp_get_wtime() - t_start << endl;
 
-    VibesFigure_Graph visu_g("graph", &g);
+    Vibes_Graph visu_g("graph", &g);
     visu_g.setProperties(0, 0, 512, 512);
     visu_g.show();
 

@@ -96,6 +96,14 @@ private:
      * @return
      */
     std::ostream& operator<< (std::ostream& stream, const Face& f);
+
+    /**
+     * @brief Overloading of the operator << for a vector of Faces
+     * @param stream
+     * @param l
+     * @return
+     */
+    std::ostream& operator<< (std::ostream& stream, const std::vector<Face*> &l);
 }
 
 #endif // FACE_H

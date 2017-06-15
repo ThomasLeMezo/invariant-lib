@@ -84,4 +84,11 @@ const std::vector<Face *> &Face::get_neighbors() const{
     return m_neighbors;
 }
 
+std::ostream& operator<< (std::ostream& stream, const std::vector<Face*> &l){
+    for(Face *f:l){
+        stream << *f << endl;
+    }
+    return stream;
+}
+
 }

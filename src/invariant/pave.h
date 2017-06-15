@@ -106,13 +106,13 @@ public:
      * @brief Return the two child Paves after calling bisection
      * @return
      */
-    const std::array<Pave *, 2> &getResult_bisected();
+    const std::array<Pave *, 2> &get_result_bisected();
 
     /**
      * @brief Return all the Faces of the Pave in a vector
      * @return
      */
-    const std::vector<Face *> &faces_vector();
+    const std::vector<Face *> &get_faces_vector();
 
     /**
      * @brief Setter to the pave node associated with this node

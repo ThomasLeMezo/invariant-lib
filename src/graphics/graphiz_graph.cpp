@@ -51,7 +51,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
 
 
     for(Pave* p:g->paves()){
-        for(Face *f:p->faces_vector()){
+        for(Face *f:p->get_faces_vector()){
             Agnode_t *n;
             std::stringstream face_param;
             face_param << f->get_position() << endl;
@@ -72,7 +72,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
     }
 
 //    for(Pave* p:g->paves_not_bisectable()){
-//        for(Face *f:p->faces_vector()){
+//        for(Face *f:p->get_faces_vector()){
 //            Agnode_t *n;
 //            std::stringstream face_param;
 //            face_param << f->get_position() << endl;
@@ -89,7 +89,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
 //    }
 
     for(Pave* p:g->paves()){
-        for(Face *f:p->faces_vector()){
+        for(Face *f:p->get_faces_vector()){
             for(Face *f_n:f->get_neighbors()){
                 Agedge_t *e;
                 e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"t", 1);
@@ -101,7 +101,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
     }
 
 //    for(Pave* p:g->paves_not_bisectable()){
-//        for(Face *f:p->faces_vector()){
+//        for(Face *f:p->get_faces_vector()){
 //            for(Face *f_n:f->get_neighbors()){
 //                Agedge_t *e;
 //                e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"", 1);

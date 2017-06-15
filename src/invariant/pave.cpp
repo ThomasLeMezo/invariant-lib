@@ -201,12 +201,12 @@ const bool Pave::request_bisection(){
     return true;
 }
 
-const std::array<Pave *, 2>& Pave::getResult_bisected()
+const std::array<Pave *, 2>& Pave::get_result_bisected()
 {
     return m_result_bisected;
 }
 
-const std::vector<Face *> &Pave::faces_vector()
+const std::vector<Face *> &Pave::get_faces_vector()
 {
     return m_faces_vector;
 }
