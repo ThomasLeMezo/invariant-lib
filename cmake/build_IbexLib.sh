@@ -11,6 +11,6 @@ if [ ! -e "$HOME/ibex/lib/libibex.a" ]; then
   git clone https://github.com/ibex-team/ibex-lib.git
   cd ibex-lib
 
-  ./waf configure --prefix=${HOME}/ibex --interval-lib=goal
-  ./waf build install clean -j
+  ./waf configure --prefix=${HOME}/ibex --interval-lib=gaol
+  ./waf build install clean -j4
 fi
