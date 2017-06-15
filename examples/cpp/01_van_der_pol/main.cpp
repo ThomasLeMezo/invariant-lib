@@ -13,27 +13,31 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    IntervalVector space(2);
+    IntervalVector space(4);
     space[0] = Interval(0,1);
     space[1] = Interval(0,1);
-//    space[2] = Interval(0,1);
+    space[2] = Interval(0,1);
+    space[3] = Interval(0,1);
 
-    IntervalVector intersect(2);
+    IntervalVector intersect(4);
     intersect[0] = Interval(0.64, 0.75);
     intersect[1] = Interval(0.61, 0.8);
+    intersect[2] = Interval(0.61, 0.8);
+    intersect[3] = Interval(0.61, 0.8);
 
     Graph g(space);
 
     double t_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<16; i++){
         g.bisect();
     }
-    cout << omp_get_wtime() - t_start << endl;
+    double t1 = omp_get_wtime() ;
+    cout << t1 - t_start << endl;
     vector<Pave *> list_p;
     vector<Face *> list_f;
     g.get_pave_node()->get_intersection_pave_outer(list_p, intersect);
     g.get_pave_node()->get_intersection_face_outer(list_f, intersect);
-    cout << omp_get_wtime() - t_start << endl;
+    cout << omp_get_wtime() - t1 << endl;
 
     cout << "list_f size = " << list_f.size() << endl;
     cout << "list_p size = " << list_p.size() << endl;

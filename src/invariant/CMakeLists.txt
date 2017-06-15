@@ -10,6 +10,9 @@
     pave.cpp
     face.cpp
     pave_node.cpp
+    maze.cpp
+    room.cpp
+    door.cpp
   )
 
   set(HEADERS
@@ -17,6 +20,9 @@
     pave.h
     face.h
     pave_node.h
+    maze.h
+    room.h
+    door.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

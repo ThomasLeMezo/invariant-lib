@@ -1,5 +1,6 @@
 #include "pave.h"
 #include <serialization.h>
+#include <utility>
 
 using namespace std;
 using namespace ibex;
@@ -13,6 +14,7 @@ Pave::Pave(const ibex::IntervalVector &position, Graph *g):
     m_serialization_id = 0;
     unsigned char dim = g->dim();
     m_dim = g->dim();
+    m_faces.reserve(m_dim);
     // Build the faces
     for(size_t i=0; i<dim; i++){
         IntervalVector iv_lb(m_position);
@@ -42,10 +44,8 @@ Pave::Pave(Graph *g):
 }
 
 Pave::~Pave(){
-    for(std::array<Face *, 2> &a:m_faces){
-        for(Face* f:a){
-            delete(f);
-        }
+    for(Face* f:m_faces_vector){
+        delete(f);
     }
 }
 
@@ -115,7 +115,7 @@ void Pave::bisect(){
     const size_t dim = m_dim;
     // Find the axe of bissection
     size_t bisect_axis = 0;
-    for(int i=0; i<dim; i++){
+    for(size_t i=0; i<dim; i++){
         if(result_boxes.first[i] != m_position[i]){
             bisect_axis = (size_t)i;
             break;

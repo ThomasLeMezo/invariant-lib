@@ -36,18 +36,16 @@ void Face::deserialize(std::ifstream& binFile){
 }
 
 void Face::add_neighbor(Face *f){
-    ibex::IntervalVector r = m_position & f->get_position();
-    if(r.is_empty())
-        return;
+    const ibex::IntervalVector r = m_position & f->get_position();
     int nb_not_flat = 0;
-    const int dim = r.size();
-    for(int i=0; i<dim; i++){
-        if(!r[i].is_degenerated())
-                nb_not_flat++;
+    for(int i=0; i<r.size(); i++){
+        if(r[i].is_degenerated()){
+            nb_not_flat++;
+            if(nb_not_flat>1)
+                return;
+        }
     }
-
-    if(nb_not_flat == m_position.size()-1)
-        m_neighbors.push_back(f);
+    m_neighbors.push_back(f);
 }
 
 void Face::remove_neighbor(const Face *f){

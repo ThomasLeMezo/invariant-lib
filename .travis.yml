@@ -23,7 +23,7 @@ addons:
     - pkg-config
     - gcc
     - graphviz-dev
-    - python2.7 
+    - python
     - flex 
     - bison 
     - g++ 
