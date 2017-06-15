@@ -10,9 +10,8 @@ ToDo
 Installation
 
 ```{r, engine='bash'}
-sudo apt-get install libgvc6 libgvc6-plugins-gtk graphviz-dev
+sudo apt-get install libgvc6 libgvc6-plugins-gtk graphviz-dev pkg-config python2.7 flex bison g++ make gcc
 ```
-
 
 Licence
 -------

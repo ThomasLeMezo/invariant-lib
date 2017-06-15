@@ -9,15 +9,16 @@
 namespace invariant {
 class Face; // declared only for friendship
 class Graph; // declared only for friendship
+class Pave_node; // declared only for friendship
 
 class Pave
 {
 public:
     /**
-     * @brief Construct a Pave with coordinates and a Graph
-     * @param coordinates of the Pave
+     * @brief Construct a Pave with position and a Graph
+     * @param position of the Pave
      */
-    Pave(const ibex::IntervalVector &coordinates, Graph* g);
+    Pave(const ibex::IntervalVector &position, Graph* g);
 
     /**
      * @brief Construct an empty Pave link to a Graph
@@ -36,8 +37,8 @@ public:
     ~Pave();
 
     /**
-     * @brief Return the coordinates of the Pave
-     * @return an interval vector of the coordinates
+     * @brief Return the position of the Pave
+     * @return an interval vector of the position
      */
     const ibex::IntervalVector &get_position() const;
 
@@ -113,13 +114,20 @@ public:
      */
     const std::vector<Face *> &faces_vector();
 
+    /**
+     * @brief Setter to the pave node associated with this node
+     * @param pave_node
+     */
+    void set_pave_node(Pave_node *pave_node);
+
 private:
 
     /** Class Variable **/
-    mutable ibex::IntervalVector      m_position; // Pave coordinates
+    mutable ibex::IntervalVector      m_position; // Pave position
     mutable std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
     mutable std::vector<Face *> m_faces_vector; // Faces of the Pave
     mutable Graph*                    m_graph;
+    mutable Pave_node*              m_pave_node;
 
     std::array<Pave*, 2>    m_result_bisected;
 
@@ -127,12 +135,20 @@ private:
 };
 
     /**
-     * @brief Overloading of operator <<
+     * @brief Overloading of the operator << for a Pave
      * @param stream
      * @param Pave
      * @return
      */
     std::ostream& operator<< (std::ostream& stream, const Pave& p);
+
+    /**
+     * @brief Overloading of the operator << for a vector of Paves
+     * @param stream
+     * @param l
+     * @return
+     */
+    std::ostream& operator<< (std::ostream& stream, const std::vector<Pave*> &l);
 }
 
 #endif // PAVE_H

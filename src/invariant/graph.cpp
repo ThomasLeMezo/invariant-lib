@@ -5,13 +5,15 @@
 using namespace std;
 
 namespace invariant {
-Graph::Graph(const ibex::IntervalVector &coordinates):
-    m_position(coordinates)
+Graph::Graph(const ibex::IntervalVector &position):
+    m_position(position)
 {
-    m_dim = (unsigned char) coordinates.size();
+    m_dim = (unsigned char) position.size();
 
     // Create one Pave
-    Pave* p = new Pave(coordinates, this);
+    Pave* p = new Pave(position, this);
+    m_pave_node = new Pave_node(p);
+    p->set_pave_node(m_pave_node);
     m_paves.push_back(p);
 }
 
@@ -19,6 +21,7 @@ Graph::~Graph(){
     for(Pave *p:m_paves){
         delete(p);
     }
+    delete(m_pave_node);
 }
 
 const ibex::IntervalVector& Graph::get_position() const
@@ -38,7 +41,7 @@ void Graph::add_paves(Pave *p){
 void Graph::serialize(std::ofstream& binFile) const{
     // unsigned char    dimension
     // size_t           number of paves
-    // IntervalVector   coordinates
+    // IntervalVector   position
     // [...] Paves of the graph
 
     binFile.write((const char*)&m_dim, sizeof(unsigned char)); // dimension
@@ -136,5 +139,10 @@ const size_t Graph::size() const{
 const std::vector<Pave *> &Graph::paves_not_bisectable() const
 {
     return m_paves_not_bisectable;
+}
+
+Pave_node* Graph::get_pave_node()
+{
+    return m_pave_node;
 }
 }

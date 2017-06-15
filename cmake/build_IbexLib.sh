@@ -12,5 +12,5 @@ if [ ! -e "$HOME/ibex/lib/libibex.a" ]; then
   cd ibex-lib
 
   ./waf configure --prefix=${HOME}/ibex
-  ./waf install -j4
+  ./waf install -j
 fi

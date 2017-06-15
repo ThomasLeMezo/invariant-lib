@@ -6,8 +6,8 @@ using namespace ibex;
 
 namespace invariant {
 
-Pave::Pave(const ibex::IntervalVector &coordinates, Graph *g):
-    m_position(coordinates)
+Pave::Pave(const ibex::IntervalVector &position, Graph *g):
+    m_position(position)
 {
     m_graph = g;
     m_serialization_id = 0;
@@ -74,6 +74,8 @@ void Pave::serialize(std::ofstream& binFile) const{
     // IntervalVector   m_position
     // [...] Faces
 
+    /// ToDo : add pave node tree to the serialization process + update others variables
+
     binFile.write((const char*) &m_serialization_id, sizeof(size_t)); // Serialization id
     ibex_tools::serializeIntervalVector(binFile, m_position);
 
@@ -88,6 +90,8 @@ void Pave::serialize(std::ofstream& binFile) const{
 void Pave::deserialize(std::ifstream& binFile){
     binFile.read((char*)&m_serialization_id, sizeof(size_t));
     m_position = ibex_tools::deserializeIntervalVector(binFile);
+
+    /// ToDo : add pave node tree to the deserialization process + update others variables
 
     // Create Faces
     for(unsigned char i=0; i<m_graph->dim(); i++){
@@ -106,6 +110,13 @@ void Pave::deserialize(std::ifstream& binFile){
 
 std::ostream& operator<< (std::ostream& stream, const Pave& p) {
     stream << p.get_position();
+    return stream;
+}
+
+std::ostream& operator<< (std::ostream& stream, const std::vector<Pave*> &l){
+    for(Pave *p:l){
+        stream << *p << endl;
+    }
     return stream;
 }
 
@@ -142,6 +153,7 @@ void Pave::bisect(){
     Pave *pave0 = new Pave(result_boxes.first, m_graph); // lb
     Pave *pave1 = new Pave(result_boxes.second, m_graph); // ub
     std::array<Pave*, 2> pave_result = {pave0, pave1};
+    m_pave_node->add_child(pave0, pave1);
 
     // 1) Update paves neighbors with the new two paves
     for(size_t face=0; face<m_faces.size(); face++){
@@ -197,6 +209,11 @@ const std::array<Pave *, 2>& Pave::getResult_bisected()
 const std::vector<Face *> &Pave::faces_vector()
 {
     return m_faces_vector;
+}
+
+void Pave::set_pave_node(Pave_node *pave_node)
+{
+    m_pave_node = pave_node;
 }
 
 }

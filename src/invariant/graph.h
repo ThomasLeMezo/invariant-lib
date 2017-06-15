@@ -3,18 +3,20 @@
 
 #include <ibex.h>
 #include "pave.h"
+#include "pave_node.h"
 #include <fstream>
 
 namespace invariant {
 class Pave; // declared only for friendship
+class Pave_node; // declared only for friendship
 class Graph
 {
 public:
     /**
-     * @brief Graph constructor with coordinates
+     * @brief Graph constructor with position
      * @param bounding box of the Graph
      */
-    Graph(const ibex::IntervalVector &coordinates);
+    Graph(const ibex::IntervalVector &position);
 
     /**
      * @brief Empty Graph constructor
@@ -93,12 +95,20 @@ public:
      */
     const std::vector<Pave *>& paves_not_bisectable() const;
 
+    /**
+     * @brief Getter to the root of the tree pave node
+     * @return
+     */
+    Pave_node *get_pave_node();
+
 private:
     /** Class Variable **/
     mutable ibex::IntervalVector      m_position; // Graph coordinates
     std::vector<Pave*>        m_paves; // Paves of the Graph
     std::vector<Pave*>        m_paves_not_bisectable; // Paves of the Graph
     mutable unsigned char             m_dim = 0; // Dimension of the space
+    mutable Pave_node*                 m_pave_node; // Root of the pave node tree
+
 };
 
     /**

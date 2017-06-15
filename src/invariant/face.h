@@ -12,7 +12,7 @@ class Face
 public:
 
     /**
-     * @brief Face constructor with coordinates, orientation and a Pave
+     * @brief Face constructor with position, orientation and a Pave
      * @param position of the Pave
      * @param orientation Vector ([0], [1] or [0,1] for each dimension)
      * @param p
@@ -32,8 +32,8 @@ public:
     ~Face();
 
     /**
-     * @brief Return the coordinates of the Face
-     * @return an interval vector of the coordinates
+     * @brief Return the position of the Face
+     * @return an interval vector of the position
      */
     const ibex::IntervalVector &get_position() const;
 
@@ -63,7 +63,7 @@ public:
     const ibex::IntervalVector &get_orientation() const;
 
     /**
-     * @brief Add new neighbor to the Face if the coordinates intersection is not empty
+     * @brief Add new neighbor to the Face if the position intersection is not empty
      * @param f
      */
     void add_neighbor(Face *f);
@@ -82,7 +82,7 @@ public:
 
 private:
     /** Class Variable **/
-    mutable ibex::IntervalVector      m_position; // Face coordinates
+    mutable ibex::IntervalVector      m_position; // Face position
     mutable ibex::IntervalVector      m_orientation; // Orientation of the Face : [1], [0] or [0,1]
                                                      // for each dimension according to the position of the Face in the Pave
     mutable Pave*                     m_pave;
