@@ -20,12 +20,12 @@ void Vibes_Graph::show() const{
     params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
     params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
-    for(Pave*p:m_graph->paves()){
+    for(Pave*p:m_graph->get_paves()){
         ibex::IntervalVector box(p->get_position());
         vibes::drawBox(box, params_bisectable);
         bounding_box |= box;
     }
-    for(Pave*p:m_graph->paves_not_bisectable()){
+    for(Pave*p:m_graph->get_paves_not_bisectable()){
         vibes::drawBox(p->get_position(), params_not_bisectable);
         bounding_box |= p->get_position();
     }
@@ -38,7 +38,26 @@ void Vibes_Graph::show() const{
 }
 
 namespace vibes{
-void drawGraph(const invariant::Graph &g){
+inline void drawGraph(const invariant::Graph &g, Params params){
+    vibes::drawPave(g.get_paves(), params);
+    vibes::drawPave(g.get_paves_not_bisectable(), params);
+}
 
+inline void drawPave(const invariant::Pave &p, Params params){
+    vibes::drawBox(p.get_position(), params);
+}
+
+inline void drawPave(const vector<invariant::Pave*>& l_p, Params params){
+    for(Pave *p:l_p)
+        vibes::drawPave(*p, params);
+}
+
+inline void drawFace(const invariant::Face &f, Params params){
+    vibes::drawBox(f.get_position(), params);
+}
+
+inline void drawFace(const vector<invariant::Face *>& l_f, Params params){
+    for(Face *f:l_f)
+        vibes::drawFace(*f, params);
 }
 }

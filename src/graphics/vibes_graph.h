@@ -21,7 +21,11 @@ private:
 };
 
 namespace vibes{
-    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::Graph &, g);
+    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::Graph &, g)
+    VIBES_FUNC_COLOR_PARAM_1(drawPave,const invariant::Pave &, p)
+    VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::Face &, f)
+    VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::Pave*> &, l_p)
+    VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::Face*> &, l_f)
 }
 
 #endif // Vibes_Graph_H

@@ -24,16 +24,6 @@ Face::Face(Pave *p):
     m_pave = p;
 }
 
-const ibex::IntervalVector& Face::get_position() const
-{
-    return m_position;
-}
-
-std::ostream& operator<< (std::ostream& stream, const Face& f) {
-    stream << f.get_position();
-    return stream;
-}
-
 void Face::serialize(std::ofstream& binFile) const{
     // Face serialization
     ibex_tools::serializeIntervalVector(binFile, m_position);
@@ -45,23 +35,13 @@ void Face::deserialize(std::ifstream& binFile){
     m_orientation = ibex_tools::deserializeIntervalVector(binFile);
 }
 
-const bool Face::is_equal(const Face& f) const{
-    if(m_position == f.get_position() && this->m_orientation==f.get_orientation())
-        return true;
-    else
-        return false;
-}
-
-const ibex::IntervalVector& Face::get_orientation() const{
-    return m_orientation;
-}
-
 void Face::add_neighbor(Face *f){
     ibex::IntervalVector r = m_position & f->get_position();
     if(r.is_empty())
         return;
     int nb_not_flat = 0;
-    for(int i=0; i<r.size(); i++){
+    const int dim = r.size();
+    for(int i=0; i<dim; i++){
         if(!r[i].is_degenerated())
                 nb_not_flat++;
     }
@@ -71,17 +51,14 @@ void Face::add_neighbor(Face *f){
 }
 
 void Face::remove_neighbor(const Face *f){
-    for(size_t i=0; i<m_neighbors.size(); i++){
+    const size_t nb_neighbor = m_neighbors.size();
+    for(size_t i=0; i<nb_neighbor; i++){
         if(m_neighbors[i] == f){ // pointer test
             m_neighbors.erase(m_neighbors.begin()+i);
             return;
         }
     }
     throw std::runtime_error("in [face.cpp/remove_neighobr] neighbor face was not found which is not expected");
-}
-
-const std::vector<Face *> &Face::get_neighbors() const{
-    return m_neighbors;
 }
 
 std::ostream& operator<< (std::ostream& stream, const std::vector<Face*> &l){

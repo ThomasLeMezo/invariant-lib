@@ -93,8 +93,8 @@ public:
 
 
 private:
-    bool        m_leaf;
-    mutable Pave*       m_pave;
+    bool                                m_leaf;
+    mutable Pave*                       m_pave = NULL;
     std::pair<Pave_node *, Pave_node *> m_child;
     const ibex::IntervalVector          m_position;
 };

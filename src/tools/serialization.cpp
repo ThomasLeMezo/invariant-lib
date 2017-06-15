@@ -86,9 +86,9 @@ void deserializeInterval(ifstream& binFile, Interval& intv)
 
 void serializeIntervalVector(std::ofstream& binFile, const ibex::IntervalVector& intv)
 {
-    int size = intv.size();
+    const int size = intv.size();
     binFile.write((const char*) &size, sizeof(int));
-    for(int dim=0; dim<intv.size(); dim++){
+    for(int dim=0; dim<size; dim++){
         serializeInterval(binFile, intv[dim]);
     }
 }
@@ -98,7 +98,8 @@ const IntervalVector deserializeIntervalVector(std::ifstream& binFile)
     int dim;
     binFile.read((char*)&dim, sizeof(int));
     IntervalVector itv(dim);
-    for(int i=0; i<dim; i++)
+    const int dim_const = dim;
+    for(int i=0; i<dim_const; i++)
         deserializeInterval(binFile, itv[i]);
     return itv;
 }

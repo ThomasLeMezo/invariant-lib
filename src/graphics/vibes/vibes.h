@@ -201,7 +201,6 @@ namespace vibes {
   inline void func_name(T1 a, T2 b, T3 c, T4 d, T5 e, T6 f, \
               const std::string &format=std::string(), Params params=Params()) {func_name(a,b,c,d,e,f,(params,VIBES_COLOR_PARAM_NAME,format));}
 
-
   /** @defgroup connection Starting and ending VIBes
    *
    *  @brief Functions for establishing connection with the VIBes viewer application.

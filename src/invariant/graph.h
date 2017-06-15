@@ -52,7 +52,7 @@ public:
      * @brief Return the list of Paves of the Graph
      * @return A list of pointer to the paves
      */
-    const std::vector<Pave *>& paves() const;
+    const std::vector<Pave *>& get_paves() const;
 
     /**
      * @brief serialize a Pave
@@ -93,7 +93,7 @@ public:
      * @brief Get the list of all paves that are not bisectable
      * @return
      */
-    const std::vector<Pave *>& paves_not_bisectable() const;
+    const std::vector<Pave *>& get_paves_not_bisectable() const;
 
     /**
      * @brief Getter to the root of the tree pave node
@@ -103,11 +103,11 @@ public:
 
 private:
     /** Class Variable **/
-    mutable ibex::IntervalVector      m_position; // Graph coordinates
-    std::vector<Pave*>        m_paves; // Paves of the Graph
-    std::vector<Pave*>        m_paves_not_bisectable; // Paves of the Graph
-    mutable unsigned char             m_dim = 0; // Dimension of the space
-    mutable Pave_node*                 m_pave_node; // Root of the pave node tree
+    mutable ibex::IntervalVector    m_position; // Graph coordinates
+    std::vector<Pave*>              m_paves; // Paves of the Graph
+    std::vector<Pave*>              m_paves_not_bisectable; // Paves of the Graph
+    mutable unsigned char           m_dim = 0; // Dimension of the space
+    mutable Pave_node*              m_pave_node = NULL; // Root of the pave node tree
 
 };
 
@@ -118,6 +118,47 @@ private:
      * @return
      */
     std::ostream& operator<< (std::ostream& stream, const Graph& g);
+
+}
+
+/// ***** Inline functions *****///
+
+namespace invariant{
+inline Pave_node* Graph::get_pave_node(){
+    return m_pave_node;
+}
+
+inline const std::vector<Pave *> &Graph::get_paves_not_bisectable() const{
+    return m_paves_not_bisectable;
+}
+
+inline const size_t Graph::size() const{
+    return m_paves.size() + m_paves_not_bisectable.size();
+}
+
+inline const Pave* Graph::operator[](std::size_t i) const{
+    return m_paves[i];
+}
+
+inline const unsigned char& Graph::dim() const{
+    return m_dim;
+}
+
+inline std::ostream& operator<< (std::ostream& stream, const Graph& g) {
+    stream << g.get_position() << " " << g.get_paves().size() << " paves";
+    return stream;
+}
+inline const ibex::IntervalVector& Graph::get_position() const{
+    return m_position;
+}
+
+inline const std::vector<Pave *> &Graph::get_paves() const{
+    return m_paves;
+}
+
+inline void Graph::add_paves(Pave *p){
+    m_paves.push_back(p);
+}
 
 }
 #endif // GRAPH_H

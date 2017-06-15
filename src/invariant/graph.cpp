@@ -24,20 +24,6 @@ Graph::~Graph(){
     delete(m_pave_node);
 }
 
-const ibex::IntervalVector& Graph::get_position() const
-{
-    return m_position;
-}
-
-const std::vector<Pave *> &Graph::paves() const
-{
-    return m_paves;
-}
-
-void Graph::add_paves(Pave *p){
-    m_paves.push_back(p);
-}
-
 void Graph::serialize(std::ofstream& binFile) const{
     // unsigned char    dimension
     // size_t           number of paves
@@ -66,24 +52,16 @@ void Graph::deserialize(std::ifstream& binFile){
     size_t number_pave;
     binFile.read((char*)&number_pave, sizeof(size_t));
     m_position = ibex_tools::deserializeIntervalVector(binFile);
-    for(size_t i=0; i<number_pave; i++){
+
+    const size_t number_pave_const = number_pave;
+    for(size_t i=0; i<number_pave_const; i++){
         Pave *p = new Pave(this);
         m_paves.push_back(p);
     }
-    for(size_t i=0; i<number_pave; i++){
+    for(size_t i=0; i<number_pave_const; i++){
         Pave *p = m_paves[i];
         p->deserialize(binFile);
     }
-}
-
-const unsigned char& Graph::dim() const
-{
-    return m_dim;
-}
-
-std::ostream& operator<< (std::ostream& stream, const Graph& g) {
-    stream << g.get_position() << " " << g.paves().size() << " paves";
-    return stream;
 }
 
 const bool Graph::is_equal(const Graph& g) const{
@@ -91,15 +69,12 @@ const bool Graph::is_equal(const Graph& g) const{
         return false;
     if(m_dim != g.dim())
         return false;
-    for(size_t i=0; i<m_paves.size(); i++){
+    const size_t nb_pave = m_paves.size();
+    for(size_t i=0; i<nb_pave; i++){
         if(!(m_paves[i]->is_equal(*(g[i]))))
             return false;
     }
     return true;
-}
-
-const Pave* Graph::operator[](std::size_t i) const{
-    return m_paves[i];
 }
 
 void Graph::bisect(){
@@ -132,17 +107,4 @@ void Graph::bisect(){
 
 }
 
-const size_t Graph::size() const{
-    return m_paves.size() + m_paves_not_bisectable.size();
-}
-
-const std::vector<Pave *> &Graph::paves_not_bisectable() const
-{
-    return m_paves_not_bisectable;
-}
-
-Pave_node* Graph::get_pave_node()
-{
-    return m_pave_node;
-}
 }

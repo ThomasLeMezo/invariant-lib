@@ -155,7 +155,7 @@ void Pave_node::get_intersection_face_inner(std::vector<Face*> &l, ibex::Ctc &nc
         }
     }
 }
-Pave* Pave_node::get_pave() const{
+inline Pave* Pave_node::get_pave() const{
     if(m_leaf)
         return m_pave;
     else{

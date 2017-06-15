@@ -125,9 +125,10 @@ private:
     /** Class Variable **/
     mutable ibex::IntervalVector      m_position; // Pave position
     mutable std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
-    mutable std::vector<Face *> m_faces_vector; // Faces of the Pave
-    mutable Graph*                    m_graph;
-    mutable Pave_node*              m_pave_node;
+    mutable std::vector<Face *>     m_faces_vector; // Faces of the Pave
+    mutable Graph*                    m_graph = NULL;
+    mutable Pave_node*              m_pave_node = NULL;
+    mutable size_t                  m_dim = 0;
 
     std::array<Pave*, 2>    m_result_bisected;
 
@@ -149,6 +150,47 @@ private:
      * @return
      */
     std::ostream& operator<< (std::ostream& stream, const std::vector<Pave*> &l);
+}
+
+/// ***** Inline functions *****///
+namespace invariant{
+
+inline const ibex::IntervalVector& Pave::get_position() const{
+    return m_position;
+}
+
+inline const std::vector<std::array<Face *, 2> > &Pave::get_faces() const{
+    return m_faces;
+}
+
+inline const size_t& Pave::get_serialization_id() const{
+    return m_serialization_id;
+}
+
+inline void Pave::set_serialization_id(const size_t &value){
+    m_serialization_id = value;
+}
+
+inline std::ostream& operator<< (std::ostream& stream, const Pave& p) {
+    stream << p.get_position();
+    return stream;
+}
+
+inline const std::array<Face*, 2>& Pave::operator[](const std::size_t& i) const{
+    return m_faces[i];
+}
+
+inline const std::array<Pave *, 2>& Pave::get_result_bisected(){
+    return m_result_bisected;
+}
+
+inline const std::vector<Face *> &Pave::get_faces_vector(){
+    return m_faces_vector;
+}
+
+inline void Pave::set_pave_node(Pave_node *pave_node){
+    m_pave_node = pave_node;
+}
 }
 
 #endif // PAVE_H
