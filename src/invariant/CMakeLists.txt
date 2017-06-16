@@ -4,25 +4,30 @@
 
 
 # Sources
+include_directories(graph)
+include_directories(maze)
+include_directories(../tools)
 
   set(SRC
-    graph.cpp
-    pave.cpp
-    face.cpp
-    pave_node.cpp
-    maze.cpp
-    room.cpp
-    door.cpp
+    graph/graph.cpp
+    graph/pave.cpp
+    graph/face.cpp
+    graph/pave_node.cpp
+
+    maze/maze.cpp
+    maze/room.cpp
+    maze/door.cpp
   )
 
   set(HEADERS
-    graph.h
-    pave.h
-    face.h
-    pave_node.h
-    maze.h
-    room.h
-    door.h
+    graph/graph.h
+    graph/pave.h
+    graph/face.h
+    graph/pave_node.h
+
+    maze/maze.h
+    maze/room.h
+    maze/door.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

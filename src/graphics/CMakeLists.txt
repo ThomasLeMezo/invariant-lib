@@ -4,7 +4,9 @@
 
 # Sources
 
-include_directories(${CMAKE_SOURCE_DIR}/src/invariant/)
+include_directories(../invariant/graph)
+include_directories(../invariant/maze)
+INCLUDE_DIRECTORIES(vibes)
 
   set(SRC
     vibes/vibes.cpp

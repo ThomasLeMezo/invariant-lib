@@ -4,9 +4,14 @@
 #include <ibex.h>
 #include <fstream>
 #include "pave.h"
+#include <map>
+#include "door.h"
+#include "maze.h"
 
 namespace invariant {
 class Pave; // declared only for friendship
+class Maze; // declared only for friendship
+class Door; // declared only for friendship
 class Face
 {
 public:
@@ -80,6 +85,19 @@ public:
      */
     const std::vector<Face *>& get_neighbors() const;
 
+    /**
+     * @brief Getter to the maze/door map
+     * @return
+     */
+    const std::map<Maze *, Door *>& get_doors() const;
+
+    /**
+     * @brief Add a new door to the map
+     * @param maze
+     * @param door
+     */
+    void add_door(Maze * maze, Door *door);
+
 private:
     /** Class Variable **/
     mutable ibex::IntervalVector      m_position; // Face position
@@ -87,6 +105,9 @@ private:
     // for each dimension according to the position of the Face in the Pave
     mutable Pave*                     m_pave = NULL;
     std::vector<Face *>               m_neighbors;
+
+    std::map<Maze*, Door*>            m_doors;
+
 };
 
 /**
@@ -132,6 +153,15 @@ inline const bool Face::is_equal(const Face& f) const{
     else
         return false;
 }
+
+inline const std::map<Maze *, Door *>& Face::get_doors() const{
+    return m_doors;
+}
+
+inline void Face::add_door(Maze * maze, Door *door){
+    m_doors.insert(std::pair<Maze*,Door*>(maze,door));
+}
+
 
 }
 

@@ -10,11 +10,14 @@ Graph::Graph(const ibex::IntervalVector &position):
 {
     m_dim = (unsigned char) position.size();
 
-    // Create one Pave
+    // Create search space Pave
     Pave* p = new Pave(position, this);
     m_pave_node = new Pave_node(p);
     p->set_pave_node(m_pave_node);
     m_paves.push_back(p);
+
+    // Create infinity Paves around search space
+
 }
 
 Graph::~Graph(){
@@ -104,7 +107,6 @@ void Graph::bisect(){
     /// Delete parent of bisected paves ///
     for(Pave* p:m_bisected_paves)
         delete(p);
-
 }
 
 }

@@ -5,10 +5,15 @@
 #include "face.h"
 #include <fstream>
 #include "graph.h"
+#include "room.h"
+#include "maze.h"
+#include <map>
 
 namespace invariant {
 class Face; // declared only for friendship
 class Graph; // declared only for friendship
+class Maze; // declared only for friendship
+class Room; // declared only for friendship
 class Pave_node; // declared only for friendship
 
 class Pave
@@ -120,6 +125,19 @@ public:
      */
     void set_pave_node(Pave_node *pave_node);
 
+    /**
+     * @brief Getter to the maze/room map
+     * @return
+     */
+    const std::map<Maze *, Room *>& get_rooms() const;
+
+    /**
+     * @brief Add a new room to the map
+     * @param maze
+     * @param room
+     */
+    void add_room(Maze * maze, Room *room);
+
 private:
 
     /** Class Variable **/
@@ -131,6 +149,8 @@ private:
     mutable size_t                  m_dim = 0;
 
     std::array<Pave*, 2>    m_result_bisected;
+
+    std::map<Maze*, Room*>            m_rooms;
 
     size_t m_serialization_id;
 };
@@ -190,6 +210,14 @@ inline const std::vector<Face *> &Pave::get_faces_vector(){
 
 inline void Pave::set_pave_node(Pave_node *pave_node){
     m_pave_node = pave_node;
+}
+
+inline const std::map<Maze *, Room*>& Pave::get_rooms() const{
+    return m_rooms;
+}
+
+inline void Pave::add_room(Maze * maze, Room *room){
+    m_rooms.insert(std::pair<Maze*,Room*>(maze,room));
 }
 }
 

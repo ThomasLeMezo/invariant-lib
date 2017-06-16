@@ -5,10 +5,12 @@
 #include "pave.h"
 #include "pave_node.h"
 #include <fstream>
+#include "maze.h"
 
 namespace invariant {
 class Pave; // declared only for friendship
 class Pave_node; // declared only for friendship
+class Maze; // declared only for friendship
 class Graph
 {
 public:
@@ -101,6 +103,19 @@ public:
      */
     Pave_node *get_pave_node();
 
+    /**
+     * @brief Getter to the vector of mazes
+     * @return
+     */
+    const std::vector<Maze *>& get_mazes() const;
+
+    /**
+     * @brief Add a new maze to the vector of mazes
+     * @param maze
+     * @param room
+     */
+    void add_maze(Maze * maze);
+
 private:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // Graph coordinates
@@ -108,6 +123,8 @@ private:
     std::vector<Pave*>              m_paves_not_bisectable; // Paves of the Graph
     mutable unsigned char           m_dim = 0; // Dimension of the space
     mutable Pave_node*              m_pave_node = NULL; // Root of the pave node tree
+
+    std::vector<Maze*>              m_mazes;
 
 };
 
@@ -158,6 +175,14 @@ inline const std::vector<Pave *> &Graph::get_paves() const{
 
 inline void Graph::add_paves(Pave *p){
     m_paves.push_back(p);
+}
+
+inline const std::vector<Maze *>& Graph::get_mazes() const{
+    return m_mazes;
+}
+
+inline void Graph::add_maze(Maze * maze){
+    m_mazes.push_back(maze);
 }
 
 }
