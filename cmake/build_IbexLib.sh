@@ -12,5 +12,5 @@ if [ ! -e "$HOME/ibex/lib/libibex.a" ]; then
   cd ibex-lib
 
   ./waf configure --prefix=${HOME}/ibex --interval-lib=gaol
-  ./waf build install clean -j4
+  ./waf build install clean
 fi
