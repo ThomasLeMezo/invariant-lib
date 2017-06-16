@@ -22,7 +22,11 @@ addons:
     - time
     - pkg-config
     - gcc
+    - graphviz
     - graphviz-dev
+    - libgraphviz-dev
+    - libgvc5
+    - libgvc5-plugins-gtk
     - python
     - flex 
     - bison 

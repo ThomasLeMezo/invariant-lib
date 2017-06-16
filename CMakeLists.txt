@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 2.8.7)
 
 # Settings
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 11)
     set(PACKAGE_NAME      invariant-lib)
     set(PACKAGE_VERSION "0.1")
     project(${PACKAGE_NAME})
@@ -21,7 +21,7 @@ cmake_minimum_required(VERSION 2.8.7)
 
 # debug/release options
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -msse3")
 
 # Options
     option(BUILD_TESTS "Build test" OFF)
