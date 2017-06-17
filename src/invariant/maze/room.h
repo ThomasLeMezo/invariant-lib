@@ -65,6 +65,12 @@ public:
      */
     void bisect();
 
+    /**
+     * @brief Test if this room is in th deque of the maze
+     * @return
+     */
+    bool is_in_deque() const;
+
 private:
     /**
      * @brief Contract doors according to the neighbors
@@ -102,6 +108,9 @@ private:
     bool    m_empty = false;
     bool    m_first_contract = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
+    mutable omp_lock_t   m_lock_deque; // Lock in_deque variable access
+
+    bool    m_in_deque = false;
 
 };
 }
@@ -113,6 +122,14 @@ inline Pave* Room::get_pave() const{
 
 inline Maze* Room::get_maze() const{
     return m_maze;
+}
+
+inline bool Room::is_in_deque() const{
+    bool result;
+    omp_set_lock(&m_lock_deque);
+    result = m_in_deque;
+    omp_unset_lock(&m_lock_deque);
+    return result;
 }
 }
 

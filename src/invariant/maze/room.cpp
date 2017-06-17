@@ -18,10 +18,12 @@ Room::Room(Pave *p, Maze *m, std::vector<ibex::Function*> f_vect)
     }
 
     omp_init_lock(&m_lock_contraction);
+    omp_init_lock(&m_lock_deque);
 }
 
 Room::~Room(){
     omp_destroy_lock(&m_lock_contraction);
+    omp_destroy_lock(&m_lock_deque);
 }
 
 void Room::set_empty_output(){
@@ -136,6 +138,9 @@ void Room::contract(){
     contract_consistency();
     synchronize_doors();
 
+    omp_set_lock(&m_lock_deque);
+    m_in_deque = false;
+    omp_unset_lock(&m_lock_deque);
     omp_unset_lock(&m_lock_contraction);
 }
 

@@ -100,7 +100,7 @@ public:
      * @param pave_node
      * @param l
      */
-    void contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room *> &list_pave_not_empty);
+    void contract_separator(Maze *maze, std::vector<Room *> &list_pave_not_empty);
 
 private:
     /**

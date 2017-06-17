@@ -4,11 +4,14 @@
 #include <ibex.h>
 #include "dynamics.h"
 #include "domain.h"
+#include "room.h"
+#include <deque>
 
 namespace invariant {
 class Graph; // declared only for friendship
 class Domain; // declared only for friendship
 class Dynamics; // declared only for friendship
+class Room; // declared only for friendship
 class Maze
 {
 public:
@@ -46,6 +49,8 @@ private:
     Domain *    m_domain = NULL;
     Graph  *    m_graph = NULL; // Graph associated with this maze
     Dynamics *  m_dynamics = NULL;
+
+    std::deque<Room *> m_deque_rooms;
 
 };
 }

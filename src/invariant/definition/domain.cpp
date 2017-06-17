@@ -8,9 +8,9 @@ Domain::Domain(Graph *graph){
     m_graph = graph;
 }
 
-void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room*> &list_pave_not_empty){
-    contract_separator(maze, pave_node, false, list_pave_not_empty, true);
-    contract_separator(maze, pave_node, false, list_pave_not_empty, false);
+void Domain::contract_separator(Maze *maze, std::vector<Room*> &list_pave_not_empty){
+    contract_separator(maze, m_graph->get_pave_node(), false, list_pave_not_empty, true);
+    contract_separator(maze, m_graph->get_pave_node(), false, list_pave_not_empty, false);
 }
 
 void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Room*> &list_pave_not_empty, bool output){
