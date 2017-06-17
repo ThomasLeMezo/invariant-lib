@@ -3,10 +3,12 @@
 
 #include <ibex.h>
 #include "face.h"
+#include "room.h"
 #include <omp.h>
 
 namespace invariant {
 class Face; // declared only for friendship
+class Room; // declared only for friendship
 class Door
 {
 public:
@@ -14,7 +16,7 @@ public:
      * @brief Constructor of a Door
      * @param face
      */
-    Door(Face * face);
+    Door(Face * face, Room *romm);
 
     /**
      * @brief Destructor of a Door
@@ -62,12 +64,24 @@ public:
      */
     void synchronize();
 
+    /**
+     * @brief Getter to the associated Face
+     * @return
+     */
+    Face * get_face() const;
+
+    /**
+     * @brief Getter to the associated Room
+     * @return
+     */
+    Room *get_room() const;
 
 
 private:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
     ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
     Face *               m_face; // pointer to the associated face
+    Room *               m_room; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
 };
 }
@@ -102,6 +116,14 @@ inline void Door::set_input_private(const ibex::IntervalVector& iv_input){
 
 inline void Door::set_output_private(const ibex::IntervalVector& iv_output){
     m_output_private = iv_output;
+}
+
+inline Face * Door::get_face() const{
+    return m_face;
+}
+
+inline Room * Door::get_room() const{
+    return m_room;
 }
 }
 #endif // DOOR_H

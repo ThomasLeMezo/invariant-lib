@@ -2,9 +2,10 @@
 
 namespace invariant {
 
-Maze::Maze(Graph *g, std::vector<ibex::Function *> f_vect)
+Maze::Maze(Domain *domain, Dynamics *dynamics)
 {
-
+    m_domain = domain;
+    m_dynamics = dynamics;
 }
 
 }

@@ -6,11 +6,11 @@
 # Sources
 
   set(SRC
-    serialization.cpp
+    serialization/serialization.cpp
   )
 
   set(HEADERS
-    serialization.h
+    serialization/serialization.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

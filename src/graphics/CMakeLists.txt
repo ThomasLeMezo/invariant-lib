@@ -6,7 +6,8 @@
 
 include_directories(../invariant/graph)
 include_directories(../invariant/maze)
-INCLUDE_DIRECTORIES(vibes)
+include_directories(../invariant/definition)
+include_directories(vibes)
 
   set(SRC
     vibes/vibes.cpp

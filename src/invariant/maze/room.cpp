@@ -3,9 +3,10 @@
 using namespace ibex;
 namespace invariant {
 
-Room::Room(Pave *p, std::vector<ibex::Function*> f_vect)
+Room::Room(Pave *p, Maze *m, std::vector<ibex::Function*> f_vect)
 {
     m_pave = p;
+    m_maze = m;
     const IntervalVector position(p->get_position());
     for(Function*f:f_vect){
         IntervalVector vector_field = f->eval_vector(position);

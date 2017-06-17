@@ -6,7 +6,8 @@
 # Sources
 include_directories(graph)
 include_directories(maze)
-include_directories(../tools)
+include_directories(../tools/serialization)
+include_directories(definition)
 
   set(SRC
     graph/graph.cpp
@@ -17,6 +18,10 @@ include_directories(../tools)
     maze/maze.cpp
     maze/room.cpp
     maze/door.cpp
+
+    definition/domain.cpp
+    definition/dynamics.cpp
+    definition/dynamics_function.cpp
   )
 
   set(HEADERS
@@ -28,6 +33,10 @@ include_directories(../tools)
     maze/maze.h
     maze/room.h
     maze/door.h
+
+    definition/domain.h
+    definition/dynamics.h
+    definition/dynamics_function.cpp
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

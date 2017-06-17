@@ -14,5 +14,5 @@ cd $INVARIANTLIB_DIR
 mkdir build/build-debug -p
 cd build/build-debug
 cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON $INVARIANTLIB_DIR
-make
+make -j
 cd ..

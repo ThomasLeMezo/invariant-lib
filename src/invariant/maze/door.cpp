@@ -2,11 +2,12 @@
 
 namespace invariant {
 
-Door::Door(Face *face):
+Door::Door(Face *face, Room *room):
     m_input_private(face->get_position()), m_output_private(face->get_position()),
     m_input_public(face->get_position()), m_output_public(face->get_position())
 {
     m_face = face;
+    m_room = room;
     omp_init_lock(&m_lock_read);
 }
 

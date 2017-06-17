@@ -1,20 +1,63 @@
 #ifndef MAZE_H
 #define MAZE_H
 
-#include "graph.h"
 #include <ibex.h>
+#include "dynamics.h"
+#include "domain.h"
 
 namespace invariant {
 class Graph; // declared only for friendship
+class Domain; // declared only for friendship
+class Dynamics; // declared only for friendship
 class Maze
 {
 public:
-    Maze(Graph *g, std::vector<ibex::Function*> f_vect);
+    /**
+     * @brief Constructor of a Maze
+     * @param g
+     * @param f_vect
+     */
+    Maze(Domain *domain, Dynamics *dynamics);
+
+    /**
+     * @brief Getter to the Domain
+     * @return
+     */
+    Domain * get_domain() const;
+
+    /**
+     * @brief Getter to the Graph
+     * @return
+     */
+    Graph * get_graph() const;
+
+    /**
+     * @brief Getter to the dynamics
+     * @return
+     */
+    Dynamics *get_dynamics() const;
 
 private:
-    std::vector<ibex::Function*> m_f_vect;
-
+    Domain *m_domain;
+    Graph  *m_graph; // Graph associated with this maze
+    Dynamics *m_dynamics;
 
 };
+}
+
+namespace invariant{
+
+inline Domain * Maze::get_domain() const{
+    return m_domain;
+}
+
+inline Dynamics * Maze::get_dynamics() const{
+    return m_dynamics;
+}
+
+inline Graph * Maze::get_graph() const{
+    return m_graph;
+}
+
 }
 #endif // MAZE_H
