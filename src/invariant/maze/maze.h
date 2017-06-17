@@ -2,10 +2,12 @@
 #define MAZE_H
 
 #include <ibex.h>
+#include <deque>
+#include <omp.h>
+
 #include "dynamics.h"
 #include "domain.h"
 #include "room.h"
-#include <deque>
 
 namespace invariant {
 class Graph; // declared only for friendship
@@ -21,6 +23,11 @@ public:
      * @param f_vect
      */
     Maze(Domain *domain, Dynamics *dynamics);
+
+    /**
+     * @brief Maze destructor
+     */
+    ~Maze();
 
     /**
      * @brief Getter to the Domain
@@ -41,9 +48,23 @@ public:
     Dynamics *get_dynamics() const;
 
     /**
-     * @brief Contract the maze
+     * @brief Contract the Maze
+     * @return the number of contractions
      */
-    void contract();
+    int contract();
+
+    /**
+     * @brief Add a Room to the deque BUT DO NOT CHECK if already in
+     * (to short locking the deque)
+     * @param r
+     */
+    void add_to_deque(Room *r);
+
+    /**
+     * @brief Add a list of rooms to the deque (check if already in)
+     * @param list_rooms
+     */
+    void add_rooms(const vector<Room *> &list_rooms);
 
 private:
     Domain *    m_domain = NULL;
@@ -51,6 +72,8 @@ private:
     Dynamics *  m_dynamics = NULL;
 
     std::deque<Room *> m_deque_rooms;
+
+    omp_lock_t  m_deque_access;
 
 };
 }
@@ -67,6 +90,12 @@ inline Dynamics * Maze::get_dynamics() const{
 
 inline Graph * Maze::get_graph() const{
     return m_graph;
+}
+
+inline void Maze::add_to_deque(Room *r){
+    omp_set_lock(&m_deque_access);
+    m_deque_rooms.push_back(r);
+    omp_unset_lock(&m_deque_access);
 }
 
 }

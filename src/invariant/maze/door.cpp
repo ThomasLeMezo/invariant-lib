@@ -23,7 +23,8 @@ void Door::synchronize(){
     omp_unset_lock(&m_lock_read);
 }
 
-void Door::contract_continuity_private(){
+bool Door::contract_continuity_private(){
+    bool change = false;
     IntervalVector door_input = ibex::IntervalVector::empty(m_input_private.size());
     IntervalVector door_output = ibex::IntervalVector::empty(m_input_private.size());
     for(Face* f:m_face->get_neighbors()){
@@ -32,7 +33,23 @@ void Door::contract_continuity_private(){
         door_output |= d->get_output();
     }
 
-    m_input_private &= door_input;
-    m_output_private &= door_output;
+    if(door_input.is_strict_interior_subset(m_input_private)
+            ||door_output.is_strict_interior_subset(m_output_private)){
+        change = true;
+        m_input_private &= door_input;
+        m_output_private &= door_output;
+    }
+
+    return change;
+}
+
+void Door::analyze_change(std::vector<Room *>&list_rooms){
+    if(m_input_private.is_strict_interior_subset(m_input_public)
+            || m_output_private.is_strict_interior_subset(m_output_public)){
+        std::vector<Face *> l_face = m_face->get_neighbors();
+        for(Face* f:l_face){
+            list_rooms.push_back(f->get_pave()->get_rooms()[m_room->get_maze()]);
+        }
+    }
 }
 }

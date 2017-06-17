@@ -101,7 +101,7 @@ public:
      * @brief Getter to the root of the tree pave node
      * @return
      */
-    Pave_node *get_pave_node();
+    Pave_node *get_pave_node() const;
 
     /**
      * @brief Getter to the vector of mazes
@@ -141,7 +141,7 @@ private:
 /// ***** Inline functions *****///
 
 namespace invariant{
-inline Pave_node* Graph::get_pave_node(){
+inline Pave_node* Graph::get_pave_node() const{
     return m_pave_node;
 }
 

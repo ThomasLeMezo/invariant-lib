@@ -89,7 +89,7 @@ public:
      * @brief Getter to the maze/door map
      * @return
      */
-    std::map<Maze *, Door *> &get_doors();
+    std::map<Maze *, Door *> get_doors();
 
     /**
      * @brief Add a new door to the map
@@ -97,6 +97,12 @@ public:
      * @param door
      */
     void add_door(Maze * maze, Door *door);
+
+    /**
+     * @brief Getter to the pave of this face
+     * @return
+     */
+    Pave * get_pave() const;
 
 private:
     /** Class Variable **/
@@ -154,7 +160,7 @@ inline const bool Face::is_equal(const Face& f) const{
         return false;
 }
 
-inline std::map<Maze *, Door *>& Face::get_doors(){
+inline std::map<Maze *, Door *> Face::get_doors(){
     return m_doors;
 }
 
@@ -162,7 +168,9 @@ inline void Face::add_door(Maze * maze, Door *door){
     m_doors.insert(std::pair<Maze*,Door*>(maze,door));
 }
 
-
+inline Pave* Face::get_pave() const{
+    return m_pave;
+}
 }
 
 #endif // FACE_H

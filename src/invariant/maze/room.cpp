@@ -1,6 +1,7 @@
 #include "room.h"
 
 using namespace ibex;
+using namespace std;
 namespace invariant {
 
 Room::Room(Pave *p, Maze *m, std::vector<ibex::Function*> f_vect)
@@ -104,11 +105,13 @@ void Room::contract_vector_field(){
 //    }
 //}
 
-void Room::contract_continuity(){
+bool Room::contract_continuity(){
+    bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
         Door *d = f->get_doors()[m_maze];
-        d->contract_continuity_private();
+        change |= d->contract_continuity_private();
     }
+    return change;
 }
 
 void Room::contract_consistency(){
@@ -130,23 +133,32 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     in &= out-c;
 }
 
-void Room::contract(){
+bool Room::contract(){
     omp_set_lock(&m_lock_contraction);
-    if(m_first_contract)
+    bool change = false;
+    if(m_first_contract){
         contract_vector_field();
-    contract_continuity();
-    contract_consistency();
-    synchronize_doors();
+        change = true;
+    }
+    change |= contract_continuity();
 
-    omp_set_lock(&m_lock_deque);
-    m_in_deque = false;
-    omp_unset_lock(&m_lock_deque);
-    omp_unset_lock(&m_lock_contraction);
+    if(change){
+        contract_consistency();
+        synchronize_doors();
+    }
+    return change;
 }
 
 void Room::synchronize_doors(){
     for(Face* f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->synchronize();
+    }
+}
+
+void Room::analyze_change(std::vector<Room *>&list_rooms){
+    for(Face* f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        d->analyze_change(list_rooms);
     }
 }
 }

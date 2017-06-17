@@ -96,6 +96,13 @@ public:
      */
     void contract_continuity_private();
 
+    /**
+     * @brief If there is a difference between private & public doors
+     * add the neighbor room to the list
+     * @param list_rooms
+     */
+    void analyze_change(std::vector<Room *>&list_rooms);
+
 
 private:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public

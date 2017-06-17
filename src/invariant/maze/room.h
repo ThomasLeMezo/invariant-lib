@@ -28,7 +28,7 @@ public:
     /**
      * @brief contract the pave (continuity + consistency)
      */
-    void contract();
+    bool contract();
 
     /**
      * @brief Getter to the associated Pave
@@ -66,16 +66,37 @@ public:
     void bisect();
 
     /**
-     * @brief Test if this room is in th deque of the maze
+     * @brief Test if this room is in the deque of the maze
      * @return
      */
     bool is_in_deque() const;
+
+    /**
+     * @brief Declare this room in the deque of the maze
+     */
+    void set_in_queue();
+
+    /**
+     * @brief Synchronize all the private doors to the public one
+     */
+    void synchronize_doors();
+
+    /**
+     * @brief Return a list of neighbor Rooms that need an update according after contraction
+     * @param list_rooms
+     */
+    void analyze_change(std::vector<Room *> &list_rooms);
+
+    /**
+     * @brief Reset deque state to false
+     */
+    void reset_deque();
 
 private:
     /**
      * @brief Contract doors according to the neighbors
      */
-    void contract_continuity();
+    bool contract_continuity();
 
     /**
      * @brief Contract doors according to the vector field flow
@@ -94,11 +115,6 @@ private:
      * @param vect
      */
     void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
-
-    /**
-     * @brief Synchronize all the private doors to the public one
-     */
-    void synchronize_doors();
 
 private:
     Pave*   m_pave = NULL; // pointer to the associated face
@@ -130,6 +146,19 @@ inline bool Room::is_in_deque() const{
     result = m_in_deque;
     omp_unset_lock(&m_lock_deque);
     return result;
+}
+
+inline void Room::set_in_queue(){
+    omp_set_lock(&m_lock_deque);
+    m_in_deque = true;
+    omp_unset_lock(&m_lock_deque);
+}
+
+inline void Room::reset_deque(){
+    omp_set_lock(&m_lock_deque);
+    m_in_deque = false;
+    omp_unset_lock(&m_lock_deque);
+    omp_unset_lock(&m_lock_contraction);
 }
 }
 
