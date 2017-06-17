@@ -6,13 +6,13 @@ using namespace std;
 using namespace ibex;
 
 namespace invariant {
-Graph::Graph(const ibex::IntervalVector &position):
-    m_position(position)
+Graph::Graph(const ibex::IntervalVector &space):
+    m_position(space)
 {
-    m_dim = (unsigned char) position.size();
+    m_dim = (unsigned char) space.size();
 
     // Create search space Pave
-    Pave* p = new Pave(position, this);
+    Pave* p = new Pave(space, this);
     m_paves.push_back(p);
 
     // Root of the pave node tree
@@ -21,7 +21,7 @@ Graph::Graph(const ibex::IntervalVector &position):
 
     // Create infinity Paves around search space
     IntervalVector* result;
-    int n=position.complementary(result);
+    int n=space.complementary(result);
 
     for (int i=0; i<n; i++) {
         Pave* p_infinity = new Pave(result[i], this);

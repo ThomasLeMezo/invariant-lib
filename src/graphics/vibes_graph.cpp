@@ -26,15 +26,17 @@ void Vibes_Graph::show() const{
         bounding_box |= box;
     }
     for(Pave*p:m_graph->get_paves_not_bisectable()){
-        vibes::drawBox(p->get_position(), params_not_bisectable);
-        bounding_box |= p->get_position();
+        if(!p->get_position().is_unbounded()){
+            vibes::drawBox(p->get_position(), params_not_bisectable);
+            bounding_box |= p->get_position();
+        }
     }
 
     double overhead_x0 = bounding_box.diam()[0]*m_overhead_factor;
     double overhead_x1 = bounding_box.diam()[1]*m_overhead_factor;
     vibes::axisLimits(bounding_box[0].lb()-overhead_x0, bounding_box[0].ub()+overhead_x0,
-                      bounding_box[1].lb()-overhead_x1, bounding_box[1].ub()+overhead_x1,
-                      m_name);
+            bounding_box[1].lb()-overhead_x1, bounding_box[1].ub()+overhead_x1,
+            m_name);
 }
 
 namespace vibes{

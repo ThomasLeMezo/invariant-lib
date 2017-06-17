@@ -178,11 +178,14 @@ void Room::analyze_change(std::vector<Room *>&list_rooms){
 }
 
 bool Room::is_empty(){
+    if(m_empty)
+        return m_empty;
     bool empty = true;
     for(Face *f:m_pave->get_faces_vector()){
         if(!f->get_doors()[m_maze]->is_empty())
             empty = false;
     }
+    m_empty = empty;
     return empty;
 }
 

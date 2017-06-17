@@ -18,7 +18,7 @@ public:
      * @brief Graph constructor with position
      * @param bounding box of the Graph
      */
-    Graph(const ibex::IntervalVector &position);
+    Graph(const ibex::IntervalVector &space);
 
     /**
      * @brief Empty Graph constructor

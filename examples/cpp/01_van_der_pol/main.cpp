@@ -1,6 +1,9 @@
 #include "graph.h"
-#include "pave.h"
+#include "domain.h"
+#include "dynamics_function.h"
+#include "maze.h"
 #include "vibes_graph.h"
+
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
@@ -13,46 +16,37 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    IntervalVector space(4);
-    space[0] = Interval(0,1);
-    space[1] = Interval(0,1);
-    space[2] = Interval(0,1);
-    space[3] = Interval(0,1);
+    IntervalVector space(2);
+    space[0] = Interval(-6,6);
+    space[1] = Interval(-6,6);
 
-    IntervalVector intersect(4);
-    intersect[0] = Interval(0.64, 0.75);
-    intersect[1] = Interval(0.61, 0.8);
-    intersect[2] = Interval(0.61, 0.8);
-    intersect[3] = Interval(0.61, 0.8);
+    // ****** Domain *******
+    Graph graph(space);
+    invariant::Domain dom(&graph);
 
-    Graph g(space);
+    Function f_sep("x1", "x2", "x1^2+x2^2-2");
+    SepFwdBwd s(f_sep, LT);
+    dom.set_sep(&s);
 
-    double t_start = omp_get_wtime();
-    for(int i=0; i<16; i++){
-        g.bisect();
+    // ****** Dynamics *******
+    ibex::Variable x1, x2;
+    ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    Dynamics_Function dyn(&f);
+
+    // ******* Maze *********
+    Maze maze(&dom, &dyn);
+
+    for(int i=0; i<10; i++){
+        graph.bisect();
+        cout << maze.contract() << " - ";
+        cout << graph.size() << endl;
     }
-    double t1 = omp_get_wtime() ;
-    cout << t1 - t_start << endl;
-    vector<Pave *> list_p;
-    vector<Face *> list_f;
-    g.get_pave_node()->get_intersection_pave_outer(list_p, intersect);
-    g.get_pave_node()->get_intersection_face_outer(list_f, intersect);
-    cout << omp_get_wtime() - t1 << endl;
 
-    cout << "list_f size = " << list_f.size() << endl;
-    cout << "list_p size = " << list_p.size() << endl;
+//    for(Pave*p:graph.get_paves()){
+//        cout << *p << endl;
+//    }
 
-//    vibes::beginDrawing();
-//    vibes::newFigure("Graph");
-//    vibes::drawGraph(g, "b[]");
-//    vibes::drawPave(g.get_paves());
-//    vibes::drawPave(list_p, "b[b]");
-//    vibes::drawFace(list_f, "r");
-
-//    Vibes_Graph visu_g("graph " + to_string(i), &g);
-//    visu_g.setProperties(0, 0, 512, 512);
-//    visu_g.show();
-
-//    Graphiz_Graph ggraph("graph.xdot", &g);
-    cout << g << endl;
+    Vibes_Graph v_graph("graph", &graph);
+    v_graph.show();
+    cout << graph << endl;
 }
