@@ -94,7 +94,7 @@ public:
     /**
      * @brief Contract its private door according to neighbors
      */
-    void contract_continuity_private();
+    bool contract_continuity_private();
 
     /**
      * @brief If there is a difference between private & public doors

@@ -77,33 +77,52 @@ void Room::contract_vector_field(){
     m_first_contract = false;
 }
 
-//void Utils::CtcPaveBackward2(Pave *p, bool inclusion, std::vector<bool> &change_tab){
-//    vector<IntervalVector> seg_out_list;
-//    for(int i=0; i<4; i++)
-//        seg_out_list.push_back(IntervalVector(2, Interval::EMPTY_SET));
+void Room::contract_consistency(){
+    for(IntervalVector &vec_field:m_vector_fields){
+        // Create tmp output doors
+        const int dim = m_pave->get_dim();
+        std::vector< std::array<IntervalVector, 2>> out_result;
+        for(int i=0; i<dim; i++){
+            std::array<IntervalVector, 2> output = {IntervalVector::empty(dim), IntervalVector::empty(dim)};
+            out_result.push_back(output);
+        }
 
-//    for(int face = 0; face < 4; face++){
-//        IntervalVector in(2, Interval::EMPTY_SET);
-//        for(int j=(face+1)%4; j!=face; j=(j+1)%4){
-//            IntervalVector seg_out(p->get_border(j)->get_segment_out_2D());
-//            IntervalVector seg_in(p->get_border(face)->get_segment_in_2D());
-//            this->CtcFlow(seg_in, seg_out, p->get_vector_field());
-//            if(!seg_in[face%2].is_degenerated())
-//                in |= seg_in;
-//            if(!seg_out[j%2].is_degenerated())
-//                seg_out_list[j] |= seg_out;
-//        }
+        for(int face_in=0; face_in<dim; face_in++){
+            for(int sens_in = 0; sens_in < 2; sens_in++){
+                IntervalVector in_result(dim, Interval::EMPTY_SET);
+                Face* f_in = m_pave->get_faces()[face_in][sens_in];
+                Door* door_in = f_in->get_doors()[m_maze];
+                const IntervalVector in(door_in->get_input());
 
-//        if(p->get_border(face)->get_segment_in_2D() != in)
-//            change_tab[face] = true;
-//        p->get_border(face)->set_segment_in(in[face%2], true);
-//    }
-//    for(int face=0; face <4; face++){
-//        if(p->get_border(face)->get_segment_out_2D() != seg_out_list[face])
-//            change_tab[face] = true;
-//        p->get_border(face)->set_segment_out(seg_out_list[face][face%2], true);
-//    }
-//}
+                for(int face_out=0; face_out<dim; face_out++){
+                    for(int sens_out = 0; sens_out < 2; sens_out++){
+                        if(!(face_in==face_out && sens_in==sens_out)){
+                            IntervalVector in_tmp(in);
+                            Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                            Door* door_out = f_out->get_doors()[m_maze];
+                            IntervalVector out_tmp(door_out->get_output());
+
+                            this->contract_flow(in_tmp, out_tmp, vec_field);
+
+                            in_result |= in_tmp;
+                            out_result[face_out][sens_out] |= out_tmp;
+                        }
+                    }
+                }
+                door_in->set_input_private(in_result);
+            }
+        }
+
+        for(int face_out =0; face_out<dim; face_out++){
+            for(int sens_out = 0; sens_out < 2; sens_out++){
+                Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                Door* door_out = f_out->get_doors()[m_maze];
+                door_out->set_input_private(out_result[face_out][sens_out]);
+            }
+        }
+
+    }
+}
 
 bool Room::contract_continuity(){
     bool change = false;
@@ -112,10 +131,6 @@ bool Room::contract_continuity(){
         change |= d->contract_continuity_private();
     }
     return change;
-}
-
-void Room::contract_consistency(){
-
 }
 
 void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect){

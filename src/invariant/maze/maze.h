@@ -64,7 +64,7 @@ public:
      * @brief Add a list of rooms to the deque (check if already in)
      * @param list_rooms
      */
-    void add_rooms(const vector<Room *> &list_rooms);
+    void add_rooms(const std::vector<Room *> &list_rooms);
 
 private:
     Domain *    m_domain = NULL;

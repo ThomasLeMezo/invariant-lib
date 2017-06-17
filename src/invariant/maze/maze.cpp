@@ -15,8 +15,8 @@ Maze::~Maze(){
     omp_destroy_lock(&m_deque_access);
 }
 
-void Maze::contract(){
-    // Domain contractions
+int Maze::contract(){
+    // Domain contraction
     vector<Room *> list_room_to_contract;
     m_domain->contract_separator(this, list_room_to_contract);
 
@@ -65,7 +65,7 @@ void Maze::add_rooms(const vector<Room *>& list_rooms){
     for(Room *r:list_rooms){
         if(!r->is_in_deque()){
             r->set_in_queue();
-            add_rooms(r);
+            this->add_to_deque(r);
         }
     }
 }
