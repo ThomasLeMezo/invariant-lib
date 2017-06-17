@@ -89,7 +89,7 @@ public:
      * @brief Getter to the maze/door map
      * @return
      */
-    const std::map<Maze *, Door *>& get_doors() const;
+    std::map<Maze *, Door *> &get_doors();
 
     /**
      * @brief Add a new door to the map
@@ -154,7 +154,7 @@ inline const bool Face::is_equal(const Face& f) const{
         return false;
 }
 
-inline const std::map<Maze *, Door *>& Face::get_doors() const{
+inline std::map<Maze *, Door *>& Face::get_doors(){
     return m_doors;
 }
 

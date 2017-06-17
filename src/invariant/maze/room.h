@@ -41,6 +41,21 @@ public:
      */
     Maze* get_maze() const;
 
+    /**
+     * @brief Set all the output doors to empty
+     */
+    void set_empty_output();
+
+    /**
+     * @brief Set all the input doors to empty
+     */
+    void set_empty_input();
+
+    /**
+     * @brief Set all input and output doors to empty
+     */
+    void set_empty();
+
 private:
     void contract_continuity();
     void contract_consistency();

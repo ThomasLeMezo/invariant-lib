@@ -14,4 +14,21 @@ Room::Room(Pave *p, Maze *m, std::vector<ibex::Function*> f_vect)
     }
 }
 
+void Room::set_empty_output(){
+    for(Face *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_empty_output();
+    }
+}
+
+void Room::set_empty_input(){
+    for(Face *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_empty_input();
+    }
+}
+
+void Room::set_empty(){
+    for(Face *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_empty();
+    }
+}
 }

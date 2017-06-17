@@ -76,6 +76,21 @@ public:
      */
     Room *get_room() const;
 
+    /**
+     * @brief Set all the output doors to empty
+     */
+    void set_empty_output();
+
+    /**
+     * @brief Set all the input doors to empty
+     */
+    void set_empty_input();
+
+    /**
+     * @brief Set all input and output doors to empty
+     */
+    void set_empty();
+
 
 private:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
@@ -124,6 +139,19 @@ inline Face * Door::get_face() const{
 
 inline Room * Door::get_room() const{
     return m_room;
+}
+
+inline void Door::set_empty_output(){
+    m_output_private.set_empty();
+}
+
+inline void Door::set_empty_input(){
+    m_input_private.set_empty();
+}
+
+inline void Door::set_empty(){
+    m_output_private.set_empty();
+    m_input_private.set_empty();
 }
 }
 #endif // DOOR_H

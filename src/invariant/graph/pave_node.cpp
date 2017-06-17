@@ -15,7 +15,7 @@ void Pave_node::add_child(Pave *p1, Pave *p2){
     m_pave = NULL;
     Pave_node* pn1 = new Pave_node(p1);
     Pave_node* pn2 = new Pave_node(p2);
-    m_child = make_pair(pn1, pn2);
+    m_children = make_pair(pn1, pn2);
 
     p1->set_pave_node(pn1);
     p2->set_pave_node(pn2);
@@ -23,8 +23,8 @@ void Pave_node::add_child(Pave *p1, Pave *p2){
 
 Pave_node::~Pave_node(){
     if(m_leaf==false){
-        delete(m_child.first);
-        delete(m_child.second);
+        delete(m_children.first);
+        delete(m_children.second);
     }
 }
 
@@ -33,8 +33,8 @@ void Pave_node::get_intersection_pave_outer(std::vector<Pave*> &l, const ibex::I
         if(m_leaf)
             l.push_back(m_pave);
         else{
-            m_child.first->get_intersection_pave_outer(l, box);
-            m_child.second->get_intersection_pave_outer(l, box);
+            m_children.first->get_intersection_pave_outer(l, box);
+            m_children.second->get_intersection_pave_outer(l, box);
         }
     }
 }
@@ -46,8 +46,8 @@ void Pave_node::get_intersection_pave_inner(std::vector<Pave*> &l, const ibex::I
                 l.push_back(m_pave);
         }
         else{
-            m_child.first->get_intersection_pave_inner(l, box);
-            m_child.second->get_intersection_pave_inner(l, box);
+            m_children.first->get_intersection_pave_inner(l, box);
+            m_children.second->get_intersection_pave_inner(l, box);
         }
     }
 }
@@ -61,8 +61,8 @@ void Pave_node::get_intersection_pave_outer(std::vector<Pave*> &l, ibex::Ctc &nc
             l.push_back(m_pave);
         }
         else{
-            m_child.first->get_intersection_pave_outer(l, nc);
-            m_child.second->get_intersection_pave_outer(l, nc);
+            m_children.first->get_intersection_pave_outer(l, nc);
+            m_children.second->get_intersection_pave_outer(l, nc);
         }
     }
 }
@@ -78,8 +78,8 @@ void Pave_node::get_intersection_pave_inner(std::vector<Pave*> &l, ibex::Ctc &nc
             }
         }
         else{
-            m_child.first->get_intersection_pave_inner(l, nc);
-            m_child.second->get_intersection_pave_inner(l, nc);
+            m_children.first->get_intersection_pave_inner(l, nc);
+            m_children.second->get_intersection_pave_inner(l, nc);
         }
     }
 }
@@ -93,8 +93,8 @@ void Pave_node::get_intersection_face_outer(std::vector<Face*> &l, const ibex::I
             }
         }
         else{
-            m_child.first->get_intersection_face_outer(l, box);
-            m_child.second->get_intersection_face_outer(l, box);
+            m_children.first->get_intersection_face_outer(l, box);
+            m_children.second->get_intersection_face_outer(l, box);
         }
     }
 }
@@ -108,8 +108,8 @@ void Pave_node::get_intersection_face_inner(std::vector<Face*> &l, const ibex::I
             }
         }
         else{
-            m_child.first->get_intersection_face_inner(l, box);
-            m_child.second->get_intersection_face_inner(l, box);
+            m_children.first->get_intersection_face_inner(l, box);
+            m_children.second->get_intersection_face_inner(l, box);
         }
     }
 }
@@ -128,8 +128,8 @@ void Pave_node::get_intersection_face_outer(std::vector<Face*> &l, ibex::Ctc &nc
             }
         }
         else{
-            m_child.first->get_intersection_face_outer(l, nc);
-            m_child.second->get_intersection_face_outer(l, nc);
+            m_children.first->get_intersection_face_outer(l, nc);
+            m_children.second->get_intersection_face_outer(l, nc);
         }
     }
 }
@@ -150,17 +150,9 @@ void Pave_node::get_intersection_face_inner(std::vector<Face*> &l, ibex::Ctc &nc
             }
         }
         else{
-            m_child.first->get_intersection_face_inner(l, nc);
-            m_child.second->get_intersection_face_inner(l, nc);
+            m_children.first->get_intersection_face_inner(l, nc);
+            m_children.second->get_intersection_face_inner(l, nc);
         }
-    }
-}
-inline Pave* Pave_node::get_pave() const{
-    if(m_leaf)
-        return m_pave;
-    else{
-        throw std::runtime_error("in [pave_node.cpp/get_pave] this Pave_node is not a leaf");
-        return NULL;
     }
 }
 

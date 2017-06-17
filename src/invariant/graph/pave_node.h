@@ -91,13 +91,49 @@ public:
      */
     Pave* get_pave() const;
 
+    /**
+     * @brief Return true is this Pave_node is a leaf
+     * @return
+     */
+    bool is_leaf() const;
+
+    /**
+     * @brief Getter to the position of this pave_node
+     * @return
+     */
+    const ibex::IntervalVector get_position() const;
+
+    const std::pair<Pave_node *, Pave_node *> get_children() const;
 
 private:
     bool                                m_leaf;
     mutable Pave*                       m_pave = NULL;
-    std::pair<Pave_node *, Pave_node *> m_child;
+    std::pair<Pave_node *, Pave_node *> m_children;
     const ibex::IntervalVector          m_position;
 };
 
+}
+
+namespace invariant {
+inline bool Pave_node::is_leaf() const{
+    return m_leaf;
+}
+
+inline Pave* Pave_node::get_pave() const{
+    if(m_leaf)
+        return m_pave;
+    else{
+        throw std::runtime_error("in [pave_node.cpp/get_pave] this Pave_node is not a leaf");
+        return NULL;
+    }
+}
+
+inline const ibex::IntervalVector Pave_node::get_position() const{
+    return m_position;
+}
+
+inline const std::pair<Pave_node *, Pave_node *> Pave_node::get_children() const{
+    return m_children;
+}
 }
 #endif // PAVE_NODE_H
