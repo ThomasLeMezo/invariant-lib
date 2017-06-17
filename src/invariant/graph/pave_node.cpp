@@ -1,5 +1,6 @@
 #include "pave_node.h"
-#include <utility>
+#include "room.h"
+
 using namespace std;
 using namespace ibex;
 
@@ -153,6 +154,16 @@ void Pave_node::get_intersection_face_inner(std::vector<Face*> &l, ibex::Ctc &nc
             m_children.first->get_intersection_face_inner(l, nc);
             m_children.second->get_intersection_face_inner(l, nc);
         }
+    }
+}
+
+void Pave_node::get_all_child_rooms(std::vector<Room *> &list_room, Maze *maze) const{
+    if(is_leaf()){
+        list_room.push_back(m_pave->get_rooms()[maze]);
+    }
+    else{
+        m_children.first->get_all_child_rooms(list_room, maze);
+        m_children.second->get_all_child_rooms(list_room, maze);
     }
 }
 

@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 using namespace std;
+using namespace ibex;
 
 namespace invariant {
 Graph::Graph(const ibex::IntervalVector &position):
@@ -12,11 +13,20 @@ Graph::Graph(const ibex::IntervalVector &position):
 
     // Create search space Pave
     Pave* p = new Pave(position, this);
-    m_pave_node = new Pave_node(p);
-    p->set_pave_node(m_pave_node);
     m_paves.push_back(p);
 
+    // Root of the pave node tree
+    m_pave_node = new Pave_node(p);
+    p->set_pave_node(m_pave_node);
+
     // Create infinity Paves around search space
+    IntervalVector* result;
+    int n=position.complementary(result);
+
+    for (int i=0; i<n; i++) {
+        Pave* p_infinity = new Pave(result[i], this);
+        m_paves_not_bisectable.push_back(p_infinity);
+    }
 
 }
 

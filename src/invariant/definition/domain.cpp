@@ -8,51 +8,72 @@ Domain::Domain(Graph *graph){
     m_graph = graph;
 }
 
-void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Pave*> &l){
+void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room*> &list_pave_not_empty){
+    contract_separator(maze, pave_node, false, list_pave_not_empty, true);
+    contract_separator(maze, pave_node, false, list_pave_not_empty, false);
+}
+
+void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Room*> &list_pave_not_empty, bool output){
     if(all_out){
         if(pave_node->is_leaf()){
             Pave* p=pave_node->get_pave();
             for(Face * f:p->get_faces_vector()){
                 Door *d = f->get_doors()[maze];
-                d->set_empty_output();
+                if(output)
+                    d->set_empty_private_output();
+                else
+                    d->set_empty_private_input();
                 d->synchronize();
             }
         }
         else{
-            contract_separator(maze, pave_node->get_children().first, true, l);
-            contract_separator(maze, pave_node->get_children().second, true, l);
+            contract_separator(maze, pave_node->get_children().first, true, list_pave_not_empty, output);
+            contract_separator(maze, pave_node->get_children().second, true, list_pave_not_empty, output);
         }
     }
     else if(pave_node->is_leaf()){
         Pave* p=pave_node->get_pave();
+        bool not_empty = false;
         for(Face * f:p->get_faces_vector()){
             Door *d = f->get_doors()[maze];
-            IntervalVector output_in(d->get_output_private());
+            IntervalVector output_in(output?d->get_output_private():d->get_input_private());
             IntervalVector output_out(output_in);
 
-            for(Sep* sep:m_sep_input){
-                sep->separate(output_in, output_out);
+            if(output){
+                m_sep_output->separate(output_in, output_out);
+                d->set_output_private(output_in);
             }
-            d->set_output_private(output_in);
+            else{
+                m_sep_input->separate(output_in, output_out);
+                d->set_input_private(output_in);
+            }
             d->synchronize();
+            if(!output_in.is_empty())
+                not_empty = true;
+        }
+        if(not_empty){
+            list_pave_not_empty.push_back(p->get_rooms()[maze]);
         }
     }
     else{
         IntervalVector position_in(pave_node->get_position());
         IntervalVector position_out(position_in);
-        for(Sep* sep:m_sep_input){
-            sep->separate(position_in, position_out);
-        }
+
+        if(output)
+            m_sep_output->separate(position_in, position_out);
+        else
+            m_sep_input->separate(position_in, position_out);
+
         if(position_in.is_empty()){
-            contract_separator(maze, pave_node->get_children().first, true, l);
-            contract_separator(maze, pave_node->get_children().second, true, l);
+            contract_separator(maze, pave_node->get_children().first, true, list_pave_not_empty, output);
+            contract_separator(maze, pave_node->get_children().second, true, list_pave_not_empty, output);
         }
         else if(position_out.is_empty()){
-            return;
+            pave_node->get_all_child_rooms(list_pave_not_empty, maze);
         }
         else{
-            contract_separator(maze,pave_node->get_children().first, false, l);
-            contract_separator(maze,pave_node->get_children().second, false, l);
+            contract_separator(maze,pave_node->get_children().first, false, list_pave_not_empty, output);
+            contract_separator(maze,pave_node->get_children().second, false, list_pave_not_empty, output);
         }
 
     }

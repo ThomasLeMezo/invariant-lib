@@ -37,10 +37,15 @@ public:
      */
     Dynamics *get_dynamics() const;
 
+    /**
+     * @brief Contract the maze
+     */
+    void contract();
+
 private:
-    Domain *m_domain;
-    Graph  *m_graph; // Graph associated with this maze
-    Dynamics *m_dynamics;
+    Domain *    m_domain = NULL;
+    Graph  *    m_graph = NULL; // Graph associated with this maze
+    Dynamics *  m_dynamics = NULL;
 
 };
 }

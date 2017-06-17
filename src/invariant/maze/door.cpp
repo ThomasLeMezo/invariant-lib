@@ -1,5 +1,6 @@
 #include "door.h"
 
+using namespace ibex;
 namespace invariant {
 
 Door::Door(Face *face, Room *room):
@@ -22,4 +23,16 @@ void Door::synchronize(){
     omp_unset_lock(&m_lock_read);
 }
 
+void Door::contract_continuity_private(){
+    IntervalVector door_input = ibex::IntervalVector::empty(m_input_private.size());
+    IntervalVector door_output = ibex::IntervalVector::empty(m_input_private.size());
+    for(Face* f:m_face->get_neighbors()){
+        Door *d = f->get_doors()[m_room->get_maze()];
+        door_input |= d->get_input();
+        door_output |= d->get_output();
+    }
+
+    m_input_private &= door_input;
+    m_output_private &= door_output;
+}
 }

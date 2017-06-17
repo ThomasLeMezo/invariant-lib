@@ -129,7 +129,7 @@ public:
      * @brief Getter to the maze/room map
      * @return
      */
-    const std::map<Maze *, Room *>& get_rooms() const;
+    std::map<Maze *, Room *> get_rooms() const;
 
     /**
      * @brief Add a new room to the map
@@ -138,21 +138,31 @@ public:
      */
     void add_room(Maze * maze, Room *room);
 
+    /**
+     * @brief Return true if the pave contain an infinite boundary
+     */
+    bool is_infinite() const;
+
+    /**
+     * @brief Return the dimension of the maze
+     * @return
+     */
+    size_t get_dim() const;
+
+
 private:
 
     /** Class Variable **/
-    mutable ibex::IntervalVector      m_position; // Pave position
-    mutable std::vector< std::array<Face*, 2>> m_faces; // Faces of the Pave
-    mutable std::vector<Face *>     m_faces_vector; // Faces of the Pave
-    mutable Graph*                    m_graph = NULL;
-    mutable Pave_node*              m_pave_node = NULL;
-    mutable size_t                  m_dim = 0;
-
-    std::array<Pave*, 2>    m_result_bisected;
-
-    std::map<Maze*, Room*>            m_rooms;
-
-    size_t m_serialization_id;
+    mutable ibex::IntervalVector                m_position; // Pave position
+    mutable std::vector< std::array<Face*, 2>>  m_faces; // Faces of the Pave
+    mutable std::vector<Face *>                 m_faces_vector; // Faces of the Pave
+    mutable Graph*                              m_graph = NULL;
+    mutable Pave_node*                          m_pave_node = NULL;
+    mutable size_t                              m_dim = 0;
+    std::array<Pave*, 2>                        m_result_bisected;
+    std::map<Maze*, Room*>                      m_rooms;
+    bool                                        m_infinite_pave = false;
+    size_t                                      m_serialization_id=0;
 };
 
     /**
@@ -212,12 +222,20 @@ inline void Pave::set_pave_node(Pave_node *pave_node){
     m_pave_node = pave_node;
 }
 
-inline const std::map<Maze *, Room*>& Pave::get_rooms() const{
+inline std::map<Maze *, Room*> Pave::get_rooms() const{
     return m_rooms;
 }
 
 inline void Pave::add_room(Maze * maze, Room *room){
     m_rooms.insert(std::pair<Maze*,Room*>(maze,room));
+}
+
+inline bool Pave::is_infinite() const{
+    return m_infinite_pave;
+}
+
+inline size_t Pave::get_dim() const{
+    return m_dim;
 }
 }
 

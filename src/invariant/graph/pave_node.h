@@ -2,12 +2,15 @@
 #define PAVE_NODE_H
 
 #include <utility>
-#include <ibex_IntervalVector.h>
-#include <pave.h>
+#include <ibex.h>
+#include "pave.h"
+#include "maze.h"
 
 namespace invariant{
 class Pave; // declare for friendchip
 class Face; // declare for friendchip
+class Maze; // declare for friendchip
+class Room; // declare for friendchip
 class Pave_node
 {
 public:
@@ -103,10 +106,20 @@ public:
      */
     const ibex::IntervalVector get_position() const;
 
+    /**
+     * @brief Get all the room of the children of this pave_node
+     * @param list_room
+     */
+    void get_all_child_rooms(std::vector<Room *> &list_room, Maze *maze) const;
+
+    /**
+     * @brief Getter to the children of this pave_node
+     * @return
+     */
     const std::pair<Pave_node *, Pave_node *> get_children() const;
 
 private:
-    bool                                m_leaf;
+    bool                                m_leaf = true;
     mutable Pave*                       m_pave = NULL;
     std::pair<Pave_node *, Pave_node *> m_children;
     const ibex::IntervalVector          m_position;

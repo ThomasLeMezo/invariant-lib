@@ -6,13 +6,14 @@
 
 #include "graph.h"
 #include "maze.h"
-#include "door.h"
+#include "room.h"
 #include "pave_node.h"
 
 namespace invariant{
 class Graph; // declared only for friendship
 class Maze; // declared only for friendship
-class Door; // declared only for friendship
+class Pave_node; // declared only for friendship
+class Room; // declared only for friendship
 class Domain
 {
 public:
@@ -25,7 +26,7 @@ public:
     // *************** Intput & Output *********************
 
     /**
-     * @brief Add a maze where non empty (or empty depending of complementary parameter) doors (input | output)
+     * @brief Add a maze where non empty (or empty depending of complementary parameter) doors (input and output)
      *        will be removed from the domain (input & output)
      * @param maze
      * @param bool complementary : true = remove empty, false = remove non empty
@@ -33,11 +34,17 @@ public:
     void add_remove_maze(invariant::Maze *maze, bool complementary);
 
     /**
-     * @brief Add a list of pair <maze, bool> where non empty (or empty depending of complementary parameter) doors (input | output)
+     * @brief Add a list of pair <maze, bool> where non empty (or empty depending of complementary parameter) doors (input and output)
      *        will be removed from the domain (input & output)
      * @param pairs (Maze, bool), see add_remove_maze(invariant::Maze *maze, bool complementary) function
      */
     void add_remove_mazes(const std::vector<std::pair<invariant::Maze*, bool>>& pairs);
+
+    /**
+     * @brief Set the separator to contract the Doors of a maze (output and input)
+     * @param sep
+     */
+    void set_sep(ibex::Sep* sep);
 
     // *************** Intput *********************
 
@@ -56,6 +63,12 @@ public:
      */
     void add_remove_mazes_input(const std::vector<std::pair<invariant::Maze*, bool>>& pairs);
 
+    /**
+     * @brief Set the separator to contract the Doors of a maze (outside and inside)
+     * @param sep
+     */
+    void set_sep_input(ibex::Sep* sep);
+
     // *************** Output *********************
 
     /**
@@ -73,6 +86,12 @@ public:
      */
     void add_remove_mazes_output(const std::vector<std::pair<invariant::Maze*, bool>>& pairs);
 
+    /**
+     * @brief Set the separator to contract the Doors of a maze (output)
+     * @param sep
+     */
+    void set_sep_output(ibex::Sep* sep);
+
     // *************** Contractors *********************
 
     /**
@@ -81,14 +100,24 @@ public:
      * @param pave_node
      * @param l
      */
-    void contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Pave*> &l);
+    void contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room *> &list_pave_not_empty);
 
+private:
+    /**
+     * @brief Contract all output or input doors of the maze according to the separator contractor
+     * @param maze
+     * @param pave_node
+     * @param l
+     * @param output : true => contract output, false => contract input
+     */
+    void contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Room *> &list_pave_not_empty, bool output);
 
 private:
     Graph * m_graph;
 
     std::vector<std::pair<invariant::Maze*, bool>> m_remove_mazes_input, m_remove_mazes_output;
-    std::vector<ibex::Sep *> m_sep_input, m_sep_output;
+    ibex::Sep* m_sep_input = NULL;
+    ibex::Sep* m_sep_output = NULL;
 };
 }
 
@@ -96,9 +125,11 @@ namespace invariant{
 inline void Domain::add_remove_maze_input(Maze *maze, bool complementary){
     m_remove_mazes_input.push_back(std::make_pair(maze, complementary));
 }
+
 inline void Domain::add_remove_maze_output(Maze *maze, bool complementary){
     m_remove_mazes_output.push_back(std::make_pair(maze, complementary));
 }
+
 inline void Domain::add_remove_maze(Maze *maze, bool complementary){
     add_remove_maze_output(maze, complementary);
     add_remove_maze_input(maze, complementary);
@@ -107,12 +138,27 @@ inline void Domain::add_remove_maze(Maze *maze, bool complementary){
 inline void Domain::add_remove_mazes_input(const std::vector<std::pair<Maze *, bool> > &pairs){
     m_remove_mazes_input.insert(m_remove_mazes_input.begin(), pairs.begin(), pairs.end());
 }
+
 inline void Domain::add_remove_mazes_output(const std::vector<std::pair<Maze *, bool> > &pairs){
     m_remove_mazes_output.insert(m_remove_mazes_output.begin(), pairs.begin(), pairs.end());
 }
+
 inline void Domain::add_remove_mazes(const std::vector<std::pair<Maze *, bool> > &pairs){
     add_remove_mazes_input(pairs);
     add_remove_mazes_output(pairs);
+}
+
+inline void Domain::set_sep(ibex::Sep* sep){
+    m_sep_input = sep;
+    m_sep_output = sep;
+}
+
+inline void Domain::set_sep_input(ibex::Sep* sep){
+    m_sep_input = sep;
+}
+
+inline void Domain::set_sep_output(ibex::Sep* sep){
+    m_sep_output = sep;
 }
 
 }

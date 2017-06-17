@@ -79,24 +79,29 @@ public:
     /**
      * @brief Set all the output doors to empty
      */
-    void set_empty_output();
+    void set_empty_private_output();
 
     /**
      * @brief Set all the input doors to empty
      */
-    void set_empty_input();
+    void set_empty_private_input();
 
     /**
      * @brief Set all input and output doors to empty
      */
-    void set_empty();
+    void set_empty_private();
+
+    /**
+     * @brief Contract its private door according to neighbors
+     */
+    void contract_continuity_private();
 
 
 private:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
     ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
-    Face *               m_face; // pointer to the associated face
-    Room *               m_room; // pointer to the associated face
+    Face *               m_face = NULL; // pointer to the associated face
+    Room *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
 };
 }
@@ -141,15 +146,15 @@ inline Room * Door::get_room() const{
     return m_room;
 }
 
-inline void Door::set_empty_output(){
+inline void Door::set_empty_private_output(){
     m_output_private.set_empty();
 }
 
-inline void Door::set_empty_input(){
+inline void Door::set_empty_private_input(){
     m_input_private.set_empty();
 }
 
-inline void Door::set_empty(){
+inline void Door::set_empty_private(){
     m_output_private.set_empty();
     m_input_private.set_empty();
 }

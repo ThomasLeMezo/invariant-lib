@@ -8,4 +8,8 @@ Maze::Maze(Domain *domain, Dynamics *dynamics)
     m_dynamics = dynamics;
 }
 
+void Maze::contract(){
+
+}
+
 }

@@ -1,9 +1,10 @@
 #ifndef ROOM_H
 #define ROOM_H
 
+#include <ibex.h>
 #include "pave.h"
 #include "maze.h"
-#include <ibex.h>
+#include <omp.h>
 
 namespace invariant {
 
@@ -22,7 +23,7 @@ public:
     /**
      * @brief Room destructor
      */
-    ~Room(){}
+    ~Room();
 
     /**
      * @brief contract the pave (continuity + consistency)
@@ -43,30 +44,64 @@ public:
 
     /**
      * @brief Set all the output doors to empty
+     * Request synchronization (omp lock)
      */
     void set_empty_output();
 
     /**
      * @brief Set all the input doors to empty
+     * Request synchronization (omp lock)
      */
-    void set_empty_input();
+    void set_empty_private_input();
 
     /**
      * @brief Set all input and output doors to empty
+     * Request synchronization (omp lock)
      */
     void set_empty();
 
+    /**
+     * @brief Function call after Pave bisection to update Room & Doors
+     */
+    void bisect();
+
 private:
+    /**
+     * @brief Contract doors according to the neighbors
+     */
     void contract_continuity();
+
+    /**
+     * @brief Contract doors according to the vector field flow
+     */
     void contract_consistency();
+
+    /**
+     * @brief Contract the doors according to the vector field orientation
+     */
     void contract_vector_field();
 
+    /**
+     * @brief Basic contraction between [in] and [out] according to a [vect].
+     * @param in
+     * @param out
+     * @param vect
+     */
+    void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
+
+    /**
+     * @brief Synchronize all the private doors to the public one
+     */
+    void synchronize_doors();
+
 private:
-    Pave*   m_pave; // pointer to the associated face
-    Maze*   m_maze; // pointer to the associated maze
+    Pave*   m_pave = NULL; // pointer to the associated face
+    Maze*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
 
-    bool    m_empty;
+    bool    m_empty = false;
+    bool    m_first_contract = true; // Use to contract according to the vector_field
+    omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
 
 };
 }

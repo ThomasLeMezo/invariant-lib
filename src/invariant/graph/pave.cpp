@@ -12,15 +12,17 @@ Pave::Pave(const ibex::IntervalVector &position, Graph *g):
 {
     m_graph = g;
     m_serialization_id = 0;
-    unsigned char dim = g->dim();
     m_dim = g->dim();
-    m_faces.reserve(m_dim);
+
+    if(position.is_unbounded())
+        m_infinite_pave = true;
+
     // Build the faces
-    for(size_t i=0; i<dim; i++){
+    for(size_t i=0; i<m_dim; i++){
         IntervalVector iv_lb(m_position);
         IntervalVector iv_ub(m_position);
-        IntervalVector orient_lb(dim, Interval(0, 1));
-        IntervalVector orient_ub(dim, Interval(0,1));
+        IntervalVector orient_lb(m_dim, Interval(0, 1));
+        IntervalVector orient_ub(m_dim, Interval(0,1));
 
         iv_lb[i]=Interval(m_position[i].lb());
         iv_ub[i]=Interval(m_position[i].ub());

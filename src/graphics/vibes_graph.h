@@ -15,7 +15,7 @@ public:
     virtual void show() const;
 
 private:
-    invariant::Graph*  m_graph;
+    invariant::Graph*  m_graph = NULL;
     double             m_overhead_factor;
 
 };
