@@ -5,8 +5,8 @@
 #include <deque>
 #include <omp.h>
 
-#include "dynamics.h"
-#include "domain.h"
+#include "../definition/dynamics.h"
+#include "../definition/domain.h"
 #include "room.h"
 
 namespace invariant {

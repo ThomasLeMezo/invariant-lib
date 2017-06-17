@@ -4,14 +4,16 @@
 #include <ibex.h>
 #include "pave.h"
 #include "maze.h"
-#include "dynamics.h"
+#include "../definition/dynamics.h"
 #include <omp.h>
+#include "face.h"
 
 namespace invariant {
 
 class Pave; // declared only for friendship
 class Maze; // declared only for friendship
 class Dynamics; // declared only for friendship
+class Face; // declared only for friendship
 class Room
 {
 public:

@@ -16,7 +16,7 @@ public:
      * @brief Constructor of a Door
      * @param face
      */
-    Door(Face * face, Room *romm);
+    Door(Face * face, Room *room);
 
     /**
      * @brief Destructor of a Door

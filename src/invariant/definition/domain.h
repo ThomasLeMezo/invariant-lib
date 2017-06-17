@@ -102,6 +102,8 @@ public:
      */
     void contract_separator(Maze *maze, std::vector<Room *> &list_pave_not_empty);
 
+    Graph* get_graph() const;
+
 private:
     /**
      * @brief Contract all output or input doors of the maze according to the separator contractor
@@ -159,6 +161,10 @@ inline void Domain::set_sep_input(ibex::Sep* sep){
 
 inline void Domain::set_sep_output(ibex::Sep* sep){
     m_sep_output = sep;
+}
+
+inline Graph* Domain::get_graph() const{
+    return m_graph;
 }
 
 }

@@ -6,12 +6,14 @@
 #include "pave.h"
 #include <map>
 #include "door.h"
+#include "room.h"
 #include "maze.h"
 
 namespace invariant {
 class Pave; // declared only for friendship
 class Maze; // declared only for friendship
 class Door; // declared only for friendship
+class Room; // declared only for friendship
 class Face
 {
 public:
@@ -96,7 +98,7 @@ public:
      * @param maze
      * @param door
      */
-    void add_door(Maze * maze, Door *door);
+    void add_door(Door *door);
 
     /**
      * @brief Getter to the pave of this face
@@ -162,10 +164,6 @@ inline const bool Face::is_equal(const Face& f) const{
 
 inline std::map<Maze *, Door *> Face::get_doors(){
     return m_doors;
-}
-
-inline void Face::add_door(Maze * maze, Door *door){
-    m_doors.insert(std::pair<Maze*,Door*>(maze,door));
 }
 
 inline Pave* Face::get_pave() const{

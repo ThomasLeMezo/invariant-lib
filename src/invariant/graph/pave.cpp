@@ -46,6 +46,9 @@ Pave::Pave(Graph *g):
 }
 
 Pave::~Pave(){
+    for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        delete(it->second);
+    }
     for(Face* f:m_faces_vector){
         delete(f);
     }

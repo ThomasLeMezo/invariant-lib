@@ -38,14 +38,17 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
         bool not_empty = false;
         for(Face * f:p->get_faces_vector()){
             Door *d = f->get_doors()[maze];
-            IntervalVector output_in(output?d->get_output_private():d->get_input_private());
-            IntervalVector output_out(output_in);
+            IntervalVector output_in(p->get_dim()), output_out(p->get_dim());
 
             if(output){
+                output_in = d->get_output_private();
+                output_out = output_in;
                 m_sep_output->separate(output_in, output_out);
                 d->set_output_private(output_in);
             }
             else{
+                output_in = d->get_input_private();
+                output_out = output_in;
                 m_sep_input->separate(output_in, output_out);
                 d->set_input_private(output_in);
             }

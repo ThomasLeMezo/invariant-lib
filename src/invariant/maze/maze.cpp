@@ -4,11 +4,17 @@ using namespace std;
 using namespace ibex;
 namespace invariant {
 
-Maze::Maze(Domain *domain, Dynamics *dynamics)
+Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
 {
     m_domain = domain;
     m_dynamics = dynamics;
     omp_init_lock(&m_deque_access);
+
+    Graph *g = domain->get_graph();
+    for(Pave*p:g->get_paves()){
+        Room *r = new Room(p, this, dynamics);
+        p->add_room(r);
+    }
 }
 
 Maze::~Maze(){

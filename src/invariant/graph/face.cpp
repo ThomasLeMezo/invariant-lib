@@ -14,7 +14,9 @@ Face::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &ori
 }
 
 Face::~Face(){
-
+    for(std::map<Maze*,Door*>::iterator it=m_doors.begin(); it!=m_doors.end(); ++it){
+        delete(it->second);
+    }
 }
 
 Face::Face(Pave *p):
@@ -64,6 +66,10 @@ std::ostream& operator<< (std::ostream& stream, const std::vector<Face*> &l){
         stream << *f << endl;
     }
     return stream;
+}
+
+void Face::add_door(Door *door){
+    m_doors.insert(std::pair<Maze*,Door*>(door->get_room()->get_maze(),door));
 }
 
 }

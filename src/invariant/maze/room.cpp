@@ -1,4 +1,5 @@
 #include "room.h"
+#include "face.h"
 
 using namespace ibex;
 using namespace std;
@@ -16,6 +17,15 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
         if(!(zero.is_subset(vector_field)))
             m_vector_fields.push_back(vector_field);
+    }
+
+    int dim = m_pave->get_dim();
+    for(int face=0; face<dim; face++){
+        for(int sens=0; sens < 2; sens++){
+            Door *d = new Door(m_pave->get_faces()[face][sens], this);
+            Face *f = m_pave->get_faces()[face][sens];
+            f->add_door(d);
+        }
     }
 
     omp_init_lock(&m_lock_contraction);

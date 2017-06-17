@@ -4,10 +4,11 @@
 
 
 # Sources
+include_directories(definition)
 include_directories(graph)
 include_directories(maze)
 include_directories(../tools/serialization)
-include_directories(definition)
+
 
   set(SRC
     graph/graph.cpp
