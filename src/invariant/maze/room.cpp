@@ -4,14 +4,14 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-Room::Room(Pave *p, Maze *m, std::vector<ibex::Function*> f_vect)
+Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
 {
     m_pave = p;
     m_maze = m;
     const IntervalVector position(p->get_position());
-    for(Function*f:f_vect){
-        IntervalVector vector_field = f->eval_vector(position);
+    vector<IntervalVector> vector_field_list = dynamics->eval(position);
 
+    for(IntervalVector &vector_field:vector_field_list){
         // Test if 0 is inside the vector_field IV
         IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
         if(!(zero.is_subset(vector_field)))
@@ -175,5 +175,18 @@ void Room::analyze_change(std::vector<Room *>&list_rooms){
         Door *d = f->get_doors()[m_maze];
         d->analyze_change(list_rooms);
     }
+}
+
+bool Room::is_empty(){
+    bool empty = true;
+    for(Face *f:m_pave->get_faces_vector()){
+        if(!f->get_doors()[m_maze]->is_empty())
+            empty = false;
+    }
+    return empty;
+}
+
+bool Room::request_bisection(){
+    return this->is_empty();
 }
 }

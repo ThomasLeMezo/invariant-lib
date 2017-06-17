@@ -103,6 +103,11 @@ public:
      */
     void analyze_change(std::vector<Room *>&list_rooms);
 
+    /**
+     * @brief Return true if input & output doors are empty
+     * @return
+     */
+    bool is_empty();
 
 private:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
@@ -164,6 +169,13 @@ inline void Door::set_empty_private_input(){
 inline void Door::set_empty_private(){
     m_output_private.set_empty();
     m_input_private.set_empty();
+}
+
+inline bool Door::is_empty(){
+    if(m_input_public.is_empty() && m_output_public.is_empty())
+        return true;
+    else
+        return false;
 }
 }
 #endif // DOOR_H

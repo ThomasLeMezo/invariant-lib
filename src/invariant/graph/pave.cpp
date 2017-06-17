@@ -167,13 +167,32 @@ void Pave::bisect(){
     m_graph->add_paves(pave_result[0]);
     m_graph->add_paves(pave_result[1]);
 
+    // Add Room to the Paves
+    for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        Room *r = (it->second);
+
+        Room *r_first = new Room(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
+        Room *r_second = new Room(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
+
+        pave_result[1]->add_room(r_first);
+        pave_result[2]->add_room(r_second);
+    }
+
     // Save results in this pave
     m_result_bisected[0] = pave_result[0];
     m_result_bisected[1] = pave_result[1];
 }
 
 const bool Pave::request_bisection(){
-    return true;
+    bool request = true;
+    for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        request &= (it->second)->request_bisection();
+    }
+    return request;
+}
+
+inline void Pave::add_room(Room *r){
+    m_rooms.insert(std::pair<Maze*,Room*>(r->get_maze(),r));
 }
 
 }

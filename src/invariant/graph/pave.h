@@ -2,14 +2,16 @@
 #define PAVE_H
 
 #include <ibex.h>
-#include "face.h"
-#include <fstream>
-#include "graph.h"
-#include "room.h"
-#include "maze.h"
 #include <map>
+#include <fstream>
+#include "room.h"
+#include "face.h"
+#include "graph.h"
+#include "maze.h"
+
 
 namespace invariant {
+
 class Face; // declared only for friendship
 class Graph; // declared only for friendship
 class Maze; // declared only for friendship
@@ -102,7 +104,7 @@ public:
 
     /**
      * @brief Return true if the Pave have to be bisected
-     * (temporary)
+     * (temporary : need to implement strategy of bisection)
      * @return
      */
     const bool request_bisection();
@@ -136,7 +138,7 @@ public:
      * @param maze
      * @param room
      */
-    void add_room(Maze * maze, Room *room);
+    void add_room(Room *r);
 
     /**
      * @brief Return true if the pave contain an infinite boundary
@@ -224,10 +226,6 @@ inline void Pave::set_pave_node(Pave_node *pave_node){
 
 inline std::map<Maze *, Room*> Pave::get_rooms() const{
     return m_rooms;
-}
-
-inline void Pave::add_room(Maze * maze, Room *room){
-    m_rooms.insert(std::pair<Maze*,Room*>(maze,room));
 }
 
 inline bool Pave::is_infinite() const{

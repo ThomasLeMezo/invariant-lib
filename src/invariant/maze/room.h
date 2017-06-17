@@ -4,12 +4,14 @@
 #include <ibex.h>
 #include "pave.h"
 #include "maze.h"
+#include "dynamics.h"
 #include <omp.h>
 
 namespace invariant {
 
 class Pave; // declared only for friendship
 class Maze; // declared only for friendship
+class Dynamics; // declared only for friendship
 class Room
 {
 public:
@@ -18,7 +20,7 @@ public:
      * @param p
      * @param f_vect
      */
-    Room(Pave *p, Maze *m, std::vector<ibex::Function *> f_vect);
+    Room(Pave *p, Maze *m, Dynamics *dynamics);
 
     /**
      * @brief Room destructor
@@ -91,6 +93,19 @@ public:
      * @brief Reset deque state to false
      */
     void reset_deque();
+
+    /**
+     * @brief Test if this Room need a bisection
+     *  answer false if empty
+     */
+    bool request_bisection();
+
+    /**
+     * @brief Return if this Room is empty
+     * (true if all doors are empty)
+     * @return
+     */
+    bool is_empty();
 
 private:
     /**
