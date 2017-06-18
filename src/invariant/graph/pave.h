@@ -151,6 +151,12 @@ public:
      */
     size_t get_dim() const;
 
+    /**
+     * @brief Get the pave node associated to this Pave
+     * @return
+     */
+    Pave_node* get_pave_node() const;
+
 
 private:
 
@@ -234,6 +240,10 @@ inline bool Pave::is_infinite() const{
 
 inline size_t Pave::get_dim() const{
     return m_dim;
+}
+
+inline Pave_node* Pave::get_pave_node() const{
+    return m_pave_node;
 }
 }
 

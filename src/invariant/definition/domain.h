@@ -100,7 +100,7 @@ public:
      * @param pave_node
      * @param l
      */
-    void contract_separator(Maze *maze, std::vector<Room *> &list_pave_not_empty);
+    void contract_separator(Maze *maze, std::vector<Room *> &list_room_not_empty);
 
     Graph* get_graph() const;
 

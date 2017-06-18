@@ -109,6 +109,13 @@ public:
      */
     bool is_empty();
 
+    /**
+     * @brief Getter to the vector fields
+     * @return
+     */
+    const std::vector<ibex::IntervalVector>& get_vector_fields() const;
+
+
 private:
     /**
      * @brief Contract doors according to the neighbors
@@ -176,6 +183,10 @@ inline void Room::reset_deque(){
     m_in_deque = false;
     omp_unset_lock(&m_lock_deque);
     omp_unset_lock(&m_lock_contraction);
+}
+
+inline const std::vector<ibex::IntervalVector>& Room::get_vector_fields() const{
+    return m_vector_fields;
 }
 }
 

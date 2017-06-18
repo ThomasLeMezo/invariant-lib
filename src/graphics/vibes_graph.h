@@ -3,6 +3,8 @@
 
 #include "ibex.h"
 #include "graph.h"
+#include "maze.h"
+#include "pave.h"
 #include "VibesFigure.h"
 #include "vibes/vibes.h"
 
@@ -10,13 +12,24 @@ class Vibes_Graph: public VibesFigure
 {
 public:
     Vibes_Graph(const std::string& figure_name, invariant::Graph *g);
+    Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* outer);
+    Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* outer, invariant::Maze* inner);
     ~Vibes_Graph(){}
 
     virtual void show() const;
 
 private:
-    invariant::Graph*  m_graph = NULL;
-    double             m_overhead_factor;
+    void show_graph() const;
+    void show_maze_outer() const;
+    void show_theta(invariant::Pave *p, invariant::Maze *maze) const;
+
+    std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
+private:
+    invariant::Graph*   m_graph = NULL;
+    double              m_overhead_factor;
+
+    invariant::Maze*    m_maze_outer = NULL;
+    invariant::Maze*    m_maze_inner = NULL;
 
 };
 
