@@ -118,11 +118,20 @@ public:
      */
     const std::pair<Pave_node *, Pave_node *> get_children() const;
 
+    /**
+     * @brief Add a flag to the emptyness map to tell if a pave was empty at that level of the tree
+     * @param maze
+     * @param empty
+     */
+    void add_emptyness(Maze *maze, bool empty);
+
 private:
     bool                                m_leaf = true;
     mutable Pave*                       m_pave = NULL;
     std::pair<Pave_node *, Pave_node *> m_children;
     const ibex::IntervalVector          m_position;
+
+    std::map<Maze*, bool>               m_empty_rooms;
 };
 
 }
@@ -147,6 +156,10 @@ inline const ibex::IntervalVector Pave_node::get_position() const{
 
 inline const std::pair<Pave_node *, Pave_node *> Pave_node::get_children() const{
     return m_children;
+}
+
+inline void Pave_node::add_emptyness(Maze *maze, bool empty){
+    m_empty_rooms.insert(std::make_pair(maze, empty));
 }
 }
 #endif // PAVE_NODE_H

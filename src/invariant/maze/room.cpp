@@ -101,7 +101,7 @@ void Room::contract_consistency(){
                 IntervalVector in_result(dim, Interval::EMPTY_SET);
                 Face* f_in = m_pave->get_faces()[face_in][sens_in];
                 Door* door_in = f_in->get_doors()[m_maze];
-                const IntervalVector in(door_in->get_input());
+                const IntervalVector in(door_in->get_input_private());
 
                 for(int face_out=0; face_out<dim; face_out++){
                     for(int sens_out = 0; sens_out < 2; sens_out++){
@@ -109,7 +109,7 @@ void Room::contract_consistency(){
                             IntervalVector in_tmp(in);
                             Face* f_out = m_pave->get_faces()[face_out][sens_out];
                             Door* door_out = f_out->get_doors()[m_maze];
-                            IntervalVector out_tmp(door_out->get_output());
+                            IntervalVector out_tmp(door_out->get_output_private());
 
                             this->contract_flow(in_tmp, out_tmp, vec_field);
 
@@ -134,6 +134,8 @@ void Room::contract_consistency(){
 }
 
 bool Room::contract_continuity(){
+    if(m_vector_fields.size()==0)
+        return false;
     bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
         Door *d = f->get_doors()[m_maze];
@@ -168,7 +170,6 @@ bool Room::contract(){
 
     if(change){
         contract_consistency();
-        synchronize_doors();
     }
     m_first_contract = false;
     return change;
@@ -189,14 +190,18 @@ void Room::analyze_change(std::vector<Room *>&list_rooms){
 
 bool Room::is_empty(){
     if(m_empty)
-        return m_empty;
-    bool empty = true;
-    for(Face *f:m_pave->get_faces_vector()){
-        if(!f->get_doors()[m_maze]->is_empty())
-            empty = false;
+        return true;
+    else{
+        bool empty = true;
+        for(Face *f:m_pave->get_faces_vector()){
+            if(!f->get_doors()[m_maze]->is_empty()){
+                empty = false;
+                return false;
+            }
+        }
+        m_empty = true;
+        return true;
     }
-    m_empty = empty;
-    return empty;
 }
 
 bool Room::request_bisection(){

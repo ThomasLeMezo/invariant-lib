@@ -66,6 +66,7 @@ int Maze::contract(){
             nb_operations++;
         }
     }
+    return nb_operations;
 }
 
 void Maze::add_rooms(const vector<Room *>& list_rooms){

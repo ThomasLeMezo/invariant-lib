@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    Function f_sep(x1, x2, 1+0*x1);
+    Function f_sep(x1, x2, pow(-x1, 2)+pow(-x2, 2)+pow(5, 2));
     SepFwdBwd s(f_sep, LEQ);
     dom.set_sep(&s);
 
@@ -37,17 +37,20 @@ int main(int argc, char *argv[])
     // ******* Maze *********
     Maze maze(&dom, &dyn);
 
-    for(int i=0; i<10; i++){
+    double time_start = omp_get_wtime();
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << maze.contract() << " - ";
         cout << graph.size() << endl;
     }
+    cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
 //    for(Pave*p:graph.get_paves()){
 //        cout << *p << endl;
 //    }
 
     Vibes_Graph v_graph("graph", &graph);
+    v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
     cout << graph << endl;
 }

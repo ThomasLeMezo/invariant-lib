@@ -177,8 +177,15 @@ void Pave::bisect(){
         Room *r_first = new Room(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
         Room *r_second = new Room(pave_result[1],r->get_maze(), r->get_maze()->get_dynamics());
 
+        // ToDo : add a contraction of Room(s) according to father
+
         pave_result[0]->add_room(r_first);
         pave_result[1]->add_room(r_second);
+
+        if(r->is_empty())
+            m_pave_node->add_emptyness((it->first), true);
+        else
+            m_pave_node->add_emptyness((it->first), false);
     }
 
     // Save results in this pave

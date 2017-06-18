@@ -44,8 +44,8 @@ bool Door::contract_continuity_private(){
 }
 
 void Door::analyze_change(std::vector<Room *>&list_rooms){
-    if(m_input_private.is_strict_interior_subset(m_input_public)
-            || m_output_private.is_strict_interior_subset(m_output_public)){
+    if((!m_input_public.is_empty() && m_input_private != m_input_public)
+            || (!m_output_public.is_empty() && m_output_private != m_output_public)){
         std::vector<Face *> l_face = m_face->get_neighbors();
         for(Face* f:l_face){
             list_rooms.push_back(f->get_pave()->get_rooms()[m_room->get_maze()]);
