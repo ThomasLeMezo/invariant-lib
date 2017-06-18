@@ -84,7 +84,6 @@ void Room::contract_vector_field(){
             // to avoid unecessary lock
         }
     }
-    m_first_contract = false;
 }
 
 void Room::contract_consistency(){
@@ -171,6 +170,7 @@ bool Room::contract(){
         contract_consistency();
         synchronize_doors();
     }
+    m_first_contract = false;
     return change;
 }
 
@@ -200,6 +200,6 @@ bool Room::is_empty(){
 }
 
 bool Room::request_bisection(){
-    return this->is_empty();
+    return !(this->is_empty());
 }
 }

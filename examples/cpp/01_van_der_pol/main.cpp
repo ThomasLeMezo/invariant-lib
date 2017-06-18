@@ -16,6 +16,8 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
+    ibex::Variable x1, x2;
+
     IntervalVector space(2);
     space[0] = Interval(-6,6);
     space[1] = Interval(-6,6);
@@ -24,12 +26,11 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    Function f_sep("x1", "x2", "x1^2+x2^2-2");
-    SepFwdBwd s(f_sep, LT);
+    Function f_sep(x1, x2, 1+0*x1);
+    SepFwdBwd s(f_sep, LEQ);
     dom.set_sep(&s);
 
     // ****** Dynamics *******
-    ibex::Variable x1, x2;
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     Dynamics_Function dyn(&f);
 

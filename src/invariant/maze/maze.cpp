@@ -8,6 +8,7 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
 {
     m_domain = domain;
     m_dynamics = dynamics;
+    m_graph = domain->get_graph();
     omp_init_lock(&m_deque_access);
 
     Graph *g = domain->get_graph();
