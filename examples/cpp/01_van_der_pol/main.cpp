@@ -31,15 +31,11 @@ int main(int argc, char *argv[])
     SepFwdBwd s1(f_sep_1, GT); // LT, LEQ, EQ, GEQ, GT
     SepFwdBwd s2(f_sep_2, LT);
     SepUnion s3(s1, s2);
-    dom.set_sep_output(&s3);
+    dom.set_sep(&s3);
 
     // ****** Dynamics *******
-    vector<Function*> v_f;
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    v_f.push_back(&f);
-//    ibex::Function f1(x1, x2, Return(-x2,-(1.0*(1.0-pow(x1, 2))*x2-x1)+0.5));
-//    v_f.push_back(&f1);
-    Dynamics_Function dyn(v_f);
+    Dynamics_Function dyn(&f);
 
     // ******* Maze *********
     Maze maze(&dom, &dyn);
@@ -57,7 +53,7 @@ int main(int argc, char *argv[])
 //    }
 
     Vibes_Graph v_graph("graph", &graph, &maze);
-    v_graph.setProperties(0, 0, 1024, 1024);
+    v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
     cout << graph << endl;
 }

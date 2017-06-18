@@ -201,7 +201,7 @@ const bool Pave::request_bisection(){
     return request;
 }
 
-inline void Pave::add_room(Room *r){
+void Pave::add_room(Room *r){
     m_rooms.insert(std::pair<Maze*,Room*>(r->get_maze(),r));
 }
 
