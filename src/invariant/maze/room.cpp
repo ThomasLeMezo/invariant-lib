@@ -61,17 +61,18 @@ void Room::contract_vector_field(){
     int dim = m_pave->get_dim();
     for(IntervalVector &v:m_vector_fields){
         // Construct the boolean interval vector of the vector_field
-        IntervalVector v_bool_in = IntervalVector::empty(dim);
-        IntervalVector v_bool_out = IntervalVector::empty(dim);
+        IntervalVector v_bool_in = IntervalVector(dim, Interval::EMPTY_SET);
+        IntervalVector v_bool_out = IntervalVector(dim, Interval::EMPTY_SET);
+
         for(int i=0; i<dim; i++){
             if(!(v[i] & Interval::POS_REALS).is_empty())
-                v_bool_out[0] |= Interval(1);
-            if(!(v[0] & Interval::NEG_REALS).is_empty())
-                v_bool_out[0] |= Interval(0);
-            if(!(-v[i] & Interval::POS_REALS).is_empty())
-                v_bool_in[0] |= Interval(1);
-            if(!(-v[0] & Interval::NEG_REALS).is_empty())
-                v_bool_in[0] |= Interval(0);
+                v_bool_out[i] |= Interval(1);
+            if(!(v[i] & Interval::NEG_REALS).is_empty())
+                v_bool_out[i] |= Interval(0);
+            if(!((-v[i]) & Interval::POS_REALS).is_empty())
+                v_bool_in[i] |= Interval(1);
+            if(!((-v[i]) & Interval::NEG_REALS).is_empty())
+                v_bool_in[i] |= Interval(0);
         }
 
         for(Face* f:m_pave->get_faces_vector()){
@@ -118,7 +119,7 @@ void Room::contract_consistency(){
                         }
                     }
                 }
-                door_in->set_input_private(in_result);
+                door_in->set_input_private(door_in->get_input_private() & in_result);
             }
         }
 
@@ -126,7 +127,7 @@ void Room::contract_consistency(){
             for(int sens_out = 0; sens_out < 2; sens_out++){
                 Face* f_out = m_pave->get_faces()[face_out][sens_out];
                 Door* door_out = f_out->get_doors()[m_maze];
-                door_out->set_input_private(out_result[face_out][sens_out]);
+                door_out->set_output_private(door_out->get_output_private() & out_result[face_out][sens_out]);
             }
         }
 

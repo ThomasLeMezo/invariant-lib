@@ -17,8 +17,8 @@ void Vibes_Graph::show() const{
 
 
     vibes::Params params_bisectable, params_not_bisectable;
-    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
-    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
+    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","yellow","EdgeColor","gray");
+    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","blue","EdgeColor","lightGray");
 
     for(Pave*p:m_graph->get_paves()){
         ibex::IntervalVector box(p->get_position());

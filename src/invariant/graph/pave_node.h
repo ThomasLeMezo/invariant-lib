@@ -125,6 +125,12 @@ public:
      */
     void add_emptyness(Maze *maze, bool empty);
 
+    /**
+     * @brief Return the map of emptyness
+     * @return
+     */
+    std::map<Maze*, bool> get_emptyness() const;
+
 private:
     bool                                m_leaf = true;
     mutable Pave*                       m_pave = NULL;
@@ -160,6 +166,10 @@ inline const std::pair<Pave_node *, Pave_node *> Pave_node::get_children() const
 
 inline void Pave_node::add_emptyness(Maze *maze, bool empty){
     m_empty_rooms.insert(std::make_pair(maze, empty));
+}
+
+inline std::map<Maze*, bool> Pave_node::get_emptyness() const{
+    return m_empty_rooms;
 }
 }
 #endif // PAVE_NODE_H

@@ -22,7 +22,7 @@ public:
      * @param g
      * @param f_vect
      */
-    Maze(Domain *domain, Dynamics *dynamics);
+    Maze(invariant::Domain *domain, Dynamics *dynamics);
 
     /**
      * @brief Maze destructor
@@ -67,7 +67,7 @@ public:
     void add_rooms(const std::vector<Room *> &list_rooms);
 
 private:
-    Domain *    m_domain = NULL;
+    invariant::Domain *    m_domain = NULL;
     Graph  *    m_graph = NULL; // Graph associated with this maze
     Dynamics *  m_dynamics = NULL;
 

@@ -22,7 +22,7 @@ Pave::Pave(const ibex::IntervalVector &position, Graph *g):
         IntervalVector iv_lb(m_position);
         IntervalVector iv_ub(m_position);
         IntervalVector orient_lb(m_dim, Interval(0, 1));
-        IntervalVector orient_ub(m_dim, Interval(0,1));
+        IntervalVector orient_ub(m_dim, Interval(0, 1));
 
         iv_lb[i]=Interval(m_position[i].lb());
         iv_ub[i]=Interval(m_position[i].ub());

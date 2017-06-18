@@ -25,16 +25,16 @@ void Door::synchronize(){
 
 bool Door::contract_continuity_private(){
     bool change = false;
-    IntervalVector door_input = ibex::IntervalVector::empty(m_input_private.size());
-    IntervalVector door_output = ibex::IntervalVector::empty(m_input_private.size());
+    IntervalVector door_input = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
+    IntervalVector door_output = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
     for(Face* f:m_face->get_neighbors()){
         Door *d = f->get_doors()[m_room->get_maze()];
-        door_input |= d->get_input();
-        door_output |= d->get_output();
+        door_input |= d->get_output();
+        door_output |= d->get_input();
     }
 
-    if(door_input.is_strict_interior_subset(m_input_private)
-            ||door_output.is_strict_interior_subset(m_output_private)){
+    if(door_input.is_interior_subset(m_input_private)
+            ||door_output.is_interior_subset(m_output_private)){
         change = true;
         m_input_private &= door_input;
         m_output_private &= door_output;

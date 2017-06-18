@@ -26,8 +26,9 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    Function f_sep(x1, x2, pow(-x1, 2)+pow(-x2, 2)+pow(5, 2));
-    SepFwdBwd s(f_sep, LEQ);
+    Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(6, 2));
+    // x1^2 + x2^2 < 0
+    SepFwdBwd s(f_sep, GT);
     dom.set_sep(&s);
 
     // ****** Dynamics *******

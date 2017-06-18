@@ -12,6 +12,7 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
     omp_init_lock(&m_deque_access);
 
     Graph *g = domain->get_graph();
+    g->add_maze(this);
     for(Pave*p:g->get_paves()){
         Room *r = new Room(p, this, dynamics);
         p->add_room(r);
@@ -25,7 +26,8 @@ Maze::~Maze(){
 int Maze::contract(){
     // Domain contraction
     vector<Room *> list_room_to_contract;
-    m_domain->contract_separator(this, list_room_to_contract);
+    invariant::Domain *d = m_domain;
+    d->contract_separator(this, list_room_to_contract);
 
     // Add Room to the Deque
     for(Room *r:list_room_to_contract){
