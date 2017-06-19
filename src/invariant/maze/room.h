@@ -73,7 +73,7 @@ public:
      * @brief Test if this room is in the deque of the maze
      * @return
      */
-    bool is_in_deque() const;
+    bool is_in_deque();
 
     /**
      * @brief Declare this room in the deque of the maze
@@ -115,6 +115,15 @@ public:
      */
     const std::vector<ibex::IntervalVector>& get_vector_fields() const;
 
+    /**
+     * @brief Lock the pave to other contractions
+     */
+    void lock_contraction();
+
+    /**
+     * @brief Unlock the pave to other contractions
+     */
+    void unlock_contraction();
 
 private:
     /**
@@ -148,7 +157,7 @@ private:
     bool    m_empty = false;
     bool    m_first_contract = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
-    mutable omp_lock_t   m_lock_deque; // Lock in_deque variable access
+    omp_lock_t   m_lock_deque; // Lock in_deque variable access
 
     bool    m_in_deque = false;
 
@@ -164,7 +173,7 @@ inline Maze* Room::get_maze() const{
     return m_maze;
 }
 
-inline bool Room::is_in_deque() const{
+inline bool Room::is_in_deque(){
     bool result;
     omp_set_lock(&m_lock_deque);
     result = m_in_deque;
@@ -182,11 +191,18 @@ inline void Room::reset_deque(){
     omp_set_lock(&m_lock_deque);
     m_in_deque = false;
     omp_unset_lock(&m_lock_deque);
-    omp_unset_lock(&m_lock_contraction);
 }
 
 inline const std::vector<ibex::IntervalVector>& Room::get_vector_fields() const{
     return m_vector_fields;
+}
+
+inline void Room::lock_contraction(){
+    omp_set_lock(&m_lock_contraction);
+}
+
+inline void Room::unlock_contraction(){
+    omp_unset_lock(&m_lock_contraction);
 }
 }
 

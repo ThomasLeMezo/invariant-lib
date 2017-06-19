@@ -40,33 +40,74 @@ int Maze::contract(){
     int nb_operations = 0;
 
     // Propagation of contractions
-    while(m_deque_rooms.size()>0){
+    bool deque_empty = m_deque_rooms.empty();
 
-        // Take one Room
-        omp_set_lock(&m_deque_access);
-        Room *r = m_deque_rooms.front();
-        m_deque_rooms.pop_front();
-        r->reset_deque(); // Room can be added again to the deque
-        omp_unset_lock(&m_deque_access);
+#pragma omp parallel
+    {
+#pragma omp single
+        {
 
-        // Contract
-        bool change = false;
-        change |= r->contract();
+            while(!deque_empty){
 
-        if(change){
-            // Analyse changes
-            vector<Room *> rooms_update;
-            r->analyze_change(rooms_update);
+#pragma omp task
+                {
+                    // Take one Room
+                    omp_set_lock(&m_deque_access);
+                    Room *r = NULL;
+                    if(!m_deque_rooms.empty()){
+                        // To improve the efficiency, we start half of the thread on the back of the deque
+                        // and the other on the front
+                        if(omp_get_thread_num()%2==0){
+                            r = m_deque_rooms.back();
+                            m_deque_rooms.pop_back();
+                        }
+                        else{
+                            r = m_deque_rooms.front();
+                            m_deque_rooms.pop_front();
+                        }
+                        r->reset_deque(); // Room can be added again to the deque
+                    }
+                    omp_unset_lock(&m_deque_access);
 
-            // Synchronize
-            r->synchronize_doors();
+                    if(r!=NULL){
+                        r->lock_contraction();
+                        // Contract
+                        bool change = false;
+                        change |= r->contract();
 
-            // Add Rooms to the Deque
-            add_rooms(rooms_update);
+                        if(change){
+                            // Analyse changes
+                            vector<Room *> rooms_update;
+                            r->analyze_change(rooms_update);
 
-            // Increment operations
-            nb_operations++;
+                            // Synchronize
+                            r->synchronize_doors();
+
+                            // Add Rooms to the Deque
+                            add_rooms(rooms_update);
+
+                            // Increment operations
+                            #pragma omp atomic
+                            nb_operations++;
+                        }
+                        r->unlock_contraction();
+                    }
+
+                }
+
+                omp_set_lock(&m_deque_access);
+                deque_empty = m_deque_rooms.empty();
+                omp_unset_lock(&m_deque_access);
+
+                if(deque_empty){
+#pragma omp taskwait
+                    omp_set_lock(&m_deque_access);
+                    deque_empty = m_deque_rooms.empty(); // New Rooms could have been added to the deque meanwhile taskwait
+                    omp_unset_lock(&m_deque_access);
+                }
+            }
         }
+
     }
     return nb_operations;
 }

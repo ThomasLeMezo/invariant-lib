@@ -161,7 +161,6 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
 }
 
 bool Room::contract(){
-    omp_set_lock(&m_lock_contraction);
     bool change = false;
     if(m_first_contract){
         contract_vector_field();

@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<10; i++){
         graph.bisect();
-        cout << maze.contract() << " - ";
+        cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
