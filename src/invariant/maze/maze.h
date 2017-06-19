@@ -98,5 +98,7 @@ inline void Maze::add_to_deque(Room *r){
     omp_unset_lock(&m_deque_access);
 }
 
+
+
 }
 #endif // MAZE_H

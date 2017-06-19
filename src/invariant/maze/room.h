@@ -165,6 +165,8 @@ private:
 }
 
 namespace invariant {
+std::ostream& operator<< (std::ostream& stream, const Room& r);
+
 inline Pave* Room::get_pave() const{
     return m_pave;
 }

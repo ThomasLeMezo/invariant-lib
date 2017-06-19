@@ -1,6 +1,7 @@
 #include "graph.h"
 #include "serialization.h"
 #include <stdexcept>
+#include <fstream>
 
 using namespace std;
 using namespace ibex;
@@ -16,8 +17,8 @@ Graph::Graph(const ibex::IntervalVector &space):
     m_paves.push_back(p);
 
     // Root of the pave node tree
-    m_pave_node = new Pave_node(p);
-    p->set_pave_node(m_pave_node);
+    m_tree = new Pave_node(p);
+    p->set_pave_node(m_tree);
 
     // Create infinity Paves around search space
     IntervalVector* result;
@@ -34,7 +35,7 @@ Graph::~Graph(){
     for(Pave *p:m_paves){
         delete(p);
     }
-    delete(m_pave_node);
+    delete(m_tree);
 }
 
 void Graph::serialize(std::ofstream& binFile) const{
@@ -101,7 +102,7 @@ void Graph::bisect(){
         m_bisectable_paves.pop_back();
 
         if(p->request_bisection()){
-            p->bisect(); // bisected added to m_paves
+            p->bisect(); // bisected added to m_paves & update mazes
             m_bisected_paves.push_back(p);
         }
         else{
@@ -110,13 +111,17 @@ void Graph::bisect(){
         }
     }
 
-    /// Call maze update (parallel loop possible) ///
-
-    // ToDo
-
     /// Delete parent of bisected paves ///
     for(Pave* p:m_bisected_paves)
         delete(p);
+}
+
+void Graph::get_room_info(Maze *maze, const IntervalVector& position, vector<Pave*> &pave_list) const{
+    m_tree->get_intersection_pave_outer(pave_list,position);
+    for(Pave *p:pave_list){
+        Room *r = p->get_rooms()[maze];
+        cout << *r << endl;
+    }
 }
 
 }

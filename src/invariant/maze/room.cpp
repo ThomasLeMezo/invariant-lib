@@ -104,30 +104,35 @@ void Room::contract_consistency(){
                 Door* door_in = f_in->get_doors()[m_maze];
                 const IntervalVector in(door_in->get_input_private());
 
-                for(int face_out=0; face_out<dim; face_out++){
-                    for(int sens_out = 0; sens_out < 2; sens_out++){
-                        if(!(face_in==face_out && sens_in==sens_out)){
-                            IntervalVector in_tmp(in);
-                            Face* f_out = m_pave->get_faces()[face_out][sens_out];
-                            Door* door_out = f_out->get_doors()[m_maze];
-                            IntervalVector out_tmp(door_out->get_output_private());
+                if(!in.is_empty()){
+                    for(int face_out=0; face_out<dim; face_out++){
+                        for(int sens_out = 0; sens_out < 2; sens_out++){
+                            if(!(face_in==face_out && sens_in==sens_out)){
+                                IntervalVector in_tmp(in);
+                                Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                                Door* door_out = f_out->get_doors()[m_maze];
+                                IntervalVector out_tmp(door_out->get_output_private());
 
-                            this->contract_flow(in_tmp, out_tmp, vec_field);
+                                if(!out_tmp.is_empty())
+                                    this->contract_flow(in_tmp, out_tmp, vec_field);
+                                else
+                                    in_tmp.set_empty();
 
-                            in_result |= in_tmp;
-                            out_result[face_out][sens_out] |= out_tmp;
+                                in_result |= in_tmp;
+                                out_result[face_out][sens_out] |= out_tmp;
+                            }
                         }
                     }
+                    door_in->set_input_private(in & in_result);
                 }
-                door_in->set_input_private(door_in->get_input_private() & in_result);
             }
         }
 
-        for(int face_out =0; face_out<dim; face_out++){
+        for(int face_out = 0; face_out<dim; face_out++){
             for(int sens_out = 0; sens_out < 2; sens_out++){
                 Face* f_out = m_pave->get_faces()[face_out][sens_out];
                 Door* door_out = f_out->get_doors()[m_maze];
-                door_out->set_output_private(door_out->get_output_private() & out_result[face_out][sens_out]);
+                door_out->set_output_private(out_result[face_out][sens_out]);
             }
         }
 
@@ -152,7 +157,7 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     Interval alpha(Interval::POS_REALS);
 
     for(int i=0; i<v.size(); i++){
-        alpha &= c[i]/v[i];
+        alpha &= ((c[i]/(v[i] & Interval::POS_REALS)) & Interval::POS_REALS) | ((c[i]/(v[i] & Interval::NEG_REALS)) & Interval::POS_REALS);
     }
 
     c &= alpha*v;
@@ -165,13 +170,13 @@ bool Room::contract(){
     if(m_first_contract){
         contract_vector_field();
         change = true;
+        m_first_contract = false;
     }
     change |= contract_continuity();
 
-    if(change){
+    if(change)
         contract_consistency();
-    }
-    m_first_contract = false;
+
     return change;
 }
 
@@ -192,10 +197,8 @@ bool Room::is_empty(){
     if(m_empty)
         return true;
     else{
-        bool empty = true;
         for(Face *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_empty()){
-                empty = false;
                 return false;
             }
         }
@@ -206,5 +209,14 @@ bool Room::is_empty(){
 
 bool Room::request_bisection(){
     return !(this->is_empty());
+}
+
+std::ostream& operator<< (std::ostream& stream, const Room& r) {
+    stream << "Room = " << r.get_pave()->get_position() << " - " << r.get_pave()->get_faces_vector().size() << " faces"<< endl;
+    for(Face *f:r.get_pave()->get_faces_vector()){
+        Door *d = f->get_doors()[r.get_maze()];
+        stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << endl;
+    }
+    return stream;
 }
 }

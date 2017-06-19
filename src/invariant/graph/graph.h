@@ -101,7 +101,7 @@ public:
      * @brief Getter to the root of the tree pave node
      * @return
      */
-    Pave_node *get_pave_node() const;
+    Pave_node *get_tree() const;
 
     /**
      * @brief Getter to the vector of mazes
@@ -116,13 +116,21 @@ public:
      */
     void add_maze(Maze * maze);
 
+    /**
+     * @brief Get info of all room inside position
+     * @param maze
+     * @param position
+     * @return
+     */
+    void get_room_info(Maze* maze, const ibex::IntervalVector &position, std::vector<Pave *> &pave_list) const;
+
 private:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // Graph coordinates
     std::vector<Pave*>              m_paves; // Paves of the Graph
     std::vector<Pave*>              m_paves_not_bisectable; // Paves of the Graph
     mutable unsigned char           m_dim = 0; // Dimension of the space
-    mutable Pave_node*              m_pave_node = NULL; // Root of the pave node tree
+    mutable Pave_node*              m_tree = NULL; // Root of the pave node tree
 
     std::vector<Maze*>              m_mazes;
 
@@ -141,8 +149,8 @@ private:
 /// ***** Inline functions *****///
 
 namespace invariant{
-inline Pave_node* Graph::get_pave_node() const{
-    return m_pave_node;
+inline Pave_node* Graph::get_tree() const{
+    return m_tree;
 }
 
 inline const std::vector<Pave *> &Graph::get_paves_not_bisectable() const{
@@ -162,7 +170,7 @@ inline const unsigned char& Graph::dim() const{
 }
 
 inline std::ostream& operator<< (std::ostream& stream, const Graph& g) {
-    stream << g.get_position() << " " << g.get_paves().size() << " paves";
+    stream << "GRAPH : " << g.get_position() << " - " << g.get_paves().size() << " paves";
     return stream;
 }
 inline const ibex::IntervalVector& Graph::get_position() const{

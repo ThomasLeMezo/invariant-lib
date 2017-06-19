@@ -35,7 +35,8 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
         std::stringstream node_pos;
         node_pos << p->get_position().mid()[0]*d_1 << ","
                  << -(p->get_position().mid()[1]*d_1) << "!";
-        agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), "");
+        char* def = new char;
+        agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
 
         map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
     }
@@ -64,7 +65,8 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
                     << ","
                     << -(p->get_position().mid()[1]*(d_1-d_2) + f->get_position().mid()[1]*d_2)
                     << "!";
-            agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), "");
+            char* def = new char;
+            agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
             agedge(graphiz_graph, map_node[p], n, (char*)"t", 1);
 
             map_face.insert(std::pair<Face*,Agnode_t *>(f, n));

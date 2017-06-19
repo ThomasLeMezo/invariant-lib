@@ -155,7 +155,7 @@ public:
      * @brief Get the pave node associated to this Pave
      * @return
      */
-    Pave_node* get_pave_node() const;
+    Pave_node* get_tree() const;
 
 
 private:
@@ -165,7 +165,7 @@ private:
     mutable std::vector< std::array<Face*, 2>>  m_faces; // Faces of the Pave
     mutable std::vector<Face *>                 m_faces_vector; // Faces of the Pave
     mutable Graph*                              m_graph = NULL;
-    mutable Pave_node*                          m_pave_node = NULL;
+    mutable Pave_node*                          m_tree = NULL;
     mutable size_t                              m_dim = 0;
     std::array<Pave*, 2>                        m_result_bisected;
     std::map<Maze*, Room*>                      m_rooms;
@@ -227,7 +227,7 @@ inline const std::vector<Face *> &Pave::get_faces_vector(){
 }
 
 inline void Pave::set_pave_node(Pave_node *pave_node){
-    m_pave_node = pave_node;
+    m_tree = pave_node;
 }
 
 inline std::map<Maze *, Room*> Pave::get_rooms() const{
@@ -242,8 +242,8 @@ inline size_t Pave::get_dim() const{
     return m_dim;
 }
 
-inline Pave_node* Pave::get_pave_node() const{
-    return m_pave_node;
+inline Pave_node* Pave::get_tree() const{
+    return m_tree;
 }
 }
 

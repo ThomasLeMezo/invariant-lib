@@ -5,6 +5,8 @@
 #include "face.h"
 #include "room.h"
 #include <omp.h>
+#include <iostream>
+#include <iomanip>
 
 namespace invariant {
 class Face; // declared only for friendship
@@ -176,6 +178,14 @@ inline bool Door::is_empty(){
         return true;
     else
         return false;
+}
+
+inline std::ostream& operator<< (std::ostream& stream, const Door& d){
+    std::ostringstream input, output;
+    input << d.get_input();
+    output << d.get_output();
+    stream << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str();
+    return stream;
 }
 }
 #endif // DOOR_H

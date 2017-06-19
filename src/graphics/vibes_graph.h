@@ -18,6 +18,8 @@ public:
 
     virtual void show() const;
 
+    void get_room_info(invariant::Maze *maze, const ibex::IntervalVector& position) const;
+
 private:
     void show_graph() const;
     void show_maze_outer() const;

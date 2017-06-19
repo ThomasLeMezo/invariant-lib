@@ -10,17 +10,17 @@ Domain::Domain(Graph *graph){
 
 void Domain::contract_separator(Maze *maze, std::vector<Room*> &list_room_not_empty){
     if(m_sep_output != NULL){
-        contract_separator(maze, m_graph->get_pave_node(), false, list_room_not_empty, true); // Output
+        contract_separator(maze, m_graph->get_tree(), false, list_room_not_empty, true); // Output
     }
     else{
-//        m_graph->get_pave_node()->get_all_child_rooms(list_room_not_empty, maze);
+//        m_graph->get_tree()->get_all_child_rooms(list_room_not_empty, maze);
     }
 
     if(m_sep_input != NULL){
-        contract_separator(maze, m_graph->get_pave_node(), false, list_room_not_empty, false); // Input
+        contract_separator(maze, m_graph->get_tree(), false, list_room_not_empty, false); // Input
     }
     else{
-//        m_graph->get_pave_node()->get_all_child_rooms(list_room_not_empty, maze);
+//        m_graph->get_tree()->get_all_child_rooms(list_room_not_empty, maze);
     }
 }
 

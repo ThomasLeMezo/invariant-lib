@@ -131,7 +131,7 @@ void Pave::bisect(){
     Pave *pave0 = new Pave(result_boxes.first, m_graph); // lb
     Pave *pave1 = new Pave(result_boxes.second, m_graph); // ub
     std::array<Pave*, 2> pave_result = {pave0, pave1};
-    m_pave_node->add_child(pave0, pave1);
+    m_tree->add_child(pave0, pave1);
 
     // 1) Update paves neighbors with the new two paves
     for(size_t face=0; face<dim; face++){
@@ -183,9 +183,9 @@ void Pave::bisect(){
         pave_result[1]->add_room(r_second);
 
         if(r->is_empty())
-            m_pave_node->add_emptyness((it->first), true);
+            m_tree->add_emptyness((it->first), true);
         else
-            m_pave_node->add_emptyness((it->first), false);
+            m_tree->add_emptyness((it->first), false);
     }
 
     // Save results in this pave

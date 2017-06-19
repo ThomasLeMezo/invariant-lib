@@ -41,19 +41,22 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-//    for(Pave*p:graph.get_paves()){
-//        cout << *p << endl;
-//    }
+    cout << graph << endl;
 
     Vibes_Graph v_graph("graph", &graph, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
-    cout << graph << endl;
+
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(-1.7);
+//    position_info[1] = Interval(1);
+//    v_graph.get_room_info(&maze, position_info);
+
 }
