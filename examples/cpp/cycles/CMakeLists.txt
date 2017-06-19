@@ -3,5 +3,5 @@
 # ==================================================================
 
 
-add_subdirectory(cycles)
-add_subdirectory(graphics)
+add_subdirectory(01_van_der_pol_invariant)
+add_subdirectory(02_van_der_pol_positive_invariant)

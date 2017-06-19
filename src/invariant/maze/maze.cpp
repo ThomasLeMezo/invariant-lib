@@ -27,6 +27,7 @@ int Maze::contract(){
     // Domain contraction
     vector<Room *> list_room_to_contract;
     invariant::Domain *d = m_domain;
+    double t_start = omp_get_wtime();
     d->contract_separator(this, list_room_to_contract);
 
     // Add Room to the Deque
@@ -37,6 +38,8 @@ int Maze::contract(){
         }
     }
 
+    cout << " => sep : " << omp_get_wtime() - t_start << endl;
+    t_start = omp_get_wtime();
     int nb_operations = 0;
 
     // Propagation of contractions
@@ -109,6 +112,7 @@ int Maze::contract(){
         }
 
     }
+    cout << " => sivia : " << omp_get_wtime() - t_start << endl;
     return nb_operations;
 }
 

@@ -47,23 +47,23 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
         bool not_empty = false;
         for(Face * f:p->get_faces_vector()){
             Door *d = f->get_doors()[maze];
-            IntervalVector output_in(p->get_dim());
-            IntervalVector output_out(p->get_dim());
+            IntervalVector sep_in(p->get_dim());
+            IntervalVector sep_out(p->get_dim());
 
             if(output){
-                output_in = d->get_output_private();
-                output_out = output_in;
-                m_sep_output->separate(output_in, output_out);
-                d->set_output_private(output_in & d->get_output_private());
+                sep_in = d->get_output_private();
+                sep_out = sep_in;
+                m_sep_output->separate(sep_in, sep_out);
+                d->set_output_private(sep_in & d->get_output_private());
             }
             else{
-                output_in = d->get_input_private();
-                output_out = output_in;
-                m_sep_input->separate(output_in, output_out);
-                d->set_input_private(output_in & d->get_input_private());
+                sep_in = d->get_input_private();
+                sep_out = sep_in;
+                m_sep_input->separate(sep_in, sep_out);
+                d->set_input_private(sep_in & d->get_input_private());
             }
             d->synchronize();
-            if(!output_in.is_empty())
+            if(!sep_in.is_empty())
                 not_empty = true;
         }
         if(not_empty){

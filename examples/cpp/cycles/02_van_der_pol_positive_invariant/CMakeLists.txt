@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(van_der_pol ${SRC})
+  add_executable(van_der_pol_positive_invariant ${SRC})
 
-  target_link_libraries(van_der_pol
+  target_link_libraries(van_der_pol_positive_invariant
 	 ${LIBS}
 	 invariant-core
          invariant-tools
