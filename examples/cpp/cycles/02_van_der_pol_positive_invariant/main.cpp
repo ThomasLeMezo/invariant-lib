@@ -26,10 +26,10 @@ int main(int argc, char *argv[])
     Graph graph(space);
 
     invariant::Domain dom(&graph);
-    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(3, 2));
+    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(5, 2));
     SepFwdBwd s1(f_sep_1, GT); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep_input(&s1);
-//    dom.set_sep_output(&s1);
+//    dom.set_sep_input(&s1);
+    dom.set_sep_output(&s1);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));

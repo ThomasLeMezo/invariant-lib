@@ -106,6 +106,17 @@ public:
      */
     Pave * get_pave() const;
 
+    /**
+     * @brief Return true if this face has no neighbors
+     * @return
+     */
+    bool is_border() const;
+
+    /**
+     * @brief Analyze if this Face is a border face
+     */
+    void analyze_border();
+
 private:
     /** Class Variable **/
     mutable ibex::IntervalVector      m_position; // Face position
@@ -113,6 +124,7 @@ private:
     // for each dimension according to the position of the Face in the Pave
     mutable Pave*                     m_pave = NULL;
     std::vector<Face *>               m_neighbors;
+    bool                              m_border = false;
 
     std::map<Maze*, Door*>            m_doors;
 
@@ -168,6 +180,15 @@ inline std::map<Maze *, Door *> Face::get_doors(){
 
 inline Pave* Face::get_pave() const{
     return m_pave;
+}
+
+inline bool Face::is_border() const{
+    return m_border;
+}
+
+inline void Face::analyze_border(){
+    if(m_neighbors.size() == 0)
+        m_border = true;
 }
 }
 

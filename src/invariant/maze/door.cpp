@@ -10,8 +10,6 @@ Door::Door(Face *face, Room *room):
     m_face = face;
     m_room = room;
     omp_init_lock(&m_lock_read);
-    if(face->get_neighbors().size()==0)
-        m_border = true;
 }
 
 Door::~Door(){
@@ -26,11 +24,11 @@ void Door::synchronize(){
 }
 
 bool Door::contract_continuity_private(){
-    if(m_border)
+    if(m_face->is_border())
         return false;
     bool change = false;
     IntervalVector door_input = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
-    IntervalVector door_output = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
+    IntervalVector door_output = ibex::IntervalVector(m_output_private.size(), Interval::EMPTY_SET);
     for(Face* f:m_face->get_neighbors()){
         Door *d = f->get_doors()[m_room->get_maze()];
         door_input |= d->get_output();

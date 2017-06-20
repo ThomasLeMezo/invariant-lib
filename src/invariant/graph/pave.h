@@ -157,6 +157,17 @@ public:
      */
     Pave_node* get_tree() const;
 
+    /**
+     * @brief Return true if this pave has one or more border faces (face with no neighbors)
+     * @return
+     */
+    bool is_border() const;
+
+    /**
+     * @brief Analyze if this Pave is a border (see is_border)
+     */
+    void analyze_border();
+
 
 private:
 
@@ -171,6 +182,7 @@ private:
     std::map<Maze*, Room*>                      m_rooms;
     bool                                        m_infinite_pave = false;
     size_t                                      m_serialization_id=0;
+    bool                                        m_border = false;
 };
 
     /**
@@ -244,6 +256,10 @@ inline size_t Pave::get_dim() const{
 
 inline Pave_node* Pave::get_tree() const{
     return m_tree;
+}
+
+inline bool Pave::is_border() const{
+    return m_border;
 }
 }
 
