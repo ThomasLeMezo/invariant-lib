@@ -167,6 +167,13 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, const ibex::IntervalVecto
     }
 }
 
+void Vibes_Graph::get_room_info(invariant::Maze *maze, double x, double y) const{
+    IntervalVector pos(2);
+    pos[0] = Interval(x);
+    pos[1] = Interval(y);
+    get_room_info(maze, pos);
+}
+
 namespace vibes{
 inline void drawGraph(const invariant::Graph &g, Params params){
     vibes::drawPave(g.get_paves(), params);

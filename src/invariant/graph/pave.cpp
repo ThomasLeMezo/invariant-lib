@@ -211,7 +211,7 @@ void Pave::add_room(Room *r){
     m_rooms.insert(std::pair<Maze*,Room*>(r->get_maze(),r));
 }
 
-inline void Pave::analyze_border(){
+void Pave::analyze_border(){
     for(Face*f:m_faces_vector)
         f->analyze_border();
 }

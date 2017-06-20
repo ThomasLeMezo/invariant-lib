@@ -26,19 +26,21 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
 
     // Nodes
     for(Pave* p:g->get_paves()){
-        Agnode_t *n;
-        std::stringstream node_param;
-        node_param << p->get_position() << endl;
-        node_param << p << endl;
-        n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
+        if(!p->is_infinite()){
+            Agnode_t *n;
+            std::stringstream node_param;
+            node_param << p->get_position() << endl;
+            node_param << p << endl;
+            n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
 
-        std::stringstream node_pos;
-        node_pos << p->get_position().mid()[0]*d_1 << ","
-                 << -(p->get_position().mid()[1]*d_1) << "!";
-        char* def = new char;
-        agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
+            std::stringstream node_pos;
+            node_pos << p->get_position().mid()[0]*d_1 << ","
+                                                       << -(p->get_position().mid()[1]*d_1) << "!";
+            char* def = new char;
+            agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
 
-        map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
+            map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
+        }
     }
 
     for(Pave* p:g->get_paves_not_bisectable()){
@@ -73,22 +75,22 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
         }
     }
 
-//    for(Pave* p:g->get_paves_not_bisectable()){
-//        for(Face *f:p->get_faces_vector()){
-//            Agnode_t *n;
-//            std::stringstream face_param;
-//            face_param << f->get_position() << endl;
-//            face_param << f << endl;
-//            n = agnode(graphiz_graph, (char*)(face_param.str().c_str()), true);
-//            agsafeset(n, (char*)"shape", (char*)"rectangle", (char*)"");
-//            agsafeset(n, (char*)"constraint", (char*)"false", (char*)"");
+    //    for(Pave* p:g->get_paves_not_bisectable()){
+    //        for(Face *f:p->get_faces_vector()){
+    //            Agnode_t *n;
+    //            std::stringstream face_param;
+    //            face_param << f->get_position() << endl;
+    //            face_param << f << endl;
+    //            n = agnode(graphiz_graph, (char*)(face_param.str().c_str()), true);
+    //            agsafeset(n, (char*)"shape", (char*)"rectangle", (char*)"");
+    //            agsafeset(n, (char*)"constraint", (char*)"false", (char*)"");
 
-//            Agedge_t *e;
-//            e = agedge(graphiz_graph, map_node[p], n, (char*)"t", 1);
+    //            Agedge_t *e;
+    //            e = agedge(graphiz_graph, map_node[p], n, (char*)"t", 1);
 
-//            map_face.insert(std::pair<Face*,Agnode_t *>(f, n));
-//        }
-//    }
+    //            map_face.insert(std::pair<Face*,Agnode_t *>(f, n));
+    //        }
+    //    }
 
     for(Pave* p:g->get_paves()){
         for(Face *f:p->get_faces_vector()){
@@ -102,17 +104,17 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
         }
     }
 
-//    for(Pave* p:g->get_paves_not_bisectable()){
-//        for(Face *f:p->get_faces_vector()){
-//            for(Face *f_n:f->get_neighbors()){
-//                Agedge_t *e;
-//                e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"", 1);
-//                agsafeset(e, (char*)"color", (char*)"red", (char*)"");
-//                agsafeset(e, (char*)"dir", (char*)"none", (char*)"");
-//                agsafeset(e, (char*)"constraint", (char*)"false", (char*)"");
-//            }
-//        }
-//    }
+    //    for(Pave* p:g->get_paves_not_bisectable()){
+    //        for(Face *f:p->get_faces_vector()){
+    //            for(Face *f_n:f->get_neighbors()){
+    //                Agedge_t *e;
+    //                e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"", 1);
+    //                agsafeset(e, (char*)"color", (char*)"red", (char*)"");
+    //                agsafeset(e, (char*)"dir", (char*)"none", (char*)"");
+    //                agsafeset(e, (char*)"constraint", (char*)"false", (char*)"");
+    //            }
+    //        }
+    //    }
 
 
     /* Set an attribute - in this case one that affects the visible rendering */

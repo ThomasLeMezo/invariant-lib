@@ -30,6 +30,15 @@ Graph::Graph(const ibex::IntervalVector &space):
         m_paves_not_bisectable.push_back(p_infinity);
     }
 
+    // Analyze faces (border)
+    for(Pave *p:m_paves)
+        p->analyze_border();
+    for(Pave *p:m_paves_not_bisectable)
+        p->analyze_border();
+
+    for(Face* f : p->get_faces_vector()){
+        cout << "face : is boder " << f->is_border() << endl;
+    }
 }
 
 Graph::~Graph(){
@@ -104,7 +113,7 @@ void Graph::bisect(){
 
         if(p->request_bisection()){
             p->bisect(); // bisected added to m_paves & update mazes
-            m_bisected_paves.push_back(p);
+            delete(p);
         }
         else{
             // Store not bisectable paves

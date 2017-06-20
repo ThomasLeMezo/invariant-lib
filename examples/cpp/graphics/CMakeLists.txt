@@ -15,7 +15,7 @@
   add_executable(graphics_example ${SRC})
 
   target_link_libraries(graphics_example
-	 ${LIBS}
+         ${LIBS}
 	 invariant-core
          invariant-tools
          invariant-graphics

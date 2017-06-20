@@ -81,6 +81,7 @@ void Room::contract_vector_field(){
                 d->set_empty_private_input();
             if((f->get_orientation() & v_bool_out).is_empty())
                 d->set_empty_private_output();
+
             // Note : synchronization will be proceed at the end of all contractors
             // to avoid unecessary lock
         }
@@ -144,8 +145,10 @@ bool Room::contract_continuity(){
         return false;
     bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
-        Door *d = f->get_doors()[m_maze];
-        change |= d->contract_continuity_private();
+        if(!f->is_border()){
+            Door *d = f->get_doors()[m_maze];
+            change |= d->contract_continuity_private();
+        }
     }
     return change;
 }

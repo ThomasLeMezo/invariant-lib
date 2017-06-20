@@ -19,17 +19,21 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-12,12);
-    space[1] = Interval(-12,12);
+    space[0] = Interval(-6,6);
+    space[1] = Interval(-6,6);
 
     // ****** Domain *******
     Graph graph(space);
 
     invariant::Domain dom(&graph);
-    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(5, 2));
-    SepFwdBwd s1(f_sep_1, GT); // LT, LEQ, EQ, GEQ, GT
-//    dom.set_sep_input(&s1);
-    dom.set_sep_output(&s1);
+    IntervalVector constraint(2);
+    constraint[0] = Interval(-6.5, 6.5);
+    constraint[1] = Interval(-6.5, 6.5);
+    Function f_id(x1,x2, Return(x1, x2));
+    SepFwdBwd s1(f_id, constraint);
+
+    dom.set_sep_input(&s1);
+//    dom.set_sep_output(&s1);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
@@ -39,7 +43,7 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<16; i++){
+    for(int i=0; i<3; i++){
         graph.bisect();
         cout << i << " | " << maze.contract() << " | " << graph.size() << endl;
     }
@@ -50,5 +54,7 @@ int main(int argc, char *argv[])
     Vibes_Graph v_graph("graph", &graph, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
+
+    v_graph.get_room_info(&maze, 4, 4);
 
 }

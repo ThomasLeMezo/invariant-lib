@@ -24,8 +24,6 @@ void Door::synchronize(){
 }
 
 bool Door::contract_continuity_private(){
-    if(m_face->is_border())
-        return false;
     bool change = false;
     IntervalVector door_input = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
     IntervalVector door_output = ibex::IntervalVector(m_output_private.size(), Interval::EMPTY_SET);
