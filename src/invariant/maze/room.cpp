@@ -141,8 +141,6 @@ void Room::contract_consistency(){
 }
 
 bool Room::contract_continuity(){
-    if(m_vector_fields.size()==0)
-        return false;
     bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
         if(!f->is_border()){
@@ -164,11 +162,13 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     }
 
     c &= alpha*v;
-    out &= c+in;
+//    out &= c+in;
     in &= out-c;
 }
 
 bool Room::contract(){
+    if(m_vector_fields.size()==0)
+        return false;
     bool change = false;
     if(m_first_contract){
         contract_vector_field();
@@ -185,7 +185,8 @@ bool Room::contract(){
 
 void Room::synchronize_doors(){
     for(Face* f:m_pave->get_faces_vector()){
-        f->get_doors()[m_maze]->synchronize();
+        Door *r = f->get_doors()[m_maze];
+        r->synchronize();
     }
 }
 

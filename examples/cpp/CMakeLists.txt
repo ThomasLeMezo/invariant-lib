@@ -5,3 +5,4 @@
 
 add_subdirectory(cycles)
 add_subdirectory(graphics)
+add_subdirectory(integration)

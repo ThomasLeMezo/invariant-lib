@@ -29,6 +29,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
         if(pave_node->is_leaf()){
             Pave* p=pave_node->get_pave();
             for(Face * f:p->get_faces_vector()){
+//                f->set_border(); // ?
                 Door *d = f->get_doors()[maze];
                 if(output)
                     d->set_empty_private_output();

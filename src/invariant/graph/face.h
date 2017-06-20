@@ -115,7 +115,12 @@ public:
     /**
      * @brief Analyze if this Face is a border face
      */
-    void analyze_border();
+    bool analyze_border();
+
+    /**
+     * @brief Set this Face as a border face
+     */
+    void set_border();
 
 private:
     /** Class Variable **/
@@ -186,9 +191,14 @@ inline bool Face::is_border() const{
     return m_border;
 }
 
-inline void Face::analyze_border(){
+inline bool Face::analyze_border(){
     if(m_neighbors.size() == 0)
         m_border = true;
+    return m_border;
+}
+
+inline void Face::set_border(){
+    m_border = true;
 }
 }
 

@@ -170,12 +170,6 @@ void Pave::bisect(){
     m_graph->add_paves(pave_result[0]);
     m_graph->add_paves(pave_result[1]);
 
-    // Analyze border
-    if(this->is_border()){
-        pave_result[0]->analyze_border();
-        pave_result[1]->analyze_border();
-    }
-
     // Add Room to the Paves
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room *r = (it->second);
@@ -192,6 +186,12 @@ void Pave::bisect(){
             m_tree->add_emptyness((it->first), true);
         else
             m_tree->add_emptyness((it->first), false);
+    }
+
+    // Analyze border
+    if(this->is_border()){
+        pave_result[0]->analyze_border();
+        pave_result[1]->analyze_border();
     }
 
     // Save results in this pave
@@ -213,7 +213,7 @@ void Pave::add_room(Room *r){
 
 void Pave::analyze_border(){
     for(Face*f:m_faces_vector)
-        f->analyze_border();
+        m_border |= f->analyze_border();
 }
 
 }
