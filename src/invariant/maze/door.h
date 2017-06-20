@@ -117,6 +117,7 @@ private:
     Face *               m_face = NULL; // pointer to the associated face
     Room *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
+    bool                 m_border = false;
 };
 }
 

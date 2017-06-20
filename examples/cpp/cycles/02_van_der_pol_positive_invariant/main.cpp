@@ -19,19 +19,17 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = Interval(-12,12);
+    space[1] = Interval(-12,12);
 
     // ****** Domain *******
     Graph graph(space);
-    invariant::Domain dom(&graph);
 
-    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(6, 2));
-//    Function f_sep_2(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1, 2));
+    invariant::Domain dom(&graph);
+    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(3, 2));
     SepFwdBwd s1(f_sep_1, GT); // LT, LEQ, EQ, GEQ, GT
-//    SepFwdBwd s2(f_sep_2, LT);
-//    SepUnion s3(s1, s2);
-    dom.set_sep_output(&s1);
+    dom.set_sep_input(&s1);
+//    dom.set_sep_output(&s1);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
@@ -41,7 +39,7 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<16; i++){
         graph.bisect();
         cout << i << " | " << maze.contract() << " | " << graph.size() << endl;
     }

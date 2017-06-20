@@ -109,8 +109,16 @@ public:
     /**
      * @brief Get all the room of the children of this pave_node
      * @param list_room
+     * @param maze
      */
     void get_all_child_rooms(std::vector<Room *> &list_room, Maze *maze) const;
+
+    /**
+     * @brief Get all non empty room of the children of this pave_node
+     * @param list_room
+     * @param maze
+     */
+    void get_all_child_rooms_not_empty(std::vector<Room *> &list_room, Maze *maze) const;
 
     /**
      * @brief Getter to the children of this pave_node

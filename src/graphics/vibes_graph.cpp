@@ -82,10 +82,15 @@ void Vibes_Graph::show_theta(Pave *p, Maze* maze) const{
 
     const vector<IntervalVector> vector_fields = r->get_vector_fields();
 
+    if(vector_fields.size()>0){
     for(IntervalVector r:vector_fields){
         for(Interval i:compute_theta(r[0], r[1])){
             vibes::drawSector(position[0].mid(), position[1].mid(), size, size, (-i.lb())*180.0/M_PI, (-i.ub())*180.0/M_PI, "black[gray]");
         }
+    }
+    }
+    else{
+       vibes::drawSector(position[0].mid(), position[1].mid(), size, size, -180, 180, "black[gray]");
     }
 
 }

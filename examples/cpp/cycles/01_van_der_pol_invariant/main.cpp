@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(6, 2));
+    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(5.5, 2));
     Function f_sep_2(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1, 2));
-    SepFwdBwd s1(f_sep_1, GT); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s1(f_sep_1, GEQ); // LT, LEQ, EQ, GEQ, GT
     SepFwdBwd s2(f_sep_2, LT);
     SepUnion s3(s1, s2);
     dom.set_sep(&s3);

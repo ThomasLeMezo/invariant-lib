@@ -26,6 +26,7 @@ Graph::Graph(const ibex::IntervalVector &space):
 
     for (int i=0; i<n; i++) {
         Pave* p_infinity = new Pave(result[i], this);
+        cout << result[i] << endl;
         m_paves_not_bisectable.push_back(p_infinity);
     }
 
