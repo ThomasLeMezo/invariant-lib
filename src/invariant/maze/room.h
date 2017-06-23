@@ -125,7 +125,7 @@ public:
      */
     void unlock_contraction();
 
-private:
+protected:
     /**
      * @brief Contract doors according to the neighbors
      */
@@ -149,7 +149,7 @@ private:
      */
     void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
 
-private:
+protected:
     Pave*   m_pave = NULL; // pointer to the associated face
     Maze*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room

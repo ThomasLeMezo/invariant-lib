@@ -124,7 +124,7 @@ public:
      */
     void get_room_info(Maze* maze, const ibex::IntervalVector &position, std::vector<Pave *> &pave_list) const;
 
-private:
+protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // Graph coordinates
     std::vector<Pave*>              m_paves; // Paves of the Graph

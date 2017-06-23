@@ -13,10 +13,6 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
 
     Graph *g = domain->get_graph();
     g->add_maze(this);
-    for(Pave*p:g->get_paves()){
-        Room *r = new Room(p, this, dynamics);
-        p->add_room(r);
-    }
 }
 
 Maze::~Maze(){

@@ -66,7 +66,7 @@ public:
      */
     void add_rooms(const std::vector<Room *> &list_rooms);
 
-private:
+protected:
     invariant::Domain *    m_domain = NULL;
     Graph  *    m_graph = NULL; // Graph associated with this maze
     Dynamics *  m_dynamics = NULL;

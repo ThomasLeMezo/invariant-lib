@@ -111,7 +111,7 @@ public:
      */
     bool is_empty();
 
-private:
+protected:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
     ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
     Face *               m_face = NULL; // pointer to the associated face

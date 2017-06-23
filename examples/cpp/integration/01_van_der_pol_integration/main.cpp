@@ -26,16 +26,12 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-//    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(5.5, 2));
-//    Function f_sep_2(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1, 2));
-//    SepFwdBwd s1(f_sep_1, LEQ); // LT, LEQ, EQ, GEQ, GT
-//    SepFwdBwd s2(f_sep_2, GT);
-//    SepInter s3(s1, s2);
-//    dom.set_sep(&s3);
+    Function f_sep(x1, x2, pow(x1-3, 2)+pow(x2-2, 2)-pow(1, 2));
+    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
+    dom.set_sep(&s);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(x2,
-                                    -x1/*(1.0*(1.0-pow(x1, 2))*x2-x1)*/));
+    ibex::Function f(x1, x2, Return(Interval(1.0), Interval(1.0)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze *********

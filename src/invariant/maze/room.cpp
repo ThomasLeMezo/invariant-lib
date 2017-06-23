@@ -162,7 +162,7 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     }
 
     c &= alpha*v;
-//    out &= c+in;
+    out &= c+in;
     in &= out-c;
 }
 
