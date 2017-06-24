@@ -110,7 +110,7 @@ void Room::contract_vector_field(){
 }
 
 void Room::contract_consistency(){
-    if(m_vector_field_zero == true && m_maze->get_type() == MAZE_PROPAGATOR){
+    if(m_vector_field_zero && m_maze->get_type() == MAZE_PROPAGATOR){
         this->set_full();
         return;
     }
