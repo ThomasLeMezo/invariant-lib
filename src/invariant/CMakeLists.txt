@@ -20,11 +20,13 @@ include_directories(../tools/serialization)
     maze/room.cpp
     maze/door.cpp
 
-    maze/outer/mazeouter.cpp
-    maze/outer/roomouter.cpp
-    maze/outer/doorouter.cpp
+    maze/propagator/mazepropagator.cpp
+    maze/propagator/roompropagator.cpp
+    maze/propagator/doorpropagator.cpp
 
-    maze/inner/mazeinner.cpp
+    maze/contractor/mazecontractor.cpp
+    maze/contractor/roomcontractor.cpp
+    maze/contractor/doorcontractor.cpp
 
     definition/domain.cpp
     definition/dynamics.cpp
@@ -41,11 +43,13 @@ include_directories(../tools/serialization)
     maze/room.h
     maze/door.h
 
-    maze/outer/mazeouter.h
-    maze/outer/roomouter.h
-    maze/outer/doorouter.h
+    maze/propagator/mazepropagator.h
+    maze/propagator/roompropagator.h
+    maze/propagator/doorpropagator.h
 
-    maze/inner/mazeinner.h
+    maze/contractor/mazecontractor.h
+    maze/contractor/roomcontractor.h
+    maze/contractor/doorcontractor.h
 
     definition/domain.h
     definition/dynamics.h

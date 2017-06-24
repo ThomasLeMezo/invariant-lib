@@ -10,6 +10,15 @@
 #include "room.h"
 
 namespace invariant {
+
+/**
+ * @brief The MazeType enum
+ * MAZE_FWD : propagation or contraction in the sens of the vector field
+ * MAZE_BWD : propagation or contraction in the opposite sens of the vector field
+ * MAZE_FWD_BWD : propagation or contraction in both sens
+ */
+enum MazeType { MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD };
+
 class Graph; // declared only for friendship
 class Domain; // declared only for friendship
 class Dynamics; // declared only for friendship
@@ -21,8 +30,9 @@ public:
      * @brief Constructor of a Maze
      * @param g
      * @param f_vect
+     * @param type of operation (forward, backward or both)
      */
-    Maze(invariant::Domain *domain, Dynamics *dynamics);
+    Maze(invariant::Domain *domain, Dynamics *dynamics, MazeType maze_type =MAZE_FWD_BWD);
 
     /**
      * @brief Maze destructor
@@ -74,6 +84,8 @@ protected:
     std::deque<Room *> m_deque_rooms;
 
     omp_lock_t  m_deque_access;
+
+    MazeType m_maze_type = MAZE_FWD_BWD;
 
 };
 }

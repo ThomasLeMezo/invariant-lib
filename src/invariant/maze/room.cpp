@@ -19,14 +19,14 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
             m_vector_fields.push_back(vector_field);
     }
 
-    int dim = m_pave->get_dim();
-    for(int face=0; face<dim; face++){
-        for(int sens=0; sens < 2; sens++){
-            Door *d = new Door(m_pave->get_faces()[face][sens], this);
-            Face *f = m_pave->get_faces()[face][sens];
-            f->add_door(d);
-        }
-    }
+//    int dim = m_pave->get_dim();
+//    for(int face=0; face<dim; face++){
+//        for(int sens=0; sens < 2; sens++){
+//            Door *d = new Door(m_pave->get_faces()[face][sens], this);
+//            Face *f = m_pave->get_faces()[face][sens];
+//            f->add_door(d);
+//        }
+//    }
 
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);

@@ -4,7 +4,7 @@ using namespace std;
 using namespace ibex;
 namespace invariant {
 
-Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
+Maze::Maze(invariant::Domain *domain, Dynamics *dynamics, MazeType maze_type)
 {
     m_domain = domain;
     m_dynamics = dynamics;
@@ -13,6 +13,8 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
 
     Graph *g = domain->get_graph();
     g->add_maze(this);
+
+    m_maze_type = maze_type;
 }
 
 Maze::~Maze(){
