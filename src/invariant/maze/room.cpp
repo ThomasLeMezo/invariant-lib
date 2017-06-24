@@ -48,16 +48,27 @@ Room::~Room(){
     omp_destroy_lock(&m_lock_deque);
 }
 
-void Room::set_empty_output(){
+void Room::set_empty_private_output(){
     for(Face *f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->set_empty_private_output();
-        f->get_doors()[m_maze]->synchronize();
     }
 }
 
 void Room::set_empty_private_input(){
     for(Face *f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->set_empty_private_input();
+    }
+}
+
+void Room::set_full_private_output(){
+    for(Face *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_full_private_output();
+    }
+}
+
+void Room::set_full_private_input(){
+    for(Face *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_full_private_input();
     }
 }
 
@@ -276,7 +287,10 @@ bool Room::is_full(){
 }
 
 bool Room::request_bisection(){
-    return !(this->is_empty());
+    if(m_maze->get_type() == MAZE_CONTRACTOR)
+        return !(this->is_empty());
+    else
+        return !(this->is_empty());
 }
 
 std::ostream& operator<< (std::ostream& stream, const Room& r) {
@@ -286,5 +300,12 @@ std::ostream& operator<< (std::ostream& stream, const Room& r) {
         stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << endl;
     }
     return stream;
+}
+
+void Room::synchronize(){
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        d->synchronize();
+    }
 }
 }

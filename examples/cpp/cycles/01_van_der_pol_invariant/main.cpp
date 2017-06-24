@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(&f);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn, MAZE_BWD);
+    Maze maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){

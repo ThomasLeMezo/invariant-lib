@@ -47,16 +47,24 @@ public:
     Maze* get_maze() const;
 
     /**
-     * @brief Set all the output doors to empty
-     * Request synchronization (omp lock)
+     * @brief Set all the private output doors to empty
      */
-    void set_empty_output();
+    void set_empty_private_output();
 
     /**
-     * @brief Set all the input doors to empty
-     * Request synchronization (omp lock)
+     * @brief Set all the private input doors to empty
      */
     void set_empty_private_input();
+
+    /**
+     * @brief Set all the private output doors to full
+     */
+    void set_full_private_output();
+
+    /**
+     * @brief Set all the private input doors to full
+     */
+    void set_full_private_input();
 
     /**
      * @brief Set all input and output private doors to empty
@@ -135,6 +143,11 @@ public:
      * @brief Unlock the pave to other contractions
      */
     void unlock_contraction();
+
+    /**
+     * @brief Synchronize the public doors with the private one
+     */
+    void synchronize();
 
 protected:
     /**

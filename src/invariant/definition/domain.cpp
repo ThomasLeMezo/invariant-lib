@@ -9,28 +9,33 @@ Domain::Domain(Graph *graph){
     m_graph = graph;
 }
 
-void Domain::contract_separator(Maze *maze, std::vector<Room*> &list_room_not_empty){
+void Domain::contract_separator(Maze *maze, std::vector<Room*> &list_room_deque){
     if(m_sep_output != NULL){
-        contract_separator(maze, m_graph->get_tree(), false, list_room_not_empty, true); // Output
+        contract_separator(maze, m_graph->get_tree(), false, list_room_deque, true); // Output
     }
     else{
-        m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_not_empty, maze);
+        if(maze->get_type() == MAZE_CONTRACTOR)
+            m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+        else
+            m_graph->get_tree()->get_all_child_rooms_not_full(list_room_deque, maze);
     }
 
     if(m_sep_input != NULL){
-        contract_separator(maze, m_graph->get_tree(), false, list_room_not_empty, false); // Input
+        contract_separator(maze, m_graph->get_tree(), false, list_room_deque, false); // Input
     }
     else{
-        m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_not_empty, maze);
+        if(maze->get_type() == MAZE_CONTRACTOR)
+            m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+        else
+            m_graph->get_tree()->get_all_child_rooms_not_full(list_room_deque, maze);
     }
 }
 
-void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Room*> &list_pave_not_empty, bool output){
-    if(all_out){
+void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_inside, std::vector<Room*> &list_pave_deque, bool output){
+    if(all_inside){
         if(pave_node->is_leaf()){
             Pave* p=pave_node->get_pave();
             for(Face * f:p->get_faces_vector()){
-//                f->set_border(); // ?
                 Door *d = f->get_doors()[maze];
                 if(output){
                     if(maze->get_type()==MAZE_CONTRACTOR)
@@ -48,12 +53,44 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
             }
         }
         else{
-            contract_separator(maze, pave_node->get_children().first, true, list_pave_not_empty, output);
-            contract_separator(maze, pave_node->get_children().second, true, list_pave_not_empty, output);
+            contract_separator(maze, pave_node->get_children().first, true, list_pave_deque, output);
+            contract_separator(maze, pave_node->get_children().second, true, list_pave_deque, output);
         }
     }
     else if(pave_node->is_leaf()){
         Pave* p=pave_node->get_pave();
+
+        // Test the pave globaly
+        if(output){
+            IntervalVector sep_in(p->get_position());
+            IntervalVector sep_out(p->get_position());
+            m_sep_output->separate(sep_in, sep_out);
+            if(!sep_out.is_empty()){
+                if(maze->get_type()==MAZE_PROPAGATOR){
+                    p->get_rooms()[maze]->set_full_private_output();
+                    p->get_rooms()[maze]->synchronize();
+                    return;
+                }
+            }
+            else
+                return;
+        }
+        else{
+            IntervalVector sep_in(p->get_position());
+            IntervalVector sep_out(p->get_position());
+            m_sep_input->separate(sep_in, sep_out);
+            if(!sep_out.is_empty()){
+                if(maze->get_type()==MAZE_PROPAGATOR){
+                    p->get_rooms()[maze]->set_full_private_input();
+                    p->get_rooms()[maze]->synchronize();
+                    return;
+                }
+            }
+            else
+                return;
+        }
+
+
         bool not_empty = false;
         for(Face * f:p->get_faces_vector()){
             Door *d = f->get_doors()[maze];
@@ -66,8 +103,9 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
                 m_sep_output->separate(sep_in, sep_out);
                 if(maze->get_type()==MAZE_CONTRACTOR)
                     d->set_output_private(sep_out & d->get_output_private());
-                else
+                else{
                     d->set_output_private(sep_out | d->get_output_private());
+                }
             }
             else{
                 sep_in = d->get_input_private();
@@ -83,7 +121,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
                 not_empty = true;
         }
         if(not_empty){
-            list_pave_not_empty.push_back(p->get_rooms()[maze]);
+            list_pave_deque.push_back(p->get_rooms()[maze]);
         }
     }
     else{
@@ -100,17 +138,17 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
 
         if(position_out.is_empty()){
             // blue area only
-            contract_separator(maze, pave_node->get_children().first, true, list_pave_not_empty, output);
-            contract_separator(maze, pave_node->get_children().second, true, list_pave_not_empty, output);
+            contract_separator(maze, pave_node->get_children().first, true, list_pave_deque, output);
+            contract_separator(maze, pave_node->get_children().second, true, list_pave_deque, output);
         }
         else if(position_in.is_empty()){
             // yellow area only
-            pave_node->get_all_child_rooms(list_pave_not_empty, maze);
+            pave_node->get_all_child_rooms(list_pave_deque, maze);
         }
         else{
             // mix area
-            contract_separator(maze,pave_node->get_children().first, false, list_pave_not_empty, output);
-            contract_separator(maze,pave_node->get_children().second, false, list_pave_not_empty, output);
+            contract_separator(maze,pave_node->get_children().first, false, list_pave_deque, output);
+            contract_separator(maze,pave_node->get_children().second, false, list_pave_deque, output);
         }
 
     }

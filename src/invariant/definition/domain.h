@@ -101,7 +101,7 @@ public:
      * @param pave_node
      * @param l
      */
-    void contract_separator(Maze *maze, std::vector<Room *> &list_room_not_empty);
+    void contract_separator(Maze *maze, std::vector<Room *> &list_room_deque);
 
     Graph* get_graph() const;
 
@@ -113,7 +113,7 @@ private:
      * @param l
      * @param output : true => contract output, false => contract input
      */
-    void contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, std::vector<Room *> &list_pave_not_empty, bool output);
+    void contract_separator(Maze *maze, Pave_node *pave_node, bool all_inside, std::vector<Room *> &list_pave_deque, bool output);
 
 private:
     Graph * m_graph;

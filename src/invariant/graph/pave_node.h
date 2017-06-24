@@ -121,6 +121,13 @@ public:
     void get_all_child_rooms_not_empty(std::vector<Room *> &list_room, Maze *maze) const;
 
     /**
+     * @brief Get all non full room of the children of this pave_node
+     * @param list_room
+     * @param maze
+     */
+    void get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maze *maze) const;
+
+    /**
      * @brief Getter to the children of this pave_node
      * @return
      */
@@ -134,10 +141,24 @@ public:
     void add_emptyness(Maze *maze, bool empty);
 
     /**
+     * @brief Add a flag to the fullness map to tell if a pave was full at that level of the tree
+     * @param maze
+     * @param empty
+     */
+    void add_fullness(Maze *maze, bool full);
+
+    /**
      * @brief Return the map of emptyness
      * @return
      */
     std::map<Maze*, bool> get_emptyness() const;
+
+    /**
+     * @brief Return the map of fullness
+     * @return
+     */
+    std::map<Maze*, bool> get_fullness() const;
+
 
 private:
     bool                                m_leaf = true;
@@ -146,6 +167,7 @@ private:
     const ibex::IntervalVector          m_position;
 
     std::map<Maze*, bool>               m_empty_rooms;
+    std::map<Maze*, bool>               m_full_rooms;
 };
 
 }
@@ -176,8 +198,16 @@ inline void Pave_node::add_emptyness(Maze *maze, bool empty){
     m_empty_rooms.insert(std::make_pair(maze, empty));
 }
 
+inline void Pave_node::add_fullness(Maze *maze, bool empty){
+    m_full_rooms.insert(std::make_pair(maze, empty));
+}
+
 inline std::map<Maze*, bool> Pave_node::get_emptyness() const{
     return m_empty_rooms;
+}
+
+inline std::map<Maze*, bool> Pave_node::get_fullness() const{
+    return m_full_rooms;
 }
 }
 #endif // PAVE_NODE_H

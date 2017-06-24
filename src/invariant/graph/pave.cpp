@@ -186,6 +186,12 @@ void Pave::bisect(){
             m_tree->add_emptyness((it->first), true);
         else
             m_tree->add_emptyness((it->first), false);
+
+        if(r->is_full())
+            m_tree->add_fullness((it->first), true);
+        else
+            m_tree->add_fullness((it->first), false);
+
     }
 
     // Analyze border

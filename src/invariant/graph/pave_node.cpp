@@ -180,4 +180,17 @@ void Pave_node::get_all_child_rooms_not_empty(std::vector<Room *> &list_room, Ma
     }
 }
 
+void Pave_node::get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maze *maze) const{
+    if(is_leaf()){
+        if(!m_pave->get_rooms()[maze]->is_full())
+            list_room.push_back(m_pave->get_rooms()[maze]);
+    }
+    else{
+        if(!this->get_fullness()[maze]){
+            m_children.first->get_all_child_rooms(list_room, maze);
+            m_children.second->get_all_child_rooms(list_room, maze);
+        }
+    }
+}
+
 }
