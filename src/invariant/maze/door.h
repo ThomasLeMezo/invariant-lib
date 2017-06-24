@@ -4,6 +4,7 @@
 #include <ibex.h>
 #include "face.h"
 #include "room.h"
+#include "maze.h"
 #include <omp.h>
 #include <iostream>
 #include <iomanip>
@@ -11,6 +12,7 @@
 namespace invariant {
 class Face; // declared only for friendship
 class Room; // declared only for friendship
+class Maze; // declared only for friendship
 class Door
 {
 public:

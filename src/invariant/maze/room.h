@@ -160,6 +160,7 @@ protected:
     omp_lock_t   m_lock_deque; // Lock in_deque variable access
 
     bool    m_in_deque = false;
+    bool    m_vector_field_zero = false;
 
 };
 }

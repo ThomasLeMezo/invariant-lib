@@ -17,7 +17,8 @@ namespace invariant {
  * MAZE_BWD : propagation or contraction in the opposite sens of the vector field
  * MAZE_FWD_BWD : propagation or contraction in both sens
  */
-enum MazeType { MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD };
+enum MazeSens { MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD};
+enum MazeType {MAZE_CONTRACTOR, MAZE_PROPAGATOR};
 
 class Graph; // declared only for friendship
 class Domain; // declared only for friendship
@@ -32,7 +33,7 @@ public:
      * @param f_vect
      * @param type of operation (forward, backward or both)
      */
-    Maze(invariant::Domain *domain, Dynamics *dynamics, MazeType maze_type =MAZE_FWD_BWD);
+    Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens =MAZE_FWD_BWD, MazeType maze_type=MAZE_CONTRACTOR);
 
     /**
      * @brief Maze destructor
@@ -76,6 +77,18 @@ public:
      */
     void add_rooms(const std::vector<Room *> &list_rooms);
 
+    /**
+     * @brief Return the sens of the Maze
+     * @return
+     */
+    MazeSens get_maze_sens() const;
+
+    /**
+     * @brief Return the type of the Maze
+     * @return
+     */
+    MazeType get_maze_type() const;
+
 protected:
     invariant::Domain *    m_domain = NULL;
     Graph  *    m_graph = NULL; // Graph associated with this maze
@@ -85,7 +98,8 @@ protected:
 
     omp_lock_t  m_deque_access;
 
-    MazeType m_maze_type = MAZE_FWD_BWD;
+    MazeSens m_maze_sens = MAZE_FWD_BWD;
+    MazeType m_maze_type = MAZE_CONTRACTOR;
 
 };
 }
@@ -110,6 +124,13 @@ inline void Maze::add_to_deque(Room *r){
     omp_unset_lock(&m_deque_access);
 }
 
+inline MazeSens Maze::get_maze_sens() const{
+    return m_maze_sens;
+}
+
+inline MazeType Maze::get_maze_type() const{
+    return m_maze_type;
+}
 
 
 }

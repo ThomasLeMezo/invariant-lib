@@ -17,16 +17,18 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
         if(!(zero.is_subset(vector_field)))
             m_vector_fields.push_back(vector_field);
+        else
+            m_vector_field_zero = true;
     }
 
-//    int dim = m_pave->get_dim();
-//    for(int face=0; face<dim; face++){
-//        for(int sens=0; sens < 2; sens++){
-//            Door *d = new Door(m_pave->get_faces()[face][sens], this);
-//            Face *f = m_pave->get_faces()[face][sens];
-//            f->add_door(d);
-//        }
-//    }
+    int dim = m_pave->get_dim();
+    for(int face=0; face<dim; face++){
+        for(int sens=0; sens < 2; sens++){
+            Door *d = new Door(m_pave->get_faces()[face][sens], this);
+            Face *f = m_pave->get_faces()[face][sens];
+            f->add_door(d);
+        }
+    }
 
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);
@@ -162,19 +164,37 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     }
 
     c &= alpha*v;
-    out &= c+in;
-    in &= out-c;
+
+    MazeSens sens = m_maze->get_maze_sens();
+    switch (m_maze->get_maze_type()) {
+    case MAZE_CONTRACTOR:
+        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+            out &= c+in;
+        if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+            in &= out-c;
+        break;
+    case MAZE_PROPAGATOR:
+        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+            out |= c+in;
+        if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+            in |= out-c;
+        break;
+    default:
+        break;
+    }
+
 }
 
 bool Room::contract(){
     if(m_vector_fields.size()==0)
         return false;
     bool change = false;
-    if(m_first_contract){
+    if(m_first_contract && m_maze->get_maze_type() == MAZE_CONTRACTOR){
         contract_vector_field();
         change = true;
-        m_first_contract = false;
     }
+    m_first_contract = false;
+
     change |= contract_continuity();
 
     if(change)

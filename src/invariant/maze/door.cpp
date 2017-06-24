@@ -10,6 +10,13 @@ Door::Door(Face *face, Room *room):
     m_face = face;
     m_room = room;
     omp_init_lock(&m_lock_read);
+
+    if(m_room->get_maze()->get_maze_type() == MAZE_PROPAGATOR){
+        m_input_private.set_empty();
+        m_output_private.set_empty();
+        m_input_public.set_empty();
+        m_output_public.set_empty();
+    }
 }
 
 Door::~Door(){
@@ -24,22 +31,39 @@ void Door::synchronize(){
 }
 
 bool Door::contract_continuity_private(){
+    MazeSens sens = m_room->get_maze()->get_maze_sens();
+    MazeType type = m_room->get_maze()->get_maze_type();
     bool change = false;
-    IntervalVector door_input = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
-    IntervalVector door_output = ibex::IntervalVector(m_output_private.size(), Interval::EMPTY_SET);
-    for(Face* f:m_face->get_neighbors()){
-        Door *d = f->get_doors()[m_room->get_maze()];
-        door_input |= d->get_output();
-        door_output |= d->get_input();
+
+    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+        IntervalVector door_input = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
+        for(Face* f:m_face->get_neighbors()){
+            Door *d = f->get_doors()[m_room->get_maze()];
+            door_input |= d->get_output();
+        }
+        if(door_input != m_input_private){
+            change = true;
+            if(type == MAZE_CONTRACTOR)
+                m_input_private &= door_input;
+            else if(type == MAZE_PROPAGATOR)
+                m_input_private |= door_input;
+        }
     }
 
-    if(door_input.is_interior_subset(m_input_private)
-            ||door_output.is_interior_subset(m_output_private)){
-        change = true;
-        m_input_private &= door_input;
-        m_output_private &= door_output;
+    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
+        IntervalVector door_output = ibex::IntervalVector(m_output_private.size(), Interval::EMPTY_SET);
+        for(Face* f:m_face->get_neighbors()){
+            Door *d = f->get_doors()[m_room->get_maze()];
+            door_output |= d->get_input();
+        }
+        if(door_output != m_output_private){
+            change = true;
+            if(type == MAZE_CONTRACTOR)
+                m_output_private &= door_output;
+            else if(type == MAZE_PROPAGATOR)
+                m_output_private |= door_output;
+        }
     }
-
     return change;
 }
 
