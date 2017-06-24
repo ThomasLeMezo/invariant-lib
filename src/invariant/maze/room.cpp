@@ -30,6 +30,15 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         }
     }
 
+    if(m_maze->get_type() == MAZE_CONTRACTOR){
+        m_full = true;
+        m_empty = false;
+    }
+    else{
+        m_full = false;
+        m_empty = true;
+    }
+
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);
 }
@@ -55,7 +64,12 @@ void Room::set_empty_private_input(){
 void Room::set_empty(){
     for(Face *f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->set_empty_private();
-        f->get_doors()[m_maze]->synchronize();
+    }
+}
+
+void Room::set_full(){
+    for(Face *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_full_private();
     }
 }
 
@@ -91,6 +105,14 @@ void Room::contract_vector_field(){
 }
 
 void Room::contract_consistency(){
+    if(m_vector_field_zero == true && m_maze->get_type() == MAZE_PROPAGATOR){
+        this->set_full();
+        return;
+    }
+
+    MazeSens sens = m_maze->get_sens();
+    MazeType type = m_maze->get_type();
+
     for(IntervalVector &vec_field:m_vector_fields){
         // Create tmp output doors
         const int dim = m_pave->get_dim();
@@ -126,16 +148,26 @@ void Room::contract_consistency(){
                             }
                         }
                     }
-                    door_in->set_input_private(in & in_result);
+                    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
+                        if(type == MAZE_CONTRACTOR)
+                            door_in->set_input_private(in & in_result);
+                        else
+                            door_in->set_input_private(in | in_result);
+                    }
                 }
             }
         }
 
-        for(int face_out = 0; face_out<dim; face_out++){
-            for(int sens_out = 0; sens_out < 2; sens_out++){
-                Face* f_out = m_pave->get_faces()[face_out][sens_out];
-                Door* door_out = f_out->get_doors()[m_maze];
-                door_out->set_output_private(out_result[face_out][sens_out]);
+        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+            for(int face_out = 0; face_out<dim; face_out++){
+                for(int sens_out = 0; sens_out < 2; sens_out++){
+                    Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                    Door* door_out = f_out->get_doors()[m_maze];
+                    if(type == MAZE_CONTRACTOR)
+                        door_out->set_output_private(out_result[face_out][sens_out]);
+                    else
+                        door_out->set_output_private(door_out->get_output_private() | out_result[face_out][sens_out]);
+                }
             }
         }
 
@@ -145,10 +177,8 @@ void Room::contract_consistency(){
 bool Room::contract_continuity(){
     bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
-        if(!f->is_border()){
             Door *d = f->get_doors()[m_maze];
             change |= d->contract_continuity_private();
-        }
     }
     return change;
 }
@@ -165,8 +195,8 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
 
     c &= alpha*v;
 
-    MazeSens sens = m_maze->get_maze_sens();
-    switch (m_maze->get_maze_type()) {
+    MazeSens sens = m_maze->get_sens();
+    switch (m_maze->get_type()) {
     case MAZE_CONTRACTOR:
         if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
             out &= c+in;
@@ -189,7 +219,7 @@ bool Room::contract(){
     if(m_vector_fields.size()==0)
         return false;
     bool change = false;
-    if(m_first_contract && m_maze->get_maze_type() == MAZE_CONTRACTOR){
+    if(m_first_contract && m_maze->get_type() == MAZE_CONTRACTOR){
         contract_vector_field();
         change = true;
     }
@@ -227,6 +257,20 @@ bool Room::is_empty(){
             }
         }
         m_empty = true;
+        return true;
+    }
+}
+
+bool Room::is_full(){
+    if(!m_full)
+        return false;
+    else{
+        for(Face *f:m_pave->get_faces_vector()){
+            if(!f->get_doors()[m_maze]->is_full()){
+                m_full = false;
+                return false;
+            }
+        }
         return true;
     }
 }

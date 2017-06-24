@@ -26,20 +26,13 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-//    Function f_sep_1(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(5.5, 2));
-//    Function f_sep_2(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1, 2));
-//    SepFwdBwd s1(f_sep_1, LEQ); // LT, LEQ, EQ, GEQ, GT
-//    SepFwdBwd s2(f_sep_2, GT);
-//    SepInter s3(s1, s2);
-//    dom.set_sep(&s3);
-
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,
-                                    -x1/*(1.0*(1.0-pow(x1, 2))*x2-x1)*/));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn);
+    Maze maze(&dom, &dyn, MAZE_BWD);
 
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){

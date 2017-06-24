@@ -81,19 +81,34 @@ public:
     Room *get_room() const;
 
     /**
-     * @brief Set all the output doors to empty
+     * @brief Set the private output doors to empty
      */
     void set_empty_private_output();
 
     /**
-     * @brief Set all the input doors to empty
+     * @brief Set the private output doors to full
+     */
+    void set_full_private_output();
+
+    /**
+     * @brief Set the input private door to empty
      */
     void set_empty_private_input();
 
     /**
-     * @brief Set all input and output doors to empty
+     * @brief Set the input private door to full
+     */
+    void set_full_private_input();
+
+    /**
+     * @brief Set all input and output private doors to empty
      */
     void set_empty_private();
+
+    /**
+     * @brief Set all input and output private doors to full
+     */
+    void set_full_private();
 
     /**
      * @brief Contract its private door according to neighbors
@@ -112,6 +127,12 @@ public:
      * @return
      */
     bool is_empty();
+
+    /**
+     * @brief Return true if input & output doors are full (ie equal to position)
+     * @return
+     */
+    bool is_full();
 
 protected:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public

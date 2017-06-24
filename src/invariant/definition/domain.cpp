@@ -1,4 +1,5 @@
 #include "domain.h"
+#include "door.h"
 
 using namespace ibex;
 using namespace std;
@@ -31,10 +32,18 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
             for(Face * f:p->get_faces_vector()){
 //                f->set_border(); // ?
                 Door *d = f->get_doors()[maze];
-                if(output)
-                    d->set_empty_private_output();
-                else
-                    d->set_empty_private_input();
+                if(output){
+                    if(maze->get_type()==MAZE_CONTRACTOR)
+                        d->set_empty_private_output();
+                    else
+                        d->set_full_private_output();
+                }
+                else{
+                    if(maze->get_type()==MAZE_CONTRACTOR)
+                        d->set_empty_private_input();
+                    else
+                        d->set_full_private_input();
+                }
                 d->synchronize();
             }
         }
@@ -55,13 +64,19 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_out, 
                 sep_in = d->get_output_private();
                 sep_out = sep_in;
                 m_sep_output->separate(sep_in, sep_out);
-                d->set_output_private(sep_out & d->get_output_private());
+                if(maze->get_type()==MAZE_CONTRACTOR)
+                    d->set_output_private(sep_out & d->get_output_private());
+                else
+                    d->set_output_private(sep_out | d->get_output_private());
             }
             else{
                 sep_in = d->get_input_private();
                 sep_out = sep_in;
                 m_sep_input->separate(sep_in, sep_out);
-                d->set_input_private(sep_out & d->get_input_private());
+                if(maze->get_type()==MAZE_CONTRACTOR)
+                    d->set_input_private(sep_out & d->get_input_private());
+                else
+                    d->set_input_private(sep_out | d->get_input_private());
             }
             d->synchronize();
             if(!sep_out.is_empty())

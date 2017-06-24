@@ -14,6 +14,7 @@ class Graph; // declared only for friendship
 class Maze; // declared only for friendship
 class Pave_node; // declared only for friendship
 class Room; // declared only for friendship
+class Door; // declared only for friendship
 class Domain
 {
 public:

@@ -59,10 +59,14 @@ public:
     void set_empty_private_input();
 
     /**
-     * @brief Set all input and output doors to empty
-     * Request synchronization (omp lock)
+     * @brief Set all input and output private doors to empty
      */
     void set_empty();
+
+    /**
+     * @brief Set all input and output private doors to full
+     */
+    void set_full();
 
     /**
      * @brief Function call after Pave bisection to update Room & Doors
@@ -103,11 +107,18 @@ public:
     bool request_bisection();
 
     /**
-     * @brief Return if this Room is empty
+     * @brief Return true if this Room is empty
      * (true if all doors are empty)
      * @return
      */
     bool is_empty();
+
+    /**
+     * @brief Return true if this Room is full
+     * (true if all doors are full)
+     * @return
+     */
+    bool is_full();
 
     /**
      * @brief Getter to the vector fields
@@ -155,6 +166,7 @@ protected:
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
 
     bool    m_empty = false;
+    bool    m_full = false;
     bool    m_first_contract = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
     omp_lock_t   m_lock_deque; // Lock in_deque variable access

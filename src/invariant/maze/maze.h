@@ -81,13 +81,13 @@ public:
      * @brief Return the sens of the Maze
      * @return
      */
-    MazeSens get_maze_sens() const;
+    MazeSens get_sens() const;
 
     /**
      * @brief Return the type of the Maze
      * @return
      */
-    MazeType get_maze_type() const;
+    MazeType get_type() const;
 
 protected:
     invariant::Domain *    m_domain = NULL;
@@ -124,11 +124,11 @@ inline void Maze::add_to_deque(Room *r){
     omp_unset_lock(&m_deque_access);
 }
 
-inline MazeSens Maze::get_maze_sens() const{
+inline MazeSens Maze::get_sens() const{
     return m_maze_sens;
 }
 
-inline MazeType Maze::get_maze_type() const{
+inline MazeType Maze::get_type() const{
     return m_maze_type;
 }
 

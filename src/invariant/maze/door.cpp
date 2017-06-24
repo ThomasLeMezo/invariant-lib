@@ -11,7 +11,7 @@ Door::Door(Face *face, Room *room):
     m_room = room;
     omp_init_lock(&m_lock_read);
 
-    if(m_room->get_maze()->get_maze_type() == MAZE_PROPAGATOR){
+    if(m_room->get_maze()->get_type() == MAZE_PROPAGATOR){
         m_input_private.set_empty();
         m_output_private.set_empty();
         m_input_public.set_empty();
@@ -31,8 +31,8 @@ void Door::synchronize(){
 }
 
 bool Door::contract_continuity_private(){
-    MazeSens sens = m_room->get_maze()->get_maze_sens();
-    MazeType type = m_room->get_maze()->get_maze_type();
+    MazeSens sens = m_room->get_maze()->get_sens();
+    MazeType type = m_room->get_maze()->get_type();
     bool change = false;
 
     if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
@@ -76,4 +76,25 @@ void Door::analyze_change(std::vector<Room *>&list_rooms){
         }
     }
 }
+
+void Door::set_full_private_output(){
+    m_output_private = m_face->get_position();
+}
+
+void Door::set_full_private_input(){
+    m_input_private = m_face->get_position();
+}
+
+void Door::set_full_private(){
+    m_output_private = m_face->get_position();
+    m_input_private = m_face->get_position();
+}
+
+bool Door::is_full(){
+    if(m_input_public == m_face->get_position() && m_output_public == m_face->get_position())
+        return true;
+    else
+        return false;
+}
+
 }
