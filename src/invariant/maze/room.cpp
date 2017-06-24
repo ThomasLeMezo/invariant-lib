@@ -30,14 +30,8 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         }
     }
 
-    if(m_maze->get_type() == MAZE_CONTRACTOR){
-        m_full = true;
-        m_empty = false;
-    }
-    else{
-        m_full = false;
-        m_empty = true;
-    }
+    m_full = false;
+    m_empty = false;
 
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);
@@ -147,7 +141,11 @@ void Room::contract_consistency(){
                                 IntervalVector in_tmp(in);
                                 Face* f_out = m_pave->get_faces()[face_out][sens_out];
                                 Door* door_out = f_out->get_doors()[m_maze];
-                                IntervalVector out_tmp(door_out->get_output_private());
+                                IntervalVector out_tmp(dim);
+                                if(type == MAZE_CONTRACTOR)
+                                    out_tmp = door_out->get_output_private();
+                                else
+                                    out_tmp = f_out->get_position();
 
                                 if(!out_tmp.is_empty())
                                     this->contract_flow(in_tmp, out_tmp, vec_field);
@@ -188,8 +186,8 @@ void Room::contract_consistency(){
 bool Room::contract_continuity(){
     bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
-            Door *d = f->get_doors()[m_maze];
-            change |= d->contract_continuity_private();
+        Door *d = f->get_doors()[m_maze];
+        change |= d->contract_continuity_private();
     }
     return change;
 }

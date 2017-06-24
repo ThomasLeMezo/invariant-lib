@@ -33,6 +33,7 @@ void Domain::contract_separator(Maze *maze, std::vector<Room*> &list_room_deque)
 
 void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_inside, std::vector<Room*> &list_pave_deque, bool output){
     if(all_inside){
+        // Case all the child paves are "inside"
         if(pave_node->is_leaf()){
             Pave* p=pave_node->get_pave();
             for(Face * f:p->get_faces_vector()){
@@ -40,14 +41,18 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
                 if(output){
                     if(maze->get_type()==MAZE_CONTRACTOR)
                         d->set_empty_private_output();
-                    else
+                    else{
                         d->set_full_private_output();
+                        p->get_neighbors_room(list_pave_deque, maze);
+                    }
                 }
                 else{
                     if(maze->get_type()==MAZE_CONTRACTOR)
                         d->set_empty_private_input();
-                    else
+                    else{
                         d->set_full_private_input();
+                        p->get_neighbors_room(list_pave_deque, maze);
+                    }
                 }
                 d->synchronize();
             }
@@ -58,6 +63,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
         }
     }
     else if(pave_node->is_leaf()){
+        // Case pave is a leaf
         Pave* p=pave_node->get_pave();
 
         // Test the pave globaly
@@ -69,6 +75,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
                 if(maze->get_type()==MAZE_PROPAGATOR){
                     p->get_rooms()[maze]->set_full_private_output();
                     p->get_rooms()[maze]->synchronize();
+                    // Add neighbors to list_pave_deque
+                    p->get_neighbors_room(list_pave_deque, maze);
                     return;
                 }
             }
@@ -83,6 +91,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
                 if(maze->get_type()==MAZE_PROPAGATOR){
                     p->get_rooms()[maze]->set_full_private_input();
                     p->get_rooms()[maze]->synchronize();
+                    // Add neighbors to list_pave_deque
+                    p->get_neighbors_room(list_pave_deque, maze);
                     return;
                 }
             }
@@ -90,7 +100,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
                 return;
         }
 
-
+        // Test each Faces
         bool not_empty = false;
         for(Face * f:p->get_faces_vector()){
             Door *d = f->get_doors()[maze];
@@ -121,7 +131,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
                 not_empty = true;
         }
         if(not_empty){
-            list_pave_deque.push_back(p->get_rooms()[maze]);
+            p->get_neighbors_room(list_pave_deque, maze);
+//            list_pave_deque.push_back(p->get_rooms()[maze]);
         }
     }
     else{

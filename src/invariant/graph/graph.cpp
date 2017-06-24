@@ -21,14 +21,14 @@ Graph::Graph(const ibex::IntervalVector &space):
     p->set_pave_node(m_tree);
 
     // Create infinity Paves around search space
-    IntervalVector* result;
-    int n=space.complementary(result);
+//    IntervalVector* result;
+//    int n=space.complementary(result);
 
-    for (int i=0; i<n; i++) {
-        Pave* p_infinity = new Pave(result[i], this);
-        cout << result[i] << endl;
-        m_paves_not_bisectable.push_back(p_infinity);
-    }
+//    for (int i=0; i<n; i++) {
+//        Pave* p_infinity = new Pave(result[i], this);
+//        cout << result[i] << endl;
+//        m_paves_not_bisectable.push_back(p_infinity);
+//    }
 
     // Analyze faces (border)
     for(Pave *p:m_paves)

@@ -168,6 +168,18 @@ public:
      */
     void analyze_border();
 
+    /**
+     * @brief @brief Add all neighbors pave to the Pave list
+     * @param pave_list
+     */
+    void get_neighbors_pave(std::vector<Pave*> pave_list);
+
+    /**
+     * @brief @brief Add all neighbors room to the Pave list
+     * @param room_list
+     * @param maze
+     */
+    void get_neighbors_room(std::vector<Room*> room_list, Maze *maze);
 
 private:
 

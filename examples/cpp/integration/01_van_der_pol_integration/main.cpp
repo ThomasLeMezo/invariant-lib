@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     x2_c = 2.0;
     r = 1.0;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
     dom.set_sep(&s);
 
     // ****** Dynamics *******
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<2; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
@@ -55,9 +55,9 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(-1.7);
-//    position_info[1] = Interval(1);
-//    v_graph.get_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(-4);
+    position_info[1] = Interval(4);
+    v_graph.get_room_info(&maze, position_info);
 
 }
