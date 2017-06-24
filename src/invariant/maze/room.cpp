@@ -96,12 +96,17 @@ void Room::contract_vector_field(){
                 v_bool_in[i] |= Interval(0);
         }
 
+        MazeSens sens = m_maze->get_sens();
         for(Face* f:m_pave->get_faces_vector()){
             Door *d = f->get_doors()[m_maze];
-            if((f->get_orientation() & v_bool_in).is_empty())
-                d->set_empty_private_input();
-            if((f->get_orientation() & v_bool_out).is_empty())
-                d->set_empty_private_output();
+            if((f->get_orientation() & v_bool_in).is_empty()){
+                if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+                    d->set_empty_private_input();
+            }
+            if((f->get_orientation() & v_bool_out).is_empty()){
+                if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+                    d->set_empty_private_output();
+            }
 
             // Note : synchronization will be proceed at the end of all contractors
             // to avoid unecessary lock
