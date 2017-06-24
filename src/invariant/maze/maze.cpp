@@ -42,7 +42,7 @@ int Maze::contract(){
         }
     }
 
-    cout << " => sep : " << omp_get_wtime() - t_start << endl;
+    cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << endl;
     t_start = omp_get_wtime();
     int nb_operations = 0;
 

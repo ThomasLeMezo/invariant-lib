@@ -42,10 +42,9 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<2; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
-        cout << i << " - " << maze.contract() << " - ";
-        cout << graph.size() << endl;
+        cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -56,7 +55,7 @@ int main(int argc, char *argv[])
     v_graph.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-4);
+    position_info[0] = Interval(-2);
     position_info[1] = Interval(4);
     v_graph.get_room_info(&maze, position_info);
 

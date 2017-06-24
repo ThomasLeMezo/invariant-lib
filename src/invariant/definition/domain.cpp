@@ -136,8 +136,10 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, bool all_insid
         }
     }
     else{
-        if(pave_node->get_emptyness()[maze]==true)
-            return;
+        if(maze->get_type() == MAZE_CONTRACTOR){
+            if(pave_node->get_emptyness()[maze]==true)
+                return;
+        }
 
         IntervalVector position_in(pave_node->get_position());
         IntervalVector position_out(position_in);

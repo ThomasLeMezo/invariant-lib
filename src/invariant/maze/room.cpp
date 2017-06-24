@@ -205,39 +205,29 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     c &= alpha*v;
 
     MazeSens sens = m_maze->get_sens();
-    switch (m_maze->get_type()) {
-    case MAZE_CONTRACTOR:
-        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
-            out &= c+in;
-        if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
-            in &= out-c;
-        break;
-    case MAZE_PROPAGATOR:
-        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
-            out |= c+in;
-        if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
-            in |= out-c;
-        break;
-    default:
-        break;
-    }
-
+    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+        out &= c+in;
+    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+        in &= out-c;
 }
 
 bool Room::contract(){
-    if(m_vector_fields.size()==0)
-        return false;
     bool change = false;
-    if(m_first_contract && m_maze->get_type() == MAZE_CONTRACTOR){
-        contract_vector_field();
-        change = true;
+    if(m_maze->get_type() == MAZE_CONTRACTOR){
+        if(m_vector_fields.size()==0)
+            return false;
+        if(m_first_contract){
+            contract_vector_field();
+            change = true;
+        }
     }
     m_first_contract = false;
 
     change |= contract_continuity();
 
-    if(change)
+    if(change){
         contract_consistency();
+    }
 
     return change;
 }
