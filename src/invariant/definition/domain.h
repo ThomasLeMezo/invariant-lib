@@ -132,7 +132,7 @@ private:
      * @param l
      * @param output : true => contract output, false => contract input
      */
-    void contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room *> &list_pave_deque, bool output, DOMAIN_SEP accelerator);
+    void contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room *> &list_room_deque, bool output, DOMAIN_SEP accelerator);
 
     /**
      * @brief Contract the boarders according to the options

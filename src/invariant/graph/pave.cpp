@@ -200,8 +200,8 @@ void Pave::bisect(){
 
         if(r->is_full()){
             m_tree->add_fullness((it->first), true);
-            r_first->set_full();
-            r_second->set_full();
+            // Child cannot be set to full because of overapproximation
+            // in the case of MAZE_PROPAGATOR
         }
         else
             m_tree->add_fullness((it->first), false);
@@ -221,6 +221,12 @@ const bool Pave::request_bisection(){
         request &= (it->second)->request_bisection();
     }
     return request;
+}
+
+void Pave::set_removed_rooms(){
+    for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        (it->second)->set_removed();
+    }
 }
 
 void Pave::add_room(Room *r){

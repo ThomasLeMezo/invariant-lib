@@ -113,6 +113,7 @@ void Graph::bisect(){
         }
         else{
             // Store not bisectable paves
+            p->set_removed_rooms();
             m_paves_not_bisectable.push_back(p);
         }
     }

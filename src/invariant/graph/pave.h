@@ -181,6 +181,11 @@ public:
      */
     void get_neighbors_room(Maze *maze, std::vector<Room*> room_list);
 
+    /**
+     * @brief Set all the rooms attached to this pave to removed state
+     */
+    void set_removed_rooms();
+
 private:
 
     /** Class Variable **/

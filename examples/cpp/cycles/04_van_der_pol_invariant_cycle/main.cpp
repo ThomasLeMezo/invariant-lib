@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
+    Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
+    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
+    dom.set_sep(&s);
+
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
@@ -53,8 +57,8 @@ int main(int argc, char *argv[])
     v_graph.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-1.7);
-//    position_info[1] = Interval(1);
+//    position_info[0] = Interval(-0.3);
+//    position_info[1] = Interval(-0.95);
 //    v_graph.get_room_info(&maze, position_info);
 
 }

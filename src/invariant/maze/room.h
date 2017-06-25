@@ -149,6 +149,18 @@ public:
      */
     void synchronize();
 
+    /**
+     * @brief Get if this room is removed (i.e. if it is active)
+     * @return
+     */
+    bool is_removed() const;
+
+    /**
+     * @brief Set this room to removed state
+     */
+    void set_removed();
+
+
 protected:
     /**
      * @brief Contract doors according to the neighbors
@@ -180,12 +192,14 @@ protected:
 
     bool    m_empty = false;
     bool    m_full = false;
+
     bool    m_first_contract = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
     omp_lock_t   m_lock_deque; // Lock in_deque variable access
 
     bool    m_in_deque = false;
     bool    m_vector_field_zero = false;
+    bool    m_removed = false;
 
 };
 }
@@ -231,6 +245,14 @@ inline void Room::lock_contraction(){
 
 inline void Room::unlock_contraction(){
     omp_unset_lock(&m_lock_contraction);
+}
+
+inline bool Room::is_removed() const{
+    return m_removed;
+}
+
+inline void Room::set_removed(){
+    m_removed = true;
 }
 }
 

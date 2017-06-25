@@ -32,6 +32,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
 
     m_full = true;
     m_empty = false;
+    m_removed = false;
 
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);
@@ -236,25 +237,31 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
 
 bool Room::contract(){
     bool change = false;
-    if(m_maze->get_type() == MAZE_CONTRACTOR){
-        if(m_vector_fields.size()==0)
-            return false;
-        if(m_first_contract){
-            contract_vector_field();
+    if(!is_removed()){
+        MazeType type = m_maze->get_type();
+        if(type == MAZE_CONTRACTOR){
+            if(m_vector_fields.size()==0)
+                return false;
+            if(m_first_contract){
+                contract_vector_field();
+                change = true;
+            }
+        }
+        if(m_first_contract && m_pave->is_border() && type == MAZE_PROPAGATOR){
+            // Case only the border is full
             change = true;
         }
-    }
-    if(m_first_contract && m_pave->is_border() && m_maze->get_type() == MAZE_PROPAGATOR){
-        change = true;
-    }
-    m_first_contract = false;
+        m_first_contract = false;
 
-    change |= contract_continuity();
+        change |= contract_continuity();
 
-    if(change){
-        contract_consistency();
+        if(change){
+            contract_consistency();
+        }
+
+        if(is_empty())
+            set_removed();
     }
-
     return change;
 }
 
@@ -301,10 +308,11 @@ bool Room::is_full(){
 }
 
 bool Room::request_bisection(){
-    if(m_maze->get_type() == MAZE_CONTRACTOR)
-        return !(this->is_empty());
-    else
-        return !(this->is_empty());
+    return !(is_empty());
+    //    if(m_maze->get_type() == MAZE_CONTRACTOR)
+    //        return !(this->is_empty());
+    //    else
+    //        return !(this->is_empty());
 }
 
 std::ostream& operator<< (std::ostream& stream, const Room& r) {
