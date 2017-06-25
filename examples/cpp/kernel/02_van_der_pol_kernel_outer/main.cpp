@@ -34,16 +34,16 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5, 0.5)));
+    ibex::Function f(x1, x2, Return(-x2,
+                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5, 0.5)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
+    Maze maze(&dom, &dyn, MAZE_BWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<16; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
@@ -52,9 +52,11 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
+    vibes::beginDrawing();
     Vibes_Graph v_graph("graph", &graph, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
+    vibes::endDrawing();
 
 //    IntervalVector position_info(2);
 //    position_info[0] = Interval(-1.7);

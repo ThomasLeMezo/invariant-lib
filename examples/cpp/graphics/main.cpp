@@ -24,9 +24,11 @@ int main(int argc, char *argv[])
     }
     cout << omp_get_wtime() - t_start << endl;
 
+    vibes::beginDrawing();
     Vibes_Graph visu_g("graph", &g);
     visu_g.setProperties(0, 0, 512, 512);
     visu_g.show();
+    vibes::endDrawing();
 
     Graphiz_Graph ggraph("graph.pdf", &g);
     cout << g << endl;

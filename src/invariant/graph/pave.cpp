@@ -218,14 +218,17 @@ void Pave::bisect(){
 const bool Pave::request_bisection(){
     bool request = true;
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
-        request &= (it->second)->request_bisection();
+        Room *r = it->second;
+        request &= r->request_bisection();
     }
     return request;
 }
 
 void Pave::set_removed_rooms(){
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
-        (it->second)->set_removed();
+        Room* r = it->second;
+        if(r->is_empty())
+            r->set_removed();
     }
 }
 

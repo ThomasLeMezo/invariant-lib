@@ -26,6 +26,8 @@ private:
     void show_maze_outer() const;
     void show_theta(invariant::Pave *p, invariant::Maze *maze) const;
 
+    void draw_room_outer(invariant::Pave *p) const;
+
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
     invariant::Graph*   m_graph = NULL;

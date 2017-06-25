@@ -28,47 +28,53 @@ void Vibes_Graph::show() const{
 
 }
 
-void Vibes_Graph::show_maze_outer() const{
-    for(Pave *p:m_graph->get_paves()){
-        // Draw backward
-        vibes::drawBox(p->get_position(), "[blue]");
+void Vibes_Graph::draw_room_outer(Pave *p) const{
+    // Draw backward
+    vibes::drawBox(p->get_position(), "[blue]");
 
-        // Draw Polygon
-        vector<double> pt_x, pt_y;
-        vector<tuple<int, int, bool>> oriented_path;
-        oriented_path.push_back(make_tuple(0, 0, true));
-        oriented_path.push_back(make_tuple(1, 1, true));
-        oriented_path.push_back(make_tuple(0, 1, false));
-        oriented_path.push_back(make_tuple(1, 0, false));
+    // Draw Polygon
+    vector<double> pt_x, pt_y;
+    vector<tuple<int, int, bool>> oriented_path;
+    oriented_path.push_back(make_tuple(0, 0, true));
+    oriented_path.push_back(make_tuple(1, 1, true));
+    oriented_path.push_back(make_tuple(0, 1, false));
+    oriented_path.push_back(make_tuple(1, 0, false));
 
-        for(tuple<int, int, bool> &t:oriented_path){
-            Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
-            IntervalVector d_iv = d->get_input() | d->get_output();
+    for(tuple<int, int, bool> &t:oriented_path){
+        Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
+        IntervalVector d_iv = d->get_input() | d->get_output();
 
-            if(!d_iv.is_empty()){
-                if(get<2>(t)){
-                    pt_x.push_back(d_iv[0].lb());
-                    pt_y.push_back(d_iv[1].lb());
-                    pt_x.push_back(d_iv[0].ub());
-                    pt_y.push_back(d_iv[1].ub());
-                }
-                else{
-                    pt_x.push_back(d_iv[0].ub());
-                    pt_y.push_back(d_iv[1].ub());
-                    pt_x.push_back(d_iv[0].lb());
-                    pt_y.push_back(d_iv[1].lb());
-                }
+        if(!d_iv.is_empty()){
+            if(get<2>(t)){
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+            }
+            else{
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
             }
         }
-        vibes::drawPolygon(pt_x, pt_y, "[yellow]");
+    }
+    vibes::drawPolygon(pt_x, pt_y, "[yellow]");
 
-        // Draw Cone
-        show_theta(p, m_maze_outer);
+    // Draw Cone
+    show_theta(p, m_maze_outer);
+}
 
+void Vibes_Graph::show_maze_outer() const{
+    for(Pave *p:m_graph->get_paves()){
+        draw_room_outer(p);
     }
     for(Pave *p:m_graph->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_outer];
+            if(!r->is_removed()){
+                draw_room_outer(p);
+            }
             if(r->is_empty())
                 vibes::drawBox(p->get_position(), "[blue]");
         }

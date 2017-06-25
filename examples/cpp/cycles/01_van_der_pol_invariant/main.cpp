@@ -48,9 +48,11 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
+    vibes::beginDrawing();
     Vibes_Graph v_graph("graph", &graph, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
+    vibes::endDrawing();
 
 //    IntervalVector position_info(2);
 //    position_info[0] = Interval(-1.7);

@@ -18,14 +18,14 @@ using namespace std;
 
 VibesFigure::VibesFigure(const string& figure_name)
 {
-  vibes::beginDrawing();
+
   m_name = figure_name;
   vibes::newFigure(m_name);
 }
 
 VibesFigure::~VibesFigure()
 {
-  vibes::endDrawing();
+
 }
 
 string VibesFigure::name() const
