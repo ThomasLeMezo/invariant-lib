@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
     invariant::Domain dom(&graph);
 
     double x1_c, x2_c, r;
-    x1_c = 3.0;
-    x2_c = 2.0;
-    r = 2;
+    x1_c = -2.0;
+    x2_c = -4.0;
+    r = 0.3;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
     dom.set_sep(&s);

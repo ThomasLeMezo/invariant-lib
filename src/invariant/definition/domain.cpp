@@ -38,7 +38,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                     else
                         r->set_full_private_input();
                     if(type == MAZE_PROPAGATOR)
-                        p->get_neighbors_room(maze, list_room_deque);
+                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                     r->synchronize();
                 }
             }
@@ -61,7 +61,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_empty_private_input();
 
                     if(type == MAZE_CONTRACTOR)
-                        p->get_neighbors_room(maze, list_room_deque);
+                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                     r->synchronize();
                 }
             }
@@ -90,9 +90,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_full_private_output();
                     else
                         r->set_full_private_input();
-                    if(type == MAZE_PROPAGATOR){
-                        p->get_neighbors_room(maze, list_room_deque);
-                    }
+                    if(type == MAZE_PROPAGATOR)
+                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                 }
             }
             else if(x_out.is_empty()){
@@ -102,9 +101,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_empty_private_output();
                     else
                         r->set_empty_private_input();
-                    if(type == MAZE_CONTRACTOR){
-                        p->get_neighbors_room(maze, list_room_deque);
-                    }
+                    if(type == MAZE_CONTRACTOR)
+                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                 }
             }
             else{
@@ -114,9 +112,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_full_private_output();
                     else
                         r->set_full_private_input();
-                    if(type == MAZE_PROPAGATOR){
-                        p->get_neighbors_room(maze, list_room_deque);
-                    }
+                    if(type == MAZE_PROPAGATOR)
+                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                 }
             }
             r->synchronize();
@@ -149,7 +146,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
 void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
     vector<Pave*> pave_border_list;
     m_graph->get_tree()->get_border_paves(pave_border_list);
-//    MazeType type = maze->get_type();
+    MazeType type = maze->get_type();
 
     for(Pave *p:pave_border_list){
         for(Face *f:p->get_faces_vector()){
@@ -167,16 +164,15 @@ void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
                 d->synchronize();
             }
         }
-        list_room_deque.push_back(p->get_rooms()[maze]);
 
-//        if(type == MAZE_PROPAGATOR && (m_border_path_in || m_border_path_out)){
-//            if(!p->get_rooms()[maze]->is_full())
-//                list_room_deque.push_back(p->get_rooms()[maze]);
-//        }
-//        if(type == MAZE_CONTRACTOR && (!m_border_path_in || !m_border_path_out)){
-//            if(!p->get_rooms()[maze]->is_empty())
-//                list_room_deque.push_back(p->get_rooms()[maze]);
-//        }
+        if(type == MAZE_PROPAGATOR && (m_border_path_in || m_border_path_out)){
+            if(!p->get_rooms()[maze]->is_full())
+                list_room_deque.push_back(p->get_rooms()[maze]);
+        }
+        if(type == MAZE_CONTRACTOR && (!m_border_path_in || !m_border_path_out)){
+            if(!p->get_rooms()[maze]->is_empty())
+                list_room_deque.push_back(p->get_rooms()[maze]);
+        }
     }
 }
 

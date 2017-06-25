@@ -3,7 +3,4 @@
 # ==================================================================
 
 
-add_subdirectory(cycles)
-add_subdirectory(graphics)
-add_subdirectory(integration)
-add_subdirectory(kernel)
+add_subdirectory(01_van_der_pol_kernel_inner)

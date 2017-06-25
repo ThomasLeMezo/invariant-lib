@@ -22,32 +22,29 @@ int main(int argc, char *argv[])
     space[0] = Interval(-6,6);
     space[1] = Interval(-6,6);
 
-    // ****** Domain *******
+    // ****** Domain ******* //
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    dom.set_border_path_in(false);
-    dom.set_border_path_out(false);
+    dom.set_border_path_in(true);
+    dom.set_border_path_out(true);
 
-    double x1_c, x2_c, r;
-    x1_c = 3.0;
-    x2_c = 2.0;
-    r = 0.3;
-    Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep(&s);
-
-    // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    // ****** Dynamics ******* //
+    ibex::Function f1(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.5)));
+    ibex::Function f2(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)-Interval(0.5)));
     vector<Function *> f_list;
-    f_list.push_back(&f);
+    f_list.push_back(&f1);
+    f_list.push_back(&f2);
     Dynamics_Function dyn(f_list);
 
-    // ******* Maze *********
+    // ******* Maze ********* //
     Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
 
+    // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }
@@ -60,8 +57,7 @@ int main(int argc, char *argv[])
     v_graph.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(4);
+//    position_info[0] = Interval(1);
+//    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
-
 }
