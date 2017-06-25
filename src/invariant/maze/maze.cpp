@@ -90,6 +90,9 @@ int Maze::contract(){
                             // Synchronize
                             r->synchronize_doors();
 
+                            if(r->is_empty())
+                                r->set_removed();
+
                             // Add Rooms to the Deque
                             add_rooms(rooms_update);
 
@@ -116,7 +119,7 @@ int Maze::contract(){
         }
 
     }
-    cout << " => sivia : " << omp_get_wtime() - t_start << endl;
+    cout << " => contractions : " << omp_get_wtime() - t_start << endl;
     return nb_operations;
 }
 

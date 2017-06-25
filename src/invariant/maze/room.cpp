@@ -236,6 +236,7 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
 }
 
 bool Room::contract(){
+    // Do not synchronization in this function or sub-functions
     bool change = false;
     if(!is_removed()){
         MazeType type = m_maze->get_type();
@@ -258,9 +259,6 @@ bool Room::contract(){
         if(change){
             contract_consistency();
         }
-
-        if(is_empty())
-            set_removed();
     }
     return change;
 }
