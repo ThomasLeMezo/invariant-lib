@@ -27,31 +27,26 @@ int main(int argc, char *argv[])
     invariant::Domain dom(&graph);
 
     Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
     dom.set_sep(&s);
 
-    dom.set_border_path_in(true);
-    dom.set_border_path_out(true);
+    dom.set_border_path_in(false);
+    dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    ibex::Function f1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5)));
-    ibex::Function f2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.5)));
-    vector<Function *> f_list;
-    f_list.push_back(&f1);
-    f_list.push_back(&f2);
-    Dynamics_Function dyn(f_list);
+    ibex::Function f(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5, 0.5)));
+    Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze.contract(); // To init the first room
     for(int i=0; i<15; i++){
         graph.bisect();
-        cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
+        cout << i << " - " << maze.contract() << " - ";
+        cout << graph.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -62,7 +57,8 @@ int main(int argc, char *argv[])
     v_graph.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(1);
+//    position_info[0] = Interval(-1.7);
 //    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
+
 }

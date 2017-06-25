@@ -12,13 +12,13 @@
 
   )
 
-  add_executable(van_der_pol_invariant ${SRC})
+  add_executable(van_der_pol_kernel_outer ${SRC})
 
-  target_link_libraries(van_der_pol_invariant
-    ${LIBS}
-    invariant-core
-    invariant-tools
-    invariant-graphics
+  target_link_libraries(van_der_pol_kernel_outer
+	${LIBS}
+	invariant-core
+	invariant-tools
+	invariant-graphics
   )
 
 
