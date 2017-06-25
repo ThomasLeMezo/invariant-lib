@@ -38,7 +38,7 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                     else
                         r->set_full_private_input();
                     if(type == MAZE_PROPAGATOR)
-                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
+                        p->get_neighbors_room(maze, list_room_deque);
                     r->synchronize();
                 }
             }
@@ -59,9 +59,6 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_empty_private_output();
                     else
                         r->set_empty_private_input();
-
-                    if(type == MAZE_CONTRACTOR)
-                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                     r->synchronize();
                 }
             }
@@ -90,8 +87,10 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_full_private_output();
                     else
                         r->set_full_private_input();
-                    if(type == MAZE_PROPAGATOR)
-                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
+                    if(type == MAZE_PROPAGATOR){
+                        p->get_neighbors_room(maze, list_room_deque);
+                        list_room_deque.push_back(r);
+                    }
                 }
             }
             else if(x_out.is_empty()){
@@ -101,8 +100,6 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_empty_private_output();
                     else
                         r->set_empty_private_input();
-                    if(type == MAZE_CONTRACTOR)
-                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
                 }
             }
             else{
@@ -112,8 +109,10 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_full_private_output();
                     else
                         r->set_full_private_input();
-                    if(type == MAZE_PROPAGATOR)
-                        list_room_deque.push_back(r); // p->get_neighbors_room(maze, list_room_deque);
+                    if(type == MAZE_PROPAGATOR){
+                        p->get_neighbors_room(maze, list_room_deque);
+                        list_room_deque.push_back(r);
+                    }
                 }
             }
             r->synchronize();

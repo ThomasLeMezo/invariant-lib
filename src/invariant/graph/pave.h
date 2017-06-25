@@ -179,7 +179,7 @@ public:
      * @param room_list
      * @param maze
      */
-    void get_neighbors_room(Maze *maze, std::vector<Room*> room_list);
+    void get_neighbors_room(Maze *maze, std::vector<Room *> &room_list);
 
     /**
      * @brief Set all the rooms attached to this pave to removed state

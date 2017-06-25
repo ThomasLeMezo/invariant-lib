@@ -6,6 +6,8 @@ namespace invariant {
 
 Maze::Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens, MazeType maze_type)
 {
+    m_maze_sens = maze_sens;
+    m_maze_type = maze_type;
     m_domain = domain;
     m_dynamics = dynamics;
     m_graph = domain->get_graph();
@@ -18,9 +20,6 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens, Ma
     }
 
     g->add_maze(this);
-
-    m_maze_sens = maze_sens;
-    m_maze_type = maze_type;
 }
 
 Maze::~Maze(){

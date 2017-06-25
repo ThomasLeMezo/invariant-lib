@@ -12,6 +12,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
     const IntervalVector position(p->get_position());
     vector<IntervalVector> vector_field_list = dynamics->eval(position);
 
+    // Eval Vector field
     for(IntervalVector &vector_field:vector_field_list){
         // Test if 0 is inside the vector_field IV
         IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
@@ -21,6 +22,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
             m_vector_field_zero = true;
     }
 
+    // Create Doors
     int dim = m_pave->get_dim();
     for(int face=0; face<dim; face++){
         for(int sens=0; sens < 2; sens++){
@@ -32,6 +34,8 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
 
     m_full = true;
     m_empty = false;
+    m_full_first_eval = true;
+    m_empty_first_eval = true;
     m_removed = false;
 
     omp_init_lock(&m_lock_contraction);
@@ -278,11 +282,13 @@ void Room::analyze_change(std::vector<Room *>&list_rooms){
 }
 
 bool Room::is_empty(){
-    if(m_empty)
+    if(m_empty && !m_empty_first_eval)
         return true;
     else{
+        m_empty_first_eval = false;
         for(Face *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_empty()){
+
                 return false;
             }
         }
@@ -292,9 +298,10 @@ bool Room::is_empty(){
 }
 
 bool Room::is_full(){
-    if(!m_full)
+    if(!m_full && !m_full_first_eval)
         return false;
     else{
+        m_full_first_eval = false;
         for(Face *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_full()){
                 m_full = false;
@@ -307,10 +314,6 @@ bool Room::is_full(){
 
 bool Room::request_bisection(){
     return !(is_empty());
-    //    if(m_maze->get_type() == MAZE_CONTRACTOR)
-    //        return !(this->is_empty());
-    //    else
-    //        return !(this->is_empty());
 }
 
 std::ostream& operator<< (std::ostream& stream, const Room& r) {

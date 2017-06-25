@@ -246,7 +246,7 @@ void Pave::get_neighbors_pave(std::vector<Pave*> pave_list){
     }
 }
 
-void Pave::get_neighbors_room(Maze *maze, std::vector<Room*> room_list){
+void Pave::get_neighbors_room(Maze *maze, std::vector<Room*>& room_list){
     for(Face *f:m_faces_vector){
         for(Face *f_n:f->get_neighbors()){
             room_list.push_back(f_n->get_pave()->get_rooms()[maze]);

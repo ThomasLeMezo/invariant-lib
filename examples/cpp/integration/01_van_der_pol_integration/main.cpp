@@ -47,7 +47,8 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    maze.contract(); // To set first pave to be in
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }
@@ -59,9 +60,9 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(4);
-//    v_graph.get_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(-2);
+    position_info[1] = Interval(4);
+    v_graph.get_room_info(&maze, position_info);
 
 }
