@@ -159,6 +159,18 @@ public:
      */
     std::map<Maze*, bool> get_fullness() const;
 
+    /**
+     * @brief Return true if this pave_node is a border pave
+     * @return
+     */
+    bool is_border_pave() const;
+
+    /**
+     * @brief Get the list of border paves
+     * @param pave_list
+     */
+    void get_border_paves(std::vector<Pave*> &pave_list) const;
+
 
 private:
     bool                                m_leaf = true;
@@ -168,6 +180,7 @@ private:
 
     std::map<Maze*, bool>               m_empty_rooms;
     std::map<Maze*, bool>               m_full_rooms;
+    bool                                m_border_pave;
 };
 
 }
@@ -208,6 +221,10 @@ inline std::map<Maze*, bool> Pave_node::get_emptyness() const{
 
 inline std::map<Maze*, bool> Pave_node::get_fullness() const{
     return m_full_rooms;
+}
+
+inline bool Pave_node::is_border_pave() const{
+    return m_border_pave;
 }
 }
 #endif // PAVE_NODE_H

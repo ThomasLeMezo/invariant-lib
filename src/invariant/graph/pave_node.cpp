@@ -9,6 +9,7 @@ Pave_node::Pave_node(Pave *p):m_position(p->get_position())
 {
     m_leaf = true;
     m_pave = p;
+    m_border_pave = p->is_border();
 }
 
 void Pave_node::add_child(Pave *p1, Pave *p2){
@@ -189,6 +190,18 @@ void Pave_node::get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maz
         if(!this->get_fullness()[maze]){
             m_children.first->get_all_child_rooms(list_room, maze);
             m_children.second->get_all_child_rooms(list_room, maze);
+        }
+    }
+}
+
+void Pave_node::get_border_paves(std::vector<Pave*>& pave_list) const{
+    if(is_leaf() && m_pave->is_border()){
+        pave_list.push_back(m_pave);
+    }
+    else{
+        if(m_border_pave){
+            m_children.first->get_border_paves(pave_list);
+            m_children.second->get_border_paves(pave_list);
         }
     }
 }

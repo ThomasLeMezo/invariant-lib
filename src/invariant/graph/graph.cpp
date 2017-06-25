@@ -16,10 +16,6 @@ Graph::Graph(const ibex::IntervalVector &space):
     Pave* p = new Pave(space, this);
     m_paves.push_back(p);
 
-    // Root of the pave node tree
-    m_tree = new Pave_node(p);
-    p->set_pave_node(m_tree);
-
     // Create infinity Paves around search space
 //    IntervalVector* result;
 //    int n=space.complementary(result);
@@ -36,9 +32,9 @@ Graph::Graph(const ibex::IntervalVector &space):
     for(Pave *p:m_paves_not_bisectable)
         p->analyze_border();
 
-    for(Face* f : p->get_faces_vector()){
-        cout << "face : is boder " << f->is_border() << endl;
-    }
+    // Root of the pave node tree
+    m_tree = new Pave_node(p);
+    p->set_pave_node(m_tree);
 }
 
 Graph::~Graph(){

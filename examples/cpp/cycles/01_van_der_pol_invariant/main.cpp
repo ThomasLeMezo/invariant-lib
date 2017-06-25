@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
+    dom.set_border_path_in(false);
+    dom.set_border_path_out(false);
+
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));

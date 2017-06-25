@@ -29,20 +29,23 @@ int main(int argc, char *argv[])
     double x1_c, x2_c, r;
     x1_c = 3.0;
     x2_c = 2.0;
-    r = 0.3;
+    r = 2;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
     dom.set_sep(&s);
+
+    dom.set_border_path_in(true);
+    dom.set_border_path_out(true);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(Interval(1.0), Interval(1.0)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn, MAZE_BWD, MAZE_CONTRACTOR);
+    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_CONTRACTOR);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<1; i++){
+    for(int i=0; i<14; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }

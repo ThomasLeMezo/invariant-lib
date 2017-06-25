@@ -10,6 +10,9 @@
 #include "pave_node.h"
 
 namespace invariant{
+
+enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
+
 class Graph; // declared only for friendship
 class Maze; // declared only for friendship
 class Pave_node; // declared only for friendship
@@ -101,9 +104,25 @@ public:
      * @param pave_node
      * @param l
      */
-    void contract_separator(Maze *maze, std::vector<Room *> &list_room_deque);
+    void contract_domain(Maze *maze, std::vector<Room *> &list_room_deque);
 
+    /**
+     * @brief Return the graph associated with this domain
+     * @return
+     */
     Graph* get_graph() const;
+
+    /**
+     * @brief Set "in" to true if there are incoming paths on the border
+     * @param in
+     */
+    void set_border_path_in(bool in);
+
+    /**
+     * @brief Set "out" to true if there are outcoming paths on the border
+     * @param out
+     */
+    void set_border_path_out(bool out);
 
 private:
     /**
@@ -113,7 +132,13 @@ private:
      * @param l
      * @param output : true => contract output, false => contract input
      */
-    void contract_separator(Maze *maze, Pave_node *pave_node, bool all_inside, std::vector<Room *> &list_pave_deque, bool output);
+    void contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room *> &list_pave_deque, bool output, DOMAIN_SEP accelerator);
+
+    /**
+     * @brief Contract the boarders according to the options
+     * @param maze
+     */
+    void contract_border(Maze *maze, std::vector<Room*> &list_room_deque);
 
 private:
     Graph * m_graph;
@@ -121,6 +146,9 @@ private:
     std::vector<std::pair<invariant::Maze*, bool>> m_remove_mazes_input, m_remove_mazes_output;
     ibex::Sep* m_sep_input = NULL;
     ibex::Sep* m_sep_output = NULL;
+
+    bool m_border_path_in = true;
+    bool m_border_path_out = true;
 };
 }
 
@@ -166,6 +194,14 @@ inline void Domain::set_sep_output(ibex::Sep* sep){
 
 inline Graph* Domain::get_graph() const{
     return m_graph;
+}
+
+inline void Domain::set_border_path_in(bool in){
+    m_border_path_in = in;
+}
+
+inline void Domain::set_border_path_out(bool out){
+    m_border_path_out = out;
 }
 
 }

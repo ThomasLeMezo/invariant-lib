@@ -123,14 +123,22 @@ void Room::contract_consistency(){
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
 
-    for(IntervalVector &vec_field:m_vector_fields){
-        // Create tmp output doors
-        const int dim = m_pave->get_dim();
+    vector<vector< array<IntervalVector, 2>>> out_results; // One per vec_field, dim, sens
+    const int dim = m_pave->get_dim();
+    const int nb_vec = m_vector_fields.size();
+
+    for(int vf=0; vf<nb_vec; vf++){
         std::vector< std::array<IntervalVector, 2>> out_result;
         for(int i=0; i<dim; i++){
             std::array<IntervalVector, 2> output = {IntervalVector::empty(dim), IntervalVector::empty(dim)};
             out_result.push_back(output);
         }
+        out_results.push_back(out_result);
+    }
+
+    int n_vf = 0;
+    for(IntervalVector &vec_field:m_vector_fields){
+        // Create tmp output doors
 
         for(int face_in=0; face_in<dim; face_in++){
             for(int sens_in = 0; sens_in < 2; sens_in++){
@@ -158,7 +166,7 @@ void Room::contract_consistency(){
                                     in_tmp.set_empty();
 
                                 in_result |= in_tmp;
-                                out_result[face_out][sens_out] |= out_tmp;
+                                out_results[n_vf][face_out][sens_out] |= out_tmp;
                             }
                         }
                     }
@@ -170,29 +178,39 @@ void Room::contract_consistency(){
                     }
                 }
             }
-        }
 
-        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
-            for(int face_out = 0; face_out<dim; face_out++){
-                for(int sens_out = 0; sens_out < 2; sens_out++){
-                    Face* f_out = m_pave->get_faces()[face_out][sens_out];
-                    Door* door_out = f_out->get_doors()[m_maze];
-                    if(type == MAZE_CONTRACTOR)
-                        door_out->set_output_private(out_result[face_out][sens_out]);
-                    else
-                        door_out->set_output_private(door_out->get_output_private() | out_result[face_out][sens_out]);
+        }
+        n_vf++;
+    }
+
+    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+        for(int face_out = 0; face_out<dim; face_out++){
+            for(int sens_out = 0; sens_out < 2; sens_out++){
+                Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                Door* door_out = f_out->get_doors()[m_maze];
+
+                IntervalVector door_out_iv(dim, Interval::ALL_REALS);
+                for(int n_vf=0; n_vf<nb_vec; n_vf++){
+                    door_out_iv &= out_results[n_vf][face_out][sens_out];
                 }
+
+                if(type == MAZE_CONTRACTOR)
+                    door_out->set_output_private(door_out_iv);
+                else
+                    door_out->set_output_private(door_out->get_output_private() | door_out_iv);
             }
         }
-
     }
+
 }
 
 bool Room::contract_continuity(){
     bool change = false;
     for(Face *f:m_pave->get_faces_vector()){
-        Door *d = f->get_doors()[m_maze];
-        change |= d->contract_continuity_private();
+        if(!f->is_border()){
+            Door *d = f->get_doors()[m_maze];
+            change |= d->contract_continuity_private();
+        }
     }
     return change;
 }
@@ -225,6 +243,9 @@ bool Room::contract(){
             contract_vector_field();
             change = true;
         }
+    }
+    if(m_first_contract && m_pave->is_border() && m_maze->get_type() == MAZE_PROPAGATOR){
+        change = true;
     }
     m_first_contract = false;
 

@@ -32,7 +32,7 @@ int Maze::contract(){
     vector<Room *> list_room_to_contract;
     invariant::Domain *d = m_domain;
     double t_start = omp_get_wtime();
-    d->contract_separator(this, list_room_to_contract);
+    d->contract_domain(this, list_room_to_contract);
 
     // Add Room to the Deque
     for(Room *r:list_room_to_contract){

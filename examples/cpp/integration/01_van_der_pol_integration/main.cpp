@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
+    dom.set_border_path_in(false);
+    dom.set_border_path_out(false);
+
     double x1_c, x2_c, r;
     x1_c = 3.0;
     x2_c = 2.0;
@@ -36,7 +39,9 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f);
+    vector<Function *> f_list;
+    f_list.push_back(&f);
+    Dynamics_Function dyn(f_list);
 
     // ******* Maze *********
     Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
@@ -54,9 +59,9 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = Interval(-2);
-    position_info[1] = Interval(4);
-    v_graph.get_room_info(&maze, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(-2);
+//    position_info[1] = Interval(4);
+//    v_graph.get_room_info(&maze, position_info);
 
 }

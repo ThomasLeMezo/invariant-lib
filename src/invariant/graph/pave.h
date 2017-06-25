@@ -179,7 +179,7 @@ public:
      * @param room_list
      * @param maze
      */
-    void get_neighbors_room(std::vector<Room*> room_list, Maze *maze);
+    void get_neighbors_room(Maze *maze, std::vector<Room*> room_list);
 
 private:
 

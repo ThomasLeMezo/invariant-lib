@@ -131,7 +131,6 @@ void Pave::bisect(){
     Pave *pave0 = new Pave(result_boxes.first, m_graph); // lb
     Pave *pave1 = new Pave(result_boxes.second, m_graph); // ub
     std::array<Pave*, 2> pave_result = {pave0, pave1};
-    m_tree->add_child(pave0, pave1);
 
     // 1) Update paves neighbors with the new two paves
     for(size_t face=0; face<dim; face++){
@@ -166,9 +165,18 @@ void Pave::bisect(){
     pave_result[1]->get_faces()[bisect_axis][0]->add_neighbor(pave_result[0]->get_faces()[bisect_axis][1]);
     pave_result[0]->get_faces()[bisect_axis][1]->add_neighbor(pave_result[1]->get_faces()[bisect_axis][0]);
 
-    // Add Paves to the graph
+    // 4) Add Paves to the graph
     m_graph->add_paves(pave_result[0]);
     m_graph->add_paves(pave_result[1]);
+
+    // 5) Analyze border
+    if(this->is_border()){
+        pave_result[0]->analyze_border();
+        pave_result[1]->analyze_border();
+    }
+
+    // 6) Add new node to the tree
+    m_tree->add_child(pave_result[0], pave_result[1]);
 
     // Add Room to the Paves
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
@@ -191,13 +199,6 @@ void Pave::bisect(){
             m_tree->add_fullness((it->first), true);
         else
             m_tree->add_fullness((it->first), false);
-
-    }
-
-    // Analyze border
-    if(this->is_border()){
-        pave_result[0]->analyze_border();
-        pave_result[1]->analyze_border();
     }
 
     // Save results in this pave
@@ -230,7 +231,7 @@ void Pave::get_neighbors_pave(std::vector<Pave*> pave_list){
     }
 }
 
-void Pave::get_neighbors_room(std::vector<Room*> room_list, Maze *maze){
+void Pave::get_neighbors_room(Maze *maze, std::vector<Room*> room_list){
     for(Face *f:m_faces_vector){
         for(Face *f_n:f->get_neighbors()){
             room_list.push_back(f_n->get_pave()->get_rooms()[maze]);
