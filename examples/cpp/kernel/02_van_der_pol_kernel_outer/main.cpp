@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(-x2,
-                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5, 0.5)));
+                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<16; i++){
+    for(int i=0; i<18; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;

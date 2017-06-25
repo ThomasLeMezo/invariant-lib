@@ -19,8 +19,10 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
     // ********** Border contraction ********** //
     contract_border(maze, list_room_deque);
 
-    // ********** Add pave to deque ********** //
+    // ********** Add additional rooms to deque ********** //
     if(maze->get_type() == MAZE_CONTRACTOR)
+        m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+    if(maze->get_type() == MAZE_PROPAGATOR && m_graph->get_paves().size()>1)
         m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
 }
 
