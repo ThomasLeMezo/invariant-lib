@@ -65,8 +65,9 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                     r->set_empty_private_output();
                 else
                     r->set_empty_private_input();
-                if(type == MAZE_CONTRACTOR)
+                if(type == MAZE_CONTRACTOR){
                     p->get_neighbors_room(maze, list_pave_deque);
+                }
                 r->synchronize();
             }
             else{
@@ -77,53 +78,56 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
     }
         break;
     case SEP_UNKNOWN:{
-        IntervalVector position_in(pave_node->get_position());
-        IntervalVector position_out(position_in);
+        IntervalVector x_in(pave_node->get_position());
+        IntervalVector x_out(x_in);
         if(output)
-            m_sep_output->separate(position_in, position_out);
+            m_sep_output->separate(x_in, x_out);
         else
-            m_sep_input->separate(position_in, position_out);
+            m_sep_input->separate(x_in, x_out);
 
         if(pave_node->is_leaf()){
             Pave* p = pave_node->get_pave();
-            if(position_in.is_empty()){
-                // Inside constraint
+            Room *r = p->get_rooms()[maze];
+            if(x_in.is_empty()){
+                // Inside the constraint
                 if(output)
-                    p->get_rooms()[maze]->set_full_private_output();
+                    r->set_full_private_output();
                 else
-                    p->get_rooms()[maze]->set_full_private_input();
-                if(type == MAZE_PROPAGATOR)
-                    list_pave_deque.push_back(p->get_rooms()[maze]);
+                    r->set_full_private_input();
+                if(type == MAZE_PROPAGATOR){
+                    p->get_neighbors_room(maze, list_pave_deque);
+                }
             }
-            else if(position_out.is_empty()){
-                // Outside constraint
+            else if(x_out.is_empty()){
+                // Outside the constraint
                 if(output)
-                    p->get_rooms()[maze]->set_empty_private_output();
+                    r->set_empty_private_output();
                 else
-                    p->get_rooms()[maze]->set_empty_private_input();
+                    r->set_empty_private_input();
                 if(type == MAZE_CONTRACTOR){
-                    list_pave_deque.push_back(p->get_rooms()[maze]);
                     p->get_neighbors_room(maze, list_pave_deque);
                 }
             }
             else{
-                // Mix => all full (over approximation)
+                // Inside & Outside the constraint => all full (over approximation)
                 if(output)
-                    p->get_rooms()[maze]->set_full_private_output();
+                    r->set_full_private_output();
                 else
-                    p->get_rooms()[maze]->set_full_private_input();
-                if(type == MAZE_PROPAGATOR)
-                    list_pave_deque.push_back(p->get_rooms()[maze]);
+                    r->set_full_private_input();
+                if(type == MAZE_PROPAGATOR){
+                    p->get_neighbors_room(maze, list_pave_deque);
+                }
             }
+            r->synchronize();
         }
         else{
             // Determine the accelerator
-            if(position_in.is_empty()){
+            if(x_in.is_empty()){
                 // Completly inside the constraint
                 contract_separator(maze, pave_node->get_children().first, list_pave_deque, output, SEP_INSIDE);
                 contract_separator(maze, pave_node->get_children().second, list_pave_deque, output, SEP_INSIDE);
             }
-            else if(position_out.is_empty()){
+            else if(x_out.is_empty()){
                 // Completly outside the constraint
                 contract_separator(maze, pave_node->get_children().first, list_pave_deque, output, SEP_OUTSIDE);
                 contract_separator(maze, pave_node->get_children().second, list_pave_deque, output, SEP_OUTSIDE);

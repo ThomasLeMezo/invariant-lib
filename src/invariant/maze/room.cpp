@@ -30,7 +30,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         }
     }
 
-    m_full = false;
+    m_full = true;
     m_empty = false;
 
     omp_init_lock(&m_lock_contraction);

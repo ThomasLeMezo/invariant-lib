@@ -190,15 +190,24 @@ void Pave::bisect(){
         pave_result[0]->add_room(r_first);
         pave_result[1]->add_room(r_second);
 
-        if(r->is_empty())
+        if(r->is_empty()){
             m_tree->add_emptyness((it->first), true);
+            r_first->set_empty();
+            r_second->set_empty();
+        }
         else
             m_tree->add_emptyness((it->first), false);
 
-        if(r->is_full())
+        if(r->is_full()){
             m_tree->add_fullness((it->first), true);
+            r_first->set_full();
+            r_second->set_full();
+        }
         else
             m_tree->add_fullness((it->first), false);
+
+        r_first->synchronize();
+        r_second->synchronize();
     }
 
     // Save results in this pave
