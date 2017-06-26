@@ -30,25 +30,25 @@ int main(int argc, char *argv[])
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
 //    dom.set_sep(&s);
 
-    dom.set_border_path_in(true);
-    dom.set_border_path_out(true);
+    dom.set_border_path_in(false);
+    dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
     ibex::Function f1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
-//    ibex::Function f2(x1, x2, Return(-x2,
-//                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3)));
+    ibex::Function f2(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.3)));
     vector<Function *> f_list;
     f_list.push_back(&f1);
 //    f_list.push_back(&f2);
     Dynamics_Function dyn(f_list);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze.contract(); // To init the first room
+//    maze.contract(); // To init the first room
     for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
