@@ -28,12 +28,11 @@ int main(int argc, char *argv[])
     invariant::Domain dom_outer(&graph);
 
     double x1_c, x2_c, r;
-    x1_c = 3.0;
-    x2_c = 2.0;
+//    x1_c = 3.0;
+//    x2_c = 2.0;
+    x1_c = -2.0;
+    x2_c = 4;
     r = 0.3;
-
-//    x1_c = 0.5;
-//    x2_c = 4.0;
 
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -52,10 +51,10 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
+        ibex::Function f(x1, x2, Return(x2,
+                                        (1.0*(1.0-pow(x1, 2))*x2-x1)));
 //    ibex::Function f(x1, x2, Return(x2,
-//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    ibex::Function f(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
+//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
     Dynamics_Function dyn_outer(&f);
     Dynamics_Function dyn_inner(&f);
 
@@ -63,12 +62,10 @@ int main(int argc, char *argv[])
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
     Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_CONTRACTOR);
 
-
-
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_outer.contract();
-    for(int i=0; i<4; i++){
+    for(int i=0; i<20; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
@@ -82,10 +79,10 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(-2);
-//    v_graph_outer.get_room_info(&maze_outer, position_info);
+    //    IntervalVector position_info(2);
+    //    position_info[0] = Interval(-2);
+    //    position_info[1] = Interval(-2);
+    //    v_graph_outer.get_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 

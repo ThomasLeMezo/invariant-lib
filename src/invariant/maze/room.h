@@ -185,6 +185,13 @@ protected:
      */
     void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
 
+public:
+    /**
+     * @brief Debug function to get private doors
+     * @param position
+     */
+    void get_private_doors_info();
+
 protected:
     Pave*   m_pave = NULL; // pointer to the associated face
     Maze*   m_maze = NULL; // pointer to the associated maze

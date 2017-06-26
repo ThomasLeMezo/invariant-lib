@@ -89,7 +89,7 @@ int Maze::contract(){
                             // Synchronize
                             r->synchronize_doors();
 
-                            if(r->is_empty())
+                            if(m_maze_type == MAZE_CONTRACTOR && r->is_empty())
                                 r->set_removed();
 
                             // Add Rooms to the Deque

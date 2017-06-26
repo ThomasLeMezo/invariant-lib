@@ -267,6 +267,35 @@ bool Room::contract(){
     return change;
 }
 
+void Room::get_private_doors_info(){
+    if(m_maze->get_type() != MAZE_PROPAGATOR)
+        return;
+    IntervalVector position(2);
+    position[0] = Interval(0, 3);
+    position[1] = Interval(-6, -3);
+    IntervalVector position2(2);
+    position2[0] = Interval(0, 3);
+    position2[1] = Interval(-3, 0);
+
+    if(m_pave->get_position() == position || m_pave->get_position() == position2){
+        if(m_pave->get_position() == position)
+            cout << "position 1" << endl;
+        else
+            cout << "position 2" << endl;
+
+        cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << endl;
+        for(Face *f:m_pave->get_faces_vector()){
+            Door *d = f->get_doors()[m_maze];
+            cout << " Face : ";
+            std::ostringstream input, output;
+            input << d->get_input_private();
+            output << d->get_output_private();
+            cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << endl;
+        }
+        cout << "----" << endl;
+    }
+}
+
 void Room::synchronize_doors(){
     for(Face* f:m_pave->get_faces_vector()){
         Door *r = f->get_doors()[m_maze];
