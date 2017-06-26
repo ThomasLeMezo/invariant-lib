@@ -194,7 +194,7 @@ void Room::contract_consistency(){
                 Face* f_out = m_pave->get_faces()[face_out][sens_out];
                 Door* door_out = f_out->get_doors()[m_maze];
 
-                IntervalVector door_out_iv(dim, Interval::ALL_REALS);
+                IntervalVector door_out_iv(door_out->get_face()->get_position());
                 for(int n_vf=0; n_vf<nb_vec; n_vf++){
                     door_out_iv &= out_results[n_vf][face_out][sens_out];
                 }
