@@ -26,7 +26,10 @@ private:
     void show_maze_outer() const;
     void show_theta(invariant::Pave *p, invariant::Maze *maze) const;
 
+    void show_maze_outer_inner() const;
+
     void draw_room_outer(invariant::Pave *p) const;
+    void draw_room_inner(invariant::Pave *p) const;
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
@@ -35,6 +38,8 @@ private:
 
     invariant::Maze*    m_maze_outer = NULL;
     invariant::Maze*    m_maze_inner = NULL;
+
+    std::vector<std::tuple<int, int, bool>> m_oriented_path;
 
 };
 

@@ -10,6 +10,11 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g): VibesFigure(
         throw std::runtime_error("in [vibes_graph.cpp/Vibes_Graph()] dim of graph is not equal to 2");
     m_graph = g;
     m_overhead_factor = 0.2; // 20%
+
+    m_oriented_path.push_back(std::make_tuple(0, 0, true));
+    m_oriented_path.push_back(std::make_tuple(1, 1, true));
+    m_oriented_path.push_back(std::make_tuple(0, 1, false));
+    m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
 Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer): Vibes_Graph(figure_name, g){
@@ -23,8 +28,42 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer, 
 
 void Vibes_Graph::show() const{
     show_graph();
-    if(m_maze_outer != NULL)
+    if(m_maze_outer != NULL && m_maze_inner == NULL)
         show_maze_outer();
+    else if(m_maze_outer != NULL && m_maze_inner != NULL)
+        show_maze_outer_inner();
+
+}
+
+void Vibes_Graph::draw_room_inner(Pave *p) const{
+    // Draw Polygon
+    vector<double> pt_x, pt_y;
+
+    for(const tuple<int, int, bool> &t:m_oriented_path){
+        Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
+        IntervalVector d_iv = d->get_input() | d->get_output();
+        IntervalVector* d_iv_list;
+        int nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
+
+        if(nb_vec == 1){
+            IntervalVector d_iv_c(d_iv_list[0]);
+            if(!d_iv_c.is_empty()){
+                if(get<2>(t)){
+                    pt_x.push_back(d_iv_c[0].lb());
+                    pt_y.push_back(d_iv_c[1].lb());
+                    pt_x.push_back(d_iv_c[0].ub());
+                    pt_y.push_back(d_iv_c[1].ub());
+                }
+                else{
+                    pt_x.push_back(d_iv_c[0].ub());
+                    pt_y.push_back(d_iv_c[1].ub());
+                    pt_x.push_back(d_iv_c[0].lb());
+                    pt_y.push_back(d_iv_c[1].lb());
+                }
+            }
+        }
+    }
+    vibes::drawPolygon(pt_x, pt_y, "[#FF00FF]");
 
 }
 
@@ -34,13 +73,8 @@ void Vibes_Graph::draw_room_outer(Pave *p) const{
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
-    vector<tuple<int, int, bool>> oriented_path;
-    oriented_path.push_back(make_tuple(0, 0, true));
-    oriented_path.push_back(make_tuple(1, 1, true));
-    oriented_path.push_back(make_tuple(0, 1, false));
-    oriented_path.push_back(make_tuple(1, 0, false));
 
-    for(tuple<int, int, bool> &t:oriented_path){
+    for(const tuple<int, int, bool> &t:m_oriented_path){
         Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
         IntervalVector d_iv = d->get_input() | d->get_output();
 
@@ -81,6 +115,32 @@ void Vibes_Graph::show_maze_outer() const{
     }
 }
 
+void Vibes_Graph::show_maze_outer_inner() const{
+    for(Pave *p:m_graph->get_paves()){
+        draw_room_outer(p);
+
+        Room *r_inner = p->get_rooms()[m_maze_inner];
+        if(!r_inner->is_full()){
+            draw_room_inner(p);
+        }
+    }
+
+    for(Pave *p:m_graph->get_paves_not_bisectable()){
+        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
+            Room *r_outer = p->get_rooms()[m_maze_outer];
+            Room *r_inner = p->get_rooms()[m_maze_inner];
+            if(r_outer->is_empty())
+                vibes::drawBox(p->get_position(), "[blue]");
+            if(!r_outer->is_removed()){
+                draw_room_outer(p);
+                if(r_inner->is_removed()){
+                    vibes::drawBox(p->get_position(), "[#FF00FF]");
+                }
+            }
+        }
+    }
+}
+
 void Vibes_Graph::show_theta(Pave *p, Maze* maze) const{
     IntervalVector position(p->get_position());
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.0;
@@ -89,14 +149,14 @@ void Vibes_Graph::show_theta(Pave *p, Maze* maze) const{
     const vector<IntervalVector> vector_fields = r->get_vector_fields();
 
     if(vector_fields.size()>0){
-    for(IntervalVector r:vector_fields){
-        for(Interval i:compute_theta(r[0], r[1])){
-            vibes::drawSector(position[0].mid(), position[1].mid(), size, size, (-i.lb())*180.0/M_PI, (-i.ub())*180.0/M_PI, "black[gray]");
+        for(IntervalVector r:vector_fields){
+            for(Interval i:compute_theta(r[0], r[1])){
+                vibes::drawSector(position[0].mid(), position[1].mid(), size, size, (-i.lb())*180.0/M_PI, (-i.ub())*180.0/M_PI, "black[gray]");
+            }
         }
     }
-    }
     else{
-       vibes::drawSector(position[0].mid(), position[1].mid(), size, size, -180, 180, "black[gray]");
+        vibes::drawSector(position[0].mid(), position[1].mid(), size, size, -180, 180, "black[gray]");
     }
 
 }

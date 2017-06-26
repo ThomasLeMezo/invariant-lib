@@ -16,7 +16,6 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    omp_set_num_threads(1);
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
@@ -32,6 +31,9 @@ int main(int argc, char *argv[])
     x1_c = 3.0;
     x2_c = 2.0;
     r = 0.3;
+
+//    x1_c = 0.5;
+//    x2_c = 4.0;
 
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -50,6 +52,8 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
+//    ibex::Function f(x1, x2, Return(x2,
+//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
     Dynamics_Function dyn_outer(&f);
@@ -58,6 +62,8 @@ int main(int argc, char *argv[])
     // ******* Mazes ********* //
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
     Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_CONTRACTOR);
+
+
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -72,19 +78,15 @@ int main(int argc, char *argv[])
     cout << graph << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph_outer("graph_outer", &graph, &maze_outer);
-    v_graph_outer.setProperties(0, 0, 1024, 1024);
-    v_graph_outer.show();
-
-    Vibes_Graph v_graph_inner("graph_inner", &graph, &maze_inner);
-    v_graph_inner.setProperties(0, 0, 1024, 1024);
-    v_graph_inner.show();
-
-    vibes::endDrawing();
+    Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
+    v_graph.setProperties(0, 0, 1024, 1024);
+    v_graph.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-1.7);
-//    position_info[1] = Interval(1);
-//    v_graph_outer.get_room_info(&maze, position_info);
+//    position_info[0] = Interval(-2);
+//    position_info[1] = Interval(-2);
+//    v_graph_outer.get_room_info(&maze_outer, position_info);
+
+    vibes::endDrawing();
 
 }
