@@ -35,9 +35,15 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3)));
     ibex::Function f2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.3)));
+
+//    ibex::Function f1(x1, x2, Return(Interval(1.0),
+//                                    Interval(0.5)));
+//    ibex::Function f2(x1, x2, Return(Interval(1.0),
+//                                     Interval(-0.5)));
+
     vector<Function *> f_list;
     f_list.push_back(&f1);
     f_list.push_back(&f2);
