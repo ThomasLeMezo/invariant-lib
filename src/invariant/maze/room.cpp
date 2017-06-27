@@ -234,7 +234,7 @@ void Room::contract_consistency(){
                 IntervalVector door_out_iv(door_out->get_face()->get_position());
                 bool one_possible = false;
                 for(int n_vf=0; n_vf<nb_vec; n_vf++){
-                    if(!door_out->is_possible_out()[n_vf]){
+                    if((type == MAZE_PROPAGATOR && !door_out->is_possible_out()[n_vf]) || type == MAZE_CONTRACTOR){
                         one_possible = true;
                         door_out_iv &= out_results[n_vf][face_out][sens_out];
                     }

@@ -70,6 +70,9 @@ void Vibes_Graph::draw_room_inner(Pave *p) const{
     }
     vibes::drawPolygon(pt_x, pt_y, "[#FF00FF]");
 
+    // Draw Cone
+    show_theta(p, m_maze_inner);
+
 }
 
 void Vibes_Graph::draw_room_outer(Pave *p) const{
