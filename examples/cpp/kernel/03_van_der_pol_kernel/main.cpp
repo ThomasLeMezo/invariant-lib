@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<22; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
