@@ -239,11 +239,11 @@ inline std::ostream& operator<< (std::ostream& stream, const Door& d){
 }
 
 inline void Door::push_back_possible_in(bool val){
-    m_possible_out.push_back(val);
+    m_possible_in.push_back(val);
 }
 
 inline void Door::push_back_possible_out(bool val){
-    m_possible_in.push_back(val);
+    m_possible_out.push_back(val);
 }
 
 inline const std::vector<bool>& Door::is_possible_out() const{

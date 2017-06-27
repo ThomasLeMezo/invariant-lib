@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
     SepFwdBwd s_inner(f_sep_inner, LEQ); // LT, LEQ, EQ, GEQ, GT
-//    dom_inner.set_sep(&s_inner);
+    dom_inner.set_sep_input(&s_inner);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<18; i++){
+    for(int i=0; i<20; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
