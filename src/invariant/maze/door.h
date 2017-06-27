@@ -134,12 +134,39 @@ public:
      */
     bool is_full();
 
+    /**
+     * @brief Set if this door is a possible out for propagation
+     * @param val
+     */
+    void push_back_possible_out(bool val);
+
+    /**
+     * @brief Get if this door is a possible out for propagation
+     * @return
+     */
+    const std::vector<bool> &is_possible_out() const;
+
+    /**
+     * @brief Set if this door is a possible in for propagation
+     * @param val
+     */
+    void push_back_possible_in(bool val);
+
+    /**
+     * @brief Get if this door is a possible in for propagation
+     * @return
+     */
+    const std::vector<bool> &is_possible_in() const;
+
 protected:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
     ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
     Face *               m_face = NULL; // pointer to the associated face
     Room *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
+
+    std::vector<bool>    m_possible_out;
+    std::vector<bool>    m_possible_in;
 };
 }
 
@@ -209,6 +236,22 @@ inline std::ostream& operator<< (std::ostream& stream, const Door& d){
     output << d.get_output();
     stream << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str();
     return stream;
+}
+
+inline void Door::push_back_possible_in(bool val){
+    m_possible_out.push_back(val);
+}
+
+inline void Door::push_back_possible_out(bool val){
+    m_possible_in.push_back(val);
+}
+
+inline const std::vector<bool>& Door::is_possible_out() const{
+    return m_possible_out;
+}
+
+inline const std::vector<bool>& Door::is_possible_in() const{
+    return m_possible_in;
 }
 }
 #endif // DOOR_H

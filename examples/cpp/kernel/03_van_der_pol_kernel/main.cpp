@@ -27,19 +27,18 @@ int main(int argc, char *argv[])
     // ****** Domain Outer ******* //
     invariant::Domain dom_outer(&graph);
 
-//    Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
-//    SepFwdBwd s_outer(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
-//    dom_outer.set_sep(&s_outer);
+    Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
+    SepFwdBwd s_outer(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
+    dom_outer.set_sep(&s_outer);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
     invariant::Domain dom_inner(&graph);
 
-//    Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
-//    SepFwdBwd s_inner(f_sep_inner, LEQ); // LT, LEQ, EQ, GEQ, GT
+    Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
+    SepFwdBwd s_inner(f_sep_inner, LEQ); // LT, LEQ, EQ, GEQ, GT
 //    dom_inner.set_sep(&s_inner);
-
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 

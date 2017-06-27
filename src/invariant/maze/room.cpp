@@ -119,6 +119,43 @@ void Room::contract_vector_field(){
     }
 }
 
+void Room::eval_vector_field_possibility(){
+    int dim = m_pave->get_dim();
+    for(IntervalVector &v:m_vector_fields){
+        // Construct the boolean interval vector of the vector_field
+        IntervalVector v_bool_in = IntervalVector(dim, Interval::EMPTY_SET);
+        IntervalVector v_bool_out = IntervalVector(dim, Interval::EMPTY_SET);
+
+        for(int i=0; i<dim; i++){
+            if(!(v[i] & Interval::POS_REALS).is_empty())
+                v_bool_out[i] |= Interval(1);
+            if(!(v[i] & Interval::NEG_REALS).is_empty())
+                v_bool_out[i] |= Interval(0);
+            if(!((-v[i]) & Interval::POS_REALS).is_empty())
+                v_bool_in[i] |= Interval(1);
+            if(!((-v[i]) & Interval::NEG_REALS).is_empty())
+                v_bool_in[i] |= Interval(0);
+        }
+
+
+        for(Face* f:m_pave->get_faces_vector()){
+            Door *d = f->get_doors()[m_maze];
+            if((f->get_orientation() & v_bool_in).is_empty())
+                d->push_back_possible_in(false);
+            else
+                d->push_back_possible_in(true);
+
+            if((f->get_orientation() & v_bool_out).is_empty())
+                d->push_back_possible_out(false);
+            else
+                d->push_back_possible_out(true);
+
+            // Note : synchronization will be proceed at the end of all contractors
+            // to avoid unecessary lock
+        }
+    }
+}
+
 void Room::contract_consistency(){
     if(m_vector_field_zero && m_maze->get_type() == MAZE_PROPAGATOR){
         this->set_full();
@@ -195,8 +232,15 @@ void Room::contract_consistency(){
                 Door* door_out = f_out->get_doors()[m_maze];
 
                 IntervalVector door_out_iv(door_out->get_face()->get_position());
+                bool one_possible = false;
                 for(int n_vf=0; n_vf<nb_vec; n_vf++){
-                    door_out_iv &= out_results[n_vf][face_out][sens_out];
+                    if(!door_out->is_possible_out()[n_vf]){
+                        one_possible = true;
+                        door_out_iv &= out_results[n_vf][face_out][sens_out];
+                    }
+                }
+                if(!one_possible){
+                    door_out_iv.set_empty();
                 }
 
                 if(type == MAZE_CONTRACTOR)
@@ -252,9 +296,12 @@ bool Room::contract(){
                 change = true;
             }
         }
-        if(m_first_contract && m_pave->is_border() && type == MAZE_PROPAGATOR){
-            // Case only the border is full
-            change = true;
+        if(m_first_contract && type == MAZE_PROPAGATOR){
+            eval_vector_field_possibility();
+            if(m_pave->is_border()){
+                // Case only the border is full
+                change = true;
+            }
         }
         m_first_contract = false;
 

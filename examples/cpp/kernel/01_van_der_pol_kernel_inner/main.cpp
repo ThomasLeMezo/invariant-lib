@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     cout << graph << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("graph", &graph, &maze);
+    Vibes_Graph v_graph("graph", &graph, &maze, Vibes_Graph::VIBES_GRAPH_INNER);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
     vibes::endDrawing();

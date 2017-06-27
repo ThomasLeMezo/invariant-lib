@@ -17,8 +17,11 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g): VibesFigure(
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer): Vibes_Graph(figure_name, g){
-    m_maze_outer = outer;
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, g){
+    if(type == VIBES_GRAPH_OUTER)
+        m_maze_outer = outer;
+    else
+        m_maze_inner = outer;
 }
 
 Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer, Maze* inner): Vibes_Graph(figure_name, g){
@@ -30,6 +33,8 @@ void Vibes_Graph::show() const{
     show_graph();
     if(m_maze_outer != NULL && m_maze_inner == NULL)
         show_maze_outer();
+    if(m_maze_outer == NULL && m_maze_inner != NULL)
+        show_maze_inner();
     else if(m_maze_outer != NULL && m_maze_inner != NULL)
         show_maze_outer_inner();
 
@@ -111,6 +116,22 @@ void Vibes_Graph::show_maze_outer() const{
             }
             if(r->is_empty())
                 vibes::drawBox(p->get_position(), "[blue]");
+        }
+    }
+}
+
+void Vibes_Graph::show_maze_inner() const{
+    for(Pave *p:m_graph->get_paves()){
+        draw_room_inner(p);
+    }
+    for(Pave *p:m_graph->get_paves_not_bisectable()){
+        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
+            Room *r = p->get_rooms()[m_maze_inner];
+            if(!r->is_removed()){
+                draw_room_inner(p);
+            }
+            if(r->is_empty())
+                vibes::drawBox(p->get_position(), "[#FF00FF]");
         }
     }
 }

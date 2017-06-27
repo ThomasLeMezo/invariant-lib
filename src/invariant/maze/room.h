@@ -178,6 +178,11 @@ protected:
     void contract_vector_field();
 
     /**
+     * @brief Test the doors according to the vector field orientation and save the result in each doors
+     */
+    void eval_vector_field_possibility();
+
+    /**
      * @brief Basic contraction between [in] and [out] according to a [vect].
      * @param in
      * @param out
