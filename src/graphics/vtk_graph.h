@@ -13,7 +13,7 @@ public:
 
     void show_graph();
 
-    void show_maze(invariant::Maze *maze);
+    void show_maze(invariant::Maze *maze, std::string comment="");
 
 private:
     invariant::Graph*   m_graph = NULL;

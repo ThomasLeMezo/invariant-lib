@@ -44,7 +44,7 @@ void Vtk_Graph::show_graph(){
     outputWriter->Write();
 }
 
-void Vtk_Graph::show_maze(invariant::Maze *maze){
+void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
 
@@ -118,7 +118,7 @@ void Vtk_Graph::show_maze(invariant::Maze *maze){
     polyData_polygon->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-    string file = m_file_name + "_polygon.vtp";
+    string file = m_file_name + "_polygon" + comment + ".vtp";
     outputWriter->SetFileName(file.c_str());
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
