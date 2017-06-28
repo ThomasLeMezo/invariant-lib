@@ -10,6 +10,7 @@
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkDelaunay3D.h>
 #include <vtkDataSetSurfaceFilter.h>
+#include <vtkCleanPolyData.h>
 
 using namespace invariant;
 using namespace std;
@@ -24,10 +25,9 @@ void Vtk_Graph::show_graph(){
     cout << "vtk graph" << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_paves = vtkSmartPointer<vtkAppendPolyData>::New();
+    vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
 
     for(Pave *p:m_graph->get_paves()){
-        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
-
         IntervalVector position(p->get_position());
         cubedata->SetBounds(position[0].lb(), position[0].ub(),
                 position[1].lb(), position[1].ub(),
@@ -47,13 +47,12 @@ void Vtk_Graph::show_graph(){
 void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
+    vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
 
     for(Pave *p:m_graph->get_paves()){
         Room *r = p->get_rooms()[maze];
 
         if(r->is_full()){
-            vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
-
             IntervalVector position(p->get_position());
             cubedata->SetBounds(position[0].lb(), position[0].ub(),
                     position[1].lb(), position[1].ub(),
@@ -99,10 +98,16 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
                 pointsCollection->SetPoints(points);
 
+                vtkSmartPointer<vtkCleanPolyData> cleanPolyData = vtkSmartPointer<vtkCleanPolyData>::New();
+                cleanPolyData->SetInputData(pointsCollection);
+                cleanPolyData->Update();
+
+                if(cleanPolyData->GetOutput()->GetNumberOfPoints() > 2){
+
                 // ********** Surface **************
                 // Create the convex hull of the pointcloud (delaunay + outer surface)
                 vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-                delaunay->SetInputData(pointsCollection);
+                delaunay->SetInputConnection(cleanPolyData->GetOutputPort());
                 delaunay->Update();
 
                 vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
@@ -111,6 +116,7 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
 
                 // ********** Append results **************
                 polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                }
             }
         }
     }

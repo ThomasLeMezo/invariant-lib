@@ -145,6 +145,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
 }
 
 void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
+    if(m_graph->size()==1)
+        return;
     vector<Pave*> pave_border_list;
     m_graph->get_tree()->get_border_paves(pave_border_list);
     MazeType type = maze->get_type();
@@ -155,13 +157,17 @@ void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
                 Door *d = f->get_doors()[maze];
                 if(m_border_path_in)
                     d->set_full_private_input();
-                else
-                    d->set_empty_private_input();
+                else{
+                    if(type != MAZE_PROPAGATOR)
+                        d->set_empty_private_input();
+                }
 
                 if(m_border_path_out)
                     d->set_full_private_output();
-                else
-                    d->set_empty_private_output();
+                else{
+                    if(type != MAZE_PROPAGATOR)
+                        d->set_empty_private_output();
+                }
                 d->synchronize();
             }
         }

@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
-    dom_outer.set_sep(&s_outer);
+    dom_outer.set_sep_input(&s_outer);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
