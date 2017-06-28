@@ -13,6 +13,10 @@ Installation
 sudo apt-get install libgvc6 libgvc6-plugins-gtk graphviz-dev pkg-config python2.7 flex bison g++ make gcc
 ```
 
+Installation of VTK:
+http://www.vtk.org/download/
+You can set the folder where vtk is installed by changing the -DVTK_DIR variable in the build scripts.
+
 Licence
 -------
 

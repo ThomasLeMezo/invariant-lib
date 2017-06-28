@@ -68,6 +68,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     endif()
 
+# VTK
+    find_package(VTK REQUIRED)
+    set(LIBS ${LIBS} ${VTK_LIBRARIES})
+
 # Sources
     add_subdirectory(src)
 
