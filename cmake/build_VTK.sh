@@ -8,8 +8,9 @@
 
 if [ ! -e "$HOME/vtk/bin/vtkH5detect" ]; then
   echo 'Installing VTK-lib...';
-  git clone https://gitlab.kitware.com/vtk
+  git clone https://gitlab.kitware.com/vtk/vtk
   cd vtk
+  git checkout v8.0.0.rc2
   BUILD_DIR=$HOME/vtk
 
   mkdir -p ${BUILD_DIR}
