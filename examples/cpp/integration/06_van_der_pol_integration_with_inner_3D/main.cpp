@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     double x1_c, x2_c, x3_c, r;
     x1_c = 3.0;
     x1_c = -2.0;
-    x2_c = 4;
+    x3_c = 0.0;
     r = 0.3;
 
     Function f_sep_outer(x1, x2, x3, pow(x1-x1_c, 2)+pow(x2-x2_c, 2) + pow(x3-x3_c, 2) - pow(r, 2));
@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
     Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_CONTRACTOR);
 
+    Vtk_Graph vtk_graph("vdp_3D", &graph);
+
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_outer.contract();
@@ -74,7 +76,7 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-    Vtk_Graph vtk_graph("vdp_3D", &graph);
+
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze_outer);
 //    vtk_graph.show_maze(&maze_inner);

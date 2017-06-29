@@ -268,7 +268,9 @@ inline bool Room::is_removed() const{
 
 inline void Room::set_removed(){
     m_removed = true;
+    // Free memory (private doors)
 }
+
 }
 
 #endif // ROOM_H

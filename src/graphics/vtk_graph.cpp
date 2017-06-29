@@ -11,6 +11,7 @@
 #include <vtkDelaunay3D.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkCleanPolyData.h>
+#include <vtkPolyVertex.h>
 
 using namespace invariant;
 using namespace std;
@@ -94,29 +95,36 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
             }
 
             if(points->GetNumberOfPoints() != 0){
-
+                points->Squeeze();
                 vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
                 pointsCollection->SetPoints(points);
+//                cout << pointsCollection->GetNumberOfPoints() << endl;
 
-                vtkSmartPointer<vtkCleanPolyData> cleanPolyData = vtkSmartPointer<vtkCleanPolyData>::New();
-                cleanPolyData->SetInputData(pointsCollection);
-                cleanPolyData->Update();
+//                vtkSmartPointer<vtkCleanPolyData> cleanPolyData = vtkSmartPointer<vtkCleanPolyData>::New();
+//                cleanPolyData->SetInputData(pointsCollection);
+//                cleanPolyData->SetTolerance(0.0);
+//                cleanPolyData->SetOutputPointsPrecision(vtkAlgorithm::DOUBLE_PRECISION);
+//                cout << " --> " << cleanPolyData->GetOutput()->GetNumberOfPoints() << endl;
+//                cleanPolyData->Update();
 
-                if(cleanPolyData->GetOutput()->GetNumberOfPoints() > 2){
+//                vtkSmartPointer<vtkPolyData> outputPolyData = cleanPolyData->GetOutput();
+//                cout << " --> " << outputPolyData->GetNumberOfPoints()<< endl;
 
-                // ********** Surface **************
-                // Create the convex hull of the pointcloud (delaunay + outer surface)
-                vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-                delaunay->SetInputConnection(cleanPolyData->GetOutputPort());
-                delaunay->Update();
+//                if(cleanPolyData->GetOutput()->GetNumberOfPoints() > 1){
 
-                vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-                surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
-                surfaceFilter->Update();
+                    // ********** Surface **************
+                    // Create the convex hull of the pointcloud (delaunay + outer surface)
+                    vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+                    delaunay->SetInputData(pointsCollection);
+                    delaunay->Update();
 
-                // ********** Append results **************
-                polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-                }
+                    vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+                    surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+                    surfaceFilter->Update();
+
+                    // ********** Append results **************
+                    polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+//                }
             }
         }
     }

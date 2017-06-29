@@ -408,4 +408,5 @@ void Room::synchronize(){
         d->synchronize();
     }
 }
+
 }
