@@ -10,8 +10,7 @@
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkDelaunay3D.h>
 #include <vtkDataSetSurfaceFilter.h>
-#include <vtkCleanPolyData.h>
-#include <vtkPolyVertex.h>
+#include <vtkMergePoints.h>
 
 using namespace invariant;
 using namespace std;
@@ -82,9 +81,11 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                                     for(int z=0; z<2; z++){
                                         if(iv[2].is_degenerated())
                                             z=1;
-                                        points->InsertNextPoint((x==0)?iv[0].lb():iv[0].ub(),
-                                                (y==0)?iv[1].lb():iv[1].ub(),
-                                            (z==0)?iv[2].lb():iv[2].ub());
+                                        double pt[3] = {(x==0)?iv[0].lb():iv[0].ub(),
+                                                        (y==0)?iv[1].lb():iv[1].ub(),
+                                                        (z==0)?iv[2].lb():iv[2].ub()};
+                                        points->InsertNextPoint(pt);
+                                        cout << pt[0] << " " << pt[1] << " " << pt[2] << endl;
                                     }
                                 }
                             }
@@ -95,23 +96,24 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
             }
 
             if(points->GetNumberOfPoints() != 0){
-                points->Squeeze();
                 vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
                 pointsCollection->SetPoints(points);
-//                cout << pointsCollection->GetNumberOfPoints() << endl;
+                cout << pointsCollection->GetNumberOfPoints() << endl;
 
-//                vtkSmartPointer<vtkCleanPolyData> cleanPolyData = vtkSmartPointer<vtkCleanPolyData>::New();
-//                cleanPolyData->SetInputData(pointsCollection);
-//                cleanPolyData->SetTolerance(0.0);
-//                cleanPolyData->SetOutputPointsPrecision(vtkAlgorithm::DOUBLE_PRECISION);
-//                cout << " --> " << cleanPolyData->GetOutput()->GetNumberOfPoints() << endl;
-//                cleanPolyData->Update();
+                vtkSmartPointer<vtkMergePoints> mergePoints = vtkSmartPointer<vtkMergePoints>::New();
+                mergePoints->SetDataSet(pointsCollection);
+                mergePoints->InitPointInsertion(pointsCollection->GetPoints(), pointsCollection->GetBounds());
 
-//                vtkSmartPointer<vtkPolyData> outputPolyData = cleanPolyData->GetOutput();
-//                cout << " --> " << outputPolyData->GetNumberOfPoints()<< endl;
+                vtkIdType id;
+                for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++){
+                    mergePoints->InsertUniquePoint(pointsCollection->GetPoint(i), id);
+                }
 
-//                if(cleanPolyData->GetOutput()->GetNumberOfPoints() > 1){
+                cout << " --> " << mergePoints->GetPoints()->GetNumberOfPoints() << endl;
+                cout << " --> " << pointsCollection->GetNumberOfPoints() << endl;
+                cout << " --> " << pointsCollection->GetNumberOfCells() << endl;
 
+                if(pointsCollection->GetNumberOfCells()>0){
                     // ********** Surface **************
                     // Create the convex hull of the pointcloud (delaunay + outer surface)
                     vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
@@ -124,7 +126,8 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
 
                     // ********** Append results **************
                     polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-//                }
+                }
+                //                }
             }
         }
     }
