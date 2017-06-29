@@ -9,10 +9,11 @@ INVARIANTLIB_DIR="$(dirname "$SCRIPT")"
 
 cd ..
 sh $INVARIANTLIB_DIR/cmake/build_IbexLib.sh
+sh $INVARIANTLIB_DIR/cmake/build_VTK.sh
 cd $INVARIANTLIB_DIR
 
 mkdir build/build-release -p
 cd build/build-release
-cmake -DCMAKE_INSTALL_PREFIX=~/ -DIBEX_ROOT=~/ibex -DVTK_DIR=${HOME}/VTK-8.0.0/build -DCMAKE_BUILD_TYPE=RELEASE $INVARIANTLIB_DIR
+cmake -DCMAKE_INSTALL_PREFIX=~/ -DIBEX_ROOT=~/ibex -DVTK_DIR=${HOME}/vtk -DCMAKE_BUILD_TYPE=RELEASE $INVARIANTLIB_DIR
 make -j
 cd ..
