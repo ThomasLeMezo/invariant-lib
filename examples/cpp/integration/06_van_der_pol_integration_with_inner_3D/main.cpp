@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     x1_c = 3.0;
     x2_c = -2.0;
     x3_c = 0;
-    r = 0.01;
+    r = 0.0;
 
     Function f_sep_outer(x1, x2, x3, pow(x1-x1_c, 2)+pow(x2-x2_c, 2) + pow(x3-x3_c, 2) - pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -41,22 +41,22 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&graph);
+//    invariant::Domain dom_inner(&graph);
 
-    SepFwdBwd s_inner(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom_inner.set_sep(&s_inner);
+//    SepFwdBwd s_inner(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
+//    dom_inner.set_sep(&s_inner);
 
-    dom_inner.set_border_path_in(true);
-    dom_inner.set_border_path_out(true);
+//    dom_inner.set_border_path_in(true);
+//    dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
         ibex::Function f(x1, x2, x3, Return(x2,
                                         (1.0*(1.0-pow(x1, 2))*x2-x1),
-                                            Interval(1.0)));
+                                            2.0+0*x3));
 //    ibex::Function f(x1, x2, Return(x2,
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
     Dynamics_Function dyn_outer(&f);
-    Dynamics_Function dyn_inner(&f);
+//    Dynamics_Function dyn_inner(&f);
 
     // ******* Mazes ********* //
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);

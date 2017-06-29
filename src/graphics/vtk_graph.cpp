@@ -35,15 +35,15 @@ void Vtk_Graph::show_graph(){
         cubedata->Update();
         polyData_paves->AddInputData(cubedata->GetOutput());
     }
-//    for(Pave *p:m_graph->get_paves_not_bisectable()){
-//        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
-//        IntervalVector position(p->get_position());
-//        cubedata->SetBounds(position[0].lb(), position[0].ub(),
-//                position[1].lb(), position[1].ub(),
-//                position[2].lb(), position[2].ub());
-//        cubedata->Update();
-//        polyData_paves->AddInputData(cubedata->GetOutput());
-//    }
+    //    for(Pave *p:m_graph->get_paves_not_bisectable()){
+    //        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
+    //        IntervalVector position(p->get_position());
+    //        cubedata->SetBounds(position[0].lb(), position[0].ub(),
+    //                position[1].lb(), position[1].ub(),
+    //                position[2].lb(), position[2].ub());
+    //        cubedata->Update();
+    //        polyData_paves->AddInputData(cubedata->GetOutput());
+    //    }
     polyData_paves->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
@@ -61,6 +61,7 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     for(Pave *p:m_graph->get_paves()){
         Room *r = p->get_rooms()[maze];
 
+
         if(r->is_full()){
             IntervalVector position(p->get_position());
             cubedata->SetBounds(position[0].lb(), position[0].ub(),
@@ -70,7 +71,7 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
             polyData_polygon->AddInputData(cubedata->GetOutput());
         }
         else if(!r->is_empty()){
-            vector<std::tuple<double, double, double>> vector_points;
+            vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
             for(size_t direction=0; direction<3; direction++){
                 for(size_t sens = 0; sens <2; sens++){
@@ -94,18 +95,7 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                                                         (y==0)?iv[1].lb():iv[1].ub(),
                                                         (z==0)?iv[2].lb():iv[2].ub()};
 
-                                        bool same = false;
-                                        for(const std::tuple<double, double, double> &pt_comp:vector_points){
-                                            if(pt[0] == get<0>(pt_comp)
-                                                    && pt[1] == get<1>(pt_comp)
-                                                    && pt[2] == get<2>(pt_comp)){
-                                             same = true;
-                                             break;
-                                            }
-                                        }
-                                        if(!same){
-                                            vector_points.push_back(std::make_tuple(pt[0], pt[1], pt[2]));
-                                        }
+                                        points->InsertNextPoint(pt[0], pt[1], pt[2]);
                                     }
                                 }
                             }
@@ -115,28 +105,22 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 }
             }
 
-            if(vector_points.size()>4){
-                vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-                for(const std::tuple<double, double, double> &pt:vector_points){
-                    points->InsertNextPoint(get<0>(pt), get<1>(pt), get<2>(pt));
-                }
-                vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
-                pointsCollection->SetPoints(points);
+            vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
+            pointsCollection->SetPoints(points);
 
-                // ********** Surface **************
-                // Create the convex hull of the pointcloud (delaunay + outer surface)
-                vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-                delaunay->SetInputData(pointsCollection);
-                delaunay->SetTolerance(0.0);
-                delaunay->Update();
+            // ********** Surface **************
+            // Create the convex hull of the pointcloud (delaunay + outer surface)
+            vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+            delaunay->SetInputData(pointsCollection);
+            delaunay->SetTolerance(0.0);
+            delaunay->Update();
 
-                vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-                surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
-                surfaceFilter->Update();
+            vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+            surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+            surfaceFilter->Update();
 
-                // ********** Append results **************
-                polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-            }
+            // ********** Append results **************
+            polyData_polygon->AddInputData(surfaceFilter->GetOutput());
         }
     }
 
