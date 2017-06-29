@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = Interval(-3.5,3.5);
+    space[1] = Interval(-4.5,4.5);
     space[2] = Interval(0,6);
 
     Graph graph(space);
@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
 
     double x1_c, x2_c, x3_c, r;
     x1_c = 3.0;
-    x1_c = -2.0;
-    x3_c = 0.0;
-    r = 0.3;
+    x2_c = -2.0;
+    x3_c = 0;
+    r = 0.01;
 
     Function f_sep_outer(x1, x2, x3, pow(x1-x1_c, 2)+pow(x2-x2_c, 2) + pow(x3-x3_c, 2) - pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -60,25 +60,24 @@ int main(int argc, char *argv[])
 
     // ******* Mazes ********* //
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
-    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_CONTRACTOR);
+//    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_CONTRACTOR);
 
     Vtk_Graph vtk_graph("vdp_3D", &graph);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_outer.contract();
-    for(int i=0; i<5; i++){
+    for(int i=0; i<22; i++){
         graph.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
+//        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << graph << endl;
 
-
     vtk_graph.show_graph();
-    vtk_graph.show_maze(&maze_outer);
-//    vtk_graph.show_maze(&maze_inner);
+    vtk_graph.show_maze(&maze_outer, "outer");
+//    vtk_graph.show_maze(&maze_inner, "inner");
 
 }

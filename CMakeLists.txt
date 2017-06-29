@@ -69,6 +69,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
     endif()
 
 # VTK
+    set(VTK_DIR "${VTK_ROOT}")
     find_package(VTK REQUIRED)
     set(LIBS ${LIBS} ${VTK_LIBRARIES})
 

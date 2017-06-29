@@ -9,7 +9,7 @@ INVARIANTLIB_DIR="$(dirname "$SCRIPT")"
 
 cd ..
 sh $INVARIANTLIB_DIR/cmake/build_IbexLib.sh
-sh $INVARIANTLIB_DIR/cmake/build_VTK.sh
+# sh $INVARIANTLIB_DIR/cmake/build_VTK.sh
 cd $INVARIANTLIB_DIR
 
 mkdir build/build-debug -p
