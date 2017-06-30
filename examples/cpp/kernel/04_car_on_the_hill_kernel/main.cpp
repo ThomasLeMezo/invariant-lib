@@ -69,13 +69,6 @@ int main(int argc, char *argv[])
     cout << graph << endl;
 
     vibes::beginDrawing();
-//    Vibes_Graph v_graph_outer("graph_outer", &graph, &maze_outer);
-//    v_graph_outer.setProperties(0, 0, 1024, 1024);
-//    v_graph_outer.show();
-
-//    Vibes_Graph v_graph_inner("graph_inner", &graph, &maze_inner);
-//    v_graph_inner.setProperties(0, 0, 1024, 1024);
-//    v_graph_inner.show();
 
     Vibes_Graph v_graph("graph_inner", &graph, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);

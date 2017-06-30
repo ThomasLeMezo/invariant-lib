@@ -12,6 +12,10 @@
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkCleanPolyData.h>
 
+#include <vtkSurfaceReconstructionFilter.h>
+#include <vtkContourFilter.h>
+#include <vtkReverseSense.h>
+
 using namespace invariant;
 using namespace std;
 using namespace ibex;
@@ -108,19 +112,42 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
             vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
             pointsCollection->SetPoints(points);
 
+            if(pointsCollection->GetNumberOfPoints()>0){
+
             // ********** Surface **************
             // Create the convex hull of the pointcloud (delaunay + outer surface)
-            vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-            delaunay->SetInputData(pointsCollection);
-            delaunay->SetTolerance(0.0);
-            delaunay->Update();
+//            vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+//            delaunay->SetInputData(pointsCollection);
+//            delaunay->SetTolerance(0.0);
+//            delaunay->Update();
 
-            vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-            surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
-            surfaceFilter->Update();
+//            vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+//            surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+//            surfaceFilter->Update();
+
+            // ********** Sphere **************
+            // Construct the surface and create isosurface.
+            vtkSmartPointer<vtkSurfaceReconstructionFilter> surf = vtkSmartPointer<vtkSurfaceReconstructionFilter>::New();
+            surf->SetInputData(pointsCollection);
+
+            vtkSmartPointer<vtkContourFilter> cf = vtkSmartPointer<vtkContourFilter>::New();
+            cf->SetInputConnection(surf->GetOutputPort());
+            cf->SetValue(0, 0.0);
+            cf->Update();
+
+            // Sometimes the contouring algorithm can create a volume whose gradient
+            // vector and ordering of polygon (using the right hand rule) are
+            // inconsistent. vtkReverseSense cures this problem.
+//            vtkSmartPointer<vtkReverseSense> reverse = vtkSmartPointer<vtkReverseSense>::New();
+//            reverse->SetInputConnection(cf->GetOutputPort());
+//            reverse->ReverseCellsOn();
+//            reverse->ReverseNormalsOn();
+//            reverse->Update();
 
             // ********** Append results **************
-            polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+//            polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+            polyData_polygon->AddInputData(cf->GetOutput());
+            }
         }
     }
 
