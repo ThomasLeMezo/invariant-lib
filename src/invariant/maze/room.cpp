@@ -235,8 +235,8 @@ void Room::contract_consistency(){
                 bool one_possible = false;
                 for(int n_vf=0; n_vf<nb_vec; n_vf++){
                     if((type == MAZE_PROPAGATOR && door_out->is_possible_out()[n_vf]) || type == MAZE_CONTRACTOR){
-                        one_possible = true;
-                        door_out_iv &= out_results[n_vf][face_out][sens_out];
+                            one_possible = true;
+                            door_out_iv &= out_results[n_vf][face_out][sens_out];
                     }
                 }
                 if(!one_possible){
@@ -245,8 +245,10 @@ void Room::contract_consistency(){
 
                 if(type == MAZE_CONTRACTOR)
                     door_out->set_output_private(door_out_iv);
-                else
-                    door_out->set_output_private(door_out->get_output_private() | door_out_iv);
+                else{
+                    if(!is_degenerated(door_out_iv))
+                        door_out->set_output_private(door_out->get_output_private() | door_out_iv);
+                }
             }
         }
     }
@@ -407,6 +409,20 @@ void Room::synchronize(){
         Door *d = f->get_doors()[m_maze];
         d->synchronize();
     }
+}
+
+bool Room::is_degenerated(const IntervalVector& iv){
+    int compt = 0;
+    int dim = m_maze->get_graph()->dim();
+    for(int i=0; i<dim; i++){
+        if(iv[i].is_degenerated()){
+            compt++;
+        }
+        if(compt == 2){
+            return true;
+        }
+    }
+    return false;
 }
 
 }

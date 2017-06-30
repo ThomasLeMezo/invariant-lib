@@ -8,14 +8,14 @@ include_directories(../invariant/graph)
 include_directories(../invariant/maze)
 include_directories(../invariant/definition)
 include_directories(vibes)
-include(${VTK_USE_FILE})
+# include(${VTK_USE_FILE})
 
   set(SRC
     vibes/vibes.cpp
     VibesFigure.cpp
     vibes_graph.cpp
     graphiz_graph.cpp
-    vtk_graph.cpp
+#    vtk_graph.cpp
   )
 
   set(HEADERS
@@ -23,7 +23,7 @@ include(${VTK_USE_FILE})
     graphiz_graph.h
     VibesFigure.h
     vibes_graph.h
-    vtk_graph.h
+#    vtk_graph.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

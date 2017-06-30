@@ -190,6 +190,13 @@ protected:
      */
     void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
 
+    /**
+     * @brief Temp
+     * @param iv
+     * @return
+     */
+    bool is_degenerated(const ibex::IntervalVector& iv);
+
 public:
     /**
      * @brief Debug function to get private doors
