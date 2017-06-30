@@ -20,13 +20,13 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-//    space[0] = Interval(-30,30);
-//    space[1] = Interval(-20,20);
-//    space[2] = Interval(0,50);
+    space[0] = Interval(-30,30);
+    space[1] = Interval(-20,20);
+    space[2] = Interval(0,50);
 
-    space[0] = Interval(-100,100);
-    space[1] = Interval(-100,100);
-    space[2] = Interval(-100, 100);
+//    space[0] = Interval(-3,13);
+//    space[1] = Interval(-1,15);
+//    space[2] = Interval(-1, 21);
 
     // ****** Domain ******* //
     Graph graph(space);
@@ -36,13 +36,13 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-//    Interval rho = Interval(28.0);
-//    Interval sigma = Interval(10.0);
-//    Interval beta = Interval(8.0/3.0);
-
-    Interval rho = Interval(13.0);
+    Interval rho = Interval(28.0);
     Interval sigma = Interval(10.0);
     Interval beta = Interval(8.0/3.0);
+
+//    Interval rho = Interval(13.0);
+//    Interval sigma = Interval(10.0);
+//    Interval beta = Interval(8.0/3.0);
 
     ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
                                         x1*(rho - x3) - x2,
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;

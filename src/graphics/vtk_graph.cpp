@@ -63,8 +63,11 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
     vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
+    int dim_paves_list = m_graph->get_paves().size();
 
-    for(Pave *p:m_graph->get_paves()){
+#pragma omp parallel for
+    for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
+        Pave *p = m_graph->get_paves()[pave_id];
         Room *r = p->get_rooms()[maze];
 
 
@@ -154,7 +157,10 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 //            reverse->Update();
 
                 // ********** Append results **************
+                #pragma omp critical
+                {
                 polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                }
             }
         }
     }
