@@ -21,6 +21,10 @@ if [ ! -e "$HOME/vtk/bin/vtkH5detect" ]; then
 
   cd ${BUILD_DIR}
   echo `pwd`
-  cmake ${SOURCE_DIR}
+  cmake ${SOURCE_DIR} -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \ 
+  					  -DEXECUTABLE_OUTPUT_PATH=${BUILD_DIR}/bin \ 
+  					  -DLIBRARY_OUTPUT_PATH=${BUILD_DIR}/lib \ 
+  					  -DCMAKE_BUILD_TYPE=Release \ 
+  					  -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP
   make -j4
 fi

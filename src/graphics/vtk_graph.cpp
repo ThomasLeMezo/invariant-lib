@@ -16,6 +16,8 @@
 #include <vtkContourFilter.h>
 #include <vtkReverseSense.h>
 
+#include <vtkUnstructuredGrid.h>
+
 using namespace invariant;
 using namespace std;
 using namespace ibex;
@@ -75,6 +77,8 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
             polyData_polygon->AddInputData(cubedata->GetOutput());
         }
         else if(!r->is_empty()){
+            int nb_faces = 0;
+            int nb_points = 0;
             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
             for(size_t direction=0; direction<3; direction++){
@@ -82,25 +86,27 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                     Face *f = p->get_faces()[direction][sens];
                     Door *d = f->get_doors()[maze];
                     if(!d->is_empty()){
+                        nb_faces++;
 
                         IntervalVector iv = d->get_input() | d->get_output();
-                        //                tab_min_max int[3][2] = {{0,2}, {0, 2}, {0, 2}};
-                        if(!iv.is_empty()){
-                            for(int x=0; x<2; x++){
-                                if(iv[0].is_degenerated())
-                                    x=1;
-                                for(int y=0; y<2; y++){
-                                    if(iv[1].is_degenerated())
-                                        y=1;
-                                    for(int z=0; z<2; z++){
-                                        if(iv[2].is_degenerated())
-                                            z=1;
-                                        double pt[3] = {(x==0)?iv[0].lb():iv[0].ub(),
-                                                        (y==0)?iv[1].lb():iv[1].ub(),
-                                                        (z==0)?iv[2].lb():iv[2].ub()};
+                        IntervalVector orientation = f->get_orientation();
+                        int val_max[3] = {2, 2, 2};
+                        for(int i=0; i<3; i++){
+                            if(orientation[i] != Interval(0, 1)){
+                                val_max[i] = 1;
+                                break;
+                            }
+                        }
 
-                                        points->InsertNextPoint(pt[0], pt[1], pt[2]);
-                                    }
+                        double val[3][2] = {{iv[0].lb(), iv[0].ub()}, // x
+                                            {iv[1].lb(), iv[1].ub()},  // y
+                                            {iv[2].lb(), iv[2].ub()}}; // z
+
+                        for(int x=0; x<val_max[0]; x++){
+                            for(int y=0; y<val_max[1]; y++){
+                                for(int z=0; z<val_max[2]; z++){
+                                    points->InsertNextPoint(val[0][x], val[1][y], val[2][z]);
+                                    nb_points++;
                                 }
                             }
                         }
@@ -109,44 +115,46 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 }
             }
 
-            vtkSmartPointer< vtkPolyData> pointsCollection = vtkSmartPointer<vtkPolyData>::New();
-            pointsCollection->SetPoints(points);
+            if(nb_faces>0){
+                vtkIdType pointIds[nb_points];
+                for(int i=0; i<nb_points; i++){
+                    pointIds[i] = i;
+                }
+                vtkSmartPointer<vtkCellArray> faces = vtkSmartPointer<vtkCellArray>::New();
 
-            if(pointsCollection->GetNumberOfPoints()>0){
+                for(int i=0; i<nb_faces; i++){
+                    vtkIdType face[4];
+                    for(int j=0; j<4; j++)
+                        face[j] = 4*i+j;
+                    faces->InsertNextCell(4, face);
+                }
 
-            // ********** Surface **************
-            // Create the convex hull of the pointcloud (delaunay + outer surface)
-//            vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-//            delaunay->SetInputData(pointsCollection);
-//            delaunay->SetTolerance(0.0);
-//            delaunay->Update();
+                vtkSmartPointer<vtkUnstructuredGrid> ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                ugrid->SetPoints(points);
+                ugrid->InsertNextCell(VTK_POLYHEDRON, nb_points, pointIds, nb_faces, faces->GetPointer());
 
-//            vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-//            surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
-//            surfaceFilter->Update();
+                // ********** Surface **************
+                // Create the convex hull of the pointcloud (delaunay + outer surface)
+                vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+                delaunay->SetInputData(ugrid);
+                delaunay->SetTolerance(0.0);
+                delaunay->Update();
 
-            // ********** Sphere **************
-            // Construct the surface and create isosurface.
-            vtkSmartPointer<vtkSurfaceReconstructionFilter> surf = vtkSmartPointer<vtkSurfaceReconstructionFilter>::New();
-            surf->SetInputData(pointsCollection);
+                vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+                surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+                surfaceFilter->Update();
 
-            vtkSmartPointer<vtkContourFilter> cf = vtkSmartPointer<vtkContourFilter>::New();
-            cf->SetInputConnection(surf->GetOutputPort());
-            cf->SetValue(0, 0.0);
-            cf->Update();
+                // Sometimes the contouring algorithm can create a volume whose gradient
+                // vector and ordering of polygon (using the right hand rule) are
+                // inconsistent. vtkReverseSense cures this problem.
+                //            vtkSmartPointer<vtkReverseSense> reverse = vtkSmartPointer<vtkReverseSense>::New();
+                //            reverse->SetInputConnection(cf->GetOutputPort());
+                //            reverse->ReverseCellsOn();
+                //            reverse->ReverseNormalsOn();
+                //            reverse->Update();
 
-            // Sometimes the contouring algorithm can create a volume whose gradient
-            // vector and ordering of polygon (using the right hand rule) are
-            // inconsistent. vtkReverseSense cures this problem.
-//            vtkSmartPointer<vtkReverseSense> reverse = vtkSmartPointer<vtkReverseSense>::New();
-//            reverse->SetInputConnection(cf->GetOutputPort());
-//            reverse->ReverseCellsOn();
-//            reverse->ReverseNormalsOn();
-//            reverse->Update();
-
-            // ********** Append results **************
-//            polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-            polyData_polygon->AddInputData(cf->GetOutput());
+                // ********** Append results **************
+                polyData_polygon->AddInputData(surfaceFilter->GetOutput());
             }
         }
     }
