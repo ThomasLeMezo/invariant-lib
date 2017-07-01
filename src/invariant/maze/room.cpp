@@ -213,6 +213,9 @@ void Room::contract_consistency(){
                         }
                     }
                     if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
+                        /// TEST ?
+                        if(is_degenerated(in_result))
+                            in_result.set_empty();
                         if(type == MAZE_CONTRACTOR)
                             door_in->set_input_private(in & in_result);
                         else
@@ -235,20 +238,22 @@ void Room::contract_consistency(){
                 bool one_possible = false;
                 for(int n_vf=0; n_vf<nb_vec; n_vf++){
                     if((type == MAZE_PROPAGATOR && door_out->is_possible_out()[n_vf]) || type == MAZE_CONTRACTOR){
-                            one_possible = true;
-                            door_out_iv &= out_results[n_vf][face_out][sens_out];
+                        one_possible = true;
+                        door_out_iv &= out_results[n_vf][face_out][sens_out];
                     }
                 }
                 if(!one_possible){
                     door_out_iv.set_empty();
                 }
 
+                /// TEST ?
+                if(is_degenerated(door_out_iv))
+                    door_out_iv.set_empty();
+
                 if(type == MAZE_CONTRACTOR)
                     door_out->set_output_private(door_out_iv);
-                else{
-                    if(!is_degenerated(door_out_iv))
-                        door_out->set_output_private(door_out->get_output_private() | door_out_iv);
-                }
+                else
+                    door_out->set_output_private(door_out->get_output_private() | door_out_iv);
             }
         }
     }

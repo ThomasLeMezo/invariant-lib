@@ -54,10 +54,11 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
+        cout << "-----" << i << "-----" << endl;
         graph.bisect();
-        cout << i << " - " << maze.contract() << " - ";
-        cout << graph.size() << endl;
+        cout << "nb contractions = " << maze.contract() << " - ";
+        cout << "graph size = " << graph.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
