@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
     ibex::Variable x, y, z;
 
     IntervalVector space(3);
-    space[0] = Interval(-10, 15);
-    space[1] = Interval(-30, 10);
-    space[2] = Interval(0, 30);
+    space[0] = Interval(-100, 100);
+    space[1] = Interval(-100, 100);
+    space[2] = Interval(-100, 100);
 
     // ****** Domain ******* //
     Graph graph(space);

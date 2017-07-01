@@ -32,15 +32,21 @@ void Vtk_Graph::show_graph(){
     cout << "vtk graph" << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_paves = vtkSmartPointer<vtkAppendPolyData>::New();
+    int nb_paves = m_graph->get_paves().size();
 
-    for(Pave *p:m_graph->get_paves()){
+    #pragma omp parallel for
+    for(int pave_id=0; pave_id<nb_paves; pave_id++){
+        Pave *p = m_graph->get_paves()[pave_id];
         vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
         IntervalVector position(p->get_position());
         cubedata->SetBounds(position[0].lb(), position[0].ub(),
                 position[1].lb(), position[1].ub(),
                 position[2].lb(), position[2].ub());
         cubedata->Update();
-        polyData_paves->AddInputData(cubedata->GetOutput());
+        #pragma omp critical
+        {
+            polyData_paves->AddInputData(cubedata->GetOutput());
+        }
     }
     //    for(Pave *p:m_graph->get_paves_not_bisectable()){
     //        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
@@ -65,12 +71,14 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
     vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
     int dim_paves_list = m_graph->get_paves().size();
+    int step = 0;
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
         Pave *p = m_graph->get_paves()[pave_id];
         Room *r = p->get_rooms()[maze];
-
+#pragma omp atomic
+        step ++;
 
         if(r->is_full()){
             IntervalVector position(p->get_position());
@@ -78,7 +86,12 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                     position[1].lb(), position[1].ub(),
                     position[2].lb(), position[2].ub());
             cubedata->Update();
-            polyData_polygon->AddInputData(cubedata->GetOutput());
+            #pragma omp critical(add_polygon)
+            {
+                polyData_polygon->AddInputData(cubedata->GetOutput());
+                if(step%1000==0)
+                    cout << "step = " << step << " /" << dim_paves_list << endl;
+            }
         }
         else if(!r->is_empty()){
             int nb_faces = 0;
@@ -158,9 +171,11 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 //            reverse->Update();
 
                 // ********** Append results **************
-                #pragma omp critical
+                #pragma omp critical(add_polygon)
                 {
-                polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                    polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                    if(step%1000==0)
+                        cout << "step = " << step << " /" << dim_paves_list << endl;
                 }
             }
         }
