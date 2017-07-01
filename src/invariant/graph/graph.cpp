@@ -39,9 +39,15 @@ Graph::Graph(const ibex::IntervalVector &space):
 
 Graph::~Graph(){
     for(Pave *p:m_paves){
-        delete(p);
+        if(p!=NULL)
+            delete(p);
     }
     delete(m_tree);
+}
+
+void Graph::delete_pave(int id){
+    delete(m_paves[id]);
+    m_paves[id] = NULL;
 }
 
 void Graph::serialize(std::ofstream& binFile) const{

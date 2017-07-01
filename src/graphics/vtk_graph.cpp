@@ -22,9 +22,10 @@ using namespace invariant;
 using namespace std;
 using namespace ibex;
 
-Vtk_Graph::Vtk_Graph(const std::string &file_name, Graph *g){
+Vtk_Graph::Vtk_Graph(const std::string &file_name, Graph *g, bool memory_optimization){
     m_graph = g;
     m_file_name = file_name;
+    m_memory_optimization = memory_optimization;
 }
 
 void Vtk_Graph::show_graph(){
@@ -162,6 +163,9 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 polyData_polygon->AddInputData(surfaceFilter->GetOutput());
                 }
             }
+        }
+        if(m_memory_optimization){
+            m_graph->delete_pave(pave_id);
         }
     }
 

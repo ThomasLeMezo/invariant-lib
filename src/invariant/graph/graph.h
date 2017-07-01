@@ -124,6 +124,12 @@ public:
      */
     void get_room_info(Maze* maze, const ibex::IntervalVector &position, std::vector<Pave *> &pave_list) const;
 
+    /**
+     * @brief Delete a pave for memory optimization
+     * @param id
+     */
+    void delete_pave(int id);
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // Graph coordinates
