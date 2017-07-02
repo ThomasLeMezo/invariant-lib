@@ -35,7 +35,7 @@ const ibex::IntervalVector NodeCurrent::eval(const IntervalVector& position){
     if(inter.is_empty()){
         return IntervalVector(position.size(), Interval::EMPTY_SET);
     }
-    else if(position.is_strict_interior_subset(m_position)){
+    else if(position.is_strict_subset(m_position)){
         return m_vector_field;
     }
     else{
@@ -55,10 +55,10 @@ void NodeCurrent::fill_leafs(short *raw_u, short *raw_v, const size_t& j_max, co
         size_t dim = m_position.size();
         vector<vector<int>> tab_point;
         for(size_t d = 0; d<dim; d++){
-            vector<int> v;
-            v.push_back(ceil(m_position[d].mid()));
-            v.push_back(floor(m_position[d].mid()));
-            tab_point.push_back(v);
+            vector<int> pt;
+            pt.push_back(ceil(m_position[d].mid()));
+            pt.push_back(floor(m_position[d].mid()));
+            tab_point.push_back(pt);
         }
 
         // U

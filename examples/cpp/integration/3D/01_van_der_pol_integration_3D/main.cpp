@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     x2_c = 2.0;
     x3_c = 1.0;
     r = 0.3;
-    cout << "test" << endl;
+
     Function f_sep(x1, x2, x3, pow(x1-x1_c, 2)+pow(x2-x2_c, 2) + pow(x3-x3_c, 2) - pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
     dom.set_sep(&s);

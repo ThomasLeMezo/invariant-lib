@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
-    for(int i=0; i<15; i++){
+    for(int i=0; i<22; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }
