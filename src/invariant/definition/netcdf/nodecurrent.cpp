@@ -31,20 +31,20 @@ const ibex::IntervalVector& NodeCurrent::compute_vector_field_tree(){
 }
 
 const ibex::IntervalVector NodeCurrent::eval(const IntervalVector& position){
-    IntervalVector inter = position & m_position;
-    if(inter.is_empty()){
-        return IntervalVector(position.size(), Interval::EMPTY_SET);
-    }
-    else if(position.is_strict_subset(m_position)){
+    if(m_leaf){
         return m_vector_field;
     }
     else{
-        if(m_leaf){
-            return m_vector_field;
+        IntervalVector inter = position & m_position;
+        if(inter.is_empty()){
+            return IntervalVector(position.size(), Interval::EMPTY_SET);
         }
+//        else if(inter.is_strict_interior_subset(m_position)){
+//            return m_vector_field;
+//        }
         else{
-            IntervalVector result(m_children.first->eval(position));
-            result |= m_children.second->eval(position);
+            IntervalVector result(m_children.first->eval(inter));
+            result |= m_children.second->eval(inter);
             return result;
         }
     }

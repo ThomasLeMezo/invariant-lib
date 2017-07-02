@@ -17,16 +17,20 @@ int main(int argc, char *argv[])
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
-    Graph graph(pm.get_search_space());
+//    IntervalVector search_space = pm.get_search_space();
+    IntervalVector search_space(2);
+    search_space[0] = Interval(0, 100);
+    search_space[1] = Interval(0, 100);
+    Graph graph(search_space);
     invariant::Domain dom(&graph);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
     double x1_c, x2_c, r;
-    x1_c = 250;
-    x2_c = 250;
-    r = 10;
+    x1_c = 30;
+    x2_c = 30;
+    r = 1;
     Variable x1, x2;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
@@ -37,7 +41,7 @@ int main(int argc, char *argv[])
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
-    for(int i=0; i<22; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }
