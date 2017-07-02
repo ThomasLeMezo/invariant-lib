@@ -7,7 +7,6 @@
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
-#include "graphiz_graph.h"
 #include <omp.h>
 
 using namespace std;
@@ -34,7 +33,7 @@ int main(int argc, char *argv[])
     x2_c = 2.0;
     r = 0.3;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom.set_sep(&s);
 
     // ****** Dynamics *******

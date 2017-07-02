@@ -5,6 +5,7 @@
 
 # Sources
 include_directories(definition)
+include_directories(definition/netcdf)
 include_directories(graph)
 include_directories(maze)
 include_directories(../tools/serialization)
@@ -23,6 +24,9 @@ include_directories(../tools/serialization)
     definition/domain.cpp
     definition/dynamics.cpp
     definition/dynamics_function.cpp
+
+    definition/netcdf/nodecurrent.cpp
+    definition/netcdf/previmer.cpp
   )
 
   set(HEADERS
@@ -37,7 +41,10 @@ include_directories(../tools/serialization)
 
     definition/domain.h
     definition/dynamics.h
-    definition/dynamics_function.cpp
+    definition/dynamics_function.h
+
+    definition/netcdf/nodecurrent.h
+    definition/netcdf/previmer.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
