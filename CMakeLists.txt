@@ -73,6 +73,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
     find_package(VTK REQUIRED)
     set(LIBS ${LIBS} ${VTK_LIBRARIES})
 
+# Netcdf
+    pkg_search_module(NETCDF netcdf-cxx4)
+    include_directories(${NETCDF_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${NETCDF_LIBRARIES})
+
 # Sources
     add_subdirectory(src)
 

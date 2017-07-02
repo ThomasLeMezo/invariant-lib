@@ -5,16 +5,16 @@
 # Sources
 
   set(SRC
-	main.cpp
+    main.cpp
   )
 
   set(HEADERS
 
   )
 
-  add_executable(rabinovich_fabrikant_invariant ${SRC})
+  add_executable(test_netcdf ${SRC})
 
-  target_link_libraries(rabinovich_fabrikant_invariant
+  target_link_libraries(test_netcdf
     ${LIBS}
     invariant-core
     invariant-tools

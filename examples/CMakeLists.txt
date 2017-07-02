@@ -7,6 +7,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/invariant/graph)
 include_directories(${CMAKE_SOURCE_DIR}/src/invariant/maze)
 include_directories(${CMAKE_SOURCE_DIR}/src/invariant/definition)
 include_directories(${CMAKE_SOURCE_DIR}/src/tools/serialization)
-include_directories(${CMAKE_SOURCE_DIR}/src/graphics/)
+include_directories(${CMAKE_SOURCE_DIR}/src/tools/netcdf)
+include_directories(${CMAKE_SOURCE_DIR}/src/graphics)
 
 add_subdirectory(cpp)

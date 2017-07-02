@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(hindmarsh–rose_invariant ${SRC})
+  add_executable(hindmarsh_rose_invariant ${SRC})
 
-  target_link_libraries(hindmarsh–rose_invariant
+  target_link_libraries(hindmarsh_rose_invariant
     ${LIBS}
     invariant-core
     invariant-tools
