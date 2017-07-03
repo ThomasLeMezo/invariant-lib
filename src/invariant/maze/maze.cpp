@@ -1,5 +1,7 @@
 #include "maze.h"
 
+#include "../../graphics/vibes_graph.h"
+
 using namespace std;
 using namespace ibex;
 namespace invariant {
@@ -80,6 +82,11 @@ int Maze::contract(){
                         // Contract
                         bool change = false;
                         change |= r->contract();
+
+                        /// DEBUG
+//                        Vibes_Graph v_graph("graph", m_graph, this);
+//                        v_graph.setProperties(0, 0, 512, 512);
+//                        v_graph.show();
 
                         if(change){
                             // Analyse changes

@@ -199,7 +199,7 @@ void Pave::bisect(){
             m_tree->add_emptyness((it->first), false);
 
         if(r->is_full()){
-            m_tree->add_fullness((it->first), true);                
+            m_tree->add_fullness((it->first), true);
             // Child cannot be set to full because of overapproximation
             // in the case of MAZE_PROPAGATOR & MAZE_CONTRACTOR is already full
         }
