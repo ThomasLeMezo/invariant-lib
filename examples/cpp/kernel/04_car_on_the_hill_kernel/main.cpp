@@ -19,8 +19,10 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
+//    space[0] = Interval(-1.0, 13.0);
+//    space[1] = Interval(-16, 16);
     space[0] = Interval(-1.0, 13.0);
-    space[1] = Interval(-16, 16);
+    space[1] = Interval(-7, 7);
 
     Graph graph(space);
 
@@ -37,16 +39,24 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(false);
 
     // ****** Dynamics Outer ******* //
+//    ibex::Function f_outer(x1, x2, Return(x2,
+//                                     (-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5, 0.5))));
     ibex::Function f_outer(x1, x2, Return(x2,
-                                     (-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5, 0.5))));
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-2.0, 2.0)));
 
     Dynamics_Function dyn_outer(&f_outer);
 
     // ****** Dynamics Inner ******* //
+//    ibex::Function f_inner1(x1, x2, Return(-x2,
+//                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5))));
+//    ibex::Function f_inner2(x1, x2, Return(-x2,
+//                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(0.5))));
     ibex::Function f_inner1(x1, x2, Return(-x2,
-                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5))));
+                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-2.0))));
     ibex::Function f_inner2(x1, x2, Return(-x2,
-                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(0.5))));
+                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(2.0))));
+
+
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
@@ -60,7 +70,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
