@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics Outer ******* //
     ibex::Function f_outer(x1, x2, Return(x2,
-                                     (-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5, +0.5))));
+                                     (-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5, 0.5))));
 
     Dynamics_Function dyn_outer(&f_outer);
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     ibex::Function f_inner1(x1, x2, Return(-x2,
                                      -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5))));
     ibex::Function f_inner2(x1, x2, Return(-x2,
-                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(+0.5))));
+                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(0.5))));
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
@@ -57,9 +57,10 @@ int main(int argc, char *argv[])
     Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_PROPAGATOR);
 
     // ******* Algorithm ********* //
+    vibes::beginDrawing();
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
@@ -67,8 +68,6 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << graph << endl;
-
-    vibes::beginDrawing();
 
     Vibes_Graph v_graph("graph_inner", &graph, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);

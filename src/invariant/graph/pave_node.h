@@ -134,18 +134,25 @@ public:
     const std::pair<Pave_node *, Pave_node *> get_children() const;
 
     /**
-     * @brief Add a flag to the emptyness map to tell if a pave was empty at that level of the tree
+     * @brief Add a flag to the emptyness map to tell if a room was empty at that level of the tree
      * @param maze
      * @param empty
      */
     void add_emptyness(Maze *maze, bool empty);
 
     /**
-     * @brief Add a flag to the fullness map to tell if a pave was full at that level of the tree
+     * @brief Add a flag to the fullness map to tell if a room was full at that level of the tree
      * @param maze
      * @param empty
      */
     void add_fullness(Maze *maze, bool full);
+
+    /**
+     * @brief Add a flag to the removed map to tell if a room was removed at that level of the tree
+     * @param maze
+     * @param removed
+     */
+    inline void add_removed(Maze *maze, bool removed);
 
     /**
      * @brief Return the map of emptyness
@@ -158,6 +165,12 @@ public:
      * @return
      */
     std::map<Maze*, bool> get_fullness() const;
+
+    /**
+     * @brief Return the map of removed
+     * @return
+     */
+    inline std::map<Maze*, bool> get_removed() const;
 
     /**
      * @brief Return true if this pave_node is a border pave
@@ -180,6 +193,7 @@ private:
 
     std::map<Maze*, bool>               m_empty_rooms;
     std::map<Maze*, bool>               m_full_rooms;
+    std::map<Maze*, bool>               m_removed_rooms;
     bool                                m_border_pave;
 };
 
@@ -211,6 +225,10 @@ inline void Pave_node::add_emptyness(Maze *maze, bool empty){
     m_empty_rooms.insert(std::make_pair(maze, empty));
 }
 
+inline void Pave_node::add_removed(Maze *maze, bool removed){
+    m_removed_rooms.insert(std::make_pair(maze, removed));
+}
+
 inline void Pave_node::add_fullness(Maze *maze, bool empty){
     m_full_rooms.insert(std::make_pair(maze, empty));
 }
@@ -221,6 +239,10 @@ inline std::map<Maze*, bool> Pave_node::get_emptyness() const{
 
 inline std::map<Maze*, bool> Pave_node::get_fullness() const{
     return m_full_rooms;
+}
+
+inline std::map<Maze*, bool> Pave_node::get_removed() const{
+    return m_removed_rooms;
 }
 
 inline bool Pave_node::is_border_pave() const{

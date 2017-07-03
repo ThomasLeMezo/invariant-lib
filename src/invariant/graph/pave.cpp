@@ -206,6 +206,11 @@ void Pave::bisect(){
         else
             m_tree->add_fullness((it->first), false);
 
+        if(r->is_removed())
+            m_tree->add_removed((it->first), true);
+        else
+            m_tree->add_removed((it->first), false);
+
         r_first->synchronize();
         r_second->synchronize();
     }

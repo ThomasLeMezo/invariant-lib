@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     ibex::Variable x, t;
 
     IntervalVector space(2);
-    space[0] = Interval(-1,20);
+    space[0] = Interval(-0.1,30);
     space[1] = Interval(-3,3);
 
     Graph graph(space);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_outer.contract();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         graph.bisect();
 //        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;

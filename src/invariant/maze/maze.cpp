@@ -43,6 +43,11 @@ int Maze::contract(){
         }
     }
 
+    /// DEBUG
+//    Vibes_Graph v_graph("graph", m_graph, this);
+//    v_graph.setProperties(0, 0, 512, 512);
+//    v_graph.show();
+
     cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << endl;
     t_start = omp_get_wtime();
     int nb_operations = 0;

@@ -145,11 +145,13 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
 }
 
 void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
-    if(m_graph->size()==1)
+    MazeType type = maze->get_type();
+
+    if(m_graph->size()==1 && type == MAZE_CONTRACTOR)
         return;
+
     vector<Pave*> pave_border_list;
     m_graph->get_tree()->get_border_paves(pave_border_list);
-    MazeType type = maze->get_type();
 
     for(Pave *p:pave_border_list){
         for(Face *f:p->get_faces_vector()){

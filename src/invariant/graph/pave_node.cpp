@@ -175,7 +175,7 @@ void Pave_node::get_all_child_rooms_not_empty(std::vector<Room *> &list_room, Ma
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
     else{
-        if(!this->get_emptyness()[maze]){
+        if(!this->get_emptyness()[maze] && !this->get_removed()[maze]){
             m_children.first->get_all_child_rooms(list_room, maze);
             m_children.second->get_all_child_rooms(list_room, maze);
         }
@@ -189,7 +189,7 @@ void Pave_node::get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maz
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
     else{
-        if(!this->get_fullness()[maze]){
+        if(!this->get_fullness()[maze] && !this->get_removed()[maze]){
             m_children.first->get_all_child_rooms(list_room, maze);
             m_children.second->get_all_child_rooms(list_room, maze);
         }
