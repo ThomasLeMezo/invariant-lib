@@ -8,6 +8,7 @@ NodeCurrent::NodeCurrent(const ibex::IntervalVector &position, double epsilon_bi
 {
     if(m_position.max_diam()<epsilon_bisection){
         m_leaf = true;
+        m_leaf_list.push_back(this);
     }
     else{
         m_leaf = false;
@@ -17,6 +18,8 @@ NodeCurrent::NodeCurrent(const ibex::IntervalVector &position, double epsilon_bi
         NodeCurrent *nc2 = new NodeCurrent(result_boxes.second, epsilon_bisection);
         m_children.first = nc1;
         m_children.second = nc2;
+        m_leaf_list.insert(m_leaf_list.end(), nc1->get_leaf_list().begin(), nc1->get_leaf_list().end());
+        m_leaf_list.insert(m_leaf_list.end(), nc2->get_leaf_list().begin(), nc2->get_leaf_list().end());
     }
 }
 
@@ -51,16 +54,23 @@ const ibex::IntervalVector NodeCurrent::eval(const IntervalVector& position){
 }
 
 void NodeCurrent::fill_leafs(short *raw_u, short *raw_v, const size_t& j_max, const float& scale_factor, const short& fill_value){
-    if(m_leaf){
-        size_t dim = m_position.size();
+
+    int nb_node=m_leaf_list.size();
+    size_t dim = m_position.size();
+
+    #pragma omp for
+    for(int id=0; id<nb_node; id++){
+        NodeCurrent *nc = m_leaf_list[id];
+
         vector<vector<int>> tab_point;
         for(size_t d = 0; d<dim; d++){
             vector<int> pt;
-            pt.push_back(ceil(m_position[d].mid()));
-            pt.push_back(floor(m_position[d].mid()));
+            pt.push_back(ceil(nc->get_position()[d].mid()));
+            pt.push_back(floor(nc->get_position()[d].mid()));
             tab_point.push_back(pt);
         }
 
+        IntervalVector vector_field(nc->get_vector_field());
         // U
         for(size_t k=0; k<tab_point[0].size(); k++){
             for(size_t l=0; l<tab_point[0].size(); l++){
@@ -68,7 +78,7 @@ void NodeCurrent::fill_leafs(short *raw_u, short *raw_v, const size_t& j_max, co
                 size_t i_coord = tab_point[1][l];
                 short v = raw_u[j_coord+i_coord*j_max];
                 if(v!=fill_value){
-                    m_vector_field[0] |= Interval(v*scale_factor);
+                    vector_field[0] |= Interval(v*scale_factor);
                 }
             }
         }
@@ -80,13 +90,10 @@ void NodeCurrent::fill_leafs(short *raw_u, short *raw_v, const size_t& j_max, co
                 int i_coord = tab_point[1][l];
                 short v = raw_v[j_coord+i_coord*j_max];
                 if(v!=fill_value){
-                    m_vector_field[1] |= Interval(v*scale_factor);
+                    vector_field[1] |= Interval(v*scale_factor);
                 }
             }
         }
-    }
-    else{
-        m_children.first->fill_leafs(raw_u, raw_v, j_max, scale_factor, fill_value);
-        m_children.second->fill_leafs(raw_u, raw_v, j_max, scale_factor, fill_value);
+        nc->set_vector_field(vector_field);
     }
 }

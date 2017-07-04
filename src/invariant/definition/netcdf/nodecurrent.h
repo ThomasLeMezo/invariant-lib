@@ -61,12 +61,20 @@ public:
      */
     void fill_leafs(short *raw_u, short *raw_v, const size_t& j_max, const float &scale_factor, const short& fill_value);
 
+    /**
+     * @brief Get the leaf list of this NodeCurrent (list of all leaf children nodes)
+     * @return
+     */
+    const std::vector<NodeCurrent *> &get_leaf_list() const;
+
 private:
     ibex::IntervalVector m_position;
     ibex::IntervalVector m_vector_field;
 
     std::pair<NodeCurrent *, NodeCurrent *> m_children;
     bool                m_leaf = false;
+
+    std::vector<NodeCurrent *> m_leaf_list;
 
 };
 
@@ -88,4 +96,9 @@ inline bool NodeCurrent::is_leaf() const{
 inline std::pair<NodeCurrent *, NodeCurrent *> NodeCurrent::get_children() const{
     return m_children;
 }
+
+inline const std::vector<NodeCurrent *>& NodeCurrent::get_leaf_list() const{
+    return m_leaf_list;
+}
+
 #endif // NODECURRENT_H

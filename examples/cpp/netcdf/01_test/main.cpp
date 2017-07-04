@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data/PREVIMER_L1-MARS2D-FINIS250_20081229T0000Z_MeteoMF.nc");
+    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteurs/data_ifremer/data/PREVIMER_L1-MARS2D-FINIS250_20161219T0000Z_MeteoMF.nc");
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
-    for(int i=0; i<8; i++){
+    for(int i=0; i<5; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }

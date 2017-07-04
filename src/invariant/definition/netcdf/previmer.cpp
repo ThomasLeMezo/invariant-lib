@@ -33,17 +33,22 @@ PreviMer::PreviMer(const std::string& file_name){
     IntervalVector position(2);
 //    position[0] = Interval(0, m_j_max);
 //    position[1] = Interval(0, m_i_max);
-    position[0] = Interval(0, 10);
-    position[1] = Interval(0, 10);
+    position[0] = Interval(180, 190);
+    position[1] = Interval(380, 390);
     double epsilon_bisection = 0.51;
 
-    double time_start_tree = omp_get_wtime();
+    double time_start_init = omp_get_wtime();
     m_node_current = new NodeCurrent(position, epsilon_bisection);
+    cout << "TIME build tree= " << omp_get_wtime() - time_start_init << endl;
     m_dim = 2;
 
+    time_start_init = omp_get_wtime();
     m_node_current->fill_leafs(m_raw_u, m_raw_v, m_j_max, m_scale_factor, m_fill_value);
+    cout << "TIME compute leafs= " << omp_get_wtime() - time_start_init << endl;
+
+    time_start_init = omp_get_wtime();
     m_node_current->compute_vector_field_tree();
-    cout << "TIME compute tree = " << omp_get_wtime() - time_start_tree << endl;
+    cout << "TIME compute tree = " << omp_get_wtime() - time_start_init << endl;
 }
 
 const vector<ibex::IntervalVector> PreviMer::eval(ibex::IntervalVector position){
