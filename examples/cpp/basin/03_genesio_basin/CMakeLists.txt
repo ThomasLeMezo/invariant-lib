@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(bacha_bassin ${SRC})
+  add_executable(genesio_basin ${SRC})
 
-  target_link_libraries(bacha_bassin
+  target_link_libraries(genesio_basin
     ${LIBS}
     invariant-core
     invariant-tools

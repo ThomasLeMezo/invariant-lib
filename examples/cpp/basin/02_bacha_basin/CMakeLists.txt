@@ -5,16 +5,16 @@
 # Sources
 
   set(SRC
-	main.cpp
+    main.cpp
   )
 
   set(HEADERS
 
   )
 
-  add_executable(bacha_bassin ${SRC})
+  add_executable(bacha_basin ${SRC})
 
-  target_link_libraries(bacha_bassin
+  target_link_libraries(bacha_basin
     ${LIBS}
     invariant-core
     invariant-tools

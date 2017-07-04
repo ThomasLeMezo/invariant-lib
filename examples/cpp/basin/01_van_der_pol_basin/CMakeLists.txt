@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(bacha_bassin ${SRC})
+  add_executable(van_der_pol_basin ${SRC})
 
-  target_link_libraries(bacha_bassin
+  target_link_libraries(van_der_pol_basin
     ${LIBS}
     invariant-core
     invariant-tools
