@@ -53,13 +53,14 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
+    vibes::beginDrawing();
     Vibes_Graph v_graph("graph", &graph, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = Interval(-2);
-    position_info[1] = Interval(4);
-    v_graph.get_room_info(&maze, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(-2);
+//    position_info[1] = Interval(4);
+//    v_graph.get_room_info(&maze, position_info);
 
 }

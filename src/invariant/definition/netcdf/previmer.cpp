@@ -33,8 +33,8 @@ PreviMer::PreviMer(const std::string& file_name){
     IntervalVector position(2);
 //    position[0] = Interval(0, m_j_max);
 //    position[1] = Interval(0, m_i_max);
-    position[0] = Interval(180, 190);
-    position[1] = Interval(380, 390);
+    position[0] = Interval(180, 200);
+    position[1] = Interval(380, 400);
     double epsilon_bisection = 0.51;
 
     double time_start_init = omp_get_wtime();
