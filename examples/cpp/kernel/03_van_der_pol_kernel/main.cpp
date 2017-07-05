@@ -24,10 +24,12 @@ int main(int argc, char *argv[])
 
     Graph graph(space);
 
+    double r = 1.0;
+
     // ****** Domain Outer ******* //
     invariant::Domain dom_outer(&graph);
 
-    Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
+    Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
     dom_outer.set_sep(&s_outer);
     dom_outer.set_border_path_in(false);
@@ -36,7 +38,7 @@ int main(int argc, char *argv[])
     // ****** Domain Inner ******* //
     invariant::Domain dom_inner(&graph);
 
-    Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
+    Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, LEQ); // LT, LEQ, EQ, GEQ, GT
     dom_inner.set_sep_input(&s_inner);
     dom_inner.set_border_path_in(true);
@@ -52,12 +54,9 @@ int main(int argc, char *argv[])
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5)));
     ibex::Function f_inner2(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.5)));
-    ibex::Function f_inner3(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
-//    f_list_inner.push_back(&f_inner3);
     Dynamics_Function dyn_inner(f_list_inner);
 
     // ******* Mazes ********* //
@@ -67,7 +66,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<14; i++){
+    for(int i=0; i<18; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
@@ -76,27 +75,13 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-    vibes::beginDrawing();
-//    Vibes_Graph v_graph_outer("graph_outer", &graph, &maze_outer);
-//    v_graph_outer.setProperties(0, 0, 1024, 1024);
-//    v_graph_outer.show();
-
-//    Vibes_Graph v_graph_inner("graph_inner", &graph, &maze_inner);
-//    v_graph_inner.setProperties(0, 0, 1024, 1024);
-//    v_graph_inner.show();
-
-    Vibes_Graph v_graph("graph_inner", &graph, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
-    Vibes_Graph v_graph2("graph_2", &graph, &maze_inner);
-    v_graph2.setProperties(0, 0, 1024, 1024);
-    v_graph2.show();
-
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(1.72);
-//    position_info[1] = Interval(-0.725);
-//    v_graph2.get_room_info(&maze_inner, position_info);
+//    Vibes_Graph v_graph2("graph_2", &graph, &maze_inner);
+//    v_graph2.setProperties(0, 0, 1024, 1024);
+//    v_graph2.show();
 
 //    position_info[0] = Interval(1.745);
 //    position_info[1] = Interval(-0.725);
