@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(2D_basin_ratschan ${SRC})
+  add_executable(2D_basin_bacha ${SRC})
 
-  target_link_libraries(2D_basin_ratschan
+  target_link_libraries(2D_basin_bacha
     ${LIBS}
     invariant-core
     invariant-tools

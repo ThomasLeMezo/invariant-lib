@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(sinusoidal2_integration ${SRC})
+  add_executable(2D_integration_sinusoidal2 ${SRC})
 
-  target_link_libraries(sinusoidal2_integration
+  target_link_libraries(2D_integration_sinusoidal2
 	${LIBS}
 	invariant-core
 	invariant-tools

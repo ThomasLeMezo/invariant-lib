@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 //    vibes::beginDrawing();
     double time_start = omp_get_wtime();
     maze_outer.contract();
-    for(int i=0; i<14; i++){
+    for(int i=0; i<18; i++){
         graph.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << graph.size() << endl;
         cout << i << " - " << maze_inner.contract() << " - " << graph.size() << endl;
@@ -81,14 +81,14 @@ int main(int argc, char *argv[])
 //    v_graph_inner.setProperties(0, 0, 512, 512);
 //    v_graph_inner.show();
 
-    Vibes_Graph v_graph_outer("graph_outer", &graph,&maze_outer, Vibes_Graph::VIBES_GRAPH_OUTER);
-    v_graph_outer.setProperties(0, 0, 512, 512);
-    v_graph_outer.show();
+//    Vibes_Graph v_graph_outer("graph_outer", &graph,&maze_outer, Vibes_Graph::VIBES_GRAPH_OUTER);
+//    v_graph_outer.setProperties(0, 0, 512, 512);
+//    v_graph_outer.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = Interval(1.36);
-    position_info[1] = Interval(-1.2);
-    v_graph_outer.get_room_info(&maze_outer, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(1.36);
+//    position_info[1] = Interval(-1.2);
+//    v_graph_outer.get_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 
