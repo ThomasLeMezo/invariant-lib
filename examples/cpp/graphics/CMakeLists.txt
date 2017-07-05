@@ -16,6 +16,7 @@
 
   target_link_libraries(2D_graphics_example
          ${LIBS}
+         ${LIBS_GRAPHIZ}
 	 invariant-core
          invariant-tools
          invariant-graphics

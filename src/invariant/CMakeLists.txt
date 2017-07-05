@@ -50,7 +50,11 @@ include_directories(../tools/serialization)
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
   add_library(invariant-core ${SRC})
-  target_link_libraries(invariant-core ${LIBS} invariant-tools)
+  target_link_libraries(invariant-core
+      ${LIBS}
+      ${LIBS_NETCDF}
+      invariant-tools
+      )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")
   install(TARGETS invariant-core DESTINATION lib)

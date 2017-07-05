@@ -56,7 +56,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
     if(LIBGVC_FOUND)
         # https://cmake.org/Wiki/CMake:How_To_Find_Libraries
         include_directories(${LIBGVC_INCLUDE_DIRS})
-        set(LIBS ${LIBS} ${LIBGVC_LIBRARIES})
+        set(LIBS_GRAPHIZ ${LIBS_GRAPHIZ} ${LIBGVC_LIBRARIES})
     else()
         message(FATAL_ERROR "Unable to find LIBGVC")
     endif()
@@ -71,12 +71,12 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
 # VTK
     set(VTK_DIR "${VTK_ROOT}")
     find_package(VTK REQUIRED)
-    set(LIBS ${LIBS} ${VTK_LIBRARIES})
+    set(LIBS_VTK ${LIBS_VTK} ${VTK_LIBRARIES})
 
 # Netcdf
     pkg_search_module(NETCDF netcdf-cxx4)
     include_directories(${NETCDF_INCLUDE_DIRS})
-    set(LIBS ${LIBS} ${NETCDF_LIBRARIES})
+    set(LIBS_NETCDF ${LIBS_NETCDF} ${NETCDF_LIBRARIES})
 
 # Sources
     add_subdirectory(src)

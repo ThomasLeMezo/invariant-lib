@@ -84,33 +84,46 @@ void Room::set_full(){
 }
 
 void Room::contract_vector_field(){
+    // Test
+    IntervalVector test(2);
+    test[0] = Interval(-2.25, -1.5);
+    test[1] = Interval(-3, -1.5);
+    if(m_pave->get_position() == test)
+        cout << "TEST" << endl;
+
     int dim = m_pave->get_dim();
-    for(IntervalVector &v:m_vector_fields){
-        // Construct the boolean interval vector of the vector_field
-        IntervalVector v_bool_in = IntervalVector(dim, Interval::EMPTY_SET);
-        IntervalVector v_bool_out = IntervalVector(dim, Interval::EMPTY_SET);
+    MazeSens sens = m_maze->get_sens();
+    IntervalVector zero(dim, Interval::ZERO);
 
-        for(int i=0; i<dim; i++){
-            if(!(v[i] & Interval::POS_REALS).is_empty())
-                v_bool_out[i] |= Interval(1);
-            if(!(v[i] & Interval::NEG_REALS).is_empty())
-                v_bool_out[i] |= Interval(0);
-            if(!((-v[i]) & Interval::POS_REALS).is_empty())
-                v_bool_in[i] |= Interval(1);
-            if(!((-v[i]) & Interval::NEG_REALS).is_empty())
-                v_bool_in[i] |= Interval(0);
-        }
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        vector<IntervalVector> vector_fields = m_maze->get_dynamics()->eval(f->get_position());
 
-        MazeSens sens = m_maze->get_sens();
-        for(Face* f:m_pave->get_faces_vector()){
-            Door *d = f->get_doors()[m_maze];
-            if((f->get_orientation() & v_bool_in).is_empty()){
-                if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
-                    d->set_empty_private_input();
-            }
-            if((f->get_orientation() & v_bool_out).is_empty()){
-                if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
-                    d->set_empty_private_output();
+        for(const IntervalVector &v:vector_fields){
+            if(!zero.is_subset(v)){
+                // Construct the boolean interval vector of the vector_field
+                IntervalVector v_bool_in = IntervalVector(dim, Interval::EMPTY_SET);
+                IntervalVector v_bool_out = IntervalVector(dim, Interval::EMPTY_SET);
+
+                for(int i=0; i<dim; i++){
+                    if(!(v[i] & Interval::POS_REALS).is_empty())
+                        v_bool_out[i] |= Interval(1);
+                    if(!(v[i] & Interval::NEG_REALS).is_empty())
+                        v_bool_out[i] |= Interval(0);
+                    if(!((-v[i]) & Interval::POS_REALS).is_empty())
+                        v_bool_in[i] |= Interval(1);
+                    if(!((-v[i]) & Interval::NEG_REALS).is_empty())
+                        v_bool_in[i] |= Interval(0);
+                }
+
+                if((f->get_orientation() & v_bool_in).is_empty()){
+                    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+                        d->set_empty_private_input();
+                }
+                if((f->get_orientation() & v_bool_out).is_empty()){
+                    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+                        d->set_empty_private_output();
+                }
             }
 
             // Note : synchronization will be proceed at the end of all contractors
@@ -121,25 +134,27 @@ void Room::contract_vector_field(){
 
 void Room::eval_vector_field_possibility(){
     int dim = m_pave->get_dim();
-    for(IntervalVector &v:m_vector_fields){
-        // Construct the boolean interval vector of the vector_field
-        IntervalVector v_bool_in = IntervalVector(dim, Interval::EMPTY_SET);
-        IntervalVector v_bool_out = IntervalVector(dim, Interval::EMPTY_SET);
 
-        for(int i=0; i<dim; i++){
-            if(!(v[i] & Interval::POS_REALS).is_empty())
-                v_bool_out[i] |= Interval(1);
-            if(!(v[i] & Interval::NEG_REALS).is_empty())
-                v_bool_out[i] |= Interval(0);
-            if(!((-v[i]) & Interval::POS_REALS).is_empty())
-                v_bool_in[i] |= Interval(1);
-            if(!((-v[i]) & Interval::NEG_REALS).is_empty())
-                v_bool_in[i] |= Interval(0);
-        }
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        vector<IntervalVector> vector_fields = m_maze->get_dynamics()->eval(f->get_position());
 
+        for(IntervalVector &v:vector_fields){
+            // Construct the boolean interval vector of the vector_field
+            IntervalVector v_bool_in = IntervalVector(dim, Interval::EMPTY_SET);
+            IntervalVector v_bool_out = IntervalVector(dim, Interval::EMPTY_SET);
 
-        for(Face* f:m_pave->get_faces_vector()){
-            Door *d = f->get_doors()[m_maze];
+            for(int i=0; i<dim; i++){
+                if(!(v[i] & Interval::POS_REALS).is_empty())
+                    v_bool_out[i] |= Interval(1);
+                if(!(v[i] & Interval::NEG_REALS).is_empty())
+                    v_bool_out[i] |= Interval(0);
+                if(!((-v[i]) & Interval::POS_REALS).is_empty())
+                    v_bool_in[i] |= Interval(1);
+                if(!((-v[i]) & Interval::NEG_REALS).is_empty())
+                    v_bool_in[i] |= Interval(0);
+            }
+
             if((f->get_orientation() & v_bool_in).is_empty())
                 d->push_back_possible_in(false);
             else
