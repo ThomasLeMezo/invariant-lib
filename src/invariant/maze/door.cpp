@@ -39,7 +39,7 @@ bool Door::contract_continuity_private(){
         IntervalVector door_input = ibex::IntervalVector(m_input_private.size(), Interval::EMPTY_SET);
         for(Face* f:m_face->get_neighbors()){
             Door *d = f->get_doors()[m_room->get_maze()];
-            door_input |= d->get_output();
+            door_input |= (d->get_output() & m_face->get_position());
         }
         if(door_input != m_input_private){
             change = true;
@@ -54,7 +54,7 @@ bool Door::contract_continuity_private(){
         IntervalVector door_output = ibex::IntervalVector(m_output_private.size(), Interval::EMPTY_SET);
         for(Face* f:m_face->get_neighbors()){
             Door *d = f->get_doors()[m_room->get_maze()];
-            door_output |= d->get_input();
+            door_output |= (d->get_input() & m_face->get_position());
         }
         if(door_output != m_output_private){
             change = true;
