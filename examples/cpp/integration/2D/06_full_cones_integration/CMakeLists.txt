@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(full_cones_integration ${SRC})
+  add_executable(2D_integration_full_cones ${SRC})
 
-  target_link_libraries(full_cones_integration
+  target_link_libraries(2D_integration_full_cones
 	${LIBS}
 	invariant-core
 	invariant-tools

@@ -105,11 +105,11 @@ class VibesFigure
      */
     static std::string rgb2hex(int r, int g, int b, int alpha = -1, const char* prefix = "#");
 
-
   protected:
 
     mutable std::string m_name;
     double m_x, m_y, m_width, m_height;
+    static bool m_begin_drawing;
 };
 
 #endif

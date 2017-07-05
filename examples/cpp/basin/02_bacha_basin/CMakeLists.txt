@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(bacha_basin ${SRC})
+  add_executable(2D_basin_bacha ${SRC})
 
-  target_link_libraries(bacha_basin
+  target_link_libraries(2D_basin_bacha
     ${LIBS}
     invariant-core
     invariant-tools

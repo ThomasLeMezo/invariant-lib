@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(van_der_pol_kernel_outer ${SRC})
+  add_executable(2D_kernel_van_der_pol_outer ${SRC})
 
-  target_link_libraries(van_der_pol_kernel_outer
+  target_link_libraries(2D_kernel_van_der_pol_outer
 	${LIBS}
 	invariant-core
 	invariant-tools

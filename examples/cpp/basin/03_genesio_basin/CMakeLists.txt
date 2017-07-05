@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(genesio_basin ${SRC})
+  add_executable(2D_basin_genesio ${SRC})
 
-  target_link_libraries(genesio_basin
+  target_link_libraries(2D_basin_genesio
     ${LIBS}
     invariant-core
     invariant-tools

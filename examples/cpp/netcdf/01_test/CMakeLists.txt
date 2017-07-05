@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(test_netcdf ${SRC})
+  add_executable(2D_netcdf_test ${SRC})
 
-  target_link_libraries(test_netcdf
+  target_link_libraries(2D_netcdf_test
     ${LIBS}
     invariant-core
     invariant-tools

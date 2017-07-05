@@ -232,8 +232,9 @@ const bool Pave::request_bisection(){
 void Pave::set_removed_rooms(){
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room* r = it->second;
-        if(r->is_empty())
-            r->set_removed();
+//        if(r->is_empty()) //?
+        r->set_removed();
+        m_tree->set_removed(it->first);
     }
 }
 

@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(damien_kernel ${SRC})
+  add_executable(2D_kernel_damien ${SRC})
 
-  target_link_libraries(damien_kernel
+  target_link_libraries(2D_kernel_damien
 	${LIBS}
 	invariant-core
 	invariant-tools

@@ -28,6 +28,8 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
 
 void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room*> &list_room_deque, bool output, DOMAIN_SEP accelerator){
     MazeType type = maze->get_type();
+    if(pave_node->get_removed()[maze])
+        return;
     switch (accelerator) {
     case SEP_INSIDE:{
         if(!pave_node->get_fullness()[maze] || type==MAZE_PROPAGATOR){
@@ -82,9 +84,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
         if(pave_node->is_leaf()){
             Pave* p = pave_node->get_pave();
             Room *r = p->get_rooms()[maze];
-            if(x_in.is_empty()){
-                // Inside the constraint
-                if(!r->is_removed()){
+            if(!r->is_removed()){
+                if(x_in.is_empty()){ // Inside the constraint
                     if(output)
                         r->set_full_private_output();
                     else
@@ -94,19 +95,13 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         list_room_deque.push_back(r);
                     }
                 }
-            }
-            else if(x_out.is_empty()){
-                // Outside the constraint
-                if(!r->is_removed()){
+                else if(x_out.is_empty()){  // Outside the constraint
                     if(output)
                         r->set_empty_private_output();
                     else
                         r->set_empty_private_input();
                 }
-            }
-            else{
-                // Inside & Outside the constraint => all full (over approximation)
-                if(!r->is_removed()){
+                else{ // Inside & Outside the constraint => all full (over approximation)
                     if(output)
                         r->set_full_private_output();
                     else
@@ -116,8 +111,8 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         list_room_deque.push_back(r);
                     }
                 }
+                r->synchronize();
             }
-            r->synchronize();
         }
         else{
             // Determine the accelerator

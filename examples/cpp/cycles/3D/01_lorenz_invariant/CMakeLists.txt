@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(lorenz_invariant ${SRC})
+  add_executable(3D_invariant_lorenz ${SRC})
 
-  target_link_libraries(lorenz_invariant
+  target_link_libraries(3D_invariant_lorenz
     ${LIBS}
     invariant-core
     invariant-tools

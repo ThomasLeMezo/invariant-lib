@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(dubins_integration ${SRC})
+  add_executable(3D_integration_dubins ${SRC})
 
-  target_link_libraries(dubins_integration
+  target_link_libraries(3D_integration_dubins
 	${LIBS}
 	invariant-core
 	invariant-tools

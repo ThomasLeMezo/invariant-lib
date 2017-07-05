@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(car_on_the_hill_kernel ${SRC})
+  add_executable(2D_kernel_car_on_the_hill ${SRC})
 
-  target_link_libraries(car_on_the_hill_kernel
+  target_link_libraries(2D_kernel_car_on_the_hill
 	${LIBS}
 	invariant-core
 	invariant-tools

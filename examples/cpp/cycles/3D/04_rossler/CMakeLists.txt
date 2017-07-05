@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(rossler_invariant ${SRC})
+  add_executable(3D_invariant_rossler ${SRC})
 
-  target_link_libraries(rossler_invariant
+  target_link_libraries(3D_invariant_rossler
     ${LIBS}
     invariant-core
     invariant-tools

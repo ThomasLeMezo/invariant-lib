@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(uniform_integration_inner ${SRC})
+  add_executable(2D_integration_uniform_inner ${SRC})
 
-  target_link_libraries(uniform_integration_inner
+  target_link_libraries(2D_integration_uniform_inner
     ${LIBS}
     invariant-core
     invariant-tools

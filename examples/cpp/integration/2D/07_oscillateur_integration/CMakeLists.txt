@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(oscillateur_integration ${SRC})
+  add_executable(2D_integration_oscillateur ${SRC})
 
-  target_link_libraries(oscillateur_integration
+  target_link_libraries(2D_integration_oscillateur
 	 ${LIBS}
 	 invariant-core
          invariant-tools

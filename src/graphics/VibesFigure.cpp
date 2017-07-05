@@ -16,9 +16,14 @@
 
 using namespace std;
 
+bool VibesFigure::m_begin_drawing = false;
+
 VibesFigure::VibesFigure(const string& figure_name)
 {
-
+    if(m_begin_drawing==false){
+        vibes::beginDrawing();
+        m_begin_drawing = true;
+    }
   m_name = figure_name;
   vibes::newFigure(m_name);
 }

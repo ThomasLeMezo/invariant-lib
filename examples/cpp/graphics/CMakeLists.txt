@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(graphics_example ${SRC})
+  add_executable(2D_graphics_example ${SRC})
 
-  target_link_libraries(graphics_example
+  target_link_libraries(2D_graphics_example
          ${LIBS}
 	 invariant-core
          invariant-tools

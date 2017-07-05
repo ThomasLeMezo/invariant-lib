@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(thomas_invariant ${SRC})
+  add_executable(3D_invariant_thomas ${SRC})
 
-  target_link_libraries(thomas_invariant
+  target_link_libraries(3D_invariant_thomas
     ${LIBS}
     invariant-core
     invariant-tools

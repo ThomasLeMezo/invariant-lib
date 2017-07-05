@@ -170,7 +170,14 @@ public:
      * @brief Return the map of removed
      * @return
      */
-    inline std::map<Maze*, bool> get_removed() const;
+    std::map<Maze *, bool> get_removed() const;
+
+    /**
+     * @brief Set removed pave_node
+     * @param Maze
+     */
+    void set_removed(Maze *maze);
+
 
     /**
      * @brief Return true if this pave_node is a border pave
@@ -241,8 +248,12 @@ inline std::map<Maze*, bool> Pave_node::get_fullness() const{
     return m_full_rooms;
 }
 
-inline std::map<Maze*, bool> Pave_node::get_removed() const{
+inline std::map<Maze *, bool> Pave_node::get_removed() const{
     return m_removed_rooms;
+}
+
+inline void Pave_node::set_removed(Maze *maze){
+    m_removed_rooms[maze] = true;
 }
 
 inline bool Pave_node::is_border_pave() const{

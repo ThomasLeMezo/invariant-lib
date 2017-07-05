@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(rabinovich_fabrikant_invariant ${SRC})
+  add_executable(3D_invariant_rabinovich_fabrikant ${SRC})
 
-  target_link_libraries(rabinovich_fabrikant_invariant
+  target_link_libraries(3D_invariant_rabinovich_fabrikant
     ${LIBS}
     invariant-core
     invariant-tools

@@ -114,9 +114,9 @@ void Vibes_Graph::show_maze_outer() const{
     for(Pave *p:m_graph->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_outer];
-            if(!r->is_removed()){
+//            if(!r->is_removed()){
                 draw_room_outer(p);
-            }
+//            }
             if(r->is_empty())
                 vibes::drawBox(p->get_position(), "[blue]");
         }
@@ -130,9 +130,9 @@ void Vibes_Graph::show_maze_inner() const{
     for(Pave *p:m_graph->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_inner];
-            if(!r->is_removed()){
+//            if(!r->is_removed()){
                 draw_room_inner(p);
-            }
+//            }
             if(r->is_empty())
                 vibes::drawBox(p->get_position(), "[#FF00FF]");
         }
@@ -155,12 +155,8 @@ void Vibes_Graph::show_maze_outer_inner() const{
             Room *r_inner = p->get_rooms()[m_maze_inner];
             if(r_outer->is_empty())
                 vibes::drawBox(p->get_position(), "[blue]");
-            if(!r_outer->is_removed()){
-                draw_room_outer(p);
-                if(r_inner->is_removed()){
-                    vibes::drawBox(p->get_position(), "[#FF00FF]");
-                }
-            }
+            if(r_inner->is_empty())
+                vibes::drawBox(p->get_position(), "[#FF00FF]");
         }
     }
 }

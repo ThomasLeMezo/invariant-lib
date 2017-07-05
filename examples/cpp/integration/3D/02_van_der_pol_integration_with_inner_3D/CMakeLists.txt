@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(van_der_pol_integration_with_inner_3D ${SRC})
+  add_executable(3D_integration_van_der_pol_with_inner ${SRC})
 
-  target_link_libraries(van_der_pol_integration_with_inner_3D
+  target_link_libraries(3D_integration_van_der_pol_with_inner
 	${LIBS}
 	invariant-core
 	invariant-tools
