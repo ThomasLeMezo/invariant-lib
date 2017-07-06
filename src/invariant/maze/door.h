@@ -147,6 +147,12 @@ public:
     void push_back_possible_out(bool val);
 
     /**
+     * @brief Set if the vector field is collinear to the face
+     * @param val
+     */
+    void push_back_collinear_vector_field(bool val);
+
+    /**
      * @brief Get if this door is a possible out for propagation
      * @return
      */
@@ -164,6 +170,12 @@ public:
      */
     const std::vector<bool> &is_possible_in() const;
 
+    /**
+     * @brief Get if the vector field is collinear to the door
+     * @return
+     */
+    const std::vector<bool>& is_collinear() const;
+
 protected:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
     ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
@@ -173,6 +185,7 @@ protected:
 
     std::vector<bool>    m_possible_out;
     std::vector<bool>    m_possible_in;
+    std::vector<bool>    m_collinear_vector_field;
 };
 }
 
@@ -250,6 +263,14 @@ inline void Door::push_back_possible_in(bool val){
 
 inline void Door::push_back_possible_out(bool val){
     m_possible_out.push_back(val);
+}
+
+inline void Door::push_back_collinear_vector_field(bool val){
+    m_collinear_vector_field.push_back(val);
+}
+
+inline const std::vector<bool>& Door::is_collinear() const{
+    return m_collinear_vector_field;
 }
 
 inline const std::vector<bool>& Door::is_possible_out() const{

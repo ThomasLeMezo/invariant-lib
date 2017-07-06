@@ -24,7 +24,7 @@ public:
      * @param orientation Vector ([0], [1] or [0,1] for each dimension)
      * @param p
      */
-    Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, Pave* p);
+    Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave* p);
 
     /**
      * @brief Face empty constructor with a Pave
@@ -68,6 +68,12 @@ public:
      * @return
      */
     const ibex::IntervalVector &get_orientation() const;
+
+    /**
+     * @brief Get the normal vector of the Face
+     * @return
+     */
+    const ibex::IntervalVector &get_normal() const;
 
     /**
      * @brief Add new neighbor to the Face if the position intersection is not empty
@@ -126,6 +132,7 @@ private:
     /** Class Variable **/
     mutable ibex::IntervalVector      m_position; // Face position
     mutable ibex::IntervalVector      m_orientation; // Orientation of the Face : [1], [0] or [0,1]
+    mutable ibex::IntervalVector         m_normal; // Normal vector of the face
     // for each dimension according to the position of the Face in the Pave
     mutable Pave*                     m_pave = NULL;
     std::vector<Face *>               m_neighbors;
@@ -161,6 +168,10 @@ inline const ibex::IntervalVector& Face::get_position() const{
 
 inline const ibex::IntervalVector& Face::get_orientation() const{
     return m_orientation;
+}
+
+inline const ibex::IntervalVector &Face::get_normal() const{
+    return m_normal;
 }
 
 inline const std::vector<Face *> &Face::get_neighbors() const{

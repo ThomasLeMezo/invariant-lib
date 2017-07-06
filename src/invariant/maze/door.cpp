@@ -91,7 +91,7 @@ void Door::set_full_private(){
 }
 
 void Door::set_full_possible_private(){
-    for(int i=0; i<m_possible_in.size(); i++){
+    for(size_t i=0; i<m_possible_in.size(); i++){
         if(m_possible_in[i])
             m_input_private = m_face->get_position();
         if(m_possible_out[i])

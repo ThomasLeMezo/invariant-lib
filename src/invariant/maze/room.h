@@ -214,6 +214,7 @@ protected:
     Pave*   m_pave = NULL; // pointer to the associated face
     Maze*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
+    std::vector<bool>    m_vector_field_zero;
 
     bool    m_empty = false;
     bool    m_full = false;
@@ -226,7 +227,6 @@ protected:
     omp_lock_t   m_lock_deque; // Lock in_deque variable access
 
     bool    m_in_deque = false;
-    bool    m_vector_field_zero = false;
     bool    m_removed = false;
 
 };

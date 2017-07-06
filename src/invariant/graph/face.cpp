@@ -6,9 +6,10 @@ using namespace std;
 
 namespace invariant {
 
-Face::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, Pave *p):
+Face::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave *p):
     m_position(position),
-    m_orientation(orientation)
+    m_orientation(orientation),
+    m_normal(normal)
 {
     m_pave = p;
 }
@@ -21,7 +22,8 @@ Face::~Face(){
 
 Face::Face(Pave *p):
     m_position(0),
-    m_orientation(0)
+    m_orientation(0),
+    m_normal(0)
 {
     m_pave = p;
 }

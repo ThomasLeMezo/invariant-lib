@@ -16,9 +16,15 @@ Pave::Pave(const ibex::IntervalVector &position, Graph *g):
 
     if(position.is_unbounded())
         m_infinite_pave = true;
+    IntervalVector normal(m_dim, Interval(0));
 
     // Build the faces
     for(size_t i=0; i<m_dim; i++){
+        IntervalVector normal_lb(normal);
+        IntervalVector normal_ub(normal);
+        normal_lb[i] = Interval(1);
+        normal_ub[i] = Interval(-1);
+
         IntervalVector iv_lb(m_position);
         IntervalVector iv_ub(m_position);
         IntervalVector orient_lb(m_dim, Interval(0, 1));
@@ -29,8 +35,8 @@ Pave::Pave(const ibex::IntervalVector &position, Graph *g):
         orient_lb[i] = Interval(0);
         orient_ub[i] = Interval(1);
 
-        Face* face_lb = new Face(iv_lb, orient_lb, this);
-        Face* face_ub = new Face(iv_ub, orient_ub, this);
+        Face* face_lb = new Face(iv_lb, orient_lb, normal_lb, this);
+        Face* face_ub = new Face(iv_ub, orient_ub, normal_ub, this);
 
         array<Face*, 2> face_array = {face_lb, face_ub};
         m_faces.push_back(face_array);
