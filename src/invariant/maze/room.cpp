@@ -240,67 +240,68 @@ void Room::contract_consistency(){
                                 IntervalVector out_tmp(dim);
 
                                 if(type == MAZE_CONTRACTOR
-                                        && !(face_out == face_in && sens_in == sens_out)
                                         && !door_out->get_output_private().is_empty()
                                         && door_in->is_collinear()[n_vf]
                                         && door_out->is_possible_out()[n_vf]
                                         && !(f_out->get_position() & f_in->get_position()).is_empty()
                                         && !f_in->is_border()){
 
-                                    // Point d'intersection
-                                    IntervalVector inter_in_out = f_out->get_position() & f_in->get_position();
-                                    // Chercher les boites qui partagent la frontière
-                                    std::vector<Door *> door_out_n_list;
+                                    if(!(face_out == face_in && sens_in == sens_out)){
+                                        // Point d'intersection
+                                        IntervalVector inter_in_out = f_out->get_position() & f_in->get_position();
+                                        // Chercher les boites qui partagent la frontière
+                                        std::vector<Door *> door_out_n_list;
 
-                                    Interval seg_in_min = f_in->get_position()[face_out];
-                                    Interval seg_out_min;
-                                    IntervalVector vec_field_union(vec_field);
+                                        Interval seg_in_min = f_in->get_position()[face_out];
+                                        Interval seg_out_min;
+                                        IntervalVector vec_field_union(vec_field);
 
-                                    for(Face * f_n_in:f_in->get_neighbors()){
-                                        if(!(f_n_in->get_position() & inter_in_out).is_empty()){
-                                            Pave *p_n = f_n_in->get_pave();
+                                        for(Face * f_n_in:f_in->get_neighbors()){
+                                            if(!(f_n_in->get_position() & inter_in_out).is_empty()){
+                                                Pave *p_n = f_n_in->get_pave();
 
-                                            Room *r_n = p_n->get_rooms()[m_maze];
-                                            vec_field_union |= r_n->get_vector_fields()[n_vf];
+                                                Room *r_n = p_n->get_rooms()[m_maze];
+                                                vec_field_union |= r_n->get_vector_fields()[n_vf];
 
-                                            seg_in_min &= f_n_in->get_position()[face_out];
+                                                seg_in_min &= f_n_in->get_position()[face_out];
 
-                                            Face *f_n_out = p_n->get_faces()[face_out][sens_out];
-                                            door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
-                                            seg_out_min &= f_n_out->get_position()[face_in];
+                                                Face *f_n_out = p_n->get_faces()[face_out][sens_out];
+                                                door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
+                                                seg_out_min &= f_n_out->get_position()[face_in];
+                                            }
                                         }
+
+                                        // In Segment
+                                        in_tmp = in;
+                                        in_tmp[face_out] &= seg_in_min;
+
+                                        Interval seg_in_min_diff, c1, c2;
+                                        in[face_out].diff(seg_in_min, c1, c2);
+                                        seg_in_min_diff = c1 | c2;
+
+                                        // Out Segment
+                                        out_tmp = door_out->get_output_private();
+                                        IntervalVector out_tmp_n(dim, Interval::EMPTY_SET);
+                                        for(Door *d_n_out:door_out_n_list){
+                                            IntervalVector iv_out = d_n_out->get_output();
+                                            iv_out[face_in] &= seg_out_min;
+                                            out_tmp_n |= iv_out;
+                                        }
+                                        out_tmp |= out_tmp_n;
+
+                                        this->contract_flow(in_tmp, out_tmp, vec_field_union);
+
+                                        //
+                                        IntervalVector in_diff(in);
+                                        if(!seg_in_min_diff.is_empty())
+                                            in_diff[face_in] &= seg_in_min_diff;
+                                        else
+                                            in_diff.set_empty();
+
+                                        in_result |= in_tmp | in_diff;
+                                        out_results[n_vf][face_in][sens_in] = in_tmp | in_diff; // ?
+                                        out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
                                     }
-
-                                    // In Segment
-                                    in_tmp = in;
-                                    in_tmp[face_out] &= seg_in_min;
-
-                                    Interval seg_in_min_diff, c1, c2;
-                                    in[face_out].diff(seg_in_min, c1, c2);
-                                    seg_in_min_diff = c1 | c2;
-
-                                    // Out Segment
-                                    out_tmp = door_out->get_output_private();
-                                    IntervalVector out_tmp_n(dim, Interval::EMPTY_SET);
-                                    for(Door *d_n_out:door_out_n_list){
-                                        IntervalVector iv_out = d_n_out->get_output();
-                                        iv_out[face_in] &= seg_out_min;
-                                        out_tmp_n |= iv_out;
-                                    }
-                                    out_tmp |= out_tmp_n;
-
-                                    this->contract_flow(in_tmp, out_tmp, vec_field_union);
-
-                                    //
-                                    IntervalVector in_diff(in);
-                                    if(!seg_in_min_diff.is_empty())
-                                        in_diff[face_in] &= seg_in_min_diff;
-                                    else
-                                        in_diff.set_empty();
-
-                                    in_result |= in_tmp | in_diff;
-                                    out_results[n_vf][face_in][sens_in] = in_tmp | in_diff; // ?
-                                    out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
                                 }
                                 else{
                                     if(type == MAZE_CONTRACTOR)
@@ -336,6 +337,7 @@ void Room::contract_consistency(){
             n_vf++;
         }
     }
+
     if(global_compute && (sens == MAZE_FWD || sens == MAZE_FWD_BWD)){
         for(int face_out = 0; face_out<dim; face_out++){
             for(int sens_out = 0; sens_out < 2; sens_out++){

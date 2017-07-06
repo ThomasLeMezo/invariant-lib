@@ -58,7 +58,7 @@ int Maze::contract(){
     // Propagation of contractions
     bool deque_empty = m_deque_rooms.empty();
 
-#pragma omp parallel // num_threads(1)
+#pragma omp parallel //num_threads(1)
     {
 #pragma omp single
         {
