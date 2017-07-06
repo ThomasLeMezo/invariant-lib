@@ -423,7 +423,12 @@ bool Room::request_bisection(){
 }
 
 std::ostream& operator<< (std::ostream& stream, const Room& r) {
-    stream << "Room = " << r.get_pave()->get_position() << " - " << r.get_pave()->get_faces_vector().size() << " faces"<< endl;
+    stream << "Room = " << r.get_pave()->get_position() << " - " << r.get_pave()->get_faces_vector().size() << " faces";
+    stream << ", vector field = ";
+    for(const IntervalVector &v:r.get_vector_fields()){
+        stream << v << " ";
+    }
+    stream << endl;
     for(Face *f:r.get_pave()->get_faces_vector()){
         Door *d = f->get_doors()[r.get_maze()];
         stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << endl;
