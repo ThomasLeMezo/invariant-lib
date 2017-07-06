@@ -244,7 +244,7 @@ void Room::contract_consistency(){
                                         && door_in->is_collinear()[n_vf]
                                         && door_out->is_possible_out()[n_vf]
                                         && !(f_out->get_position() & f_in->get_position()).is_empty()
-                                        && !f_in->is_border()){
+                                        /*&& !f_in->is_border()*/){
 
                                     if(!(face_out == face_in && sens_in == sens_out)){
                                         // Point d'intersection
@@ -299,23 +299,26 @@ void Room::contract_consistency(){
                                             in_diff.set_empty();
 
                                         in_result |= in_tmp | in_diff;
-                                        out_results[n_vf][face_in][sens_in] = in_tmp | in_diff; // ?
+//                                        out_results[n_vf][face_in][sens_in] = in_tmp | in_diff; // ?
                                         out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
                                     }
                                 }
                                 else{
-                                    if(type == MAZE_CONTRACTOR)
-                                        out_tmp = door_out->get_output_private();
-                                    else
-                                        out_tmp = f_out->get_position();
+                                    // ToDo : improve propagation (avoid sliding same as contractor)
+                                    if(type != MAZE_PROPAGATOR || !(face_out == face_in && sens_out == sens_in)){
+                                        if(type == MAZE_CONTRACTOR)
+                                            out_tmp = door_out->get_output_private();
+                                        else
+                                            out_tmp = f_out->get_position();
 
-                                    if(!out_tmp.is_empty())
-                                        this->contract_flow(in_tmp, out_tmp, vec_field);
-                                    else
-                                        in_tmp.set_empty();
+                                        if(!out_tmp.is_empty())
+                                            this->contract_flow(in_tmp, out_tmp, vec_field);
+                                        else
+                                            in_tmp.set_empty();
 
-                                    in_result |= in_tmp;
-                                    out_results[n_vf][face_out][sens_out] |= out_tmp;
+                                        in_result |= in_tmp;
+                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+                                    }
                                 }
                             }
                         }
