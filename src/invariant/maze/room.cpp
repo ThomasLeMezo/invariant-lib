@@ -173,7 +173,7 @@ void Room::eval_vector_field_possibility(){
 
 void Room::contract_consistency(){
     if(m_vector_field_zero && m_maze->get_type() == MAZE_PROPAGATOR && m_vector_fields.empty()){
-        this->set_full();
+        this->set_full_possible();
         return;
     }
 
@@ -273,6 +273,13 @@ void Room::contract_consistency(){
         }
     }
 
+}
+
+void Room::set_full_possible(){
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        d->set_full_possible_private();
+    }
 }
 
 bool Room::contract_continuity(){

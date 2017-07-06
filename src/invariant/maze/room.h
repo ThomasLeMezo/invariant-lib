@@ -77,6 +77,12 @@ public:
     void set_full();
 
     /**
+     * @brief Set full the room according to vector field possibilities
+     * @return
+     */
+    void set_full_possible();
+
+    /**
      * @brief Function call after Pave bisection to update Room & Doors
      */
     void bisect();

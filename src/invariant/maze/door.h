@@ -111,6 +111,12 @@ public:
     void set_full_private();
 
     /**
+     * @brief Set full all input & output private doors according to
+     * vector field possibility
+     */
+    void set_full_possible_private();
+
+    /**
      * @brief Contract its private door according to neighbors
      */
     bool contract_continuity_private();

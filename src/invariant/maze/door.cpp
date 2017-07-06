@@ -90,6 +90,15 @@ void Door::set_full_private(){
     m_input_private = m_face->get_position();
 }
 
+void Door::set_full_possible_private(){
+    for(int i=0; i<m_possible_in.size(); i++){
+        if(m_possible_in[i])
+            m_input_private = m_face->get_position();
+        if(m_possible_out[i])
+            m_output_private = m_face->get_position();
+    }
+}
+
 bool Door::is_full(){
     if(m_input_public == m_face->get_position() && m_output_public == m_face->get_position())
         return true;
