@@ -51,16 +51,18 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-        ibex::Function f(x1, x2, Return(x2,
+    ibex::Function f_outer(x1, x2, Return(x2,
                                         (1.0*(1.0-pow(x1, 2))*x2-x1)));
 //    ibex::Function f(x1, x2, Return(x2,
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
-    Dynamics_Function dyn_outer(&f);
-    Dynamics_Function dyn_inner(&f);
+    ibex::Function f_inner(x1, x2, Return(-x2,
+                                        -(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    Dynamics_Function dyn_outer(&f_outer);
+    Dynamics_Function dyn_inner(&f_inner);
 
     // ******* Mazes ********* //
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
-    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_CONTRACTOR);
+    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_BWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -74,15 +76,14 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-    vibes::beginDrawing();
     Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
-    //    IntervalVector position_info(2);
-    //    position_info[0] = Interval(-2);
-    //    position_info[1] = Interval(-2);
-    //    v_graph_outer.get_room_info(&maze_outer, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(-1.16);
+    position_info[1] = Interval(3.62);
+    v_graph.get_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 

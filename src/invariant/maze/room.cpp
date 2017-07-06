@@ -183,12 +183,18 @@ void Room::eval_vector_field_possibility(){
 }
 
 void Room::contract_consistency(){
+    m_nb_contract++;
+    IntervalVector test(2);
+    test[0] = Interval(-1.171875, -1.125);
+    test[1] = Interval(3.5625, 3.65625);
+    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR)
+        cout << "DEBUG" << endl;
+
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
 
     vector<vector< array<IntervalVector, 2>>> out_results; // One per vec_field, dim, sens
     const int dim = m_pave->get_dim();
-    IntervalVector zero(dim, Interval::ZERO);
     const int nb_vec = m_vector_fields.size();
 
     for(int vf=0; vf<nb_vec; vf++){
@@ -200,6 +206,7 @@ void Room::contract_consistency(){
         out_results.push_back(out_result);
     }
 
+    bool global_compute = false;
     int n_vf = 0;
     for(IntervalVector &vec_field:m_vector_fields){
         bool compute = true;
@@ -214,8 +221,10 @@ void Room::contract_consistency(){
         }
         // Create tmp output doors
         if(compute){
+            global_compute |= true;
             for(int face_in=0; face_in<dim; face_in++){
                 for(int sens_in = 0; sens_in < 2; sens_in++){
+
                     IntervalVector in_result(dim, Interval::EMPTY_SET);
                     Face* f_in = m_pave->get_faces()[face_in][sens_in];
                     Door* door_in = f_in->get_doors()[m_maze];
@@ -231,60 +240,66 @@ void Room::contract_consistency(){
                                 IntervalVector out_tmp(dim);
 
                                 if(type == MAZE_CONTRACTOR
+                                        && !(face_out == face_in && sens_in == sens_out)
                                         && !door_out->get_output_private().is_empty()
                                         && door_in->is_collinear()[n_vf]
                                         && door_out->is_possible_out()[n_vf]
-                                        && !(f_out->get_position() & f_in->get_position()).is_empty()){
+                                        && !(f_out->get_position() & f_in->get_position()).is_empty()
+                                        && !f_in->is_border()){
 
                                     // Point d'intersection
                                     IntervalVector inter_in_out = f_out->get_position() & f_in->get_position();
                                     // Chercher les boites qui partagent la frontière
                                     std::vector<Door *> door_out_n_list;
 
-                                    Interval seg_in_min;
+                                    Interval seg_in_min = f_in->get_position()[face_out];
                                     Interval seg_out_min;
-                                    IntervalVector vec_field_tmp(vec_field);
+                                    IntervalVector vec_field_union(vec_field);
 
                                     for(Face * f_n_in:f_in->get_neighbors()){
                                         if(!(f_n_in->get_position() & inter_in_out).is_empty()){
                                             Pave *p_n = f_n_in->get_pave();
 
-                                            Room *r_n = f_n_in->get_pave()->get_rooms()[m_maze];
-                                            vec_field_tmp |= r_n->get_vector_fields()[n_vf];
+                                            Room *r_n = p_n->get_rooms()[m_maze];
+                                            vec_field_union |= r_n->get_vector_fields()[n_vf];
 
-                                            seg_in_min &= f_n_in->get_position()[face_in];
+                                            seg_in_min &= f_n_in->get_position()[face_out];
 
                                             Face *f_n_out = p_n->get_faces()[face_out][sens_out];
                                             door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
-                                            seg_out_min &= f_n_out->get_position()[face_out];
+                                            seg_out_min &= f_n_out->get_position()[face_in];
                                         }
                                     }
 
                                     // In Segment
                                     in_tmp = in;
-                                    in_tmp[face_in] &= seg_in_min;
+                                    in_tmp[face_out] &= seg_in_min;
 
                                     Interval seg_in_min_diff, c1, c2;
-                                    in[face_in].diff(seg_in_min, c1, c2);
+                                    in[face_out].diff(seg_in_min, c1, c2);
                                     seg_in_min_diff = c1 | c2;
 
                                     // Out Segment
                                     out_tmp = door_out->get_output_private();
                                     IntervalVector out_tmp_n(dim, Interval::EMPTY_SET);
                                     for(Door *d_n_out:door_out_n_list){
-                                        IntervalVector iv = d_n_out->get_output();
-                                        iv[face_out] &= seg_out_min;
-                                        out_tmp_n |= iv;
+                                        IntervalVector iv_out = d_n_out->get_output();
+                                        iv_out[face_in] &= seg_out_min;
+                                        out_tmp_n |= iv_out;
                                     }
                                     out_tmp |= out_tmp_n;
 
-                                    this->contract_flow(in_tmp, out_tmp, vec_field_tmp);
+                                    this->contract_flow(in_tmp, out_tmp, vec_field_union);
 
                                     //
                                     IntervalVector in_diff(in);
-                                    in_diff[face_in] &= seg_in_min_diff;
+                                    if(!seg_in_min_diff.is_empty())
+                                        in_diff[face_in] &= seg_in_min_diff;
+                                    else
+                                        in_diff.set_empty();
 
                                     in_result |= in_tmp | in_diff;
+                                    out_results[n_vf][face_in][sens_in] = in_tmp | in_diff; // ?
                                     out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
                                 }
                                 else{
@@ -320,37 +335,37 @@ void Room::contract_consistency(){
             }
             n_vf++;
         }
+    }
+    if(global_compute && (sens == MAZE_FWD || sens == MAZE_FWD_BWD)){
+        for(int face_out = 0; face_out<dim; face_out++){
+            for(int sens_out = 0; sens_out < 2; sens_out++){
+                Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                Door* door_out = f_out->get_doors()[m_maze];
 
-        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
-            for(int face_out = 0; face_out<dim; face_out++){
-                for(int sens_out = 0; sens_out < 2; sens_out++){
-                    Face* f_out = m_pave->get_faces()[face_out][sens_out];
-                    Door* door_out = f_out->get_doors()[m_maze];
-
-                    IntervalVector door_out_iv(door_out->get_face()->get_position());
-                    bool one_possible = false;
-                    for(int n_vf=0; n_vf<nb_vec; n_vf++){
-                        if((type == MAZE_PROPAGATOR && door_out->is_possible_out()[n_vf]) || type == MAZE_CONTRACTOR){
-                            one_possible = true;
-                            door_out_iv &= out_results[n_vf][face_out][sens_out];
-                        }
+                IntervalVector door_out_iv(door_out->get_face()->get_position());
+                bool one_possible = false;
+                for(int n_vf=0; n_vf<nb_vec; n_vf++){
+                    if((type == MAZE_PROPAGATOR && door_out->is_possible_out()[n_vf]) || type == MAZE_CONTRACTOR){
+                        one_possible = true;
+                        door_out_iv &= out_results[n_vf][face_out][sens_out];
                     }
-                    if(!one_possible){
-                        door_out_iv.set_empty();
-                    }
-
-                    /// TEST ?
-                    if(is_degenerated(door_out_iv))
-                        door_out_iv.set_empty();
-
-                    if(type == MAZE_CONTRACTOR)
-                        door_out->set_output_private(door_out_iv);
-                    else
-                        door_out->set_output_private(door_out->get_output_private() | door_out_iv);
                 }
+                if(!one_possible){
+                    door_out_iv.set_empty();
+                }
+
+                /// TEST ?
+                if(is_degenerated(door_out_iv))
+                    door_out_iv.set_empty();
+
+                if(type == MAZE_CONTRACTOR)
+                    door_out->set_output_private(door_out_iv);
+                else
+                    door_out->set_output_private(door_out->get_output_private() | door_out_iv);
             }
         }
     }
+
 
 }
 
@@ -503,6 +518,9 @@ std::ostream& operator<< (std::ostream& stream, const Room& r) {
     for(const IntervalVector &v:r.get_vector_fields()){
         stream << v << " ";
     }
+    stream << endl;
+    stream << " nb_contractions = " << r.get_nb_contractions();
+    stream << ", removed = " << (r.is_removed()?"true":"false");
     stream << endl;
     for(Face *f:r.get_pave()->get_faces_vector()){
         Door *d = f->get_doors()[r.get_maze()];

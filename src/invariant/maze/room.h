@@ -210,6 +210,12 @@ public:
      */
     void get_private_doors_info();
 
+    /**
+     * @brief Get the number of contractions call
+     * @return
+     */
+    int get_nb_contractions() const;
+
 protected:
     Pave*   m_pave = NULL; // pointer to the associated face
     Maze*   m_maze = NULL; // pointer to the associated maze
@@ -228,6 +234,8 @@ protected:
 
     bool    m_in_deque = false;
     bool    m_removed = false;
+
+    int     m_nb_contract = 0;
 
 };
 }
@@ -282,6 +290,10 @@ inline bool Room::is_removed() const{
 inline void Room::set_removed(){
     m_removed = true;
     // Free memory (private doors)
+}
+
+inline int Room::get_nb_contractions() const{
+    return m_nb_contract;
 }
 
 }
