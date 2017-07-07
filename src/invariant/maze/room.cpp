@@ -184,11 +184,11 @@ void Room::eval_vector_field_possibility(){
 
 void Room::contract_consistency(){
     m_nb_contract++;
-    IntervalVector test(2);
-    test[0] = Interval(-1.171875, -1.125);
-    test[1] = Interval(3.5625, 3.65625);
-    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR)
-        cout << "DEBUG" << endl;
+//    IntervalVector test(2);
+//    test[0] = Interval(-1.171875, -1.125);
+//    test[1] = Interval(3.5625, 3.65625);
+//    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR)
+//        cout << "DEBUG" << endl;
 
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
@@ -240,11 +240,10 @@ void Room::contract_consistency(){
                                 IntervalVector out_tmp(dim);
 
                                 if(type == MAZE_CONTRACTOR
-                                        && !door_out->get_output_private().is_empty()
                                         && door_in->is_collinear()[n_vf]
                                         && door_out->is_possible_out()[n_vf]
                                         && !(f_out->get_position() & f_in->get_position()).is_empty()
-                                        /*&& !f_in->is_border()*/){
+                                        /*&& !f_out->is_border()*/){
 
                                     if(!(face_out == face_in && sens_in == sens_out)){
                                         // Point d'intersection
@@ -253,7 +252,7 @@ void Room::contract_consistency(){
                                         std::vector<Door *> door_out_n_list;
 
                                         Interval seg_in_min = f_in->get_position()[face_out];
-                                        Interval seg_out_min;
+                                        Interval seg_out_n_min;
                                         IntervalVector vec_field_union(vec_field);
 
                                         for(Face * f_n_in:f_in->get_neighbors()){
@@ -267,7 +266,7 @@ void Room::contract_consistency(){
 
                                                 Face *f_n_out = p_n->get_faces()[face_out][sens_out];
                                                 door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
-                                                seg_out_min &= f_n_out->get_position()[face_in];
+                                                seg_out_n_min &= f_n_out->get_position()[face_in];
                                             }
                                         }
 
@@ -284,7 +283,7 @@ void Room::contract_consistency(){
                                         IntervalVector out_tmp_n(dim, Interval::EMPTY_SET);
                                         for(Door *d_n_out:door_out_n_list){
                                             IntervalVector iv_out = d_n_out->get_output();
-                                            iv_out[face_in] &= seg_out_min;
+                                            iv_out[face_in] &= seg_out_n_min;
                                             out_tmp_n |= iv_out;
                                         }
                                         out_tmp |= out_tmp_n;
@@ -298,14 +297,35 @@ void Room::contract_consistency(){
                                         else
                                             in_diff.set_empty();
 
-                                        in_result |= in_tmp | in_diff;
-//                                        out_results[n_vf][face_in][sens_in] = in_tmp | in_diff; // ?
+                                        // Compute max impact on in
+                                        Interval seg_out_min = seg_out_n_min | f_out->get_position()[face_in];
+                                        Interval c3, c4;
+                                        Interval::ALL_REALS.diff(seg_out_min, c3, c4);
+
+                                        IntervalVector out_impact1(f_out->get_position());
+                                        out_impact1[face_in] |= c3;
+                                        IntervalVector out_impact2(f_out->get_position());
+                                        out_impact2[face_in] |= c4;
+
+                                        IntervalVector in_impact1(f_in->get_position());
+                                        IntervalVector in_impact2(f_in->get_position());
+
+                                        this->contract_flow(in_impact1, out_impact1, vec_field_union);
+                                        this->contract_flow(in_impact2, out_impact2, vec_field_union);
+
+                                        IntervalVector no_impact = in_impact1 | in_impact2;
+                                        // Devide in two segment out
+
+                                        IntervalVector in_out(door_in->get_output_private() & door_in->get_input_private());
+                                        in_result |= (in_out & no_impact) | (in_tmp | in_diff);
                                         out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
+
+//                                        out_results[n_vf][face_in][sens_in] |= (in_out & no_impact) | (in_tmp | in_diff) & door_in->get_output_private();
                                     }
                                 }
                                 else{
                                     // ToDo : improve propagation (avoid sliding same as contractor)
-                                    if(type != MAZE_PROPAGATOR || !(face_out == face_in && sens_out == sens_in)){
+                                    if(type == MAZE_CONTRACTOR || !(face_out == face_in && sens_out == sens_in)){
                                         if(type == MAZE_CONTRACTOR)
                                             out_tmp = door_out->get_output_private();
                                         else
@@ -364,13 +384,12 @@ void Room::contract_consistency(){
                     door_out_iv.set_empty();
 
                 if(type == MAZE_CONTRACTOR)
-                    door_out->set_output_private(door_out_iv);
+                    door_out->set_output_private(door_out_iv & door_out->get_output_private());
                 else
                     door_out->set_output_private(door_out->get_output_private() | door_out_iv);
             }
         }
     }
-
 
 }
 
@@ -401,10 +420,9 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     for(int i=0; i<v.size(); i++){
         alpha &= ((c[i]/(v[i] & Interval::POS_REALS)) & Interval::POS_REALS) | ((c[i]/(v[i] & Interval::NEG_REALS)) & Interval::POS_REALS);
     }
-
     c &= alpha*v;
 
-    MazeSens sens = m_maze->get_sens();
+    const MazeSens sens = m_maze->get_sens();
     if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
         out &= c+in;
     if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)

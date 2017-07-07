@@ -249,7 +249,8 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, const ibex::IntervalVecto
     std::vector<invariant::Pave*> pave_list;
     m_graph->get_room_info(maze, position, pave_list);
     for(invariant::Pave* p:pave_list){
-        vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(), 0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]");
+        vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
+                0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]");
     }
 }
 

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
     IntervalVector space(2);
     space[0] = Interval(-3,3);
-    space[1] = Interval(-3,3);
+    space[1] = Interval(-3,3.1);
 
     // ****** Domain ******* //
     Graph graph(space);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<10; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;

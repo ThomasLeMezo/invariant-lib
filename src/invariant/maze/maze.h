@@ -17,7 +17,11 @@ namespace invariant {
  * MAZE_BWD : propagation or contraction in the opposite sens of the vector field
  * MAZE_FWD_BWD : propagation or contraction in both sens
  */
-enum MazeSens { MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD};
+enum MazeSens {MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD};
+
+/**
+ * @brief The MazeType enum
+ */
 enum MazeType {MAZE_CONTRACTOR, MAZE_PROPAGATOR};
 
 class Graph; // declared only for friendship
