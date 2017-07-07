@@ -219,9 +219,8 @@ protected:
      * @param sens_out
      * @param out_tmp
      * @param in_tmp
-     * @return
      */
-    ibex::IntervalVector contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, ibex::IntervalVector &out_tmp, ibex::IntervalVector &in_tmp);
+    void contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, ibex::IntervalVector &out_tmp, ibex::IntervalVector &in_tmp);
 
     /**
      * @brief Get the OUT segment in the case of a sliding mode
@@ -229,9 +228,8 @@ protected:
      * @param face
      * @param sens
      * @param out_tmp
-     * @return
      */
-    ibex::IntervalVector contract_sliding_mode_out(int n_vf, int face, int sens, ibex::IntervalVector &out_return);
+    void contract_sliding_mode_out(int n_vf, int face, int sens, ibex::IntervalVector &out_return);
 
 public:
     /**

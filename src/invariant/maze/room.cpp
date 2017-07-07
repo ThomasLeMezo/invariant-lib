@@ -331,7 +331,7 @@ void Room::contract_consistency(){
 
 }
 
-ibex::IntervalVector Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVector &out_return){
+void Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVector &out_return){
     Face* f_out = m_pave->get_faces()[face][sens];
     Door* door_out = f_out->get_doors()[m_maze];
     IntervalVector out(door_out->get_output_private());
@@ -348,16 +348,16 @@ ibex::IntervalVector Room::contract_sliding_mode_out(int n_vf, int face, int sen
             out_return |= d_neighbour->get_input() & out;
         }
         else{
-            // Compute contribution of each faces
+            // Compute contribution of each neighbours faces
             for(int face_n=0; face_n<dim; face_n++){
                 for(int sens_n=0; sens<2; sens++){
                     Face *f_in = p_neighbour->get_faces()[face_n][sens_n];
                     Door *d_in = f_in->get_doors()[m_maze];
+                    IntervalVector in_tmp(d_in->get_input());
 
-                    if(!(face_n == face && sens_n==sens) && d_in->is_possible_in()[n_vf]){
+                    if(!(face_n == face && sens_n == sens) && !in_tmp.is_empty()){
                         IntervalVector vect_field_n = r_neighbour->get_vector_fields()[n_vf];
                         IntervalVector out_tmp(out);
-                        IntervalVector in_tmp(d_in->get_input());
                         contract_flow(in_tmp, out_tmp, vect_field_n);
                         out_return |= out_tmp;
                     }
@@ -368,7 +368,7 @@ ibex::IntervalVector Room::contract_sliding_mode_out(int n_vf, int face, int sen
     }
 }
 
-ibex::IntervalVector Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_tmp, IntervalVector &in_tmp){
+void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_tmp, IntervalVector &in_tmp){
 
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
@@ -400,10 +400,6 @@ ibex::IntervalVector Room::contract_sliding_mode_in(ibex::IntervalVector vec_fie
             door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
             seg_out_n_min &= f_n_out->get_position()[face_in];
         }
-
-//        Door *d_n = f_n_in->get_doors()[m_maze];
-//        if(d_n->i)
-//        if()
     }
 
     // In Segment
@@ -453,9 +449,7 @@ ibex::IntervalVector Room::contract_sliding_mode_in(ibex::IntervalVector vec_fie
     // Devide in two segment out
 
     IntervalVector in_out(door_in->get_output_private() & door_in->get_input_private());
-    in_out = (in_out & no_impact) | (in_tmp | in_diff);
-
-    return in_out;
+    in_tmp = (in_out & no_impact) | (in_tmp | in_diff);
 }
 
 void Room::set_full_possible(){
