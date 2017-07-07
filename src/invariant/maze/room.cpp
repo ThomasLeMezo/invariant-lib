@@ -448,12 +448,6 @@ inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n
     IntervalVector no_impact = in_impact1 | in_impact2;
     // Devide in two segment out
 
-    IntervalVector test(2);
-    test[0] = Interval(-1.17188, -1.125);
-    test[1] = Interval(3.5625, 3.65625);
-    if(m_pave->get_position().is_subset(test))
-        cout << "DEBUG" << endl;
-
     IntervalVector in_out(/*door_in->get_output_private() &*/ door_in->get_input_private());
     in_return = (in_out & no_impact) | (in_tmp | in_diff);
 }
