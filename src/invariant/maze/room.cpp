@@ -331,7 +331,7 @@ void Room::contract_consistency(){
 
 }
 
-void Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVector &out_return){
+inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVector &out_return){
     Face* f_out = m_pave->get_faces()[face][sens];
     Door* door_out = f_out->get_doors()[m_maze];
     IntervalVector out(door_out->get_output_private());
@@ -368,7 +368,7 @@ void Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVecto
     }
 }
 
-void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_tmp, IntervalVector &in_tmp){
+inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_tmp, IntervalVector &in_return){
 
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
@@ -403,7 +403,7 @@ void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, in
     }
 
     // In Segment
-    in_tmp = in;
+    IntervalVector in_tmp = in;
     in_tmp[face_out] &= seg_in_min;
 
     Interval seg_in_min_diff, c1, c2;
@@ -435,9 +435,9 @@ void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, in
     Interval::ALL_REALS.diff(seg_out_min, c3, c4);
 
     IntervalVector out_impact1(f_out->get_position());
-    out_impact1[face_in] |= c3;
+    out_impact1[face_in] = c3;
     IntervalVector out_impact2(f_out->get_position());
-    out_impact2[face_in] |= c4;
+    out_impact2[face_in] = c4;
 
     IntervalVector in_impact1(f_in->get_position());
     IntervalVector in_impact2(f_in->get_position());
@@ -448,8 +448,14 @@ void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, in
     IntervalVector no_impact = in_impact1 | in_impact2;
     // Devide in two segment out
 
-    IntervalVector in_out(door_in->get_output_private() & door_in->get_input_private());
-    in_tmp = (in_out & no_impact) | (in_tmp | in_diff);
+    IntervalVector test(2);
+    test[0] = Interval(-1.17188, -1.125);
+    test[1] = Interval(3.5625, 3.65625);
+    if(m_pave->get_position().is_subset(test))
+        cout << "DEBUG" << endl;
+
+    IntervalVector in_out(/*door_in->get_output_private() &*/ door_in->get_input_private());
+    in_return = (in_out & no_impact) | (in_tmp | in_diff);
 }
 
 void Room::set_full_possible(){
