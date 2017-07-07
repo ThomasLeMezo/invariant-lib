@@ -343,7 +343,7 @@ inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, Interv
         Pave *p_neighbour = f_neighbour->get_pave();
         Room *r_neighbour = p_neighbour->get_rooms()[m_maze];
 
-        if(r_neighbour->get_vector_fields_zero()[n_vf]){
+        if(r_neighbour->get_one_vector_fields_zero(n_vf)){
             // Case Zero
             out_return |= d_neighbour->get_input() & out;
         }
@@ -356,7 +356,7 @@ inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, Interv
                     IntervalVector in_tmp(d_in->get_input());
 
                     if(!(face_n == face && sens_n == sens) && !in_tmp.is_empty()){
-                        IntervalVector vect_field_n = r_neighbour->get_vector_fields()[n_vf];
+                        IntervalVector vect_field_n = r_neighbour->get_one_vector_fields(n_vf);
                         IntervalVector out_tmp(out);
                         contract_flow(in_tmp, out_tmp, vect_field_n);
                         out_return |= out_tmp;
@@ -392,9 +392,9 @@ inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n
             Pave *p_n = f_n_in->get_pave();
 
             Room *r_n = p_n->get_rooms()[m_maze];
-            vec_field_union |= r_n->get_vector_fields()[n_vf];
+            vec_field_union |= r_n->get_one_vector_fields(n_vf); /// WARNING ?
 
-            seg_in_min &= f_n_in->get_position()[face_out];
+            seg_in_min &= f_n_in->get_position()[face_out]; /// WARNING ?
 
             Face *f_n_out = p_n->get_faces()[face_out][sens_out];
             door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
@@ -630,6 +630,14 @@ bool Room::is_degenerated(const IntervalVector& iv){
         }
     }
     return false;
+}
+
+const ibex::IntervalVector Room::get_one_vector_fields(int n_vf) const{
+    return m_vector_fields[n_vf];
+}
+
+const bool Room::get_one_vector_fields_zero(int n_vf) const{
+    return m_vector_field_zero[n_vf];
 }
 
 }

@@ -141,6 +141,19 @@ public:
     const std::vector<ibex::IntervalVector>& get_vector_fields() const;
 
     /**
+     * @brief Getter to one of the the vector fields
+     * @return
+     */
+    const ibex::IntervalVector get_one_vector_fields(int n_vf) const;
+
+    /**
+     * @brief Getter to one of the the vector fields zero evaluation
+     * @param n_vf
+     * @return
+     */
+    const bool get_one_vector_fields_zero(int n_vf) const;
+
+    /**
      * @brief Lock the pave to other contractions
      */
     void lock_contraction();
