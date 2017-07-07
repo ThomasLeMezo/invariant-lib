@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     invariant::Domain dom(&graph);
 
     dom.set_border_path_in(false);
-    dom.set_border_path_out(false);
+    dom.set_border_path_out(true);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
+    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -54,13 +54,17 @@ int main(int argc, char *argv[])
     v_graph.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(0);
-    position_info[1] = Interval(1);
+//    position_info[0] = Interval(0);
+//    position_info[1] = Interval(1);
+//    v_graph.get_room_info(&maze, position_info);
+
+    position_info[0] = Interval(-2.95);
+    position_info[1] = Interval(0.55);
     v_graph.get_room_info(&maze, position_info);
 
-    position_info[0] = Interval(0);
-    position_info[1] = Interval(-1);
-    v_graph.get_room_info(&maze, position_info);
+//    position_info[0] = Interval(0);
+//    position_info[1] = Interval(-1);
+//    v_graph.get_room_info(&maze, position_info);
     vibes::endDrawing();
 
 }

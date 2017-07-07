@@ -166,6 +166,12 @@ public:
      */
     void set_removed();
 
+    /**
+     * @brief Get the vector of bool telling if zero belongs to the vector field
+     * @return
+     */
+    std::vector<bool> get_vector_fields_zero();
+
 
 protected:
     /**
@@ -202,6 +208,30 @@ protected:
      * @return
      */
     bool is_degenerated(const ibex::IntervalVector& iv);
+
+    /**
+     * @brief Get the IN segment in the case of a sliding mode
+     * @param vec_field
+     * @param n_vf
+     * @param face_in
+     * @param sens_in
+     * @param face_out
+     * @param sens_out
+     * @param out_tmp
+     * @param in_tmp
+     * @return
+     */
+    ibex::IntervalVector contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, ibex::IntervalVector &out_tmp, ibex::IntervalVector &in_tmp);
+
+    /**
+     * @brief Get the OUT segment in the case of a sliding mode
+     * @param n_vf
+     * @param face
+     * @param sens
+     * @param out_tmp
+     * @return
+     */
+    ibex::IntervalVector contract_sliding_mode_out(int n_vf, int face, int sens, ibex::IntervalVector &out_return);
 
 public:
     /**
@@ -294,6 +324,10 @@ inline void Room::set_removed(){
 
 inline int Room::get_nb_contractions() const{
     return m_nb_contract;
+}
+
+inline std::vector<bool> Room::get_vector_fields_zero(){
+    return m_vector_field_zero;
 }
 
 }
