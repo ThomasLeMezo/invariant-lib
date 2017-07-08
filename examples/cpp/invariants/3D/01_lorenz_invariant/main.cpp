@@ -64,19 +64,19 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-//    Vtk_Graph vtk_graph("lorenz", &graph, true);
-//    vtk_graph.show_graph();
-//    vtk_graph.show_maze(&maze);
+    Vtk_Graph vtk_graph("lorenz", &graph, true);
+    vtk_graph.show_graph();
+    vtk_graph.show_maze(&maze);
 
-    vector<Pave*> pave_list;
-    IntervalVector position_info(3);
-    position_info[0] = Interval(-30.0);
-    position_info[1] = Interval(-2.5);
-    position_info[2] = Interval(28.0);
-    graph.get_room_info(&maze, position_info, pave_list);
+//    vector<Pave*> pave_list;
+//    IntervalVector position_info(3);
+//    position_info[0] = Interval(-30.0);
+//    position_info[1] = Interval(-2.5);
+//    position_info[2] = Interval(28.0);
+//    graph.get_room_info(&maze, position_info, pave_list);
 
-    position_info[0] = Interval(-0.5);
-    position_info[1] = Interval(-19.375);
-    position_info[2] = Interval(0.78125);
-    graph.get_room_info(&maze, position_info, pave_list);
+//    position_info[0] = Interval(-0.5);
+//    position_info[1] = Interval(-19.375);
+//    position_info[2] = Interval(0.78125);
+//    graph.get_room_info(&maze, position_info, pave_list);
 }
