@@ -247,16 +247,17 @@ void Room::contract_consistency(){
 
                                     if(!(face_out == face_in && sens_in == sens_out)){
                                         /// INPUT
-                                        IntervalVector in_tmp(dim), out_tmp(dim);
-                                        contract_sliding_mode_in(vec_field, n_vf, face_in, sens_in, face_out, sens_out, out_tmp, in_tmp);
-                                        in_result |= in_tmp;
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
+                                        IntervalVector in_return(dim), out_return(dim);
+//                                        contract_sliding_mode_in(vec_field, n_vf, face_in, sens_in, face_out, sens_out, out_tmp, in_tmp);
+                                        contract_sliding_mode_in2(n_vf, face_in, sens_in, face_out, sens_out, out_return, in_return);
+                                        in_result |= in_return;
+                                        out_results[n_vf][face_out][sens_out] |= out_return & door_out->get_output_private();
                                     }
                                     else{
                                         /// OUTPUT
                                         IntervalVector out_tmp(dim);
                                         contract_sliding_mode_out(n_vf, face_out, sens_out, out_tmp);
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private();
+                                        out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private() & door_out->get_input_private();
                                     }
                                 }
                                 /// CASE NO SLIDING MODE
@@ -368,6 +369,57 @@ inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, Interv
     }
 }
 
+inline void Room::contract_sliding_mode_in2(int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_return, IntervalVector &in_return){
+    Face* f_in = m_pave->get_faces()[face_in][sens_in];
+    Door* door_in = f_in->get_doors()[m_maze];
+    Face* f_out = m_pave->get_faces()[face_out][sens_out];
+    Door* door_out = f_out->get_doors()[m_maze];
+    int dim = m_pave->get_dim();
+    IntervalVector in(door_in->get_input_private());
+    in_return = IntervalVector(dim, Interval::EMPTY_SET);
+
+    // Own contribution
+    out_return = door_out->get_output_private();
+    IntervalVector in_tmp(in);
+    contract_flow(in_tmp, out_return, m_vector_fields[n_vf]);
+    in_return |= in_tmp;
+
+    // Neighbours contribution
+    Interval max_impact_seg;
+    for(Face * f_neighbour:f_in->get_neighbors()){
+        Door *d_neighbour = f_neighbour->get_doors()[m_maze];
+        Pave *p_neighbour = f_neighbour->get_pave();
+        Room *r_neighbour = p_neighbour->get_rooms()[m_maze];
+
+        max_impact_seg &= f_neighbour->get_position()[face_out];
+
+        if(r_neighbour->get_one_vector_fields_zero(n_vf)){
+            // Case Zero
+            in_return |= d_neighbour->get_output() & in;
+        }
+        else{
+            Face *f_out_neighbour = p_neighbour->get_faces()[face_out][sens_out];
+            Door *d_out_neighbour = f_out_neighbour->get_doors()[m_maze];
+            IntervalVector out_neighbour(d_out_neighbour->get_output());
+
+            IntervalVector in_tmp(in & d_neighbour->get_input());
+            IntervalVector vect_field_n = r_neighbour->get_one_vector_fields(n_vf);
+
+            contract_flow(in_tmp, out_neighbour, vect_field_n);
+            in_return |= in_tmp;
+        }
+    }
+
+    // Compute No impact zone
+    Interval no_impact_seg, ni1, ni2;
+    in[face_out].diff(max_impact_seg, ni1, ni2);
+    no_impact_seg = ni1 | ni2;
+    IntervalVector no_impact(in);
+    no_impact[face_out] = no_impact_seg;
+
+    in_return |= no_impact & in;
+}
+
 inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_tmp, IntervalVector &in_return){
 
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
@@ -378,6 +430,7 @@ inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n
 
     const IntervalVector in(door_in->get_input_private());
 
+    /// **** Compute involved Paves ****
     // Point d'intersection
     IntervalVector inter_in_out = f_out->get_position() & f_in->get_position();
     // Chercher les boites qui partagent la frontière
@@ -392,9 +445,9 @@ inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n
             Pave *p_n = f_n_in->get_pave();
 
             Room *r_n = p_n->get_rooms()[m_maze];
-            vec_field_union |= r_n->get_one_vector_fields(n_vf); /// WARNING ?
+            vec_field_union |= r_n->get_one_vector_fields(n_vf);
 
-            seg_in_min &= f_n_in->get_position()[face_out]; /// WARNING ?
+            seg_in_min &= f_n_in->get_position()[face_out];
 
             Face *f_n_out = p_n->get_faces()[face_out][sens_out];
             door_out_n_list.push_back(f_n_out->get_doors()[m_maze]);
@@ -429,7 +482,7 @@ inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n
     else
         in_diff.set_empty();
 
-    // Compute max impact on in
+    /// **** Compute zone of NO IMPACT ****
     Interval seg_out_min = seg_out_n_min | f_out->get_position()[face_in];
     Interval c3, c4;
     Interval::ALL_REALS.diff(seg_out_min, c3, c4);
@@ -448,7 +501,8 @@ inline void Room::contract_sliding_mode_in(ibex::IntervalVector vec_field, int n
     IntervalVector no_impact = in_impact1 | in_impact2;
     // Devide in two segment out
 
-    IntervalVector in_out(/*door_in->get_output_private() &*/ door_in->get_input_private());
+    /// **** Compute in return ****
+    IntervalVector in_out(door_in->get_output_private() & door_in->get_input_private());
     in_return = (in_out & no_impact) | (in_tmp | in_diff);
 }
 
@@ -481,10 +535,10 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     }
     c &= alpha*v;
 
-    const MazeSens sens = m_maze->get_sens();
-    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+//    const MazeSens sens = m_maze->get_sens();
+//    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
         out &= c+in;
-    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+//    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
         in &= out-c;
 }
 

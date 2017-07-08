@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(true);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(Interval(1.0), Interval(1.0)));
+    ibex::Function f(x1, x2, Return(Interval(1), Interval(1)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze *********
@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(4);
-//    v_graph.get_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(-0.09);
+    position_info[1] = Interval(-2.976);
+    v_graph.get_room_info(&maze, position_info);
 
 }

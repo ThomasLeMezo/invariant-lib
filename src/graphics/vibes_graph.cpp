@@ -1,5 +1,6 @@
 #include "vibes_graph.h"
 #include <ibex.h>
+#include "ostream"
 
 using namespace invariant;
 using namespace ibex;
@@ -260,6 +261,50 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, double x, double y) const
     pos[1] = Interval(y);
     get_room_info(maze, pos);
 }
+
+void Vibes_Graph::draw_room_info(invariant::Maze *maze, const IntervalVector& position) const{
+    std::vector<invariant::Pave*> pave_list;
+    m_graph->get_room_info(maze, position, pave_list);
+    for(invariant::Pave* p:pave_list){
+        vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
+                0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]", vibesParams("figure", m_name));
+    }
+
+    for(invariant::Pave* p:pave_list){
+        IntervalVector p_position = p->get_position();
+        double p_diam[2] = {p_position[0].diam(), p_position[1].diam()};
+        double offset[2] = {p_diam[0]*0.05, p_diam[1]*0.05};
+
+        // New Figure
+        ostringstream name;
+        name << p_position;
+        vibes::newFigure(name.str());
+        vibes::setFigureProperties(vibesParams("width", 512,"height", 512));
+
+        // Draw Pave
+        draw_room_outer(p);
+
+        // Draw Doors
+        for(int face=0; face<2; face++){
+            for(int sens=0; sens<2; sens++){
+                Face *f=p->get_faces()[face][sens];
+                Door *d = f->get_doors()[maze];
+
+                IntervalVector input = d->get_input();
+                IntervalVector output = d->get_output();
+
+                input[face] += 1.0*Interval((sens==1)?(offset[face]):(-offset[face])) + Interval(-offset[face]/4.0, offset[face]/4.0);
+                output[face] += 2.0*Interval((sens==1)?(offset[face]):(-offset[face])) + Interval(-offset[face]/4.0, offset[face]/4.0);
+
+                vibes::drawBox(input, "red[red]");
+                vibes::drawBox(output, "blue[blue]");
+            }
+        }
+        vibes::axisLimits(p_position[0].lb()-3*offset[0], p_position[0].ub()+3*offset[0],
+                          p_position[1].lb()-3*offset[1], p_position[1].ub()+3*offset[1]);
+    }
+}
+
 
 namespace vibes{
 inline void drawGraph(const invariant::Graph &g, Params params){
