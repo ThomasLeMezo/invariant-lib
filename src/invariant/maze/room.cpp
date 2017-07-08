@@ -243,7 +243,7 @@ void Room::contract_consistency(){
                                         && door_in->is_collinear()[n_vf]
                                         && door_out->is_possible_out()[n_vf]
                                         && !(f_out->get_position() & f_in->get_position()).is_empty()
-                                        /*&& !f_out->is_border()*/){
+                                        ){
 
                                     if(!(face_out == face_in && sens_in == sens_out)){
                                         /// INPUT
