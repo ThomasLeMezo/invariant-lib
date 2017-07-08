@@ -45,7 +45,7 @@ const ibex::IntervalVector NodeCurrent::eval(const IntervalVector& position){
             IntervalVector empty(position.size(), Interval::EMPTY_SET);
             return empty;
         }
-        else if(position.is_subset(m_position)){
+        else if(m_position.is_subset(position)){
             return m_vector_field;
         }
         else{
