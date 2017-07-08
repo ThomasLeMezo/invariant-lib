@@ -115,9 +115,9 @@ void Vibes_Graph::show_maze_outer() const{
     for(Pave *p:m_graph->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_outer];
-//            if(!r->is_removed()){
-                draw_room_outer(p);
-//            }
+            //            if(!r->is_removed()){
+            draw_room_outer(p);
+            //            }
             if(r->is_empty())
                 vibes::drawBox(p->get_position(), "[blue]");
         }
@@ -131,9 +131,9 @@ void Vibes_Graph::show_maze_inner() const{
     for(Pave *p:m_graph->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_inner];
-//            if(!r->is_removed()){
-                draw_room_inner(p);
-//            }
+            //            if(!r->is_removed()){
+            draw_room_inner(p);
+            //            }
             if(r->is_empty())
                 vibes::drawBox(p->get_position(), "[#FF00FF]");
         }
@@ -168,11 +168,16 @@ void Vibes_Graph::show_theta(Pave *p, Maze* maze) const{
     Room *r = p->get_rooms()[maze];
 
     const vector<IntervalVector> vector_fields = r->get_vector_fields();
+    IntervalVector empty(2, Interval::EMPTY_SET);
 
     if(vector_fields.size()>0){
         for(IntervalVector r:vector_fields){
-            for(Interval i:compute_theta(r[0], r[1])){
-                vibes::drawSector(position[0].mid(), position[1].mid(), size, size, (-i.lb())*180.0/M_PI, (-i.ub())*180.0/M_PI, "black[gray]");
+            if(r == empty)
+                vibes::drawBox(position[0].mid()+Interval(-size, +size), position[1].mid()+Interval(-size, +size), "black[gray]");
+            else{
+                for(Interval i:compute_theta(r[0], r[1])){
+                    vibes::drawSector(position[0].mid(), position[1].mid(), size, size, (-i.lb())*180.0/M_PI, (-i.ub())*180.0/M_PI, "black[gray]");
+                }
             }
         }
     }
@@ -301,7 +306,7 @@ void Vibes_Graph::draw_room_info(invariant::Maze *maze, const IntervalVector& po
             }
         }
         vibes::axisLimits(p_position[0].lb()-3*offset[0], p_position[0].ub()+3*offset[0],
-                          p_position[1].lb()-3*offset[1], p_position[1].ub()+3*offset[1]);
+                p_position[1].lb()-3*offset[1], p_position[1].ub()+3*offset[1]);
     }
 }
 

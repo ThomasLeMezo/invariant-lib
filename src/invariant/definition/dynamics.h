@@ -13,7 +13,7 @@ public:
      */
     Dynamics();
 
-    virtual const std::vector<ibex::IntervalVector> eval(ibex::IntervalVector position) =0;
+    virtual const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector& position) =0;
 };
 }
 

@@ -31,7 +31,7 @@ public:
      * @param position
      * @return
      */
-    const std::vector<ibex::IntervalVector> eval(ibex::IntervalVector position);
+    const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector &position);
 
 private:
     std::vector<ibex::Function*> m_functions;

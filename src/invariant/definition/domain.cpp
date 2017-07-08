@@ -5,8 +5,9 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-Domain::Domain(Graph *graph){
+Domain::Domain(Graph *graph, DOMAIN_PROPAGATION_START link){
     m_graph = graph;
+    m_link_start = link;
 }
 
 void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
@@ -22,7 +23,7 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
     // ********** Add additional rooms to deque ********** //
     if(maze->get_type() == MAZE_CONTRACTOR)
         m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
-    if(maze->get_type() == MAZE_PROPAGATOR && m_graph->get_paves().size()>1)
+    if(maze->get_type() == MAZE_PROPAGATOR && m_graph->get_paves().size()>1 && m_link_start==NOT_LINK_TO_INITIAL_CONDITION) // When initial condition is not link with active paves
         m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
 }
 

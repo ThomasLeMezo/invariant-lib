@@ -47,7 +47,7 @@ public:
      * (union of its children vector field)
      * @return
      */
-    const ibex::IntervalVector &compute_vector_field_tree();
+    const ibex::IntervalVector compute_vector_field_tree();
 
     /**
      * @brief Eval the vector filed at this position
@@ -59,7 +59,7 @@ public:
     /**
      * @brief Fill leafs with current
      */
-    void fill_leafs(short *raw_u, short *raw_v, const size_t& i_max, const float &scale_factor, const short& fill_value);
+    void fill_leafs(const std::vector<std::vector<short>> &raw_u, const std::vector<std::vector<short>> &raw_v, const float& scale_factor, const short& fill_value);
 
     /**
      * @brief Get the leaf list of this NodeCurrent (list of all leaf children nodes)

@@ -21,7 +21,7 @@ public:
      * @param position
      * @return
      */
-    const std::vector<ibex::IntervalVector> eval(ibex::IntervalVector position);
+    const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector &position);
 
     /**
      * @brief Get the search space associated with the current vector field
@@ -29,9 +29,9 @@ public:
      */
     const ibex::IntervalVector& get_search_space();
 
-    short* get_raw_u();
+    const std::vector<std::vector<short> >& get_raw_u();
 
-    short* get_raw_v();
+    const std::vector<std::vector<short> >& get_raw_v();
 
     size_t get_j_max();
 
@@ -49,8 +49,8 @@ private:
     const ibex::IntervalVector& get_vector_field_at_point(std::vector<double> position);
 
 private:
-    signed short *m_raw_u;
-    signed short *m_raw_v;
+    std::vector<std::vector<short>> m_raw_u;
+    std::vector<std::vector<short>> m_raw_v;
     float m_scale_factor = 0;
     short m_fill_value = 0;
     int m_dim = 0;
@@ -61,11 +61,11 @@ private:
 
 };
 
-inline short* PreviMer::get_raw_u(){
+inline const std::vector<std::vector<short>>& PreviMer::get_raw_u(){
     return m_raw_u;
 }
 
-inline short* PreviMer::get_raw_v(){
+inline const std::vector<std::vector<short>>& PreviMer::get_raw_v(){
     return m_raw_v;
 }
 

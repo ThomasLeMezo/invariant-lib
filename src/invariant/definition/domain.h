@@ -12,6 +12,7 @@
 namespace invariant{
 
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
+enum DOMAIN_PROPAGATION_START{LINK_TO_INITIAL_CONDITION, NOT_LINK_TO_INITIAL_CONDITION};
 
 class Graph; // declared only for friendship
 class Maze; // declared only for friendship
@@ -23,9 +24,10 @@ class Domain
 public:
     /**
      * @brief Constructor of a domain
-     * @param maze
+     * @param graph
+     * @param link : specify if the initial condition in the case of a propagation maze is always link to the yellow zone
      */
-    Domain(Graph* graph);
+    Domain(Graph* graph, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
 
     // *************** Intput & Output *********************
 
@@ -149,6 +151,8 @@ private:
 
     bool m_border_path_in = true;
     bool m_border_path_out = true;
+
+    DOMAIN_PROPAGATION_START m_link_start = NOT_LINK_TO_INITIAL_CONDITION;
 };
 }
 

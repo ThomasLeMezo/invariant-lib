@@ -21,7 +21,6 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         else
             m_vector_field_zero.push_back(false);
         m_vector_fields.push_back(vector_field);
-
     }
 
     // Create Doors
@@ -183,18 +182,25 @@ void Room::eval_vector_field_possibility(){
 }
 
 void Room::contract_consistency(){
+    const int dim = m_pave->get_dim();
+
+    IntervalVector empty = IntervalVector(dim, Interval::EMPTY_SET);
+    for(IntervalVector &vec_field:m_vector_fields){
+        if(vec_field == empty)
+            return;
+    }
+
     m_nb_contract++;
-//    IntervalVector test(2);
-//    test[0] = Interval(-1.171875, -1.125);
-//    test[1] = Interval(3.5625, 3.65625);
-//    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR)
-//        cout << "DEBUG" << endl;
+    //    IntervalVector test(2);
+    //    test[0] = Interval(-1.171875, -1.125);
+    //    test[1] = Interval(3.5625, 3.65625);
+    //    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR)
+    //        cout << "DEBUG" << endl;
 
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
 
     vector<vector< array<IntervalVector, 2>>> out_results; // One per vec_field, dim, sens
-    const int dim = m_pave->get_dim();
     const int nb_vec = m_vector_fields.size();
 
     for(int vf=0; vf<nb_vec; vf++){
@@ -208,6 +214,7 @@ void Room::contract_consistency(){
 
     bool global_compute = false;
     int n_vf = 0;
+
     for(IntervalVector &vec_field:m_vector_fields){
         bool compute = true;
         if(m_vector_field_zero[n_vf]){
@@ -448,11 +455,11 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     }
     c &= alpha*v;
 
-//    const MazeSens sens = m_maze->get_sens();
-//    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
-        out &= c+in;
-//    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
-        in &= out-c;
+    //    const MazeSens sens = m_maze->get_sens();
+    //    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+    out &= c+in;
+    //    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+    in &= out-c;
 }
 
 bool Room::contract(){

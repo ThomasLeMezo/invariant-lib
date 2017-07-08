@@ -18,7 +18,7 @@ Dynamics_Function::~Dynamics_Function(){
     omp_destroy_lock(&m_lock_dynamics);
 }
 
-const std::vector<ibex::IntervalVector> Dynamics_Function::eval(IntervalVector position){
+const std::vector<ibex::IntervalVector> Dynamics_Function::eval(const IntervalVector& position){
     omp_set_lock(&m_lock_dynamics);
     vector<IntervalVector> vector_field;
     for(Function*f:m_functions){
