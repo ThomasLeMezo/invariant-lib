@@ -20,8 +20,8 @@ PreviMer::PreviMer(const std::string& file_name){
     m_i_max = dataFile.getDim("ni_u").getSize();
 
     // ******* DATA U,V ******
-    m_raw_u = new short[m_j_max*m_i_max];
-    m_raw_v = new short[m_j_max*m_i_max];
+    m_raw_u = new signed short[m_j_max*m_i_max];
+    m_raw_v = new signed short[m_j_max*m_i_max];
     u_var.getVar(m_raw_u);
     v_var.getVar(m_raw_v);
 
@@ -31,10 +31,10 @@ PreviMer::PreviMer(const std::string& file_name){
 
     // ******* Node Current ******
     IntervalVector position(2);
-//    position[0] = Interval(0, m_j_max);
-//    position[1] = Interval(0, m_i_max);
-    position[0] = Interval(180, 200);
-    position[1] = Interval(380, 400);
+    position[0] = Interval(0, m_j_max);
+    position[1] = Interval(0, m_i_max);
+    position[0] = Interval(100, 200);
+    position[1] = Interval(400, 500);
     double epsilon_bisection = 0.51;
 
     double time_start_init = omp_get_wtime();
@@ -43,7 +43,7 @@ PreviMer::PreviMer(const std::string& file_name){
     m_dim = 2;
 
     time_start_init = omp_get_wtime();
-    m_node_current->fill_leafs(m_raw_u, m_raw_v, m_j_max, m_scale_factor, m_fill_value);
+    m_node_current->fill_leafs(m_raw_u, m_raw_v, m_i_max, m_scale_factor, m_fill_value);
     cout << "TIME compute leafs= " << omp_get_wtime() - time_start_init << endl;
 
     time_start_init = omp_get_wtime();

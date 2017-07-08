@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
 //    graph.get_room_info(&maze, position_info, pave_list);
 
     position_info[0] = Interval(29.5);
-    position_info[1] = Interval(3.0);
-    position_info[2] = Interval(28.0);
+    position_info[1] = Interval(3.0, 3.2);
+    position_info[2] = Interval(27.0, 28.0);
 //    graph.get_room_info(&maze, position_info, pave_list);
     vtk_graph.show_room_info(&maze, position_info);
 }

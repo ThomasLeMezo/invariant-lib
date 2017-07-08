@@ -59,7 +59,7 @@ public:
     /**
      * @brief Fill leafs with current
      */
-    void fill_leafs(short *raw_u, short *raw_v, const size_t& j_max, const float &scale_factor, const short& fill_value);
+    void fill_leafs(short *raw_u, short *raw_v, const size_t& i_max, const float &scale_factor, const short& fill_value);
 
     /**
      * @brief Get the leaf list of this NodeCurrent (list of all leaf children nodes)

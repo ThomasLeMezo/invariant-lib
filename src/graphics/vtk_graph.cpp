@@ -109,8 +109,10 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
                 IntervalVector input(d->get_input());
                 IntervalVector output(d->get_output());
 
-                input[face] += 1.0*Interval((sens==1)?(offset[face]):(-offset[face])) + Interval(-offset[face]/4.0, offset[face]/4.0);
-                output[face] += 2.0*Interval((sens==1)?(offset[face]):(-offset[face])) + Interval(-offset[face]/4.0, offset[face]/4.0);
+//                input[face] += /*1.0*Interval((sens==1)?(offset[face]):(-offset[face])) +*/ Interval(/*-offset[face]/4.0*/0.0, offset[face]/4.0);
+                input[face] += (sens==1)?(Interval(0, offset[face]/4.0)):(Interval(-offset[face]/4.0, 0));
+//                output[face] += /*2.0*Interval((sens==1)?(offset[face]):(-offset[face])) +*/ Interval(/*-offset[face]/4.0*/0.0, offset[face]/4.0);
+                output[face] += (sens==1)?(Interval(0, offset[face]/4.0)):(Interval(-offset[face]/4.0, 0));
 
                 if(!input.is_empty()){
                     vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();

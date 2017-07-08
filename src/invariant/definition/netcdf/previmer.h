@@ -29,6 +29,16 @@ public:
      */
     const ibex::IntervalVector& get_search_space();
 
+    short* get_raw_u();
+
+    short* get_raw_v();
+
+    size_t get_j_max();
+
+    size_t get_i_max();
+
+    short get_fill_value();
+
 private:
 
     /**
@@ -39,8 +49,8 @@ private:
     const ibex::IntervalVector& get_vector_field_at_point(std::vector<double> position);
 
 private:
-    short *m_raw_u;
-    short *m_raw_v;
+    signed short *m_raw_u;
+    signed short *m_raw_v;
     float m_scale_factor = 0;
     short m_fill_value = 0;
     int m_dim = 0;
@@ -50,6 +60,26 @@ private:
     NodeCurrent *m_node_current;
 
 };
+
+inline short* PreviMer::get_raw_u(){
+    return m_raw_u;
+}
+
+inline short* PreviMer::get_raw_v(){
+    return m_raw_v;
+}
+
+inline size_t PreviMer::get_j_max(){
+    return m_j_max;
+}
+
+inline size_t PreviMer::get_i_max(){
+    return m_i_max;
+}
+
+inline short PreviMer::get_fill_value(){
+    return m_fill_value;
+}
 
 }
 
