@@ -2,6 +2,9 @@
 #include <netcdf>
 #include <omp.h>
 
+#include <sys/types.h>
+#include <dirent.h>
+
 using namespace std;
 using namespace netCDF;
 using namespace netCDF::exceptions;
@@ -45,8 +48,10 @@ PreviMer::PreviMer(const std::string& file_name){
     IntervalVector position(2);
     position[0] = Interval(0, m_j_max);
     position[1] = Interval(0, m_i_max);
-//    position[0] = Interval(0, 300);
-//    position[1] = Interval(200, 500);
+
+    position[0] = Interval(75, 280);
+    position[1] = Interval(400, 600);
+
     double epsilon_bisection = 0.51;
 
     double time_start_init = omp_get_wtime();

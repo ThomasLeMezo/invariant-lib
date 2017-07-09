@@ -27,6 +27,8 @@ include_directories(../tools/serialization)
 
     definition/netcdf/nodecurrent.cpp
     definition/netcdf/previmer.cpp
+    definition/netcdf/previmer3d.cpp
+    definition/netcdf/nodecurrent3d.cpp
   )
 
   set(HEADERS
@@ -45,6 +47,8 @@ include_directories(../tools/serialization)
 
     definition/netcdf/nodecurrent.h
     definition/netcdf/previmer.h
+    definition/netcdf/previmer3d.h
+    definition/netcdf/nodecurrent3d.h
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})

@@ -2,6 +2,7 @@
 #include "previmer.h"
 #include "maze.h"
 #include <ibex.h>
+#include <math.h>
 
 #include "vibes_graph.h"
 
@@ -14,7 +15,7 @@ int main(int argc, char *argv[])
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
 //    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteurs/data_ifremer/data/PREVIMER_L1-MARS2D-FINIS250_20161219T0000Z_MeteoMF.nc");
-    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20170711T0000Z_MeteoMF.nc");
+    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20170709T1700Z_MeteoMF.nc");
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
@@ -29,8 +30,8 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     double x1_c, x2_c, r;
-    x1_c = 120;
-    x2_c = 480;
+    x1_c = 240;
+    x2_c = 453;
     r = 0.1;
     Variable x1, x2;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
@@ -40,9 +41,12 @@ int main(int argc, char *argv[])
     // ******* Maze *********
     Maze maze(&dom, &pm, MAZE_FWD, MAZE_PROPAGATOR);
 
+    double max_diam = max(search_space[0].diam(), search_space[1].diam());
+    int iterations_max = 2*(ceil(log(max_diam)/log(2)));
+
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
-    for(int i=0; i<17; i++){
+    for(int i=0; i<iterations_max+1; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
     }
@@ -55,8 +59,8 @@ int main(int argc, char *argv[])
     v_graph.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(167);
-    position_info[1] = Interval(478);
+    position_info[0] = Interval(x1_c);
+    position_info[1] = Interval(x2_c);
     v_graph.get_room_info(&maze, position_info);
 
 
