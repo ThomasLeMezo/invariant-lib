@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
 //    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteurs/data_ifremer/data/PREVIMER_L1-MARS2D-FINIS250_20161219T0000Z_MeteoMF.nc");
-    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20170709T1700Z_MeteoMF.nc");
+    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20170709T0000Z_MeteoMF.nc");
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     double x1_c, x2_c, r;
-    x1_c = 240;
-    x2_c = 453;
+    x1_c = 160;
+    x2_c = 470;
     r = 0.1;
     Variable x1, x2;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
@@ -68,19 +68,19 @@ int main(int argc, char *argv[])
 
 
     /// DEBUG
-//    short fill_value = pm.get_fill_value();
+    short fill_value = pm.get_fill_value();
 
-//    vibes::beginDrawing();
-//    vibes::newFigure("test");
-//    for(size_t i=0; i<pm.get_i_max(); i+=3){
-//        for(size_t j=0; j<pm.get_j_max(); j+=3){
-//            if(pm.get_raw_u()[i][j]!=fill_value){
-//                vibes::drawBox(i, i+1, j, j+1, "b[b]");
-//            }
-//            else{
-//                vibes::drawBox(i, i+1, j, j+1, "grey[grey]");
-//            }
-//        }
-//    }
-//    vibes::axisAuto("test");
+    vibes::beginDrawing();
+    vibes::newFigure("test");
+    for(size_t i=0; i<pm.get_i_max(); i+=3){
+        for(size_t j=0; j<pm.get_j_max(); j+=3){
+            if(pm.get_raw_u()[i][j]!=fill_value){
+                vibes::drawBox(i, i+1, j, j+1, "b[b]");
+            }
+            else{
+                vibes::drawBox(i, i+1, j, j+1, "grey[grey]");
+            }
+        }
+    }
+    vibes::axisAuto("test");
 }
