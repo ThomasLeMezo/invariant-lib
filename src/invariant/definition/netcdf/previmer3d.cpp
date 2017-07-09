@@ -21,11 +21,16 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
 
     vector<string> file_list;
     get_file_list(file_directory, file_list);
-    size_t nb_files = file_list.size();
+    int nb_files = file_list.size();
+    int max_t = min(nb_files, (int)(search_space[0].ub()));
     bool first_read = true;
+    int cpt = 0;
 
-    for(const string &file_name:file_list){
-        NcFile dataFile(file_name, NcFile::read);
+    for(int file_id = 0; file_id<max_t; file_id++){
+        const string file_name = file_list[file_id];
+
+        cout << "load file : " << ++cpt << "/" << max_t << endl;
+        NcFile dataFile(file_directory+file_name, NcFile::read);
 
         NcVar u_var=dataFile.getVar("U");
         NcVar v_var=dataFile.getVar("V");
@@ -74,6 +79,7 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
         position[0] = Interval(0, m_size[0]);
         position[1] = Interval(0, m_size[1]);
         position[2] = Interval(0, m_size[2]);
+        cout << "unbound search space set to : " << position << endl;
     }
 
     double time_start_init = omp_get_wtime();
@@ -85,6 +91,9 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
     cout << "TIME compute leafs = ";
     m_node_current->fill_leafs(m_raw_u, m_raw_v, m_scale_factor, m_fill_value);
     cout << omp_get_wtime() - time_start_init << endl;
+
+    m_raw_u.clear();
+    m_raw_v.clear();
 
     time_start_init = omp_get_wtime();
     m_node_current->compute_vector_field_tree();

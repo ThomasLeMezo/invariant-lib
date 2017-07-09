@@ -90,7 +90,7 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
                     short vec_u = raw_u[t_coord][i_coord][j_coord];
                     short vec_v = raw_v[t_coord][i_coord][j_coord];
                     if(vec_u!=fill_value && vec_v!=fill_value){
-                        vector_field[0] |= Interval(15.0*60.0/250.0); // 15 min in second / 250m (size of each square)
+                        vector_field[0] |= Interval(1.0/(15.0*60.0/250.0)); // 15 min in second / 250m (size of each square)
                         vector_field[1] |= Interval(vec_u*scale_factor);
                         vector_field[2] |= Interval(vec_v*scale_factor);
                     }
