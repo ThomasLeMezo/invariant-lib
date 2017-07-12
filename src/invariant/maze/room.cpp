@@ -251,7 +251,7 @@ void Room::contract_consistency(){
                             /// INPUT
                             IntervalVector out_return(dim, Interval::EMPTY_SET);
                             contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_result);
-                            out_results[n_vf][face_in][sens_in] |= out_return & door_in->get_output_private();
+                            out_results[n_vf][face_in][sens_in] |= (out_return | in_result) & door_in->get_output_private();
                         }
                         else{
                             for(int face_out=0; face_out<dim; face_out++){
