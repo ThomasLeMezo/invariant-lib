@@ -278,6 +278,7 @@ void Room::contract_consistency(){
                                 }
                             }
                         }
+
                         if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
                             /// TEST ?
                             if(is_degenerated(in_result))
@@ -336,11 +337,11 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
 
-    IntervalVector test(2);
-    test[0] = Interval(-1.3125, -1.125);
-    test[1] = Interval(4.125, 4.3125);
-    if(get_pave()->get_position().is_subset(test))
-        cout << "test" << endl;
+//    IntervalVector test(2);
+//    test[0] = Interval(-1.3125, -1.125);
+//    test[1] = Interval(3.1875, 3.375);
+//    if(get_pave()->get_position().is_subset(test) && sens_in==1)
+//        cout << "test" << endl;
 
     vector<int> where_zeros = door_in->get_where_zeros(n_vf);
 
@@ -375,7 +376,7 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
             for(int sens_out = 0; sens_out < 2; sens_out ++){
                 Face *f_out = pave_n->get_faces()[face_out][sens_out];
                 Door *d_out = f_out->get_doors()[m_maze];
-                if(!d_out->get_output().is_empty() && !d_out->get_input().is_empty()){
+                if(!(d_out->get_output().is_empty() && d_out->get_input().is_empty())){
 
                     // Test if the Face intersect another face of the neighbours ?
                     IntervalVector own_surface(f_out->get_position());
