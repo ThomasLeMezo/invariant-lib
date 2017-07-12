@@ -246,12 +246,36 @@ void Room::contract_consistency(){
                     const IntervalVector in(door_in->get_input_private());
 
                     if(!in.is_empty()){
-                        for(int face_out=0; face_out<dim; face_out++){
-                            for(int sens_out = 0; sens_out < 2; sens_out++){
 
-                                IntervalVector in_tmp(in);
-                                Face* f_out = m_pave->get_faces()[face_out][sens_out];
-                                Door* door_out = f_out->get_doors()[m_maze];
+                        if(type == MAZE_CONTRACTOR && door_in->is_collinear()[n_vf]){
+
+                        }
+                        else{
+                            for(int face_out=0; face_out<dim; face_out++){
+                                for(int sens_out = 0; sens_out < 2; sens_out++){
+                                    IntervalVector in_tmp(in);
+                                    Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                                    Door* door_out = f_out->get_doors()[m_maze];
+
+                                    IntervalVector out_tmp(dim);
+                                    if(type == MAZE_CONTRACTOR || !(face_out == face_in && sens_out == sens_in)){
+                                        if(type == MAZE_CONTRACTOR)
+                                            out_tmp = door_out->get_output_private();
+                                        else
+                                            out_tmp = f_out->get_position();
+
+                                        if(!out_tmp.is_empty())
+                                            this->contract_flow(in_tmp, out_tmp, vec_field);
+                                        else
+                                            in_tmp.set_empty();
+
+                                        in_result |= in_tmp;
+                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+                                    }
+
+                                }
+                            }
+                        }
 
                                 /// CASE SLIDING MODE
                                 if(type == MAZE_CONTRACTOR
@@ -277,21 +301,7 @@ void Room::contract_consistency(){
                                 /// CASE NO SLIDING MODE
                                 else{
                                     // ToDo : improve propagation (avoid sliding same as contractor)
-                                    IntervalVector out_tmp(dim);
-                                    if(type == MAZE_CONTRACTOR || !(face_out == face_in && sens_out == sens_in)){
-                                        if(type == MAZE_CONTRACTOR)
-                                            out_tmp = door_out->get_output_private();
-                                        else
-                                            out_tmp = f_out->get_position();
 
-                                        if(!out_tmp.is_empty())
-                                            this->contract_flow(in_tmp, out_tmp, vec_field);
-                                        else
-                                            in_tmp.set_empty();
-
-                                        in_result |= in_tmp;
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
-                                    }
                                 }
                             }
                         }
