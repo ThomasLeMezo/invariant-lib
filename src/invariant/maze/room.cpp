@@ -337,12 +337,6 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
 
-//    IntervalVector test(2);
-//    test[0] = Interval(-1.3125, -1.125);
-//    test[1] = Interval(3.1875, 3.375);
-//    if(get_pave()->get_position().is_subset(test) && sens_in==1)
-//        cout << "test" << endl;
-
     vector<int> where_zeros = door_in->get_where_zeros(n_vf);
 
     // Find adjacent paves
