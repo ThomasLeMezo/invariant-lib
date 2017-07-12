@@ -4,4 +4,4 @@
 
 
 add_subdirectory(01_test)
-add_subdirectory(02_test)
+#add_subdirectory(02_test)

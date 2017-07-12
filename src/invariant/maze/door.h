@@ -176,6 +176,19 @@ public:
      */
     const std::vector<bool>& is_collinear() const;
 
+    /**
+     * @brief Set the dimensions where the n-ith vector field cross zero
+     * @param zeros
+     */
+    void push_back_zeros_in_vector_field(std::vector<short> zeros);
+
+    /**
+     * @brief Return the list of dimensions where the i-th vector field cross zero
+     * @param vector_field_id
+     * @return
+     */
+    const std::vector<short>& where_zeros(size_t vector_field_id) const;
+
 protected:
     ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
     ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
@@ -186,6 +199,7 @@ protected:
     std::vector<bool>    m_possible_out;
     std::vector<bool>    m_possible_in;
     std::vector<bool>    m_collinear_vector_field;
+    std::vector<std::vector<short>> m_zeros_in_vector_fields;
 };
 }
 
@@ -267,6 +281,14 @@ inline void Door::push_back_possible_out(bool val){
 
 inline void Door::push_back_collinear_vector_field(bool val){
     m_collinear_vector_field.push_back(val);
+}
+
+inline void Door::push_back_zeros_in_vector_field(std::vector<short> zeros){
+    m_zeros_in_vector_fields.push_back(zeros);
+}
+
+inline const std::vector<short>& Door::where_zeros(size_t vector_field_id) const{
+    return m_zeros_in_vector_fields[vector_field_id];
 }
 
 inline const std::vector<bool>& Door::is_collinear() const{

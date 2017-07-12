@@ -133,11 +133,19 @@ void Room::contract_vector_field(){
 
         for(const IntervalVector&v:m_vector_fields){
             IntervalVector product = hadamard_product(v, f->get_normal());
+            vector<short> where_zeros;
 
-            if(zero.is_subset(product))
+            if(zero.is_subset(product)){
                 d->push_back_collinear_vector_field(true);
+                for(int n_dim=0; n_dim<dim; n_dim++){
+                    if(Interval::ZERO.is_subset(product[n_dim])){
+                        where_zeros.push_back(n_dim);
+                    }
+                }
+            }
             else
                 d->push_back_collinear_vector_field(false);
+            d->push_back_zeros_in_vector_field(where_zeros);
         }
     }
 }

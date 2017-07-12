@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
 
 //    vector<Pave*> pave_list;
     IntervalVector position_info(3);
-//    position_info[0] = Interval(-30.0);
-//    position_info[1] = Interval(-2.5);
-//    position_info[2] = Interval(28.0);
+    position_info[0] = Interval(-30.0);
+    position_info[1] = Interval(-2.5);
+    position_info[2] = Interval(28.0);
 //    graph.get_room_info(&maze, position_info, pave_list);
 
     position_info[0] = Interval(29.5);
