@@ -233,6 +233,9 @@ protected:
      * @param in_return
      */
     void contract_sliding_mode_in(int n_vf, int face_in, int sens_in, int face_out, int sens_out, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return);
+
+    void contract_sliding_mode2(int n_vf, int face_in, int sens_in, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return);
+
     /**
      * @brief Get the OUT segment in the case of a sliding mode
      * @param n_vf
@@ -337,6 +340,16 @@ inline int Room::get_nb_contractions() const{
 
 inline std::vector<bool> Room::get_vector_fields_zero(){
     return m_vector_field_zero;
+}
+
+inline int get_nb_dim_flat(const ibex::IntervalVector &iv){
+    int dim = iv.size();
+    int flat;
+    for(int i=0; i<dim; i++){
+        if(iv[i].is_degenerated())
+            flat++;
+    }
+    return flat;
 }
 
 }

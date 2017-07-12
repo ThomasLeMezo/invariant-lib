@@ -133,7 +133,7 @@ void Room::contract_vector_field(){
 
         for(const IntervalVector&v:m_vector_fields){
             IntervalVector product = hadamard_product(v, f->get_normal());
-            vector<short> where_zeros;
+            vector<int> where_zeros;
 
             if(zero.is_subset(product)){
                 d->push_back_collinear_vector_field(true);
@@ -247,8 +247,11 @@ void Room::contract_consistency(){
 
                     if(!in.is_empty()){
 
-                        if(type == MAZE_CONTRACTOR && door_in->is_collinear()[n_vf]){
-
+                        if(type == MAZE_CONTRACTOR && door_in->is_collinear()[n_vf]){ /// SLIDING MODE
+                            /// INPUT
+                            IntervalVector out_return(dim, Interval::EMPTY_SET);
+                            contract_sliding_mode2(n_vf, face_in, sens_in, out_return, in_result);
+                            out_results[n_vf][face_in][sens_in] |= out_return & door_in->get_output_private();
                         }
                         else{
                             for(int face_out=0; face_out<dim; face_out++){
@@ -272,36 +275,6 @@ void Room::contract_consistency(){
                                         in_result |= in_tmp;
                                         out_results[n_vf][face_out][sens_out] |= out_tmp;
                                     }
-
-                                }
-                            }
-                        }
-
-                                /// CASE SLIDING MODE
-                                if(type == MAZE_CONTRACTOR
-                                        && door_in->is_collinear()[n_vf]
-                                        && door_out->is_possible_out()[n_vf]
-                                        && !(f_out->get_position() & f_in->get_position()).is_empty()
-                                        ){
-
-                                    if(!(face_out == face_in && sens_in == sens_out)){
-                                        /// INPUT
-                                        IntervalVector in_return(dim), out_return(dim);
-                                        contract_sliding_mode_in(n_vf, face_in, sens_in, face_out, sens_out, out_return, in_return);
-                                        in_result |= in_return;
-                                        out_results[n_vf][face_out][sens_out] |= out_return & door_out->get_output_private();
-                                    }
-                                    else{
-                                        /// OUTPUT
-                                        IntervalVector out_tmp(dim);
-                                        contract_sliding_mode_out(n_vf, face_out, sens_out, out_tmp);
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp & door_out->get_output_private() & door_out->get_input_private();
-                                    }
-                                }
-                                /// CASE NO SLIDING MODE
-                                else{
-                                    // ToDo : improve propagation (avoid sliding same as contractor)
-
                                 }
                             }
                         }
@@ -316,6 +289,7 @@ void Room::contract_consistency(){
                                     door_in->set_input_private(in | in_result);
                             }
                         }
+
                     }
                 }
 
@@ -353,7 +327,6 @@ void Room::contract_consistency(){
             }
         }
     }
-
 }
 
 inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVector &out_return){
@@ -393,6 +366,89 @@ inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, Interv
     }
 }
 
+inline void Room::contract_sliding_mode2(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
+    Face* f_in = m_pave->get_faces()[face_in][sens_in];
+    Door* door_in = f_in->get_doors()[m_maze];
+    int dim = get_pave()->get_dim();
+    IntervalVector in(door_in->get_input_private());
+    in_return = IntervalVector(dim, Interval::EMPTY_SET);
+    out_return = IntervalVector(dim, Interval::EMPTY_SET);
+
+    vector<int> where_zeros = door_in->get_where_zeros(n_vf);
+
+    // Find adjacent paves
+    vector<Pave *> adjacent_paves;
+    m_maze->get_graph()->get_tree()->get_intersection_pave_outer(adjacent_paves, f_in->get_position());
+
+    // Remove pave not in the zero(s) direction
+    IntervalVector vec_field(dim, Interval::EMPTY_SET);
+    vector<Pave *> adjacent_paves_zeros;
+    for(Pave *pave_n:adjacent_paves){
+        IntervalVector inter = pave_n->get_position() & f_in->get_position();
+        bool is_zero = false;
+        int cpt_point = 0;
+        for(int &i:where_zeros){
+            if(inter[i].is_degenerated()){
+                is_zero = true;
+                cpt_point++;
+            }
+        }
+        if(is_zero && cpt_point != dim){
+            adjacent_paves_zeros.push_back(pave_n);
+            Room *room_n= pave_n->get_rooms()[m_maze];
+            vec_field |= room_n->get_one_vector_fields(n_vf);
+        }
+    }
+
+    // For each Pave, propagate OUT -> IN
+    for(Pave *pave_n:adjacent_paves_zeros){
+
+        for(int face_out=0; face_out<dim; face_out++){
+            for(int sens_out = 0; sens_out < 2; sens_out ++){
+                Face *f_out = pave_n->get_faces()[face_out][sens_out];
+                Door *d_out = f_out->get_doors()[m_maze];
+                if(!d_out->get_output().is_empty() && !d_out->get_input().is_empty()){
+
+                    // Test if the Face intersect another face of the neighbours ?
+                    IntervalVector own_surface(dim, Interval::EMPTY_SET);
+                    for(Face *face_out_n:f_out->get_neighbors()){
+                        Pave *pave_out_n = face_out_n->get_pave();
+
+                        // Test if the pave is a neighbour pave of the face_in
+                        bool is_neighbour_pave = false;
+                        for(Pave *pave_test:adjacent_paves_zeros){
+                            if(pave_test == pave_out_n){ // Pointer comparison (?working?)
+                                is_neighbour_pave = true;
+                                break;
+                            }
+                        }
+                        // Compute the shared surface with neighbours (outer approximation => union)
+                        if(is_neighbour_pave){
+                            IntervalVector *diff_list;
+                            int nb_boxes = f_out->get_position().diff(face_out_n->get_position(), diff_list);
+                            IntervalVector union_of_diff(dim, Interval::EMPTY_SET);
+                            for(int i=0; i<nb_boxes; i++)
+                                union_of_diff |= diff_list[i];
+                            own_surface &= union_of_diff;
+                        }
+                    }
+                    // Compute the propagation to the IN
+                    IntervalVector in_tmp_IN(in);
+                    IntervalVector out_tmp_IN(own_surface & d_out->get_output());
+                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
+
+                    IntervalVector in_tmp_OUT(own_surface & d_out->get_input());
+                    IntervalVector out_tmp_OUT(door_in->get_output_private());
+                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
+
+                    in_return |= in_tmp_IN;
+                    out_return |= out_tmp_OUT;
+                }
+            }
+        }
+    }
+}
+
 inline void Room::contract_sliding_mode_in(int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_return, IntervalVector &in_return){
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
@@ -414,6 +470,9 @@ inline void Room::contract_sliding_mode_in(int n_vf, int face_in, int sens_in, i
         Door *d_neighbour = f_neighbour->get_doors()[m_maze];
         Pave *p_neighbour = f_neighbour->get_pave();
         Room *r_neighbour = p_neighbour->get_rooms()[m_maze];
+
+
+
 
         max_impact_seg &= f_neighbour->get_position()[face_out];
 
