@@ -130,28 +130,12 @@ void Room::contract_vector_field(){
             // Note : synchronization will be proceed at the end of all contractors
             // to avoid unecessary lock
         }
-
-        for(const IntervalVector&v:m_vector_fields){
-            IntervalVector product = hadamard_product(v, f->get_normal());
-            vector<int> where_zeros;
-
-            if(zero.is_subset(product)){
-                d->push_back_collinear_vector_field(true);
-                for(int n_dim=0; n_dim<dim; n_dim++){
-                    if(Interval::ZERO.is_subset(product[n_dim])){
-                        where_zeros.push_back(n_dim);
-                    }
-                }
-            }
-            else
-                d->push_back_collinear_vector_field(false);
-            d->push_back_zeros_in_vector_field(where_zeros);
-        }
     }
 }
 
 void Room::eval_vector_field_possibility(){
     int dim = m_pave->get_dim();
+    IntervalVector zero(dim, Interval::ZERO);
 
     for(Face *f:m_pave->get_faces_vector()){
         Door *d = f->get_doors()[m_maze];
@@ -185,6 +169,23 @@ void Room::eval_vector_field_possibility(){
 
             // Note : synchronization will be proceed at the end of all contractors
             // to avoid unecessary lock
+
+            for(const IntervalVector&v:m_vector_fields){
+                IntervalVector product = hadamard_product(v, f->get_normal());
+                vector<int> where_zeros;
+
+                if(zero.is_subset(product)){
+                    d->push_back_collinear_vector_field(true);
+                    for(int n_dim=0; n_dim<dim; n_dim++){
+                        if(Interval::ZERO.is_subset(product[n_dim])){
+                            where_zeros.push_back(n_dim);
+                        }
+                    }
+                }
+                else
+                    d->push_back_collinear_vector_field(false);
+                d->push_back_zeros_in_vector_field(where_zeros);
+            }
         }
     }
 }
@@ -246,11 +247,10 @@ void Room::contract_consistency(){
                     const IntervalVector in(door_in->get_input_private());
 
                     if(!in.is_empty()){
-
                         if(type == MAZE_CONTRACTOR && door_in->is_collinear()[n_vf]){ /// SLIDING MODE
                             /// INPUT
                             IntervalVector out_return(dim, Interval::EMPTY_SET);
-                            contract_sliding_mode2(n_vf, face_in, sens_in, out_return, in_result);
+                            contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_result);
                             out_results[n_vf][face_in][sens_in] |= out_return & door_in->get_output_private();
                         }
                         else{
@@ -329,50 +329,18 @@ void Room::contract_consistency(){
     }
 }
 
-inline void Room::contract_sliding_mode_out(int n_vf, int face, int sens, IntervalVector &out_return){
-    Face* f_out = m_pave->get_faces()[face][sens];
-    Door* door_out = f_out->get_doors()[m_maze];
-    IntervalVector out(door_out->get_output_private());
-    int dim = m_pave->get_dim();
-
-    out_return = IntervalVector(m_pave->get_dim(), Interval::EMPTY_SET);
-    for(Face * f_neighbour:f_out->get_neighbors()){
-        Door *d_neighbour = f_neighbour->get_doors()[m_maze];
-        Pave *p_neighbour = f_neighbour->get_pave();
-        Room *r_neighbour = p_neighbour->get_rooms()[m_maze];
-
-        if(r_neighbour->get_one_vector_fields_zero(n_vf)){
-            // Case Zero
-            out_return |= d_neighbour->get_input() & out;
-        }
-        else{
-            // Compute contribution of each neighbours faces
-            for(int face_n=0; face_n<dim; face_n++){
-                for(int sens_n=0; sens<2; sens++){
-                    Face *f_in = p_neighbour->get_faces()[face_n][sens_n];
-                    Door *d_in = f_in->get_doors()[m_maze];
-                    IntervalVector in_tmp(d_in->get_input());
-
-                    if(!(face_n == face && sens_n == sens) && !in_tmp.is_empty()){
-                        IntervalVector vect_field_n = r_neighbour->get_one_vector_fields(n_vf);
-                        IntervalVector out_tmp(out);
-                        contract_flow(in_tmp, out_tmp, vect_field_n);
-                        out_return |= out_tmp;
-                    }
-                }
-            }
-        }
-
-    }
-}
-
-inline void Room::contract_sliding_mode2(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
+inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
     int dim = get_pave()->get_dim();
-    IntervalVector in(door_in->get_input_private());
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
+
+    IntervalVector test(2);
+    test[0] = Interval(-1.3125, -1.125);
+    test[1] = Interval(4.125, 4.3125);
+    if(get_pave()->get_position().is_subset(test))
+        cout << "test" << endl;
 
     vector<int> where_zeros = door_in->get_where_zeros(n_vf);
 
@@ -410,14 +378,14 @@ inline void Room::contract_sliding_mode2(int n_vf, int face_in, int sens_in, Int
                 if(!d_out->get_output().is_empty() && !d_out->get_input().is_empty()){
 
                     // Test if the Face intersect another face of the neighbours ?
-                    IntervalVector own_surface(dim, Interval::EMPTY_SET);
+                    IntervalVector own_surface(f_out->get_position());
                     for(Face *face_out_n:f_out->get_neighbors()){
                         Pave *pave_out_n = face_out_n->get_pave();
 
                         // Test if the pave is a neighbour pave of the face_in
                         bool is_neighbour_pave = false;
                         for(Pave *pave_test:adjacent_paves_zeros){
-                            if(pave_test == pave_out_n){ // Pointer comparison (?working?)
+                            if(pave_test->get_position() == pave_out_n->get_position()){ // Pointer comparison (?working?)
                                 is_neighbour_pave = true;
                                 break;
                             }
@@ -425,82 +393,31 @@ inline void Room::contract_sliding_mode2(int n_vf, int face_in, int sens_in, Int
                         // Compute the shared surface with neighbours (outer approximation => union)
                         if(is_neighbour_pave){
                             IntervalVector *diff_list;
-                            int nb_boxes = f_out->get_position().diff(face_out_n->get_position(), diff_list);
+                            int nb_boxes = f_out->get_position().diff(face_out_n->get_position() & f_out->get_position(), diff_list);
                             IntervalVector union_of_diff(dim, Interval::EMPTY_SET);
                             for(int i=0; i<nb_boxes; i++)
                                 union_of_diff |= diff_list[i];
                             own_surface &= union_of_diff;
                         }
                     }
+
                     // Compute the propagation to the IN
-                    IntervalVector in_tmp_IN(in);
-                    IntervalVector out_tmp_IN(own_surface & d_out->get_output());
-                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
+                    if(!own_surface.is_empty()){
+                        IntervalVector in_tmp_IN(door_in->get_input_private());
+                        IntervalVector out_tmp_IN(own_surface & d_out->get_output());
+                        contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
 
-                    IntervalVector in_tmp_OUT(own_surface & d_out->get_input());
-                    IntervalVector out_tmp_OUT(door_in->get_output_private());
-                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
+                        IntervalVector in_tmp_OUT(own_surface & d_out->get_input());
+                        IntervalVector out_tmp_OUT(door_in->get_output_private());
+                        contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
 
-                    in_return |= in_tmp_IN;
-                    out_return |= out_tmp_OUT;
+                        in_return |= in_tmp_IN;
+                        out_return |= out_tmp_OUT;
+                    }
                 }
             }
         }
     }
-}
-
-inline void Room::contract_sliding_mode_in(int n_vf, int face_in, int sens_in, int face_out, int sens_out, IntervalVector &out_return, IntervalVector &in_return){
-    Face* f_in = m_pave->get_faces()[face_in][sens_in];
-    Door* door_in = f_in->get_doors()[m_maze];
-    Face* f_out = m_pave->get_faces()[face_out][sens_out];
-    Door* door_out = f_out->get_doors()[m_maze];
-    int dim = m_pave->get_dim();
-    IntervalVector in(door_in->get_input_private());
-    in_return = IntervalVector(dim, Interval::EMPTY_SET);
-
-    // Own contribution
-    out_return = door_out->get_output_private();
-    IntervalVector in_tmp(in);
-    contract_flow(in_tmp, out_return, m_vector_fields[n_vf]);
-    in_return |= in_tmp;
-
-    // Neighbours contribution
-    Interval max_impact_seg;
-    for(Face * f_neighbour:f_in->get_neighbors()){
-        Door *d_neighbour = f_neighbour->get_doors()[m_maze];
-        Pave *p_neighbour = f_neighbour->get_pave();
-        Room *r_neighbour = p_neighbour->get_rooms()[m_maze];
-
-
-
-
-        max_impact_seg &= f_neighbour->get_position()[face_out];
-
-        if(r_neighbour->get_one_vector_fields_zero(n_vf)){
-            // Case Zero
-            in_return |= d_neighbour->get_output() & in;
-        }
-        else{
-            Face *f_out_neighbour = p_neighbour->get_faces()[face_out][sens_out];
-            Door *d_out_neighbour = f_out_neighbour->get_doors()[m_maze];
-            IntervalVector out_neighbour(d_out_neighbour->get_output());
-
-            IntervalVector in_tmp(in & d_neighbour->get_input());
-            IntervalVector vect_field_n = r_neighbour->get_one_vector_fields(n_vf);
-
-            contract_flow(in_tmp, out_neighbour, vect_field_n);
-            in_return |= in_tmp;
-        }
-    }
-
-    // Compute No impact zone
-    Interval no_impact_seg, ni1, ni2;
-    in[face_out].diff(max_impact_seg, ni1, ni2);
-    no_impact_seg = ni1 | ni2;
-    IntervalVector no_impact(in);
-    no_impact[face_out] = no_impact_seg;
-
-    in_return |= no_impact & in;
 }
 
 void Room::set_full_possible(){
@@ -532,10 +449,7 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     }
     c &= alpha*v;
 
-    //    const MazeSens sens = m_maze->get_sens();
-    //    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
     out &= c+in;
-    //    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
     in &= out-c;
 }
 
@@ -553,6 +467,7 @@ bool Room::contract(){
             if(m_pave->is_border()) // Case only the border is full
                 change = true;
         }
+
         if(m_first_contract){
             eval_vector_field_possibility();
             m_first_contract = false;

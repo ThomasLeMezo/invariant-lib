@@ -267,7 +267,7 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, double x, double y) const
     get_room_info(maze, pos);
 }
 
-void Vibes_Graph::draw_room_info(invariant::Maze *maze, const IntervalVector& position) const{
+void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& position) const{
     std::vector<invariant::Pave*> pave_list;
     m_graph->get_room_info(maze, position, pave_list);
     for(invariant::Pave* p:pave_list){
