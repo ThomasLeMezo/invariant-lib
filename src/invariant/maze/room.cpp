@@ -172,14 +172,15 @@ void Room::eval_vector_field_possibility(){
 
             for(const IntervalVector&v:m_vector_fields){
                 IntervalVector product = hadamard_product(v, f->get_normal());
-                vector<int> where_zeros;
+                vector<bool> where_zeros;
 
                 if(zero.is_subset(product)){
                     d->push_back_collinear_vector_field(true);
                     for(int n_dim=0; n_dim<dim; n_dim++){
-                        if(Interval::ZERO.is_subset(product[n_dim])){
-                            where_zeros.push_back(n_dim);
-                        }
+                        if(Interval::ZERO.is_subset(product[n_dim]))
+                            where_zeros.push_back(true);
+                        else
+                            where_zeros.push_back(false);
                     }
                 }
                 else
@@ -337,7 +338,7 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
 
-    vector<int> where_zeros = door_in->get_where_zeros(n_vf);
+    vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
 
     // Find adjacent paves
     vector<Pave *> adjacent_paves;
@@ -348,15 +349,14 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
     vector<Pave *> adjacent_paves_zeros;
     for(Pave *pave_n:adjacent_paves){
         IntervalVector inter = pave_n->get_position() & f_in->get_position();
-        bool is_zero = false;
-        int cpt_point = 0;
-        for(int &i:where_zeros){
-            if(inter[i].is_degenerated()){
-                is_zero = true;
-                cpt_point++;
+        bool add = true;
+        for(int i=0; i<dim; i++){
+            if(!where_zeros[i] && inter[i].is_degenerated()){
+                add = false;
+                break;
             }
         }
-        if(is_zero && cpt_point != dim){
+        if(add){
             adjacent_paves_zeros.push_back(pave_n);
             Room *room_n= pave_n->get_rooms()[m_maze];
             vec_field |= room_n->get_one_vector_fields(n_vf);
@@ -445,10 +445,13 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
     IntervalVector c(out-in);
     IntervalVector v(vect);
     Interval alpha(Interval::POS_REALS);
+    IntervalVector zero(in.size(), Interval::ZERO);
 
     for(int i=0; i<v.size(); i++){
-        alpha &= ((c[i]/(v[i] & Interval::POS_REALS)) & Interval::POS_REALS) | ((c[i]/(v[i] & Interval::NEG_REALS)) & Interval::POS_REALS);
+        if(!(c[i]==Interval::ZERO && Interval::ZERO.is_subset(v[i])))
+            alpha &= ((c[i]/(v[i] & Interval::POS_REALS)) & Interval::POS_REALS) | ((c[i]/(v[i] & Interval::NEG_REALS)) & Interval::POS_REALS);
     }
+
     c &= alpha*v;
 
     out &= c+in;
