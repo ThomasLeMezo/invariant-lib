@@ -363,6 +363,13 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
         }
     }
 
+    IntervalVector zero(dim, Interval::ZERO);
+    if(zero.is_subset(vec_field)){
+        in_return = door_in->get_input_private();
+        out_return = door_in->get_output_private();
+        return;
+    }
+
     // For each Pave, propagate OUT -> IN
     for(Pave *pave_n:adjacent_paves_zeros){
 
