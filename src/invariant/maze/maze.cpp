@@ -48,6 +48,10 @@ int Maze::contract(){
 //        Vibes_Graph v_graph("graph_debug", m_graph, this);
 //        v_graph.setProperties(0, 0, 512, 512);
 //        v_graph.show();
+//        IntervalVector test(2);
+//        test[0] = Interval(-2);
+//        test[1] = Interval(2);
+//        v_graph.show_room_info(this, test);
 //        cout << "debug graph_debug" << endl;
 //    }
 
@@ -91,11 +95,6 @@ int Maze::contract(){
                         bool change = false;
                         change |= r->contract();
 
-                        /// DEBUG
-//                        Vibes_Graph v_graph("graph", m_graph, this);
-//                        v_graph.setProperties(0, 0, 512, 512);
-//                        v_graph.show();
-
                         if(change){
                             // Analyse changes
                             vector<Room *> rooms_update;
@@ -114,6 +113,13 @@ int Maze::contract(){
                             #pragma omp atomic
                             nb_operations++;
                         }
+
+                        /// DEBUG
+//                        Vibes_Graph v_graph("graph", m_graph, this);
+//                        v_graph.setProperties(0, 0, 512, 512);
+//                        v_graph.show();
+//                        v_graph.show_room_info(this, test);
+
                         r->unlock_contraction();
                     }
 
