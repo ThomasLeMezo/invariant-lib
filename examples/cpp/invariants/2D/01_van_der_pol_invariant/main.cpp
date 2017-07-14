@@ -58,9 +58,10 @@ int main(int argc, char *argv[])
 //    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
 
-    position_info[0] = Interval(-2.95);
-    position_info[1] = Interval(0.55);
-    v_graph.get_room_info(&maze, position_info);
+    position_info[0] = Interval(-1.16);
+    position_info[1] = Interval(3.62);
+//    v_graph.get_room_info(&maze, position_info);
+    v_graph.show_room_info(&maze, position_info);
 
 //    position_info[0] = Interval(0);
 //    position_info[1] = Interval(-1);

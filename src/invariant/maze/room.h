@@ -223,24 +223,14 @@ protected:
     bool is_degenerated(const ibex::IntervalVector& iv);
 
     /**
-     * @brief Get the IN segment in the case of a sliding mode
+     * @brief Get door contraction in case of sliding mode (IN & OUT)
      * @param n_vf
      * @param face_in
      * @param sens_in
-     * @param face_out
-     * @param sens_out
      * @param out_return
      * @param in_return
      */
-    void contract_sliding_mode_in(int n_vf, int face_in, int sens_in, int face_out, int sens_out, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return);
-    /**
-     * @brief Get the OUT segment in the case of a sliding mode
-     * @param n_vf
-     * @param face
-     * @param sens
-     * @param out_tmp
-     */
-    void contract_sliding_mode_out(int n_vf, int face, int sens, ibex::IntervalVector &out_return);
+    void contract_sliding_mode(int n_vf, int face_in, int sens_in, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return);
 
 public:
     /**
@@ -276,11 +266,15 @@ protected:
 
     int     m_nb_contract = 0;
 
+    bool m_debug_room = false;
+
 };
 }
 
 namespace invariant {
 std::ostream& operator<< (std::ostream& stream, const Room& r);
+
+int get_nb_dim_flat(const ibex::IntervalVector &iv);
 
 inline Pave* Room::get_pave() const{
     return m_pave;

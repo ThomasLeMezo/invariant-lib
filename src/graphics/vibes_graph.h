@@ -24,7 +24,7 @@ public:
     void get_room_info(invariant::Maze *maze, const ibex::IntervalVector& position) const;
     void get_room_info(invariant::Maze *maze, double x, double y) const;
 
-    void draw_room_info(invariant::Maze *maze, const ibex::IntervalVector &position) const;
+    void show_room_info(invariant::Maze *maze, const ibex::IntervalVector &position) const;
 
 private:
     void show_graph() const;

@@ -48,6 +48,7 @@ public:
      * @return an interval vector of the position
      */
     const ibex::IntervalVector &get_position() const;
+    const ibex::IntervalVector get_position_copy() const;
 
     /**
      * @brief Return the array of an array of Faces of the Pave
