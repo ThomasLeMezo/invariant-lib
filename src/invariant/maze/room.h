@@ -274,6 +274,8 @@ protected:
 namespace invariant {
 std::ostream& operator<< (std::ostream& stream, const Room& r);
 
+int get_nb_dim_flat(const ibex::IntervalVector &iv);
+
 inline Pave* Room::get_pave() const{
     return m_pave;
 }
@@ -329,16 +331,6 @@ inline int Room::get_nb_contractions() const{
 
 inline std::vector<bool> Room::get_vector_fields_zero(){
     return m_vector_field_zero;
-}
-
-inline int get_nb_dim_flat(const ibex::IntervalVector &iv){
-    int dim = iv.size();
-    int flat;
-    for(int i=0; i<dim; i++){
-        if(iv[i].is_degenerated())
-            flat++;
-    }
-    return flat;
 }
 
 }

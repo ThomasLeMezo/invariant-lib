@@ -43,7 +43,6 @@ public:
      * @return an interval vector of the position
      */
     const ibex::IntervalVector &get_position() const;
-    const ibex::IntervalVector get_position_copy() const;
 
     /**
      * @brief Face serialization
@@ -164,10 +163,6 @@ std::ostream& operator<< (std::ostream& stream, const std::vector<Face*> &l);
 
 namespace invariant{
 inline const ibex::IntervalVector& Face::get_position() const{
-    return m_position;
-}
-
-inline const ibex::IntervalVector Face::get_position_copy() const{
     return m_position;
 }
 

@@ -374,7 +374,7 @@ void Room:: contract_consistency(){
     }
 }
 
-inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
+void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
     int dim = get_pave()->get_dim();
@@ -390,24 +390,17 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
     // Remove pave not in the zero(s) direction
     IntervalVector vec_field(dim, Interval::EMPTY_SET);
     vector<Pave *> adjacent_paves_zeros;
+    IntervalVector pave_extrude(f_in->get_position());
+    for(int id_zero=0; id_zero<dim; id_zero++){
+        if(where_zeros[id_zero])
+            pave_extrude[id_zero] = Interval::ALL_REALS;
+    }
+
     for(Pave *pave_n:adjacent_paves){
         // Find adjacent paves that extrude this pave in the directions of zeros
-        bool add = false;
-        IntervalVector pave_extrude(f_in->get_position());
-        int nb_zeros = 0;
-        for(int i=0; i<dim; i++){
-            if(where_zeros[i]){
-                pave_extrude[i] = Interval::ALL_REALS;
-                nb_zeros++;
-            }
-        }
         IntervalVector inter_extrude = pave_n->get_position() & pave_extrude;
 
-        if(get_nb_dim_flat(inter_extrude)<=min(0,(dim-nb_zeros)-1)){
-            add = true;
-        }
-
-        if(add){
+        if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){
             adjacent_paves_zeros.push_back(pave_n);
             Room *room_n= pave_n->get_rooms()[m_maze];
             vec_field |= room_n->get_one_vector_fields(n_vf);
@@ -660,7 +653,7 @@ bool Room::is_degenerated(const IntervalVector& iv){
     int compt = 0;
     int dim = m_maze->get_graph()->dim();
     for(int i=0; i<dim; i++){
-        if(iv[i].is_degenerated()){
+        if(iv[i].is_degenerated() && !iv[i].is_unbounded()){
             compt++;
         }
         if(compt == 2){
@@ -676,6 +669,16 @@ const ibex::IntervalVector Room::get_one_vector_fields(int n_vf) const{
 
 const bool Room::get_one_vector_fields_zero(int n_vf) const{
     return m_vector_field_zero[n_vf];
+}
+
+int get_nb_dim_flat(const ibex::IntervalVector &iv){
+    int dim = iv.size();
+    int flat=0;
+    for(int i=0; i<dim; i++){
+        if(iv[i].is_degenerated() && !iv[i].is_unbounded())
+            flat++;
+    }
+    return flat;
 }
 
 }
