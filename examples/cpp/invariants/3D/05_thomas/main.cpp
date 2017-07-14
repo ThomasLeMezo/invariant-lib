@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    Interval b = Interval(0.32899);
-//    Interval b = Interval(0.208186);
+//    Interval b = Interval(0.32899);
+    Interval b = Interval(0.208186);
 
     ibex::Function f(x, y, z, Return(sin(y)-b*x,
                                      sin(z)-b*y,
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<23; i++){
         cout << "-----" << i << "-----" << endl;
         graph.bisect();
         cout << "nb contractions = " << maze.contract() << " - ";

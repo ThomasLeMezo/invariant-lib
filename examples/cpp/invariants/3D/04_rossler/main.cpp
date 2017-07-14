@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
     ibex::Variable x, y, z;
 
     IntervalVector space(3);
-    space[0] = Interval(-100, 100);
-    space[1] = Interval(-100, 100);
-    space[2] = Interval(-100, 100);
+    space[0] = Interval(-15, 15);
+    space[1] = Interval(-15, 15);
+    space[2] = Interval(-1, 50);
 
     // ****** Domain ******* //
     Graph graph(space);
@@ -32,11 +32,13 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
+    // a=0.432, b=2 and c=4
+    // a=0.2, b=0.2, c=8.0
     Interval a = Interval(0.2);
     Interval b = Interval(0.2);
     Interval c = Interval(5.7);
 
-    ibex::Function f(x, y, z, Return(-x-z,
+    ibex::Function f(x, y, z, Return(-(y+z),
                                      x+a*y,
                                      b+z*(x-c)));
     Dynamics_Function dyn(&f);
@@ -56,7 +58,7 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-    Vtk_Graph vtk_graph("lorenz", &graph, true);
+    Vtk_Graph vtk_graph("rossler", &graph, true);
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 

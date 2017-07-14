@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
 
     ibex::Function f(x, y, z, Return(y*(z-1+pow(x,2))+gamma*x,
-                                     x*(2*z+1-pow(x,2))+gamma*y,
+                                     x*(3.0*z+1-pow(x,2))+gamma*y,
                                      -2*z*(alpha+x*y)));
     Dynamics_Function dyn(&f);
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         cout << "-----" << i << "-----" << endl;
         graph.bisect();
         cout << "nb contractions = " << maze.contract() << " - ";

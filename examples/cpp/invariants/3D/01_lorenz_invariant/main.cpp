@@ -6,10 +6,11 @@
 
 #include <iostream>
 #include "vibes/vibes.h"
-#include <cstring>
 #include "graphiz_graph.h"
 #include <omp.h>
 #include "vtk_graph.h"
+
+#include <string>
 
 using namespace std;
 using namespace ibex;
@@ -51,6 +52,7 @@ int main(int argc, char *argv[])
 
     // ******* Maze ********* //
     Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
+    Vtk_Graph vtk_graph("lorenz", &graph, false);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -59,25 +61,29 @@ int main(int argc, char *argv[])
         graph.bisect();
         cout << "nb contractions = " << maze.contract() << " - ";
         cout << "graph size = " << graph.size() << endl;
+        if(i>14)
+            vtk_graph.show_maze(&maze, std::to_string(i));
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << graph << endl;
 
-    Vtk_Graph vtk_graph("lorenz", &graph, true);
+
+//    Vtk_Graph vtk_graph("lorenz", &graph, false);
 //    vtk_graph.show_graph();
-//    vtk_graph.show_maze(&maze);
+
 
 //    vector<Pave*> pave_list;
-    IntervalVector position_info(3);
-    position_info[0] = Interval(-30.0);
-    position_info[1] = Interval(-2.5);
-    position_info[2] = Interval(28.0);
+//    IntervalVector position_info(3);
+//    position_info[0] = Interval(-30.0);
+//    position_info[1] = Interval(-2.5);
+//    position_info[2] = Interval(28.0);
 //    graph.get_room_info(&maze, position_info, pave_list);
 
-    position_info[0] = Interval(29.5);
-    position_info[1] = Interval(2.5);
-    position_info[2] = Interval(27.5, 28.4);
+//    IntervalVector position_info(3);
+//    position_info[0] = Interval(29.5);
+//    position_info[1] = Interval(2.5);
+//    position_info[2] = Interval(27.5, 28.4);
 //    graph.get_room_info(&maze, position_info, pave_list);
 //    vtk_graph.show_room_info(&maze, position_info);
 }
