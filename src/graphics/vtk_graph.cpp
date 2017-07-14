@@ -73,6 +73,9 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
         double vec_field_point[3][2] = {{vec_field[0].lb(), vec_field[0].ub()},
                                         {vec_field[1].lb(), vec_field[1].ub()},
                                         {vec_field[2].lb(), vec_field[2].ub()}};
+        field->InsertNextTuple3(vec_field[0].mid(),
+                                vec_field[1].mid(),
+                                vec_field[2].mid());
         for(int x=0; x<2; x++){
             for(int y=0; y<2; y++){
                 for(int z=0; z<2; z++){

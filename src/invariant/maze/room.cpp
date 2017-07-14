@@ -86,11 +86,11 @@ void Room::set_full(){
 
 void Room::contract_vector_field(){
     // Test
-//    IntervalVector test(2);
-//    test[0] = Interval(-2.25, -1.5);
-//    test[1] = Interval(-3, -1.5);
-//    if(m_pave->get_position() == test)
-//        cout << "TEST" << endl;
+    //    IntervalVector test(2);
+    //    test[0] = Interval(-2.25, -1.5);
+    //    test[1] = Interval(-3, -1.5);
+    //    if(m_pave->get_position() == test)
+    //        cout << "TEST" << endl;
 
     int dim = m_pave->get_dim();
     MazeSens sens = m_maze->get_sens();
@@ -202,14 +202,14 @@ void Room:: contract_consistency(){
 
     m_nb_contract++;
 
-//    IntervalVector test(2);
-//    test[0] = Interval(-1.17189, -1.124);
-//    test[1] = Interval(3.5624, 3.65626);
-//    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
-//        cout << endl;
-//        cout << "DEBUG ROOM : " << m_pave->get_position() << endl;
-//        m_debug_room = true;
-//    }
+    //    IntervalVector test(2);
+    //    test[0] = Interval(-1.17189, -1.124);
+    //    test[1] = Interval(3.5624, 3.65626);
+    //    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
+    //        cout << endl;
+    //        cout << "DEBUG ROOM : " << m_pave->get_position() << endl;
+    //        m_debug_room = true;
+    //    }
 
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
@@ -386,11 +386,13 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
     // Find adjacent paves
     vector<Pave *> adjacent_paves;
     m_maze->get_graph()->get_tree()->get_intersection_pave_outer(adjacent_paves, f_in->get_position());
+    //    m_maze->get_graph()->get_tree()->get_intersection_pave_outer(adjacent_paves, m_pave->get_position());
 
     // Remove pave not in the zero(s) direction
     IntervalVector vec_field(dim, Interval::EMPTY_SET);
     vector<Pave *> adjacent_paves_zeros;
     IntervalVector pave_extrude(f_in->get_position());
+    //    IntervalVector pave_extrude(m_pave->get_position());
     for(int id_zero=0; id_zero<dim; id_zero++){
         if(where_zeros[id_zero])
             pave_extrude[id_zero] = Interval::ALL_REALS;
@@ -465,21 +467,25 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                             in_return |= in_tmp_IN ;
                         }
 
-                        IntervalVector in_tmp_OUT(own_surface);
-                        if(local_pave)
-                            in_tmp_OUT &= d_out->get_input_private();
-                        else
-                            in_tmp_OUT &= d_out->get_input();
-                        IntervalVector out_tmp_OUT(door_in->get_output_private());
-                        if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
-                            contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
-                            out_return |= out_tmp_OUT;
+                        if(!in_tmp_IN.is_empty()){
+                            IntervalVector in_tmp_OUT(own_surface);
+                            if(local_pave)
+                                in_tmp_OUT &= d_out->get_input_private();
+                            else
+                                in_tmp_OUT &= d_out->get_input();
+                            IntervalVector out_tmp_OUT(door_in->get_output_private());
+                            if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
+                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
+                                out_return |= out_tmp_OUT;
+                            }
                         }
                     }
                 }
             }
         }
     }
+//    if(out_return.is_empty())
+//        in_return.set_empty();
 }
 
 void Room::set_full_possible(){
