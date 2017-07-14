@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     invariant::Domain dom(&graph);
 
     dom.set_border_path_in(false);
-    dom.set_border_path_out(true);
+    dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<6; i++){
+    for(int i=0; i<10; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
@@ -58,10 +58,10 @@ int main(int argc, char *argv[])
 //    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
 
-    position_info[0] = Interval(-2);
-    position_info[1] = Interval(1);
+    position_info[0] = Interval(-1.16);
+    position_info[1] = Interval(3.62);
 //    v_graph.get_room_info(&maze, position_info);
-//    v_graph.show_room_info(&maze, position_info);
+    v_graph.show_room_info(&maze, position_info);
 
 //    position_info[0] = Interval(0);
 //    position_info[1] = Interval(-1);

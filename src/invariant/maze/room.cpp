@@ -86,11 +86,11 @@ void Room::set_full(){
 
 void Room::contract_vector_field(){
     // Test
-    IntervalVector test(2);
-    test[0] = Interval(-2.25, -1.5);
-    test[1] = Interval(-3, -1.5);
-    if(m_pave->get_position() == test)
-        cout << "TEST" << endl;
+//    IntervalVector test(2);
+//    test[0] = Interval(-2.25, -1.5);
+//    test[1] = Interval(-3, -1.5);
+//    if(m_pave->get_position() == test)
+//        cout << "TEST" << endl;
 
     int dim = m_pave->get_dim();
     MazeSens sens = m_maze->get_sens();
@@ -191,7 +191,7 @@ void Room::eval_vector_field_possibility(){
     }
 }
 
-void Room::contract_consistency(){
+void Room:: contract_consistency(){
     const int dim = m_pave->get_dim();
 
     IntervalVector empty = IntervalVector(dim, Interval::EMPTY_SET);
@@ -202,11 +202,14 @@ void Room::contract_consistency(){
 
     m_nb_contract++;
 
-    //    IntervalVector test(2);
-    //    test[0] = Interval(-3, 0);
-    //    test[1] = Interval(0.05, 3.1);
-    //    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR)
-    //        cout << "DEBUG" << endl;
+//    IntervalVector test(2);
+//    test[0] = Interval(-1.17189, -1.124);
+//    test[1] = Interval(3.5624, 3.65626);
+//    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
+//        cout << endl;
+//        cout << "DEBUG ROOM : " << m_pave->get_position() << endl;
+//        m_debug_room = true;
+//    }
 
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
@@ -388,14 +391,22 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
     IntervalVector vec_field(dim, Interval::EMPTY_SET);
     vector<Pave *> adjacent_paves_zeros;
     for(Pave *pave_n:adjacent_paves){
-        IntervalVector inter = pave_n->get_position() & f_in->get_position();
-        bool add = true;
+        // Find adjacent paves that extrude this pave in the directions of zeros
+        bool add = false;
+        IntervalVector pave_extrude(f_in->get_position());
+        int nb_zeros = 0;
         for(int i=0; i<dim; i++){
-            if(!where_zeros[i] && inter[i].is_degenerated()){
-                add = false;
-                break;
+            if(where_zeros[i]){
+                pave_extrude[i] = Interval::ALL_REALS;
+                nb_zeros++;
             }
         }
+        IntervalVector inter_extrude = pave_n->get_position() & pave_extrude;
+
+        if(get_nb_dim_flat(inter_extrude)<=min(0,(dim-nb_zeros)-1)){
+            add = true;
+        }
+
         if(add){
             adjacent_paves_zeros.push_back(pave_n);
             Room *room_n= pave_n->get_rooms()[m_maze];
@@ -412,11 +423,15 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
 
     // For each Pave, propagate OUT -> IN
     for(Pave *pave_n:adjacent_paves_zeros){
+        bool local_pave = false;
+        if(pave_n->get_position() == m_pave->get_position())
+            local_pave = true;
 
         for(int face_out=0; face_out<dim; face_out++){
             for(int sens_out = 0; sens_out < 2; sens_out ++){
                 Face *f_out = pave_n->get_faces()[face_out][sens_out];
                 Door *d_out = f_out->get_doors()[m_maze];
+
                 if(!(d_out->get_output().is_empty() && d_out->get_input().is_empty())){
 
                     // Test if the Face intersect another face of the neighbours ?
@@ -446,15 +461,27 @@ inline void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, Inte
                     // Compute the propagation to the IN
                     if(!own_surface.is_empty()){
                         IntervalVector in_tmp_IN(door_in->get_input_private());
-                        IntervalVector out_tmp_IN(own_surface & d_out->get_output());
-                        contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
+                        IntervalVector out_tmp_IN(own_surface);
+                        if(local_pave)
+                            out_tmp_IN &= d_out->get_output_private();
+                        else
+                            out_tmp_IN &= d_out->get_output();
 
-                        IntervalVector in_tmp_OUT(own_surface & d_out->get_input());
+                        if(!in_tmp_IN.is_empty() && !out_tmp_IN.is_empty()){
+                            contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
+                            in_return |= in_tmp_IN ;
+                        }
+
+                        IntervalVector in_tmp_OUT(own_surface);
+                        if(local_pave)
+                            in_tmp_OUT &= d_out->get_input_private();
+                        else
+                            in_tmp_OUT &= d_out->get_input();
                         IntervalVector out_tmp_OUT(door_in->get_output_private());
-                        contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
-
-                        in_return |= in_tmp_IN ;
-                        out_return |= out_tmp_OUT /*| in_tmp_IN*/;
+                        if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
+                            contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
+                            out_return |= out_tmp_OUT;
+                        }
                     }
                 }
             }
@@ -490,6 +517,8 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
         if(!(c[i]==Interval::ZERO && Interval::ZERO.is_subset(v[i])))
             alpha &= ((c[i]/(v[i] & Interval::POS_REALS)) & Interval::POS_REALS) | ((c[i]/(v[i] & Interval::NEG_REALS)) & Interval::POS_REALS);
     }
+    if(alpha==Interval::ZERO)
+        alpha.set_empty();
 
     c &= alpha*v;
     out &= c+in;

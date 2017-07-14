@@ -266,6 +266,8 @@ protected:
 
     int     m_nb_contract = 0;
 
+    bool m_debug_room = false;
+
 };
 }
 

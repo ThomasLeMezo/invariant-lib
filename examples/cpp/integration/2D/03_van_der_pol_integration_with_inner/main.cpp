@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
     v_graph.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-1.13);
-    position_info[1] = Interval(3.25, 3.5);
+    position_info[0] = Interval(-1.2, -1.16);
+    position_info[1] = Interval(3.62);
 //    v_graph.get_room_info(&maze_inner, position_info);
 //    v_graph.show_room_info(&maze_inner, position_info);
 
