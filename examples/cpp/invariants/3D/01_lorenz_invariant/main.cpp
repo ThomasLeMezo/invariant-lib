@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     IntervalVector space(3);
     space[0] = Interval(-20,20);
     space[1] = Interval(-30,30);
-    space[2] = Interval(1,51);
+    space[2] = Interval(0.001,51);
 
     //    space[0] = Interval(-3,13);
     //    space[1] = Interval(-1,15);

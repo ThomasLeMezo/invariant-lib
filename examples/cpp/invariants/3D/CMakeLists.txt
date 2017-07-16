@@ -8,5 +8,5 @@ add_subdirectory(03_rabinovich_fabrikant)
 add_subdirectory(04_rossler)
 add_subdirectory(05_thomas)
 add_subdirectory(06_corkscrew)
-
+add_subdirectory(07_torus)
 
