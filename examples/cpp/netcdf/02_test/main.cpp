@@ -44,9 +44,11 @@ int main(int argc, char *argv[])
     // ******* Maze *********
     Maze maze(&dom, &pm3d, MAZE_FWD, MAZE_PROPAGATOR);
 
+    cout << "Domain = " << search_space << endl;
+
     double max_diam = search_space.max_diam();
     int iterations_max = 4*(ceil(log(max_diam)/log(2)));
-    iterations_max = 20;
+    iterations_max = 5;
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in

@@ -15,5 +15,5 @@ cd $INVARIANTLIB_DIR
 mkdir build/build-release -p
 cd build/build-release
 cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DVTK_ROOT=${HOME}/vtk -DCMAKE_BUILD_TYPE=RELEASE $INVARIANTLIB_DIR
-make -j
+make -j4
 cd ..

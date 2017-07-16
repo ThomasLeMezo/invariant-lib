@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
     ibex::Variable x, y, z;
 
     IntervalVector space(3);
-    space[0] = Interval(-10, 10);
-    space[1] = Interval(-10, 10);
-    space[2] = Interval(-10, 10);
+    space[0] = Interval(-4, 2);
+    space[1] = Interval(-2, 2);
+    space[2] = Interval(-2, 3);
 
     // ****** Domain ******* //
     Graph graph(space);
@@ -32,12 +32,16 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-//    Interval b = Interval(0.32899);
-    Interval b = Interval(0.208186);
+//    Interval gamma = Interval(0.87);
+//    Interval alpha = Interval(1.1);
 
-    ibex::Function f(x, y, z, Return(sin(y)-b*x,
-                                     sin(z)-b*y,
-                                     sin(x)-b*z));
+    Interval gamma = Interval(0.1);
+    Interval alpha = Interval(0.14);
+
+
+    ibex::Function f(x, y, z, Return(y*(z-1+pow(x,2))+gamma*x,
+                                     x*(3.0*z+1-pow(x,2))+gamma*y,
+                                     -2*z*(alpha+x*y)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
@@ -55,8 +59,8 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-    Vtk_Graph vtk_graph("thomas", &graph, true);
-//    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("rabinovich-fabrikant", &graph, true);
+    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 
     //    IntervalVector position_info(2);

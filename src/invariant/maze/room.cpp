@@ -202,14 +202,15 @@ void Room:: contract_consistency(){
 
     m_nb_contract++;
 
-    //    IntervalVector test(2);
-    //    test[0] = Interval(-1.17189, -1.124);
-    //    test[1] = Interval(3.5624, 3.65626);
-    //    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
-    //        cout << endl;
-    //        cout << "DEBUG ROOM : " << m_pave->get_position() << endl;
-    //        m_debug_room = true;
-    //    }
+//    IntervalVector test(2);
+//    test[0] = Interval(-2.0626, -1.875);
+//    test[1] = Interval(-3.1, -2.80937);
+//    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
+//        cout << endl;
+//        cout << "DEBUG ROOM : " << m_pave->get_position() << " Debug ID = " << m_time_debug << endl;
+//        m_debug_room = true;
+//        m_time_debug++;
+//    }
 
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
@@ -258,28 +259,27 @@ void Room:: contract_consistency(){
                 collinear.push_back(collinear_tmp);
             }
 
-
+            // ************* SLIDING MODE *************
             for(int face_in=0; face_in<dim; face_in++){
                 for(int sens_in = 0; sens_in < 2; sens_in++){
-
-                    Face* f_in = m_pave->get_faces()[face_in][sens_in];
-                    Door* door_in = f_in->get_doors()[m_maze];
-                    const IntervalVector in(door_in->get_input_private());
-
-                    // ************* SLIDING MODE *************
                     if(type == MAZE_CONTRACTOR && collinear[face_in][sens_in]){
+                        Face* f_in = m_pave->get_faces()[face_in][sens_in];
+                        Door* door_in = f_in->get_doors()[m_maze];
+
                         /// INPUT
                         IntervalVector out_return(dim, Interval::EMPTY_SET);
-                        IntervalVector in_result(dim, Interval::EMPTY_SET);
-                        contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_result);
+                        IntervalVector in_return(dim, Interval::EMPTY_SET);
+                        contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_return);
                         out_results[n_vf][face_in][sens_in] = out_return;
 
                         if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
-                            if(is_degenerated(in_result))
-                                in_result.set_empty();
-                            door_in->set_input_private(in_result);
+                            door_in->set_input_private(in_return); // Write input
+                        }
+                        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+                            door_in->set_output_private(out_return); // Write output
                         }
 
+                        /// Impact on other faces
                         for(int face_out=0; face_out<dim; face_out++){
                             for(int sens_out = 0; sens_out < 2; sens_out++){
                                 if(!(face_out == face_in && sens_in == sens_out)){
@@ -295,8 +295,18 @@ void Room:: contract_consistency(){
                             }
                         }
                     }
-                    // ************* STANDARD MODE *************
-                    else{
+                }
+            }
+
+            // ************* STANDARD MODE *************
+            for(int face_in=0; face_in<dim; face_in++){
+                for(int sens_in = 0; sens_in < 2; sens_in++){
+                    if(!(type == MAZE_CONTRACTOR && collinear[face_in][sens_in])){
+
+                        Face* f_in = m_pave->get_faces()[face_in][sens_in];
+                        Door* door_in = f_in->get_doors()[m_maze];
+                        const IntervalVector in(door_in->get_input_private());
+
                         if(!in.is_empty()){
                             IntervalVector in_result(dim, Interval::EMPTY_SET);
                             for(int face_out=0; face_out<dim; face_out++){
@@ -312,21 +322,17 @@ void Room:: contract_consistency(){
                                         else
                                             out_return = f_out->get_position();
 
-                                        if(!out_return.is_empty())
+                                        if(!out_return.is_empty() && !in_tmp.is_empty()){
                                             this->contract_flow(in_tmp, out_return, vec_field);
-                                        else
-                                            in_tmp.set_empty();
 
-                                        in_result |= in_tmp;
-                                        if(type == MAZE_PROPAGATOR || !collinear[face_out][sens_out])
-                                            out_results[n_vf][face_out][sens_out] |= out_return;
+                                            in_result |= in_tmp;
+                                            if(type == MAZE_PROPAGATOR || !collinear[face_out][sens_out])
+                                                out_results[n_vf][face_out][sens_out] |= out_return;
+                                        }
                                     }
                                 }
                             }
                             if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
-                                /// TEST ?
-                                if(is_degenerated(in_result))
-                                    in_result.set_empty();
                                 if(type == MAZE_CONTRACTOR)
                                     door_in->set_input_private(in & in_result);
                                 else{
@@ -357,13 +363,9 @@ void Room:: contract_consistency(){
                         door_out_iv &= out_results[n_vf][face_out][sens_out];
                     }
                 }
-                if(!one_possible){
+                if(!one_possible){ // For Kernel
                     door_out_iv.set_empty();
                 }
-
-                /// TEST ?
-                if(is_degenerated(door_out_iv))
-                    door_out_iv.set_empty();
 
                 if(type == MAZE_CONTRACTOR)
                     door_out->set_output_private(door_out_iv & door_out->get_output_private());
@@ -484,8 +486,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
             }
         }
     }
-//    if(out_return.is_empty())
-//        in_return.set_empty();
+    //    if(out_return.is_empty())
+    //        in_return.set_empty();
 }
 
 void Room::set_full_possible(){
@@ -655,19 +657,19 @@ void Room::synchronize(){
     }
 }
 
-bool Room::is_degenerated(const IntervalVector& iv){
-    int compt = 0;
-    int dim = m_maze->get_graph()->dim();
-    for(int i=0; i<dim; i++){
-        if(iv[i].is_degenerated() && !iv[i].is_unbounded()){
-            compt++;
-        }
-        if(compt == 2){
-            return true;
-        }
-    }
-    return false;
-}
+//bool Room::is_degenerated(const IntervalVector& iv){
+//    int compt = 0;
+//    int dim = m_maze->get_graph()->dim();
+//    for(int i=0; i<dim; i++){
+//        if(iv[i].is_degenerated() && !iv[i].is_unbounded()){
+//            compt++;
+//        }
+//        if(compt == 2){
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 const ibex::IntervalVector Room::get_one_vector_fields(int n_vf) const{
     return m_vector_fields[n_vf];

@@ -220,7 +220,7 @@ protected:
      * @param iv
      * @return
      */
-    bool is_degenerated(const ibex::IntervalVector& iv);
+//    bool is_degenerated(const ibex::IntervalVector& iv);
 
     /**
      * @brief Get door contraction in case of sliding mode (IN & OUT)
@@ -267,6 +267,7 @@ protected:
     int     m_nb_contract = 0;
 
     bool m_debug_room = false;
+    int m_time_debug = 0;
 
 };
 }
