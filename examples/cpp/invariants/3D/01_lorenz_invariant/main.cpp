@@ -21,13 +21,13 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = Interval(-30,30);
-    space[1] = Interval(-20,20);
-    space[2] = Interval(0,50);
+    space[0] = Interval(-20,20);
+    space[1] = Interval(-30,30);
+    space[2] = Interval(1,51);
 
-//    space[0] = Interval(-3,13);
-//    space[1] = Interval(-1,15);
-//    space[2] = Interval(-1, 21);
+    //    space[0] = Interval(-3,13);
+    //    space[1] = Interval(-1,15);
+    //    space[2] = Interval(-1, 21);
 
     // ****** Domain ******* //
     Graph graph(space);
@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
     Interval sigma = Interval(10.0);
     Interval beta = Interval(8.0/3.0);
 
-//    Interval rho = Interval(13.0);
-//    Interval sigma = Interval(10.0);
-//    Interval beta = Interval(8.0/3.0);
+    //    Interval rho = Interval(13.0);
+    //    Interval sigma = Interval(10.0);
+    //    Interval beta = Interval(8.0/3.0);
 
     ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
                                         x1*(rho - x3) - x2,
@@ -52,38 +52,28 @@ int main(int argc, char *argv[])
 
     // ******* Maze ********* //
     Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
-    Vtk_Graph vtk_graph("lorenz", &graph, false);
+    Vtk_Graph vtk_graph("lorenz", &graph, true);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<18; i++){
+    for(int i=0; i<20; i++){
         cout << "-----" << i << "-----" << endl;
         graph.bisect();
-        cout << "nb contractions = " << maze.contract() << " - ";
-        cout << "graph size = " << graph.size() << endl;
-        if(i>14)
-            vtk_graph.show_maze(&maze, std::to_string(i));
+        cout << "nb contractions = " << maze.contract() << " - " << "graph size = " << graph.size() << endl;
+        //        vtk_graph.show_maze(&maze, std::to_string(i));
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
-
     cout << graph << endl;
 
+    vtk_graph.show_graph();
+    vtk_graph.show_maze(&maze);
 
-//    Vtk_Graph vtk_graph("lorenz", &graph, false);
-//    vtk_graph.show_graph();
-
-
-//    vector<Pave*> pave_list;
-//    IntervalVector position_info(3);
-//    position_info[0] = Interval(-30.0);
-//    position_info[1] = Interval(-2.5);
-//    position_info[2] = Interval(28.0);
-//    graph.get_room_info(&maze, position_info, pave_list);
-
-//    IntervalVector position_info(3);
-//    position_info[0] = Interval(29.5);
-//    position_info[1] = Interval(2.5);
-//    position_info[2] = Interval(27.5, 28.4);
-//    graph.get_room_info(&maze, position_info, pave_list);
+    IntervalVector position_info(3);
+    position_info[0] = Interval(0.5);
+    position_info[1] = Interval(0.5);
+    position_info[2] = Interval(0.5);
 //    vtk_graph.show_room_info(&maze, position_info);
+    //        vector<Pave*> pave_list;
+    //        graph.get_room_info(&maze, position_info, pave_list);
+
 }

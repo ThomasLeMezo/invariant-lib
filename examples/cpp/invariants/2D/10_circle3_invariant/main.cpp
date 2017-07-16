@@ -19,23 +19,19 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-3,3);
-    space[1] = Interval(-3,3.1);
+    space[0] = Interval(-4,4);
+    space[1] = Interval(-4,4);
 
     // ****** Domain ******* //
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(0.5, 2));
-    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep(&s);
-
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x1, x2, Return(x2,
-                                    (8.0/25.0*pow(x1,5)-4.0/3.0*pow(x1,3)+4.0/5.0*x1)));
+    ibex::Function f(x1, x2, Return(x1-x2-pow(x1,3),
+                                    x1-pow(x1,2)*x2));
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //

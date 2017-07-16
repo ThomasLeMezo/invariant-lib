@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CYCLE_Solver>
+    <x1>x1-x2-x1^3</x1>
+    <x2>x1-x1^2*x2</x2>
+    <x1min>-4</x1min>
+    <x1max>4</x1max>
+    <x2min>-4</x2min>
+    <x2max>4</x2max>
+    <iterations>10</iterations>
+    <removing>false</removing>
+    <stop>false</stop>
+    <negative>false</negative>
+    <positive>false</positive>
+</CYCLE_Solver>
