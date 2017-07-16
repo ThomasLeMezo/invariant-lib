@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     x1_c = -0.27;
     x2_c = 1.9;
     x3_c = 0;
-    r = 0.1;
+    r = 1.0;
 
     Function f_sep_outer(x1, x2, x3, pow(x1-x1_c, 2)+pow(x2-x2_c, 2) + pow(x3-x3_c, 2) - pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_outer.contract();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;

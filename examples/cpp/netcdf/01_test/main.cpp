@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
 {
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteurs/data_ifremer/data/PREVIMER_L1-MARS2D-FINIS250_20161219T0000Z_MeteoMF.nc");
-//    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20170709T0000Z_MeteoMF.nc");
+//    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteurs/data_ifremer/data/PREVIMER_L1-MARS2D-FINIS250_20161219T0000Z_MeteoMF.nc");
+    PreviMer pm = PreviMer("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20170709T0000Z_MeteoMF.nc");
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
