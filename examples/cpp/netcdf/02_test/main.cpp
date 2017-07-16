@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
     string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 8); // T = 0..96 (in 15*min)
+    search_space[0] = Interval(0, 3); // T = 0..96 (in 15*min)
     search_space[1] = Interval(0, 300); // X = 0..300
-    search_space[2] = Interval(200, 500); // Y = 200..500
+    search_space[2] = Interval(0, 300); // Y = 200..500
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
 
     double t_c, x_c, y_c, r;
     t_c = 1;
-    x_c = 160;
-    y_c = 470;
-    r = 0.1;
+    x_c = 50;
+    y_c = 50;
+    r = 1;
     Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
     double max_diam = search_space.max_diam();
     int iterations_max = 4*(ceil(log(max_diam)/log(2)));
-    iterations_max = 5;
+    iterations_max = 2;
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in

@@ -1,6 +1,9 @@
 #include "door.h"
+#include <iostream>
+#include "omp.h"
 
 using namespace ibex;
+using namespace std;
 namespace invariant {
 
 Door::Door(Face *face, Room *room):
@@ -67,10 +70,10 @@ bool Door::contract_continuity_private(){
     return change;
 }
 
-void Door::analyze_change(std::vector<Room *>&list_rooms){
+void Door::analyze_change(vector<Room *>&list_rooms){
     if(m_input_private != get_input()
             || m_output_private != get_output()){
-        std::vector<Face *> l_face = m_face->get_neighbors();
+        vector<Face *> l_face = m_face->get_neighbors();
         for(Face* f:l_face)
             list_rooms.push_back(f->get_pave()->get_rooms()[m_room->get_maze()]);
     }
