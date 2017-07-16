@@ -657,19 +657,19 @@ void Room::synchronize(){
     }
 }
 
-bool Room::is_degenerated(const IntervalVector& iv){
-    int compt = 0;
-    int dim = m_maze->get_graph()->dim();
-    for(int i=0; i<dim; i++){
-        if(iv[i].is_degenerated() && !iv[i].is_unbounded()){
-            compt++;
-        }
-        if(compt == 2){
-            return true;
-        }
-    }
-    return false;
-}
+//bool Room::is_degenerated(const IntervalVector& iv){
+//    int compt = 0;
+//    int dim = m_maze->get_graph()->dim();
+//    for(int i=0; i<dim; i++){
+//        if(iv[i].is_degenerated() && !iv[i].is_unbounded()){
+//            compt++;
+//        }
+//        if(compt == 2){
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 const ibex::IntervalVector Room::get_one_vector_fields(int n_vf) const{
     return m_vector_fields[n_vf];
