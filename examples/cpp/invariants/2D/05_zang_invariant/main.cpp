@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
     Graph graph(space);
     invariant::Domain dom(&graph);
 
-    Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(0.5, 2));
-    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep(&s);
+//    Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(0.5, 2));
+//    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
+//    dom.set_sep(&s);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<10; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
 //    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
 
-    position_info[0] = Interval(-1.16);
-    position_info[1] = Interval(3.62);
+    position_info[0] = Interval(-2);
+    position_info[1] = Interval(-2.9);
 //    v_graph.get_room_info(&maze, position_info);
     v_graph.show_room_info(&maze, position_info);
 
