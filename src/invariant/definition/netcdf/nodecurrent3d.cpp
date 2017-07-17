@@ -91,8 +91,8 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
                     short vec_v = raw_v[t_coord][i_coord][j_coord];
                     if(vec_u!=fill_value && vec_v!=fill_value){
                         vector_field[0] |= Interval(1.0); // 15 min x 250m (size of each square)
-                        vector_field[1] |= Interval(vec_u*scale_factor/(250.0*60.0*15.0));
-                        vector_field[2] |= Interval(vec_v*scale_factor/(250.0*60.0*15.0));
+                        vector_field[1] |= Interval(vec_u*scale_factor/*/(250.0*60.0*15.0)*/);
+                        vector_field[2] |= Interval(vec_v*scale_factor/*/(250.0*60.0*15.0)*/);
                     }
                     else
                         no_value = true;

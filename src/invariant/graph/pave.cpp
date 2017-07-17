@@ -121,8 +121,10 @@ const bool Pave::is_equal(const Pave& p) const{
 }
 
 void Pave::bisect(){
-    ibex::LargestFirst bisector(0, 0.5);
-    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
+//    ibex::LargestFirst bisector(0, 0.5);
+//    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
+
+    std::pair<IntervalVector, IntervalVector> result_boxes = m_graph->bisect_largest_first(m_position);
     const size_t dim = m_dim;
     // Find the axe of bissection
     size_t bisect_axis = 0;

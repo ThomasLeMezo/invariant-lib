@@ -35,6 +35,12 @@ Graph::Graph(const ibex::IntervalVector &space):
     // Root of the pave node tree
     m_tree = new Pave_node(p);
     p->set_pave_node(m_tree);
+
+    // Compute ratio dimension
+    for(int dim=0; dim<m_dim; dim++){
+        double diam = space[dim].diam();
+        m_ratio_dimension.push_back(1.0/diam);
+    }
 }
 
 Graph::~Graph(){
@@ -135,6 +141,28 @@ void Graph::get_room_info(Maze *maze, const IntervalVector& position, vector<Pav
         Room *r = p->get_rooms()[maze];
         cout << *r << endl;
     }
+}
+
+
+std::pair<IntervalVector, IntervalVector> Graph::bisect_largest_first(const IntervalVector &position){
+    // Find largest dimension
+    Vector diam = position.diam();
+    int dim_max = 0;
+    double max = diam[0]*m_ratio_dimension[0];
+    for(int i=1; i<m_dim; i++){
+        double test = diam[i]*m_ratio_dimension[i];
+        if(max<test){
+            max = test;
+            dim_max = i;
+        }
+    }
+    IntervalVector p1(position);
+    IntervalVector p2(position);
+
+    p1[dim_max] = Interval(position[dim_max].lb(), position[dim_max].mid());
+    p2[dim_max] = Interval(position[dim_max].mid(), position[dim_max].ub());
+
+    return std::make_pair(p1, p2);
 }
 
 }

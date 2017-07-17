@@ -130,6 +130,13 @@ public:
      */
     void delete_pave(int id);
 
+    /**
+     * @brief Bisector strategy (bisect according to ratio dimension of the search space)
+     * @param position
+     * @return
+     */
+    std::pair<ibex::IntervalVector, ibex::IntervalVector> bisect_largest_first(const ibex::IntervalVector &position);
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // Graph coordinates
@@ -139,6 +146,8 @@ protected:
     mutable Pave_node*              m_tree = NULL; // Root of the pave node tree
 
     std::vector<Maze*>              m_mazes;
+
+    std::vector<double> m_ratio_dimension;
 
 };
 
