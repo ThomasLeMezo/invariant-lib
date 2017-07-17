@@ -4,9 +4,11 @@
 #include <string>
 #include "nodecurrent3d.h"
 #include "dynamics.h"
+#include <utility>
 
 namespace invariant {
 
+class NodeCurrent3D; // Friendchip
 class PreviMer3D : public invariant::Dynamics
 {
 public:
@@ -14,7 +16,7 @@ public:
      * @brief PreviMer constructor
      * @param file_name
      */
-    PreviMer3D(const std::string &file_directory, const ibex::IntervalVector &search_space, double epsilon_bisection_tree=0.51);
+    PreviMer3D(const std::string &file_directory, const ibex::IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection);
 
     /**
      * @brief Eval a vector field
@@ -36,6 +38,10 @@ public:
     short get_fill_value();
 
     const std::vector<size_t>& get_size();
+
+    std::vector<double> get_grid_size();
+
+    std::pair<ibex::IntervalVector, ibex::IntervalVector> bisect_largest_first(const ibex::IntervalVector &position);
 
 private:
     /**
@@ -63,6 +69,11 @@ private:
     std::vector<size_t> m_size;
 
     NodeCurrent3D *m_node_current;
+
+    std::vector<double> m_grid_size;
+
+    std::vector<double> m_limit_bisection;
+    std::vector<double> m_ratio_dimension;
 };
 
 inline const std::vector<std::vector<std::vector<short> > > &PreviMer3D::get_raw_u(){
@@ -79,6 +90,10 @@ inline short PreviMer3D::get_fill_value(){
 
 inline const std::vector<size_t>& PreviMer3D::get_size(){
     return m_size;
+}
+
+inline std::vector<double> PreviMer3D::get_grid_size(){
+    return m_grid_size;
 }
 
 }

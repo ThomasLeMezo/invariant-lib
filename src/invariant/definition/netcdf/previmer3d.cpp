@@ -1,9 +1,12 @@
 #include "previmer3d.h"
+#include "nodecurrent3d.h"
 #include <netcdf>
 #include <omp.h>
 
 #include <sys/types.h>
 #include <dirent.h>
+
+#include <utility>
 
 using namespace std;
 using namespace netCDF;
@@ -12,17 +15,26 @@ using namespace ibex;
 
 namespace invariant {
 
-PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, double epsilon_bisection_tree){
+PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection){
 
     if(search_space.size()!=3){
         throw std::runtime_error("in [previmer3d.cpp/PreviMer3D()] dim of search_space is not equal to 3");
     }
     m_dim = 3;
+    m_grid_size = grid_size;
+    m_limit_bisection = limit_bisection;
+
+    // Compute ratio dimension
+    for(int dim=0; dim<m_dim; dim++){
+        double diam = search_space[dim].diam();
+        m_ratio_dimension.push_back(1.0/diam);
+    }
+
 
     vector<string> file_list;
     get_file_list(file_directory, file_list);
     int nb_files = file_list.size();
-    int max_t = min(nb_files, (int)(search_space[0].ub()));
+    int max_t = min(nb_files, (int)(search_space[0].ub()/grid_size[0]));
     bool first_read = true;
     int cpt = 0;
 
@@ -72,19 +84,21 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
             m_size.push_back(j_max);
         }
     }
+    cout << "Data properties" << endl;
+    cout << " Scale factor = " << m_scale_factor << endl;
+    cout << " Fill Value = " << m_fill_value << endl;
 
     // ******* Node Current ******
     IntervalVector position(search_space);
     if(search_space.is_unbounded()){
-        position[0] = Interval(0, m_size[0]);
-        position[1] = Interval(0, m_size[1]);
-        position[2] = Interval(0, m_size[2]);
+        for(int i=0; i<3; i++)
+            position[i] = Interval(0, m_size[i]*m_grid_size[i]);
         cout << "unbound search space set to : " << position << endl;
     }
 
     double time_start_init = omp_get_wtime();
     cout << "TIME build tree = ";
-    m_node_current = new NodeCurrent3D(position, epsilon_bisection_tree);
+    m_node_current = new NodeCurrent3D(position, limit_bisection, this);
     cout << omp_get_wtime() - time_start_init << endl;
 
     time_start_init = omp_get_wtime();
@@ -125,6 +139,44 @@ int PreviMer3D::get_file_list(string dir, vector<string> &files){
     }
     closedir(dp);
     return 0;
+}
+
+std::pair<IntervalVector, IntervalVector> PreviMer3D::bisect_largest_first(const IntervalVector &position){
+    // Select dimensions to bisect
+    bool one_possible = false;
+    vector<bool> possible_dim;
+    for(int dim = 0; dim<m_dim; dim++){
+        if(position[dim].diam() > m_limit_bisection[dim]){
+            possible_dim.push_back(true);
+            one_possible = true;
+        }
+        else{
+            possible_dim.push_back(false);
+        }
+    }
+    if(!one_possible){ // If no-one possible make all possible
+        for(int dim=0; dim<m_dim; dim++)
+            possible_dim[dim] = true;
+    }
+
+    // Find largest dimension
+    Vector diam = position.diam();
+    int dim_max = 0;
+    double max = 0;
+    for(int i=0; i<m_dim; i++){
+        double test = diam[i]*m_ratio_dimension[i];
+        if((max<test) & (possible_dim[i])){
+            max = test;
+            dim_max = i;
+        }
+    }
+    IntervalVector p1(position);
+    IntervalVector p2(position);
+
+    p1[dim_max] = Interval(position[dim_max].lb(), position[dim_max].mid());
+    p2[dim_max] = Interval(position[dim_max].mid(), position[dim_max].ub());
+
+    return std::make_pair(p1, p2);
 }
 
 }

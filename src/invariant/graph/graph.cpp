@@ -40,6 +40,7 @@ Graph::Graph(const ibex::IntervalVector &space):
     for(int dim=0; dim<m_dim; dim++){
         double diam = space[dim].diam();
         m_ratio_dimension.push_back(1.0/diam);
+        m_limit_bisection.push_back(0.0);
     }
 }
 
@@ -145,13 +146,30 @@ void Graph::get_room_info(Maze *maze, const IntervalVector& position, vector<Pav
 
 
 std::pair<IntervalVector, IntervalVector> Graph::bisect_largest_first(const IntervalVector &position){
+    // Select dimensions to bisect
+    bool one_possible = false;
+    vector<bool> possible_dim;
+    for(int dim = 0; dim<m_dim; dim++){
+        if(position[dim].diam() > m_limit_bisection[dim]){
+            possible_dim.push_back(true);
+            one_possible = true;
+        }
+        else{
+            possible_dim.push_back(false);
+        }
+    }
+    if(!one_possible){ // If no-one possible make all possible
+        for(int dim=0; dim<m_dim; dim++)
+            possible_dim[dim] = true;
+    }
+
     // Find largest dimension
     Vector diam = position.diam();
     int dim_max = 0;
-    double max = diam[0]*m_ratio_dimension[0];
-    for(int i=1; i<m_dim; i++){
+    double max = 0;
+    for(int i=0; i<m_dim; i++){
         double test = diam[i]*m_ratio_dimension[i];
-        if(max<test){
+        if((max<test) & (possible_dim[i])){
             max = test;
             dim_max = i;
         }

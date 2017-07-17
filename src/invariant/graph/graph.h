@@ -137,6 +137,12 @@ public:
      */
     std::pair<ibex::IntervalVector, ibex::IntervalVector> bisect_largest_first(const ibex::IntervalVector &position);
 
+    /**
+     * @brief Set the limit of bisection (avoid to bisect if possible)
+     * @param limit_bisection
+     */
+    void set_limit_bisection(const std::vector<double> &limit_bisection);
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // Graph coordinates
@@ -148,6 +154,7 @@ protected:
     std::vector<Maze*>              m_mazes;
 
     std::vector<double> m_ratio_dimension;
+    std::vector<double> m_limit_bisection;
 
 };
 
@@ -206,6 +213,13 @@ inline const std::vector<Maze *>& Graph::get_mazes() const{
 
 inline void Graph::add_maze(Maze * maze){
     m_mazes.push_back(maze);
+}
+
+inline void Graph::set_limit_bisection(const std::vector<double> &limit_bisection){
+    if(limit_bisection.size() != m_dim)
+        throw std::runtime_error("in [graph.cpp/set_limit_bisection] dimensions doesn't match");
+    else
+        m_limit_bisection = limit_bisection;
 }
 
 }

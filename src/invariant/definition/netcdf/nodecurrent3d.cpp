@@ -3,19 +3,30 @@
 using namespace ibex;
 using namespace std;
 
-NodeCurrent3D::NodeCurrent3D(const ibex::IntervalVector &position, double epsilon_bisection):
+namespace invariant {
+
+NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer):
     m_position(position), m_vector_field(position.size(), Interval::EMPTY_SET)
 {
-    if(m_position.max_diam()<epsilon_bisection){
+    m_previmer = previmer;
+    bool limit_reach = true;
+    for(size_t dim=0; dim<limit_bisection.size(); dim++){
+        if(m_position[dim].diam()>limit_bisection[dim]){
+            limit_reach = false;
+            break;
+        }
+    }
+
+    if(limit_reach){
         m_leaf = true;
         m_leaf_list.push_back(this);
     }
     else{
         m_leaf = false;
-        ibex::LargestFirst bisector(0, 0.5);
-        std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(position);
-        NodeCurrent3D *nc1 = new NodeCurrent3D(result_boxes.first, epsilon_bisection);
-        NodeCurrent3D *nc2 = new NodeCurrent3D(result_boxes.second, epsilon_bisection);
+        // ToDo : improve bisection to match change made in pave !!
+        std::pair<IntervalVector, IntervalVector> result_boxes = previmer->bisect_largest_first(position);
+        NodeCurrent3D *nc1 = new NodeCurrent3D(result_boxes.first, limit_bisection, previmer);
+        NodeCurrent3D *nc2 = new NodeCurrent3D(result_boxes.second, limit_bisection, previmer);
         m_children.first = nc1;
         m_children.second = nc2;
         m_leaf_list.insert(m_leaf_list.end(), nc1->get_leaf_list().begin(), nc1->get_leaf_list().end());
@@ -64,35 +75,40 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
 
     int d_max[3] = {(int)(raw_u.size())-1, (int)(raw_u[0].size())-1, (int)(raw_u[0][0].size())-1};
 
+    vector<double> grid_size = m_previmer->get_grid_size();
+
     //    #pragma omp parallel for
     for(int id=0; id<nb_node; id++){
         NodeCurrent3D *nc = m_leaf_list[id];
 
+        /// **** Interpolation of vector field ****
         vector<vector<int>> tab_point;
-        for(size_t d = 0; d<dim; d++){
+
+        for(int dim = 0; dim<3; dim++){
             vector<int> pt;
+            double center = nc->get_position()[dim].mid() / grid_size[dim]; // Back to the grid coord
             // Cross pattern
-            pt.push_back(std::max(0, std::min((int)ceil(nc->get_position()[d].mid()), d_max[d])));
-            pt.push_back(std::max(0, std::min((int)floor(nc->get_position()[d].mid()), d_max[d])));
+            pt.push_back(std::max(0, std::min((int)ceil(center), d_max[dim])));
+            pt.push_back(std::max(0, std::min((int)floor(center), d_max[dim])));
             tab_point.push_back(pt);
         }
 
         IntervalVector vector_field(dim, Interval::EMPTY_SET); // 3 Dimensions (dt, U, V)
         bool no_value = false;
         // U & V
-        for(size_t k=0; k<tab_point[0].size(); k++){
-            for(size_t l=0; l<tab_point[0].size(); l++){
-                for(size_t m=0; l<tab_point[0].size(); l++){
-                    size_t t_coord = tab_point[0][k];
-                    size_t i_coord = tab_point[1][l];
-                    size_t j_coord = tab_point[1][m];
+        for(size_t t_id=0; t_id<tab_point[0].size(); t_id++){
+            for(size_t u_id=0; u_id<tab_point[0].size(); u_id++){
+                for(size_t v_id=0; v_id<tab_point[0].size(); v_id++){
+                    size_t t_coord = tab_point[0][t_id];
+                    size_t i_coord = tab_point[1][u_id];
+                    size_t j_coord = tab_point[2][v_id];
 
                     short vec_u = raw_u[t_coord][i_coord][j_coord];
                     short vec_v = raw_v[t_coord][i_coord][j_coord];
                     if(vec_u!=fill_value && vec_v!=fill_value){
-                        vector_field[0] |= Interval(1.0); // 15 min x 250m (size of each square)
-                        vector_field[1] |= Interval(vec_u*scale_factor/*/(250.0*60.0*15.0)*/);
-                        vector_field[2] |= Interval(vec_v*scale_factor/*/(250.0*60.0*15.0)*/);
+                        vector_field[0] |= Interval(1.0);
+                        vector_field[1] |= Interval(vec_u*scale_factor);
+                        vector_field[2] |= Interval(vec_v*scale_factor);
                     }
                     else
                         no_value = true;
@@ -105,5 +121,7 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
 
         nc->set_vector_field(vector_field);
     }
+}
+
 }
 

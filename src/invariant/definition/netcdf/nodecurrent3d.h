@@ -2,7 +2,11 @@
 #define NODECURRENT3D_H
 
 #include <ibex.h>
+#include "previmer3d.h"
 
+namespace invariant {
+
+class PreviMer3D;
 class NodeCurrent3D
 {
 public:
@@ -10,7 +14,7 @@ public:
      * @brief NodeCurrent constructor
      * @param position
      */
-    NodeCurrent3D(const ibex::IntervalVector &position, double epsilon_bisection);
+    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer);
 
     /**
      * @brief Get the position of this NodeCurrent
@@ -76,6 +80,8 @@ private:
 
     std::vector<NodeCurrent3D *> m_leaf_list;
 
+    PreviMer3D *m_previmer;
+
 };
 
 inline const ibex::IntervalVector& NodeCurrent3D::get_position() const{
@@ -99,6 +105,8 @@ inline std::pair<NodeCurrent3D *, NodeCurrent3D *> NodeCurrent3D::get_children()
 
 inline const std::vector<NodeCurrent3D *>& NodeCurrent3D::get_leaf_list() const{
     return m_leaf_list;
+}
+
 }
 
 #endif // NODECURRENT3D_H
