@@ -12,21 +12,24 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    int iterations_max = 17;
+    int iterations_max = 20;
 
     string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
 
     vector<double> grid_size = {15*60.0, 250.0, 250.0}; // {15*60 s, 250 m, 250 m}
-    vector<double> limit_bisection = {15.0*60.0, 250.0/2.0, 250.0/2.0};
+    vector<double> limit_bisection = {15.0*60.0/2.0, 250.0/2.0, 250.0/2.0};
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0 * grid_size[0], 8 * grid_size[0]); // T = 0..96 (in 15*min)
-    search_space[1] = Interval(100 * grid_size[1], 250 * grid_size[1]); // X = 0..300
-    search_space[2] = Interval(420 * grid_size[2], 600 * grid_size[2]); // Y = 200..500
+    search_space[0] = Interval(0, 8); // T = 0..96 (in 15*min)
+    search_space[1] = Interval(100, 250); // X = 0..300
+    search_space[2] = Interval(420, 600); // Y = 200..500
+
+    for(int i=0; i<3; i++)
+        search_space[i] *= grid_size[i]; // Y = 200..500
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(dir, search_space, grid_size, limit_bisection, 15);
+    PreviMer3D pm3d = PreviMer3D(dir, search_space, grid_size, limit_bisection, iterations_max);
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
