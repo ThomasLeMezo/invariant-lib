@@ -150,33 +150,36 @@ void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
     m_graph->get_tree()->get_border_paves(pave_border_list);
 
     for(Pave *p:pave_border_list){
-        for(Face *f:p->get_faces_vector()){
-            if(f->is_border()){
-                Door *d = f->get_doors()[maze];
-                if(m_border_path_in)
-                    d->set_full_private_input();
-                else{
-                    if(type != MAZE_PROPAGATOR)
-                        d->set_empty_private_input();
-                }
+        Room *r = p->get_rooms()[maze];
+        if(!r->is_removed()){
+            for(Face *f:p->get_faces_vector()){
+                if(f->is_border()){
+                    Door *d = f->get_doors()[maze];
+                    if(m_border_path_in)
+                        d->set_full_private_input();
+                    else{
+                        if(type != MAZE_PROPAGATOR)
+                            d->set_empty_private_input();
+                    }
 
-                if(m_border_path_out)
-                    d->set_full_private_output();
-                else{
-                    if(type != MAZE_PROPAGATOR)
-                        d->set_empty_private_output();
+                    if(m_border_path_out)
+                        d->set_full_private_output();
+                    else{
+                        if(type != MAZE_PROPAGATOR)
+                            d->set_empty_private_output();
+                    }
+                    d->synchronize();
                 }
-                d->synchronize();
             }
-        }
 
-        if(type == MAZE_PROPAGATOR && (m_border_path_in || m_border_path_out)){
-            if(!p->get_rooms()[maze]->is_full())
-                list_room_deque.push_back(p->get_rooms()[maze]);
-        }
-        if(type == MAZE_CONTRACTOR && (!m_border_path_in || !m_border_path_out)){
-            if(!p->get_rooms()[maze]->is_empty())
-                list_room_deque.push_back(p->get_rooms()[maze]);
+            if(type == MAZE_PROPAGATOR && (m_border_path_in || m_border_path_out)){
+                if(!p->get_rooms()[maze]->is_full())
+                    list_room_deque.push_back(p->get_rooms()[maze]);
+            }
+            if(type == MAZE_CONTRACTOR && (!m_border_path_in || !m_border_path_out)){
+                if(!p->get_rooms()[maze]->is_empty())
+                    list_room_deque.push_back(p->get_rooms()[maze]);
+            }
         }
     }
 }

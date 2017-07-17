@@ -189,9 +189,16 @@ public:
      */
     const std::vector<bool> &get_where_zeros(size_t vector_field_id) const;
 
+    /**
+     * @brief Reduce de size of the Door if inactive (delete private IV)
+     */
+    void set_removed();
+
 protected:
-    ibex::IntervalVector m_input_public, m_output_public; //input and output doors public
-    ibex::IntervalVector m_input_private, m_output_private; //input and output doors private (for contraction)
+    ibex::IntervalVector m_input_public;
+    ibex::IntervalVector m_output_public; //input and output doors public
+    ibex::IntervalVector *m_input_private;
+    ibex::IntervalVector *m_output_private; //input and output doors private (for contraction)
     Face *               m_face = NULL; // pointer to the associated face
     Room *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
@@ -220,19 +227,19 @@ inline const ibex::IntervalVector Door::get_output() const{
 }
 
 inline const ibex::IntervalVector& Door::get_input_private() const{
-    return m_input_private;
+    return *m_input_private;
 }
 
 inline const ibex::IntervalVector& Door::get_output_private() const{
-    return m_output_private;
+    return *m_output_private;
 }
 
 inline void Door::set_input_private(const ibex::IntervalVector& iv_input){
-    m_input_private = iv_input;
+    *m_input_private = iv_input;
 }
 
 inline void Door::set_output_private(const ibex::IntervalVector& iv_output){
-    m_output_private = iv_output;
+    *m_output_private = iv_output;
 }
 
 inline Face * Door::get_face() const{
@@ -244,16 +251,16 @@ inline Room * Door::get_room() const{
 }
 
 inline void Door::set_empty_private_output(){
-    m_output_private.set_empty();
+    m_output_private->set_empty();
 }
 
 inline void Door::set_empty_private_input(){
-    m_input_private.set_empty();
+    m_input_private->set_empty();
 }
 
 inline void Door::set_empty_private(){
-    m_output_private.set_empty();
-    m_input_private.set_empty();
+    m_output_private->set_empty();
+    m_input_private->set_empty();
 }
 
 inline bool Door::is_empty(){

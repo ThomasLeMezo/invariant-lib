@@ -321,11 +321,6 @@ inline bool Room::is_removed() const{
     return m_removed;
 }
 
-inline void Room::set_removed(){
-    m_removed = true;
-    // Free memory (private doors)
-}
-
 inline int Room::get_nb_contractions() const{
     return m_nb_contract;
 }

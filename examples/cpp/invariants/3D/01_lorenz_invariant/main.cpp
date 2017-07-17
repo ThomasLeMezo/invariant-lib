@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<23; i++){
         cout << "-----" << i << "-----" << endl;
         graph.bisect();
         cout << "nb contractions = " << maze.contract() << " - " << "graph size = " << graph.size() << endl;
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
     cout << graph << endl;
 
-    vtk_graph.show_graph();
+//    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 
     IntervalVector position_info(3);

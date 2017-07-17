@@ -689,4 +689,13 @@ int get_nb_dim_flat(const ibex::IntervalVector &iv){
     return flat;
 }
 
+void Room::set_removed(){
+    m_removed = true;
+    // Free memory (private doors)
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        d->set_removed();
+    }
+}
+
 }
