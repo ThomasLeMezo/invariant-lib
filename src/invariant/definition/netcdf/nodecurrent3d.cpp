@@ -90,8 +90,11 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
             vector<int> pt;
             double center = nc->get_position()[dim].mid() / grid_size[dim]; // Back to the grid coord
             // Cross pattern
-            pt.push_back(std::max(0, std::min((int)ceil(center), d_max[dim])));
-            pt.push_back(std::max(0, std::min((int)floor(center), d_max[dim])));
+            for(int i=std::max(0, std::min((int)floor(center), d_max[dim]));
+                i<std::max(0, std::min((int)ceil(center), d_max[dim]));
+                i++){
+                pt.push_back(i);
+            }
             tab_point.push_back(pt);
         }
 

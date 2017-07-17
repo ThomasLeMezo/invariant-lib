@@ -12,15 +12,17 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
+    int iterations_max = 17;
+
     string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
 
     vector<double> grid_size = {15*60.0, 250.0, 250.0}; // {15*60 s, 250 m, 250 m}
-    vector<double> limit_bisection = {60.0, 250.0/2.0, 250.0/2.0};
+    vector<double> limit_bisection = {15.0*60.0, 250.0/2.0, 250.0/2.0};
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 8 * grid_size[0]); // T = 0..96 (in 15*min)
-    search_space[1] = Interval(0, 300 * grid_size[1]); // X = 0..300
-    search_space[2] = Interval(0, 300 * grid_size[2]); // Y = 200..500
+    search_space[0] = Interval(0 * grid_size[0], 8 * grid_size[0]); // T = 0..96 (in 15*min)
+    search_space[1] = Interval(100 * grid_size[1], 250 * grid_size[1]); // X = 0..300
+    search_space[2] = Interval(420 * grid_size[2], 600 * grid_size[2]); // Y = 200..500
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
@@ -38,8 +40,8 @@ int main(int argc, char *argv[])
 
     double t_c, x_c, y_c, r;
     t_c = 0 * grid_size[0];
-    x_c = 150 * grid_size[1];
-    y_c = 150 * grid_size[2];
+    x_c = 160 * grid_size[1];
+    y_c = 460 * grid_size[2];
     r = 250;
     Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
@@ -50,10 +52,8 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &pm3d, MAZE_FWD, MAZE_PROPAGATOR);
 
     cout << "Domain = " << search_space << endl;
-
-    double max_diam = search_space.max_diam();
-    int iterations_max = 4*(ceil(log(max_diam)/log(2)));
-    iterations_max = 15;
+//    double max_diam = search_space.max_diam();
+//    int iterations_max = 4*(ceil(log(max_diam)/log(2)));
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
