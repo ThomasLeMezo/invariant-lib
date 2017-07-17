@@ -15,7 +15,7 @@ using namespace ibex;
 
 namespace invariant {
 
-PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection){
+PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level){
 
     if(search_space.size()!=3){
         throw std::runtime_error("in [previmer3d.cpp/PreviMer3D()] dim of search_space is not equal to 3");
@@ -98,7 +98,7 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
 
     double time_start_init = omp_get_wtime();
     cout << "TIME build tree = ";
-    m_node_current = new NodeCurrent3D(position, limit_bisection, this);
+    m_node_current = new NodeCurrent3D(position, limit_bisection, this, 0, stop_level);
     cout << omp_get_wtime() - time_start_init << endl;
 
     time_start_init = omp_get_wtime();

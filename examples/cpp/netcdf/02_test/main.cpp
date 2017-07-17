@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(dir, search_space, grid_size, limit_bisection);
+    PreviMer3D pm3d = PreviMer3D(dir, search_space, grid_size, limit_bisection, 15);
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
@@ -37,10 +37,10 @@ int main(int argc, char *argv[])
     graph.set_limit_bisection(limit_bisection);
 
     double t_c, x_c, y_c, r;
-    t_c = 0;
-    x_c = 150;
-    y_c = 150;
-    r = 0.5;
+    t_c = 0 * grid_size[0];
+    x_c = 150 * grid_size[1];
+    y_c = 150 * grid_size[2];
+    r = 250;
     Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)

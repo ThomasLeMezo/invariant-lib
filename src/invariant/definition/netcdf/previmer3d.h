@@ -16,7 +16,7 @@ public:
      * @brief PreviMer constructor
      * @param file_name
      */
-    PreviMer3D(const std::string &file_directory, const ibex::IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection);
+    PreviMer3D(const std::string &file_directory, const ibex::IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level);
 
     /**
      * @brief Eval a vector field

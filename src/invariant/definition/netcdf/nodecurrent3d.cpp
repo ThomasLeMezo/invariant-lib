@@ -5,7 +5,7 @@ using namespace std;
 
 namespace invariant {
 
-NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer):
+NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, int level, int stop_level):
     m_position(position), m_vector_field(position.size(), Interval::EMPTY_SET)
 {
     m_previmer = previmer;
@@ -16,6 +16,8 @@ NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<d
             break;
         }
     }
+    if(level>stop_level)
+        limit_reach = true;
 
     if(limit_reach){
         m_leaf = true;
@@ -25,8 +27,8 @@ NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<d
         m_leaf = false;
         // ToDo : improve bisection to match change made in pave !!
         std::pair<IntervalVector, IntervalVector> result_boxes = previmer->bisect_largest_first(position);
-        NodeCurrent3D *nc1 = new NodeCurrent3D(result_boxes.first, limit_bisection, previmer);
-        NodeCurrent3D *nc2 = new NodeCurrent3D(result_boxes.second, limit_bisection, previmer);
+        NodeCurrent3D *nc1 = new NodeCurrent3D(result_boxes.first, limit_bisection, previmer, level+1, stop_level);
+        NodeCurrent3D *nc2 = new NodeCurrent3D(result_boxes.second, limit_bisection, previmer, level+1, stop_level);
         m_children.first = nc1;
         m_children.second = nc2;
         m_leaf_list.insert(m_leaf_list.end(), nc1->get_leaf_list().begin(), nc1->get_leaf_list().end());

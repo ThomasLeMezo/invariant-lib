@@ -14,7 +14,7 @@ public:
      * @brief NodeCurrent constructor
      * @param position
      */
-    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer);
+    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, int level, int stop_level);
 
     /**
      * @brief Get the position of this NodeCurrent
