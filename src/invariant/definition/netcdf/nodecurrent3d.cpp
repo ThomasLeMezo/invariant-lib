@@ -10,14 +10,15 @@ NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<d
 {
     m_previmer = previmer;
     bool limit_reach = true;
-    for(size_t dim=0; dim<limit_bisection.size(); dim++){
+    for(size_t dim=0; dim<3; dim++){
         if(m_position[dim].diam()>limit_bisection[dim]){
             limit_reach = false;
+//            cout << "break " << level << " " << dim << " " << m_position[dim].diam() << " " << limit_bisection[dim] << endl;
             break;
         }
     }
-    if(level>stop_level)
-        limit_reach = true;
+//    if(level>stop_level)
+//        limit_reach = true;
 
     if(limit_reach){
         m_leaf = true;
