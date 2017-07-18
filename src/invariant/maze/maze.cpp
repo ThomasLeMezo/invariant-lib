@@ -66,9 +66,7 @@ int Maze::contract(){
     {
 #pragma omp single
         {
-
             while(!deque_empty){
-
 #pragma omp task
                 {
                     // Take one Room
@@ -122,7 +120,6 @@ int Maze::contract(){
 
                         r->unlock_contraction();
                     }
-
                 }
 
                 omp_set_lock(&m_deque_access);
@@ -137,7 +134,6 @@ int Maze::contract(){
                 }
             }
         }
-
     }
     cout << " => contractions : " << omp_get_wtime() - t_start << endl;
     return nb_operations;
