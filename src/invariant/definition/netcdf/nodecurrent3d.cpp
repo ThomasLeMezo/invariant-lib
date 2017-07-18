@@ -13,12 +13,12 @@ NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<d
     for(size_t dim=0; dim<3; dim++){
         if(m_position[dim].diam()>limit_bisection[dim]){
             limit_reach = false;
-//            cout << "break " << level << " " << dim << " " << m_position[dim].diam() << " " << limit_bisection[dim] << endl;
+            //            cout << "break " << level << " " << dim << " " << m_position[dim].diam() << " " << limit_bisection[dim] << endl;
             break;
         }
     }
-//    if(level>stop_level)
-//        limit_reach = true;
+    //    if(level>stop_level)
+    //        limit_reach = true;
 
     if(limit_reach){
         m_leaf = true;
@@ -78,7 +78,7 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
 
     vector<double> grid_size = m_previmer->get_grid_size();
 
-    //    #pragma omp parallel for
+#pragma omp parallel for
     for(int id=0; id<nb_node; id++){
         NodeCurrent3D *nc = m_leaf_list[id];
 
@@ -111,7 +111,8 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
 
         IntervalVector vector_field(3, Interval::EMPTY_SET); // 3 Dimensions (dt, U, V)
         // T
-        vector_field[0] = Interval(1.0);
+//        vector_field[0] = Interval(0.9, 1.1);
+        vector_field[0] = Interval(1);
         bool no_value = false;
         // U
         for(size_t t_id=0; t_id<tab_point_u[0].size(); t_id++){

@@ -1,5 +1,6 @@
 #include "room.h"
 #include "face.h"
+#include "iostream"
 
 using namespace ibex;
 using namespace std;
