@@ -6,7 +6,7 @@ using namespace std;
 namespace invariant {
 
 NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, std::vector<NodeCurrent3D *> &leaf_list):
-    m_position(position), m_vector_field(position.size(), Interval::EMPTY_SET)
+    m_position(position), m_vector_field(2, Interval::EMPTY_SET)
 {
     m_previmer = previmer;
     bool limit_reach = true;
@@ -49,6 +49,8 @@ const ibex::IntervalVector& NodeCurrent3D::compute_vector_field_tree(){
     }
 }
 
+static ibex::IntervalVector empty3(3, ibex::Interval::EMPTY_SET);
+
 const ibex::IntervalVector NodeCurrent3D::eval(const IntervalVector& position){
     if(m_leaf){
         return m_vector_field;
@@ -56,17 +58,13 @@ const ibex::IntervalVector NodeCurrent3D::eval(const IntervalVector& position){
     else{
         IntervalVector inter = position & m_position;
         if(inter.is_empty()){
-            IntervalVector empty(position.size(), Interval::EMPTY_SET);
-            return empty;
+            return empty3;
         }
         else if(m_position.is_subset(position)){
             return m_vector_field;
         }
         else{
-            IntervalVector result(position.size(), Interval::EMPTY_SET);
-            result |= m_children.first->eval(inter);
-            result |= m_children.second->eval(inter);
-            return result;
+            return (m_children.first->eval(inter) | m_children.second->eval(inter));
         }
     }
 }

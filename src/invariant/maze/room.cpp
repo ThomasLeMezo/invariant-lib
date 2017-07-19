@@ -136,7 +136,7 @@ void Room::contract_vector_field(){
 
 void Room::eval_vector_field_possibility(){
     int dim = m_pave->get_dim();
-    IntervalVector zero(dim, Interval::ZERO);
+    IntervalVector zero = IntervalVector(dim, Interval::ZERO);
 
     for(Face *f:m_pave->get_faces_vector()){
         Door *d = f->get_doors()[m_maze];

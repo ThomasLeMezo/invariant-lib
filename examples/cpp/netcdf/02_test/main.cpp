@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     vector<double> limit_bisection = {15.0*60.0/2.0, 250.0/2.0, 250.0/2.0};
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 10); // T = 0..96 (in 15*min)
+    search_space[0] = Interval(0, 4); // T = 0..96 (in 15*min)
     search_space[1] = Interval(100, 250); // X = 0..300
     search_space[2] = Interval(420, 600); // Y = 200..500
 

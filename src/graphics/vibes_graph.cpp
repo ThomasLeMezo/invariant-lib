@@ -85,7 +85,7 @@ void Vibes_Graph::draw_room_outer(Pave *p) const{
 
     for(const tuple<int, int, bool> &t:m_oriented_path){
         Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
-        IntervalVector d_iv(d->get_input_private() | d->get_output_private());
+        IntervalVector d_iv(d->get_input() | d->get_output());
 
         if(!d_iv.is_empty()){
             if(get<2>(t)){

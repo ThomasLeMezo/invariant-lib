@@ -132,6 +132,7 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
 
     double time_start_init = omp_get_wtime();
     cout << "Mem 1 = " << getValue()/1000 - ram_init << " Mo" << endl;  // 29 Mo
+    cout << "size raw_u_t = " << (*raw_u_t).size() << " " << (*raw_u_t)[0].size() << " " << (*raw_u_t)[0][0].size() << endl;
 
     cout << "TIME build tree = ";
     m_node_current = new NodeCurrent3D(position, limit_bisection, this, m_leaf_list);
@@ -164,7 +165,12 @@ PreviMer3D::~PreviMer3D(){
 
 const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& position){
     vector<ibex::IntervalVector> vector_fields;
-    vector_fields.push_back(m_node_current->eval(position));
+    IntervalVector result = m_node_current->eval(position);
+    IntervalVector vec(3);
+    vec[0] = Interval(1);
+    vec[1] = result[0];
+    vec[2] = result[1];
+    vector_fields.push_back(vec);
     return vector_fields;
 }
 
@@ -263,10 +269,7 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
             tab_point_v.push_back(pt_v);
         }
 
-        IntervalVector vector_field(3, Interval::EMPTY_SET); // 3 Dimensions (dt, U, V)
-        // T
-//        vector_field[0] = Interval(0.9, 1.1);
-        vector_field[0] = Interval(10.0, 10.1);
+        IntervalVector vector_field(2, Interval::EMPTY_SET); // 2 Dimensions (U, V) -> bc T=Interval(1)
         bool no_value = false;
         // U
         for(size_t t_id=0; t_id<tab_point_u[0].size(); t_id++){
@@ -278,7 +281,7 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
 
                     short vec_u = raw_u_t[t_coord][i_coord][j_coord];
                     if(vec_u!=m_fill_value){
-                        vector_field[1] |= Interval(vec_u*m_scale_factor);
+                        vector_field[0] |= Interval(vec_u*m_scale_factor);
                     }
                     else
                         no_value = true;
@@ -295,7 +298,7 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
 
                     short vec_v = raw_v_t[t_coord][i_coord][j_coord];
                     if(vec_v!=m_fill_value){
-                        vector_field[2] |= Interval(vec_v*m_scale_factor);
+                        vector_field[1] |= Interval(vec_v*m_scale_factor);
                     }
                     else
                         no_value = true;
@@ -304,9 +307,8 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
         }
 
         if(no_value)
-            vector_field = IntervalVector(3, Interval::EMPTY_SET);
-
-//        nc->set_vector_field(vector_field);
+            vector_field = IntervalVector(2, Interval::EMPTY_SET);
+        nc->set_vector_field(vector_field);
     }
 }
 
