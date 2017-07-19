@@ -19,6 +19,11 @@ public:
     PreviMer3D(const std::string &file_directory, const ibex::IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level);
 
     /**
+     * @brief PreviMer destructor
+     */
+    ~PreviMer3D();
+
+    /**
      * @brief Eval a vector field
      * @param position
      * @return
@@ -60,29 +65,25 @@ private:
      */
     const ibex::IntervalVector& get_vector_field_at_point(std::vector<double> position);
 
+    /**
+     * @brief Fill the leafs of the node tree
+     */
+    void fill_leafs(const std::vector<std::vector<std::vector<short>>> &raw_u_t, const std::vector<std::vector<std::vector<short>>> &raw_v_t);
+
 private:
-    std::vector<std::vector<std::vector<short>>> m_raw_u;
-    std::vector<std::vector<std::vector<short>>> m_raw_v;
     float m_scale_factor = 0;
     short m_fill_value = 0;
     int m_dim = 0;
     std::vector<size_t> m_size;
 
     NodeCurrent3D *m_node_current;
+    std::vector<NodeCurrent3D *> m_leaf_list;
 
     std::vector<double> m_grid_size;
 
     std::vector<double> m_limit_bisection;
     std::vector<double> m_ratio_dimension;
 };
-
-inline const std::vector<std::vector<std::vector<short> > > &PreviMer3D::get_raw_u(){
-    return m_raw_u;
-}
-
-inline const std::vector<std::vector<std::vector<short> > >& PreviMer3D::get_raw_v(){
-    return m_raw_v;
-}
 
 inline short PreviMer3D::get_fill_value(){
     return m_fill_value;

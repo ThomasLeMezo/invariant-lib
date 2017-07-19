@@ -11,10 +11,18 @@ class NodeCurrent3D
 {
 public:
     /**
-     * @brief NodeCurrent constructor
+     * @brief NodeCurrent3D constructor
      * @param position
+     * @param limit_bisection
+     * @param previmer
+     * @param leaf_list
      */
-    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, int level, int stop_level);
+    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, std::vector<NodeCurrent3D *> &leaf_list);
+
+    /**
+     * @brief NodeCurrent destructor
+     */
+    ~NodeCurrent3D();
 
     /**
      * @brief Get the position of this NodeCurrent
@@ -51,7 +59,7 @@ public:
      * (union of its children vector field)
      * @return
      */
-    const ibex::IntervalVector compute_vector_field_tree();
+    const ibex::IntervalVector &compute_vector_field_tree();
 
     /**
      * @brief Eval the vector filed at this position
@@ -59,11 +67,6 @@ public:
      * @return
      */
     const ibex::IntervalVector eval(const ibex::IntervalVector& position);
-
-    /**
-     * @brief Fill leafs with current
-     */
-    void fill_leafs(const std::vector<std::vector<std::vector<short> > > &raw_u, const std::vector<std::vector<std::vector<short> > > &raw_v, const float& scale_factor, const short& fill_value);
 
     /**
      * @brief Get the leaf list of this NodeCurrent (list of all leaf children nodes)
@@ -77,8 +80,6 @@ private:
 
     std::pair<NodeCurrent3D *, NodeCurrent3D *> m_children;
     bool                m_leaf = false;
-
-    std::vector<NodeCurrent3D *> m_leaf_list;
 
     PreviMer3D *m_previmer;
 
@@ -101,10 +102,6 @@ inline bool NodeCurrent3D::is_leaf() const{
 }
 inline std::pair<NodeCurrent3D *, NodeCurrent3D *> NodeCurrent3D::get_children() const{
     return m_children;
-}
-
-inline const std::vector<NodeCurrent3D *>& NodeCurrent3D::get_leaf_list() const{
-    return m_leaf_list;
 }
 
 }
