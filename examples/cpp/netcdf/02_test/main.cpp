@@ -12,7 +12,7 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    int iterations_max = 2;
+    int iterations_max = 5;
 
     string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     double t_c, x_c, y_c, r;
     t_c = 0 * grid_size[0];
     x_c = 160 * grid_size[1];
-    y_c = 460 * grid_size[2];
+    y_c = 536 * grid_size[2];
     r = 0.0;
     Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
@@ -77,5 +77,5 @@ int main(int argc, char *argv[])
     position[1] = Interval(35000); // 37304, 37980
     position[2] = Interval(125000); // 119766, 120469
 //    graph.get_room_info(&maze, position, pave_list);
-    vtk_graph.show_room_info(&maze, position);
+    vtk_graph.show_room_info(&maze, search_space);
 }
