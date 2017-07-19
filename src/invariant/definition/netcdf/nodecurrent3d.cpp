@@ -112,7 +112,7 @@ void NodeCurrent3D::fill_leafs(const vector<vector<vector<short>>> &raw_u, const
         IntervalVector vector_field(3, Interval::EMPTY_SET); // 3 Dimensions (dt, U, V)
         // T
 //        vector_field[0] = Interval(0.9, 1.1);
-        vector_field[0] = Interval(1);
+        vector_field[0] = Interval(1.0);
         bool no_value = false;
         // U
         for(size_t t_id=0; t_id<tab_point_u[0].size(); t_id++){

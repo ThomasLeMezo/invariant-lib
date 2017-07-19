@@ -12,7 +12,7 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    int iterations_max = 18;
+    int iterations_max = 2;
 
     string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     vector<double> limit_bisection = {15.0*60.0/2.0, 250.0/2.0, 250.0/2.0};
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 4); // T = 0..96 (in 15*min)
+    search_space[0] = Interval(0, 2); // T = 0..96 (in 15*min)
     search_space[1] = Interval(100, 250); // X = 0..300
     search_space[2] = Interval(420, 600); // Y = 200..500
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     t_c = 0 * grid_size[0];
     x_c = 160 * grid_size[1];
     y_c = 460 * grid_size[2];
-    r = 10.0;
+    r = 0.0;
     Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
@@ -68,13 +68,14 @@ int main(int argc, char *argv[])
 
     cout << graph << endl;
 
-    Vtk_Graph vtk_graph("Previmer", &graph, true);
+    Vtk_Graph vtk_graph("Previmer", &graph, false);
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
-//    vector<Pave *> pave_list;
-//    IntervalVector position(3);
-//    position[0] = Interval(800); // 450, 900
-//    position[1] = Interval(37800); // 37304, 37980
-//    position[2] = Interval(120000); // 119766, 120469
+    vector<Pave *> pave_list;
+    IntervalVector position(3);
+    position[0] = Interval(500); // 450, 900
+    position[1] = Interval(35000); // 37304, 37980
+    position[2] = Interval(125000); // 119766, 120469
 //    graph.get_room_info(&maze, position, pave_list);
+    vtk_graph.show_room_info(&maze, position);
 }
