@@ -268,7 +268,6 @@ protected:
 
     bool m_debug_room = false;
     int m_time_debug = 0;
-
 };
 }
 
