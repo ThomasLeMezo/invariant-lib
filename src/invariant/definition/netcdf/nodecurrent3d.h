@@ -17,30 +17,12 @@ public:
      * @param previmer
      * @param leaf_list
      */
-    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, std::vector<NodeCurrent3D *> &leaf_list);
+    NodeCurrent3D(const ibex::IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, std::vector<NodeCurrent3D *> &leaf_list, std::vector<ibex::IntervalVector> & leaf_position);
 
     /**
      * @brief NodeCurrent destructor
      */
     ~NodeCurrent3D();
-
-    /**
-     * @brief Get the position of this NodeCurrent
-     * @return
-     */
-    const ibex::IntervalVector& get_position() const;
-
-    /**
-     * @brief Get the vector field associated with this NodeCurrent
-     * @return
-     */
-    const ibex::IntervalVector& get_vector_field() const;
-
-    /**
-     * @brief Set the vector field associated with this NodeCurrent
-     * @param iv
-     */
-    void set_vector_field(const ibex::IntervalVector& iv);
 
     /**
      * @brief Return if this NodeCurrent is a leaf
@@ -59,49 +41,64 @@ public:
      * (union of its children vector field)
      * @return
      */
-    const ibex::IntervalVector &compute_vector_field_tree();
+    void compute_vector_field_tree(const ibex::IntervalVector &position, short &min_u, short &max_u, short &min_v, short &max_v);
 
     /**
      * @brief Eval the vector filed at this position
      * @param position
      * @return
      */
-    const ibex::IntervalVector eval(const ibex::IntervalVector& position);
+    void eval(const ibex::IntervalVector& target, const ibex::IntervalVector& position, short &min_u, short &max_u, short &min_v, short &max_v) const;
 
     /**
-     * @brief Get the leaf list of this NodeCurrent (list of all leaf children nodes)
-     * @return
+     * @brief Set the vector field of this node
+     * @param min_u
+     * @param max_u
+     * @param min_v
+     * @param max_v
      */
-    const std::vector<NodeCurrent3D *> &get_leaf_list() const;
+    void set_vector_field(short min_u, short max_u, short min_v, short max_v);
 
 private:
-    ibex::IntervalVector m_position;
-    ibex::IntervalVector m_vector_field;
+
+    /**
+     * @brief Compute the union of min/max vector field
+     * @param min_u
+     * @param max_u
+     * @param min_v
+     * @param max_v
+     */
+    void union_vector(short &min_u, short &max_u,short &min_v, short &max_v) const;
+
+private:
+//    ibex::IntervalVector m_position;
+//    ibex::IntervalVector m_vector_field;
+
+    short m_min_u = 32767;
+    short m_min_v = 32767;
+    short m_max_u = -32767;
+    short m_max_v = -32767;
+
+    signed char m_bisection_axis = -1; // -1 if leaf
 
     std::pair<NodeCurrent3D *, NodeCurrent3D *> m_children;
-    bool                m_leaf = false;
 
     PreviMer3D *m_previmer;
 
 };
 
-inline const ibex::IntervalVector& NodeCurrent3D::get_position() const{
-    return m_position;
-}
-
-inline const ibex::IntervalVector& NodeCurrent3D::get_vector_field() const{
-    return m_vector_field;
-}
-
-inline void NodeCurrent3D::set_vector_field(const ibex::IntervalVector& iv){
-    m_vector_field = iv;
-}
-
 inline bool NodeCurrent3D::is_leaf() const{
-    return m_leaf;
+    return (m_bisection_axis == -1)?true:false;
 }
 inline std::pair<NodeCurrent3D *, NodeCurrent3D *> NodeCurrent3D::get_children() const{
     return m_children;
+}
+
+inline void NodeCurrent3D::set_vector_field(short min_u, short max_u, short min_v, short max_v){
+    m_min_u = min_u;
+    m_min_v = min_v;
+    m_max_u = max_u;
+    m_max_v = max_v;
 }
 
 }

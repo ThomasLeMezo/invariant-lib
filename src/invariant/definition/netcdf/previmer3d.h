@@ -46,7 +46,7 @@ public:
 
     std::vector<double> get_grid_size();
 
-    std::pair<ibex::IntervalVector, ibex::IntervalVector> bisect_largest_first(const ibex::IntervalVector &position);
+    signed char bisect_largest_first(const ibex::IntervalVector &position, ibex::IntervalVector &p1, ibex::IntervalVector &p2);
 
 private:
     /**
@@ -75,9 +75,11 @@ private:
     short m_fill_value = 0;
     int m_dim = 0;
     std::vector<size_t> m_size;
+    ibex::IntervalVector m_search_space;
 
     NodeCurrent3D *m_node_current;
     std::vector<NodeCurrent3D *> m_leaf_list;
+    std::vector<ibex::IntervalVector> m_leaf_position;
 
     std::vector<double> m_grid_size;
 
@@ -95,6 +97,10 @@ inline const std::vector<size_t>& PreviMer3D::get_size(){
 
 inline std::vector<double> PreviMer3D::get_grid_size(){
     return m_grid_size;
+}
+
+inline const ibex::IntervalVector& PreviMer3D::get_search_space(){
+    return m_search_space;
 }
 
 }

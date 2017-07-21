@@ -44,11 +44,13 @@ int getValue(){ //Note: this value is in KB!
     return result;
 }
 
-PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level){
+PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level):
+    m_search_space(search_space)
+{
     int ram_init = getValue()/1000;
     cout << "Mem 0 = " << ram_init << " Mo" << endl;
 
-    if(search_space.size()!=3){
+    if(m_search_space.size()!=3){
         throw std::runtime_error("in [previmer3d.cpp/PreviMer3D()] dim of search_space is not equal to 3");
     }
     m_dim = 3;
@@ -57,15 +59,15 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
 
     // Compute ratio dimension
     for(int dim=0; dim<m_dim; dim++){
-        double diam = search_space[dim].diam();
+        double diam = m_search_space[dim].diam();
         m_ratio_dimension.push_back(1.0/diam);
     }
 
     vector<string> file_list;
     get_file_list(file_directory, file_list);
     int nb_files = file_list.size();
-    int t_max = min(nb_files, (int)(search_space[0].ub()/grid_size[0]));
-    int t_min = max(0, (int)(search_space[0].lb()/grid_size[0]));
+    int t_max = min(nb_files, (int)(m_search_space[0].ub()/grid_size[0]));
+    int t_min = max(0, (int)(m_search_space[0].lb()/grid_size[0]));
     bool first_read = true;
     int cpt = 0;
 
@@ -122,12 +124,11 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
     cout << " Scale factor = " << m_scale_factor << endl;
     cout << " Fill Value = " << m_fill_value << endl;
 
-//    // ******* Node Current ******
-    IntervalVector position(search_space);
-    if(search_space.is_unbounded()){
+    //    // ******* Node Current ******
+    if(m_search_space.is_unbounded()){
         for(int i=0; i<3; i++)
-            position[i] = Interval(0, m_size[i]*m_grid_size[i]);
-        cout << "unbound search space set to : " << position << endl;
+            m_search_space[i] = Interval(0, m_size[i]*m_grid_size[i]);
+        cout << "unbound search space set to : " << m_search_space << endl;
     }
 
     double time_start_init = omp_get_wtime();
@@ -135,7 +136,7 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
     cout << "size raw_u_t = " << (*raw_u_t).size() << " " << (*raw_u_t)[0].size() << " " << (*raw_u_t)[0][0].size() << endl;
 
     cout << "TIME build tree = ";
-    m_node_current = new NodeCurrent3D(position, limit_bisection, this, m_leaf_list);
+    m_node_current = new NodeCurrent3D(m_search_space, limit_bisection, this, m_leaf_list, m_leaf_position);
     cout << omp_get_wtime() - time_start_init << endl;
 
     time_start_init = omp_get_wtime();
@@ -153,7 +154,11 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
     delete(raw_v_t);
 
     time_start_init = omp_get_wtime();
-    m_node_current->compute_vector_field_tree();
+    short min_u = 32767;
+    short min_v = 32767;
+    short max_u = -32767;
+    short max_v = -32767;
+    m_node_current->compute_vector_field_tree(m_search_space, min_u, max_u, min_v, max_v);
     cout << "TIME compute tree = " << omp_get_wtime() - time_start_init << endl;
 
     cout << "Mem 4 = " << getValue()/1000 - ram_init << " Mo" << endl;
@@ -165,17 +170,22 @@ PreviMer3D::~PreviMer3D(){
 
 const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& position){
     vector<ibex::IntervalVector> vector_fields;
-    IntervalVector result = m_node_current->eval(position);
+    short min_u = 32767;
+    short min_v = 32767;
+    short max_u = -32767;
+    short max_v = -32767;
+    m_node_current->eval(position, m_search_space, min_u, max_u, min_v, max_v);
     IntervalVector vec(3);
-    vec[0] = Interval(1);
-    vec[1] = result[0];
-    vec[2] = result[1];
+    if((min_u == 32767 && max_u == -32767) || (min_v == 32767 && max_v == -32767)){
+        vec = IntervalVector(3, Interval::EMPTY_SET);
+    }
+    else{
+        vec[0] = Interval(1);
+        vec[1] = Interval(min_u * m_scale_factor, max_u * m_scale_factor);
+        vec[2] = Interval(min_v * m_scale_factor, max_v * m_scale_factor);
+    }
     vector_fields.push_back(vec);
     return vector_fields;
-}
-
-const ibex::IntervalVector& PreviMer3D::get_search_space(){
-    return m_node_current->get_position();
 }
 
 int PreviMer3D::get_file_list(string dir, vector<string> &files){
@@ -195,7 +205,7 @@ int PreviMer3D::get_file_list(string dir, vector<string> &files){
     return 0;
 }
 
-std::pair<IntervalVector, IntervalVector> PreviMer3D::bisect_largest_first(const IntervalVector &position){
+signed char PreviMer3D::bisect_largest_first(const IntervalVector &position, IntervalVector &p1, IntervalVector &p2){
     // Select dimensions to bisect
     bool one_possible = false;
     vector<bool> possible_dim;
@@ -224,13 +234,13 @@ std::pair<IntervalVector, IntervalVector> PreviMer3D::bisect_largest_first(const
             dim_max = i;
         }
     }
-    IntervalVector p1(position);
-    IntervalVector p2(position);
+    p1 = position;
+    p2 = position;
 
     p1[dim_max] = Interval(position[dim_max].lb(), position[dim_max].mid());
     p2[dim_max] = Interval(position[dim_max].mid(), position[dim_max].ub());
 
-    return std::make_pair(p1, p2);
+    return (signed char)dim_max;
 }
 
 void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > > &raw_u_t, const std::vector<std::vector<std::vector<short> > > &raw_v_t){
@@ -241,18 +251,19 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
 #pragma omp parallel for
     for(int id=0; id<nb_node; id++){
         NodeCurrent3D *nc = m_leaf_list[id];
+        IntervalVector position = m_leaf_position[id];
 
         /// **** Interpolation of vector field ****
         vector<vector<int>> tab_point_u, tab_point_v;
 
         for(int dim = 0; dim<3; dim++){
             vector<int> pt_u, pt_v;
-            Interval center_u = nc->get_position()[dim].mid() / m_grid_size[dim]; // Back to the grid coord
+            Interval center_u = position[dim].mid() / m_grid_size[dim]; // Back to the grid coord
             Interval center_v;
             if(dim > 0)
-                center_v = (nc->get_position()[dim].mid()+0.5*m_grid_size[dim]) / m_grid_size[dim]; // Back to the grid coord
+                center_v = (position[dim].mid()+0.5*m_grid_size[dim]) / m_grid_size[dim]; // Back to the grid coord
             else
-                center_v = nc->get_position()[dim].mid() / m_grid_size[dim]; // Back to the grid coord
+                center_v = position[dim].mid() / m_grid_size[dim]; // Back to the grid coord
 
             // Cross pattern
             for(int i=std::max(0, std::min((int)floor(center_u.lb()), d_max[dim]));
@@ -271,6 +282,12 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
 
         IntervalVector vector_field(2, Interval::EMPTY_SET); // 2 Dimensions (U, V) -> bc T=Interval(1)
         bool no_value = false;
+
+        short min_u = 32767;
+        short min_v = 32767;
+        short max_u = -32767;
+        short max_v = -32767;
+
         // U
         for(size_t t_id=0; t_id<tab_point_u[0].size(); t_id++){
             for(size_t u_id=0; u_id<tab_point_u[0].size(); u_id++){
@@ -281,7 +298,8 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
 
                     short vec_u = raw_u_t[t_coord][i_coord][j_coord];
                     if(vec_u!=m_fill_value){
-                        vector_field[0] |= Interval(vec_u*m_scale_factor);
+                        min_u = min(min_u, vec_u);
+                        max_u = max(max_u, vec_u);
                     }
                     else
                         no_value = true;
@@ -298,7 +316,8 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
 
                     short vec_v = raw_v_t[t_coord][i_coord][j_coord];
                     if(vec_v!=m_fill_value){
-                        vector_field[1] |= Interval(vec_v*m_scale_factor);
+                        min_v = min(min_v, vec_v);
+                        max_v = max(max_v, vec_v);
                     }
                     else
                         no_value = true;
@@ -306,9 +325,14 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short> > >
             }
         }
 
-        if(no_value)
-            vector_field = IntervalVector(2, Interval::EMPTY_SET);
-        nc->set_vector_field(vector_field);
+        if(no_value){
+            min_u = 32767;
+            min_v = 32767;
+            max_u = -32767;
+            max_v = -32767;
+        }
+
+        nc->set_vector_field(min_u, max_u, min_v, max_v);
     }
 }
 
