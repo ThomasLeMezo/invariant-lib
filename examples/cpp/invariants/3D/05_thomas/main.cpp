@@ -31,9 +31,27 @@ int main(int argc, char *argv[])
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
+    double r = 0.1;
+    Array<Sep> array_sep;
+    Function f_sep1(x, y, z, pow(x, 2)+pow(y, 2)+pow(z, 2)-pow(r, 2));
+    SepFwdBwd s1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT
+    array_sep.add(s1);
+
+//    Function f_sep2(x1, x2, x3, pow(x1-pt_xy, 2)+pow(x2-pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));
+//    SepFwdBwd s2(f_sep2, GEQ); // LT, LEQ, EQ, GEQ, GT
+//    array_sep.add(s2);
+
+//    Function f_sep3(x1, x2, x3, pow(x1+pt_xy, 2)+pow(x2+pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));
+//    SepFwdBwd s3(f_sep3, GEQ); // LT, LEQ, EQ, GEQ, GT
+//    array_sep.add(s3);
+
+    SepInter sep_total(array_sep);
+    dom.set_sep(&sep_total);
+
     // ****** Dynamics ******* //
 //    Interval b = Interval(0.32899);
-    Interval b = Interval(0.208186);
+//    Interval b = Interval(0.208186);
+    Interval b = Interval(0.1998);
 
     ibex::Function f(x, y, z, Return(sin(y)-b*x,
                                      sin(z)-b*y,

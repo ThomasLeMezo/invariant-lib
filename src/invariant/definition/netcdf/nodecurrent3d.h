@@ -31,12 +31,6 @@ public:
     bool is_leaf() const;
 
     /**
-     * @brief Get the children of this NodeCurrent
-     * @return
-     */
-    std::pair<NodeCurrent3D *, NodeCurrent3D *> get_children() const;
-
-    /**
      * @brief Compute the vector field if this NodeCurrent is not a leaf
      * (union of its children vector field)
      * @return
@@ -74,14 +68,15 @@ private:
 //    ibex::IntervalVector m_position;
 //    ibex::IntervalVector m_vector_field;
 
-    short m_min_u = 32767;
-    short m_min_v = 32767;
-    short m_max_u = -32767;
-    short m_max_v = -32767;
+    signed short m_min_u = 32767;
+    signed short m_min_v = 32767;
+    signed short m_max_u = -32767;
+    signed short m_max_v = -32767;
 
     signed char m_bisection_axis = -1; // -1 if leaf
 
-    std::pair<NodeCurrent3D *, NodeCurrent3D *> m_children;
+    NodeCurrent3D * m_children_first;
+    NodeCurrent3D * m_children_second;
 
     PreviMer3D *m_previmer;
 
@@ -89,9 +84,6 @@ private:
 
 inline bool NodeCurrent3D::is_leaf() const{
     return (m_bisection_axis == -1)?true:false;
-}
-inline std::pair<NodeCurrent3D *, NodeCurrent3D *> NodeCurrent3D::get_children() const{
-    return m_children;
 }
 
 inline void NodeCurrent3D::set_vector_field(short min_u, short max_u, short min_v, short max_v){

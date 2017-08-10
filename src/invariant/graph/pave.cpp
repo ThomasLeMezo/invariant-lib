@@ -200,8 +200,8 @@ void Pave::bisect(){
 
         if(r->is_empty()){
             m_tree->add_emptyness((it->first), true);
-            r_first->set_empty();
-            r_second->set_empty();
+            r_first->set_empty_private();
+            r_second->set_empty_private();
         }
         else
             m_tree->add_emptyness((it->first), false);
@@ -266,7 +266,9 @@ void Pave::get_neighbors_pave(std::vector<Pave*> pave_list){
 void Pave::get_neighbors_room(Maze *maze, std::vector<Room*>& room_list){
     for(Face *f:m_faces_vector){
         for(Face *f_n:f->get_neighbors()){
-            room_list.push_back(f_n->get_pave()->get_rooms()[maze]);
+            Room *r_n = f_n->get_pave()->get_rooms()[maze];
+            if(!r_n->is_removed())
+                room_list.push_back(r_n);
         }
     }
 }

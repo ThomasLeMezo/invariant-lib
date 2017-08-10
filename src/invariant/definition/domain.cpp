@@ -21,10 +21,14 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
     contract_border(maze, list_room_deque);
 
     // ********** Add additional rooms to deque ********** //
-    if(maze->get_type() == MAZE_CONTRACTOR)
+    if(maze->get_type() == MAZE_CONTRACTOR){
         m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
-    if(maze->get_type() == MAZE_PROPAGATOR && m_graph->get_paves().size()>1 && m_link_start==NOT_LINK_TO_INITIAL_CONDITION) // When initial condition is not link with active paves
-        m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+    }
+    if(maze->get_type() == MAZE_PROPAGATOR && m_graph->get_paves().size()>1 && m_link_start==NOT_LINK_TO_INITIAL_CONDITION){ // When initial condition is not link with active paves
+        //        m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+        m_graph->get_tree()->get_all_child_rooms_border_outside(list_room_deque, maze);
+        // (OK ?) Wrong function -> need to add neighbours of full paves instead of not_empty
+    }
 }
 
 void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Room*> &list_room_deque, bool output, DOMAIN_SEP accelerator){
@@ -179,6 +183,25 @@ void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
             if(type == MAZE_CONTRACTOR && (!m_border_path_in || !m_border_path_out)){
                 if(!p->get_rooms()[maze]->is_empty())
                     list_room_deque.push_back(p->get_rooms()[maze]);
+            }
+        }
+    }
+}
+
+void Domain::inter_maze(Maze *maze){
+    for(Maze *maze_inter : m_maze_list){
+        if(maze != maze_inter){
+
+            std::vector<Room *> room_list;
+            m_graph->get_tree()->get_all_child_rooms_not_empty(room_list, maze);
+
+            for(Room *r:room_list){
+                Pave *p = r->get_pave();
+                Room *r_inter = p->get_rooms()[maze_inter];
+                if(r_inter->is_empty()){
+                    r->set_empty_private();
+                    r->synchronize();
+                }
             }
         }
     }

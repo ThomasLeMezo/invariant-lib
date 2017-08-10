@@ -12,15 +12,15 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    int iterations_max = 5;
+    int iterations_max = 20;
 
     string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
 
     vector<double> grid_size = {15*60.0, 250.0, 250.0}; // {15*60 s, 250 m, 250 m}
-    vector<double> limit_bisection = {15.0*60.0/2.0, 250.0/2.0, 250.0/2.0};
+    vector<double> limit_bisection = {15.0*60.0, 250.0, 250.0}; // Or divide by 2
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 4); // T = 0..96 (in 15*min)
+    search_space[0] = Interval(0, 10); // T = 0..96 (in 15*min)
     search_space[1] = Interval(100, 250); // X = 0..300
     search_space[2] = Interval(420, 600); // Y = 200..500
 
@@ -61,23 +61,26 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
     for(int i=0; i<iterations_max; i++){
+        cout << i << "/" << iterations_max << endl;
+        double time_start_bisection = omp_get_wtime();
         graph.bisect();
-        cout << i << "/" << iterations_max << " - " << maze.contract() << " - " << graph.size() << endl;
+        cout << " => bisection : " << omp_get_wtime() - time_start_bisection << "s - " << graph.size() << endl;
+        maze.contract();
     }
-    cout << "TIME = " << omp_get_wtime() - time_start << endl;
+    cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
 
     cout << graph << endl;
 
-    Vtk_Graph vtk_graph("Previmer", &graph, false);
-    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("Previmer", &graph, true);
+//    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 //    vector<Pave *> pave_list;
     IntervalVector position(3);
-    position[0] = Interval(500); // 450, 900
-    position[1] = Interval(35000); // 37304, 37980
-    position[2] = Interval(125000); // 119766, 120469
+    position[0] = Interval(0, 3000); // 450, 900
+    position[1] = Interval(39000, 41000); // 37304, 37980
+    position[2] = Interval(135500); // 119766, 120469
 //    graph.get_room_info(&maze, position, pave_list);
-    vtk_graph.show_room_info(&maze, search_space);
+//    vtk_graph.show_room_info(&maze, search_space);
 
     return 0;
 }

@@ -180,9 +180,9 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec = IntervalVector(3, Interval::EMPTY_SET);
     }
     else{
-        vec[0] = Interval(1);
-        vec[1] = Interval(min_u * m_scale_factor, max_u * m_scale_factor);
-        vec[2] = Interval(min_v * m_scale_factor, max_v * m_scale_factor);
+        vec[0] = Interval(1.0);
+        vec[1] = Interval(min_u * m_scale_factor, max_u * m_scale_factor) + Interval(-0.01, 0.01);
+        vec[2] = Interval(min_v * m_scale_factor, max_v * m_scale_factor) + Interval(-0.01, 0.01);
     }
     vector_fields.push_back(vec);
     return vector_fields;

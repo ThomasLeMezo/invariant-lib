@@ -125,6 +125,14 @@ void Graph::bisect(){
             delete(p);
         }
         else{
+            // I
+//            for(Maze *maze:m_mazes){
+//                if(maze->get_type() == MAZE_PROPAGATOR){
+//                    Room *r = p->get_rooms()[maze];
+//                    r->set_empty_private();
+//                    r->synchronize();
+//                }
+//            }
             // Store not bisectable paves
             p->set_removed_rooms();
             m_paves_not_bisectable.push_back(p);

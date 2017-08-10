@@ -63,10 +63,20 @@ public:
     Dynamics *get_dynamics() const;
 
     /**
+     * @brief Initialize the Maze by applying only a domain contractor
+     */
+    void init();
+
+    /**
      * @brief Contract the Maze
      * @return the number of contractions
      */
     int contract();
+
+    /**
+     * @brief Contract the Maze by intersecting with other domain mazes
+     */
+    void contract_inter();
 
     /**
      * @brief Add a Room to the deque BUT DO NOT CHECK if already in

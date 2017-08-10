@@ -128,6 +128,13 @@ public:
     void get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maze *maze) const;
 
     /**
+     * @brief Get all outside rooms that are on the border of the set
+     * @param list_room
+     * @param maze
+     */
+    void get_all_child_rooms_border_outside(std::vector<Room *> &list_room, Maze *maze) const;
+
+    /**
      * @brief Getter to the children of this pave_node
      * @return
      */

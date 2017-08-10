@@ -174,10 +174,14 @@ void Pave_node::get_all_child_rooms_not_empty(std::vector<Room *> &list_room, Ma
         if(!r->is_empty() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
+    //    else if(this->get_fullness()[maze]){ // Not right because of contraction of the yellow area
+    //        m_children.first->get_all_child_rooms(list_room, maze);
+    //        m_children.second->get_all_child_rooms(list_room, maze);
+    //    }
     else{
-        if(!this->get_emptyness()[maze] && !this->get_removed()[maze]){
-            m_children.first->get_all_child_rooms(list_room, maze);
-            m_children.second->get_all_child_rooms(list_room, maze);
+        if(!this->get_removed()[maze] && !this->get_emptyness()[maze]){
+            m_children.first->get_all_child_rooms_not_empty(list_room, maze);
+            m_children.second->get_all_child_rooms_not_empty(list_room, maze);
         }
     }
 }
@@ -188,10 +192,28 @@ void Pave_node::get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maz
         if(!r->is_full() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
+    else if(this->get_emptyness()[maze]){
+        m_children.first->get_all_child_rooms(list_room, maze);
+        m_children.second->get_all_child_rooms(list_room, maze);
+    }
     else{
         if(!this->get_fullness()[maze] && !this->get_removed()[maze]){
-            m_children.first->get_all_child_rooms(list_room, maze);
-            m_children.second->get_all_child_rooms(list_room, maze);
+            m_children.first->get_all_child_rooms_not_full(list_room, maze);
+            m_children.second->get_all_child_rooms_not_full(list_room, maze);
+        }
+    }
+}
+
+void Pave_node::get_all_child_rooms_border_outside(std::vector<Room *> &list_room, Maze *maze) const{
+    if(is_leaf()){
+        Room *r = m_pave->get_rooms()[maze];
+        if(!r->is_full() && !r->is_removed())
+            list_room.push_back(m_pave->get_rooms()[maze]);
+    }
+    else{
+        if(!this->get_removed()[maze]){
+            m_children.first->get_all_child_rooms_not_full(list_room, maze);
+            m_children.second->get_all_child_rooms_not_full(list_room, maze);
         }
     }
 }

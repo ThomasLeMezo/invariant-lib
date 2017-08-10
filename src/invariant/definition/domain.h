@@ -126,6 +126,18 @@ public:
      */
     void set_border_path_out(bool out);
 
+    /**
+     * @brief Add a maze to intersect with
+     * @param maze
+     */
+    void add_maze(Maze *maze);
+
+    /**
+     * @brief Intersect the initial condition with the maze state
+     * @param maze
+     */
+    void inter_maze(Maze *maze);
+
 private:
     /**
      * @brief Contract all output or input doors of the maze according to the separator contractor
@@ -153,6 +165,8 @@ private:
     bool m_border_path_out = true;
 
     DOMAIN_PROPAGATION_START m_link_start = NOT_LINK_TO_INITIAL_CONDITION;
+
+    std::vector<Maze *> m_maze_list;
 };
 }
 
@@ -206,6 +220,10 @@ inline void Domain::set_border_path_in(bool in){
 
 inline void Domain::set_border_path_out(bool out){
     m_border_path_out = out;
+}
+
+inline void Domain::add_maze(Maze *maze){
+    m_maze_list.push_back(maze);
 }
 
 }

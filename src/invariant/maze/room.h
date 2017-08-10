@@ -67,9 +67,9 @@ public:
     void set_full_private_input();
 
     /**
-     * @brief Set all input and output private doors to empty
+     * @brief Set all input and output doors to empty
      */
-    void set_empty();
+    void set_empty_private();
 
     /**
      * @brief Set all input and output private doors to full

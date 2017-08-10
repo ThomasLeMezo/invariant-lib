@@ -73,7 +73,7 @@ void Room::set_full_private_input(){
     }
 }
 
-void Room::set_empty(){
+void Room::set_empty_private(){
     for(Face *f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->set_empty_private();
     }
@@ -317,7 +317,7 @@ void Room:: contract_consistency(){
                                     Door* door_out = f_out->get_doors()[m_maze];
 
                                     IntervalVector out_return(dim);
-                                    if(type == MAZE_PROPAGATOR || !(face_out == face_in && sens_out == sens_in)){
+                                    if(/*type == MAZE_PROPAGATOR ||*/ !(face_out == face_in && sens_out == sens_in)){
                                         if(type == MAZE_CONTRACTOR)
                                             out_return = door_out->get_output_private();
                                         else

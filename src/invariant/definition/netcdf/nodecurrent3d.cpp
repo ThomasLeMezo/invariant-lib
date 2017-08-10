@@ -27,15 +27,15 @@ NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<d
         m_bisection_axis = previmer->bisect_largest_first(position, p1, p2);
         NodeCurrent3D *nc1 = new NodeCurrent3D(p1, limit_bisection, previmer, leaf_list, leaf_position);
         NodeCurrent3D *nc2 = new NodeCurrent3D(p2, limit_bisection, previmer, leaf_list, leaf_position);
-        m_children.first = nc1;
-        m_children.second = nc2;
+        m_children_first = nc1;
+        m_children_second = nc2;
     }
 }
 
 NodeCurrent3D::~NodeCurrent3D(){
     if(!is_leaf()){
-        delete(m_children.first);
-        delete(m_children.second);
+        delete(m_children_first);
+        delete(m_children_second);
     }
 }
 
@@ -50,16 +50,14 @@ void NodeCurrent3D::compute_vector_field_tree(const ibex::IntervalVector &positi
         p1[m_bisection_axis] = Interval(position[m_bisection_axis].lb(),position[m_bisection_axis].mid());
         p2[m_bisection_axis] = Interval(position[m_bisection_axis].mid(),position[m_bisection_axis].ub());
 
-        m_children.first->compute_vector_field_tree(p1, min_u, max_u, min_v, max_v);
-        m_children.second->compute_vector_field_tree(p2, min_u, max_u, min_v, max_v);
+        m_children_first->compute_vector_field_tree(p1, min_u, max_u, min_v, max_v);
+        m_children_second->compute_vector_field_tree(p2, min_u, max_u, min_v, max_v);
         m_min_u = min_u;
         m_min_v = min_v;
         m_max_u = max_u;
         m_max_v = max_v;
     }
 }
-
-static ibex::IntervalVector empty3(3, ibex::Interval::EMPTY_SET);
 
 void NodeCurrent3D::eval(const IntervalVector& target, const IntervalVector& position, short &min_u, short &max_u,
                                                short &min_v, short &max_v) const{
@@ -80,8 +78,8 @@ void NodeCurrent3D::eval(const IntervalVector& target, const IntervalVector& pos
             IntervalVector p2(position);
             p1[m_bisection_axis] = Interval(position[m_bisection_axis].lb(),position[m_bisection_axis].mid());
             p2[m_bisection_axis] = Interval(position[m_bisection_axis].mid(),position[m_bisection_axis].ub());
-            m_children.first->eval(target, p1, min_u, max_u, min_v, max_v);
-            m_children.second->eval(target, p2, min_u, max_u, min_v, max_v);
+            m_children_first->eval(target, p1, min_u, max_u, min_v, max_v);
+            m_children_second->eval(target, p2, min_u, max_u, min_v, max_v);
         }
     }
 }

@@ -28,6 +28,12 @@ Maze::~Maze(){
     omp_destroy_lock(&m_deque_access);
 }
 
+void Maze::init(){
+    vector<Room *> list_room_to_contract;
+    invariant::Domain *d = m_domain;
+    d->contract_domain(this, list_room_to_contract);
+}
+
 int Maze::contract(){
     // Domain contraction
     vector<Room *> list_room_to_contract;
@@ -135,8 +141,15 @@ int Maze::contract(){
             }
         }
     }
+
     cout << " => contractions : " << omp_get_wtime() - t_start << endl;
     return nb_operations;
+}
+
+void Maze::contract_inter(){
+    // Intersect this maze with other mazes
+    invariant::Domain *d = m_domain;
+    d->inter_maze(this);
 }
 
 void Maze::add_rooms(const vector<Room *>& list_rooms){

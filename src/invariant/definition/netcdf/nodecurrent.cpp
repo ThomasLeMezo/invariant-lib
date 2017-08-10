@@ -62,7 +62,7 @@ void NodeCurrent::fill_leafs(const vector<vector<short>> &raw_u, const vector<ve
     int nb_node=m_leaf_list.size();
     size_t dim = m_position.size();
 
-    int d_max[2] = {raw_u.size()-1, raw_u[0].size()-1};
+    int d_max[2] = {(int)raw_u.size()-1, (int)raw_u[0].size()-1};
 
 //    #pragma omp parallel for
     for(int id=0; id<nb_node; id++){
