@@ -1,0 +1,31 @@
+from setuptools import setup, Distribution
+# force External module
+class BinaryDistribution(Distribution):
+    def has_ext_modules(self):
+        return True
+
+setup(
+  name='pyinvariant',
+  version='${PACKAGE_VERSION}',
+  author='Thomas Le Mézo',
+  author_email='thomas.le_mezo@ensta-bretagne.org',
+  url='https://github.com/ThomasLeMezo/invariant-lib',
+  description='A python interface of the Invariant library',
+  long_description='',
+  ext_modules=[],
+  packages=['pyinvariant'],
+  package_data={
+      'pyinvariant': ['invariant${PYTHON_MODULE_EXTENSION}'],
+
+  },
+  # test_suite='pyinvariant.tests',
+  license="LGPLv3+",
+  classifiers=[
+      "Development Status :: 3 - Alpha",
+      "Topic :: Scientific/Engineering :: Mathematics",
+      "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+  ],
+  include_package_data=True,
+  zip_safe=False,
+  distclass=BinaryDistribution
+)

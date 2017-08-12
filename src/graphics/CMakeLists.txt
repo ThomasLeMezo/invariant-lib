@@ -28,12 +28,12 @@ include_directories(vibes)
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-graphics ${SRC})
+  add_library(invariant-graphics ${SRC} ${HEADERS})
   target_link_libraries(invariant-graphics
       ${LIBS}
       ${LIBS_GRAPHIZ}
       ${LIBS_VTK}
-      )
+  )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")
   install(TARGETS invariant-graphics DESTINATION lib)

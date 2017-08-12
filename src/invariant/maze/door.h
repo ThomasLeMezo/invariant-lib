@@ -7,6 +7,7 @@
 #include "maze.h"
 #include <omp.h>
 #include <iostream>
+#include <sstream>      // std::ostringstream
 #include <iomanip>
 
 namespace invariant {
