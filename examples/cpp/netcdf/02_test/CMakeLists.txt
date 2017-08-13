@@ -4,6 +4,7 @@
 
 # Sources
 
+if(WITH_NETCDF AND WITH_3D)
   set(SRC
     main.cpp
   )
@@ -16,10 +17,12 @@
 
   target_link_libraries(3D_netcdf_test
     ${LIBS}
+    ${LIBS_NETCDF}
     invariant-core
     invariant-tools
-    invariant-graphics
+    invariant-graphics-3D
   )
+endif()
 
 
 # Tests

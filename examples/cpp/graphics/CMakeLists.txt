@@ -4,6 +4,7 @@
 
 # Sources
 
+if(WITH_GRAPHIZ)
   set(SRC
 	main.cpp
   )
@@ -19,8 +20,10 @@
          ${LIBS_GRAPHIZ}
 	 invariant-core
          invariant-tools
+         invariant-graphics-graphiz
          invariant-graphics
   )
+endif()
 
 
 # Tests

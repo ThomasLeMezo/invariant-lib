@@ -4,6 +4,7 @@
 
 # Sources
 
+if(WITH_3D)
   set(SRC
 	main.cpp
   )
@@ -18,9 +19,9 @@
 	 ${LIBS}
 	 invariant-core
          invariant-tools
-         invariant-graphics
+         invariant-graphics-3D
   )
-
+endif()
 
 # Tests
 
