@@ -10,6 +10,8 @@ cmake_minimum_required(VERSION 3.5)
     set(PACKAGE_VERSION "0.1")
     project(${PACKAGE_NAME})
 
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
+
 # debug/release options
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0 -Wno-reorder")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
@@ -20,24 +22,24 @@ cmake_minimum_required(VERSION 3.5)
 
     if(NOT WIN32)
         set(CMAKE_CXX_FLAGS " -fPIC ${CMAKE_CXX_FLAGS}")
-        set(IbexLib_USE_STATIC 1) # force ibex static linking
     endif()
 
-# IBEX-lib package
     FIND_PACKAGE(PkgConfig)
-    set(IbexLib_USE_STATIC 1)
-    set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${IBEX_ROOT}/share/pkgconfig/")
-    message(STATUS "[IBEX] PKG_CONFIG_PATH = $ENV{PKG_CONFIG_PATH}")
-    pkg_search_module(IBEX ibex)
 
+# IBEX-lib package
+    set(IbexLib_USE_STATIC 1)
+    # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${IBEX_ROOT}/share/pkgconfig/")
+    # message(STATUS "[IBEX] PKG_CONFIG_PATH = $ENV{PKG_CONFIG_PATH}")
+    # pkg_search_module(IBEX ibex)
+
+    FIND_PACKAGE(IbexLib REQUIRED)
     if(IBEX_FOUND)
         # https://cmake.org/Wiki/CMake:How_To_Find_Libraries
         INCLUDE_DIRECTORIES(${IBEX_INCLUDE_DIRS})
         set(LIBS ${LIBS} ${IBEX_LIBRARIES})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math")
-        set(IBEX_DEFINITIONS ${PC_IBEX_CFLAGS_OTHER})
 
-        link_directories("${IBEX_ROOT}/lib" "${IBEX_ROOT}/lib/ibex/3rd")
+        # link_directories("${IBEX_ROOT}/lib" "${IBEX_ROOT}/lib/ibex/3rd")
 
         message(STATUS "[IBEX] IBEX_LIBRARIES = ${IBEX_LIBRARIES}")
         message(STATUS "[IBEX] IBEX_INCLUDE_DIRS = ${IBEX_INCLUDE_DIRS}")
@@ -46,6 +48,7 @@ cmake_minimum_required(VERSION 3.5)
     else()
         message(FATAL_ERROR "Unable to find IBEX-lib. You may need to set IBEX_ROOT ${IBEX_ROOT}")
     endif()
+
 
 # Graphiz
     pkg_search_module(LIBGVC libgvc)
@@ -105,7 +108,7 @@ cmake_minimum_required(VERSION 3.5)
 # Pybind11
     if(WITH_PYTHON)
         message(STATUS "[PYTHON] ON")
-        set(PYBIND11_CPP_STANDARD -std=c++14)
+#        set(PYBIND11_CPP_STANDARD -std=c++14)
         add_subdirectory(pybind11)
         add_subdirectory(python)
     else()

@@ -25,6 +25,7 @@ pybind11_add_module(pyinvariant
 
 target_link_libraries(pyinvariant PRIVATE
     invariant-core
+    invariant-graphics
 )
 
 #add_custom_command(TARGET invariant POST_BUILD

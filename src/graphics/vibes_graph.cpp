@@ -1,6 +1,6 @@
 #include "vibes_graph.h"
-#include <ibex.h>
 #include "ostream"
+#include <ibex.h>
 
 using namespace invariant;
 using namespace ibex;

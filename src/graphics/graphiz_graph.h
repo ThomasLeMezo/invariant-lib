@@ -1,8 +1,8 @@
 #ifndef GRAPHIZ_GRAPH_H
 #define GRAPHIZ_GRAPH_H
 
-#include <string>
 #include "graph.h"
+#include <string>
 
 class Graphiz_Graph
 {

@@ -8,7 +8,8 @@ SCRIPT="$(readlink -f "$0")"
 INVARIANTLIB_DIR="$(dirname "$SCRIPT")"
 
 cd ..
-sh $INVARIANTLIB_DIR/cmake/build_IbexLib.sh
+# sh $INVARIANTLIB_DIR/cmake/build_IbexLib.sh
+sh $INVARIANTLIB_DIR/cmake/build_Ibex4pyIbex.sh # Benoit Desrocher version
 # sh $INVARIANTLIB_DIR/cmake/build_VTK.sh
 cd $INVARIANTLIB_DIR
 
