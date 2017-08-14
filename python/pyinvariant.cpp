@@ -1,35 +1,38 @@
 #include <pybind11/pybind11.h>
-#include <pybind11/operators.h>
-#include <pybind11/functional.h>
 #include <pybind11/stl.h>
 
 #include <ibex.h>
 #include "graph.h"
 #include "domain.h"
 #include "maze.h"
+#include "dynamics.h"
 #include "dynamics_function.h"
 #include "vibes_graph.h"
 #include <string>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
-using py::self;
 
-//PYBIND11_MODULE(pyinvariant, m){
-//  m.doc() = "Python binding of invariant-lib";
-PYBIND11_PLUGIN(pyinvariant) {
-  py::module m("pyinvariant", "Python binding of invariant-lib");
+using namespace invariant;
+using namespace ibex;
+
+PYBIND11_MODULE(pyinvariant, m){
+  m.doc() = "Python binding of invariant-lib";
+//PYBIND11_PLUGIN(pyinvariant) {
+//  py::module m("pyinvariant", "Python binding of invariant-lib");
+//  py::module pyibex = (py::object) py::module::import("pyibex");
 
   // ********* Graphs *********
-  py::class_<invariant::Graph>(m, "Graph")
-          .def(py::init<const ibex::IntervalVector&>(), "IntervalVector"_a )
-          .def("bisect", &invariant::Graph::bisect)
-          .def("size", &invariant::Graph::size)
+  py::class_<Graph>(m, "Graph")
+          .def(py::init<const IntervalVector&>(), "IntervalVector"_a )
+          .def("bisect", &Graph::bisect)
+          .def("size", &Graph::size)
   ;
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
           .def(py::init<invariant::Graph*>(), "graph"_a)
+          .def(py::init<invariant::Graph*, DOMAIN_PROPAGATION_START>(), "graph"_a, "DOMAIN_PROPAGATION_START"_a)
           .def("set_border_path_in", &invariant::Domain::set_border_path_in)
           .def("set_border_path_out", &invariant::Domain::set_border_path_out)
           .def("set_sep", &invariant::Domain::set_sep)
@@ -43,7 +46,10 @@ PYBIND11_PLUGIN(pyinvariant) {
     ;
 
   // ********* Dynamics Function *********
-  py::class_<invariant::Dynamics_Function>(m, "DynamicsFunction")
+  py::class_<invariant::Dynamics> dynamics(m, "Dynamics");
+//          dynamics.def(py::init<>())
+//    ;
+  py::class_<invariant::Dynamics_Function>(m, "DynamicsFunction", dynamics)
           .def(py::init<ibex::Function*>(), "f"_a)
     ;
 
@@ -76,6 +82,7 @@ PYBIND11_PLUGIN(pyinvariant) {
                "VIBES_GRAPH_TYPE"_a = Vibes_Graph::VIBES_GRAPH_OUTER)
           .def("setProperties", &Vibes_Graph::setProperties)
           .def("show", &Vibes_Graph::show)
+          .def("drawCircle", &Vibes_Graph::drawCircle)
           ;
 
   // ********* ENUM *********
@@ -85,10 +92,13 @@ PYBIND11_PLUGIN(pyinvariant) {
       .value("MAZE_FWD_BWD", invariant::MazeSens::MAZE_FWD_BWD)
       .export_values();
 
-  py::enum_<invariant::MazeType>(m, "MazeType")
-      .value("MAZE_CONTRACTOR", invariant::MazeType::MAZE_CONTRACTOR)
-      .value("MAZE_PROPAGATOR", invariant::MazeType::MAZE_PROPAGATOR)
+  py::enum_<MazeType>(m, "MazeType")
+      .value("MAZE_CONTRACTOR", MazeType::MAZE_CONTRACTOR)
+      .value("MAZE_PROPAGATOR", MazeType::MAZE_PROPAGATOR)
       .export_values();
 
-  return m.ptr();
+  py::enum_<DOMAIN_PROPAGATION_START>(m, "DOMAIN_PROPAGATION_START")
+      .value("LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::LINK_TO_INITIAL_CONDITION)
+      .value("NOT_LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::NOT_LINK_TO_INITIAL_CONDITION)
+      .export_values();
 }

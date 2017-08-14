@@ -26,6 +26,15 @@ public:
 
     void show_room_info(invariant::Maze *maze, const ibex::IntervalVector &position) const;
 
+    ///
+    /// \brief drawCircle for easier integration with the python binding
+    /// \param x_center
+    /// \param y_center
+    /// \param radius
+    /// \param params
+    ///
+    void drawCircle(double x_center, double y_center, double radius, std::string params) const;
+
 private:
     void show_graph() const;
     void show_maze_outer() const;

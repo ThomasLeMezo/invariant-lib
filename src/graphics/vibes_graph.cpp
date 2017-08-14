@@ -310,6 +310,9 @@ void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& po
     }
 }
 
+void Vibes_Graph::drawCircle(double x_center, double y_center, double radius, string params) const{
+        vibes::drawCircle(x_center, y_center, radius, params);
+}
 
 namespace vibes{
 inline void drawGraph(const invariant::Graph &g, Params params){
