@@ -26,7 +26,7 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
     }
     if(maze->get_type() == MAZE_PROPAGATOR && m_graph->get_paves().size()>1 && m_link_start==NOT_LINK_TO_INITIAL_CONDITION){ // When initial condition is not link with active paves
         //        m_graph->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
-        m_graph->get_tree()->get_all_child_rooms_border_outside(list_room_deque, maze);
+        m_graph->get_tree()->get_all_child_rooms_inside_outside(list_room_deque, maze);
         // (OK ?) Wrong function -> need to add neighbours of full paves instead of not_empty
     }
 }

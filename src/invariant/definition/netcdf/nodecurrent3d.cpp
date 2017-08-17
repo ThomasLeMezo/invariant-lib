@@ -7,7 +7,6 @@ namespace invariant {
 
 NodeCurrent3D::NodeCurrent3D(const IntervalVector &position, const std::vector<double> &limit_bisection, PreviMer3D *previmer, std::vector<NodeCurrent3D *> &leaf_list, std::vector<IntervalVector> &leaf_position)
 {
-    m_previmer = previmer;
     bool limit_reach = true;
     for(size_t dim=0; dim<3; dim++){
         if(position[dim].diam()>limit_bisection[dim]){

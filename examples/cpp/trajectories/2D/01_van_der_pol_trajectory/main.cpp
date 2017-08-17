@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
         maze_A.contract();
         maze_B.contract();
 
-        maze_A.contract_inter();
-        maze_B.contract_inter();
+        maze_A.contract_inter(&maze_B);
+        maze_B.contract_inter(&maze_A);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

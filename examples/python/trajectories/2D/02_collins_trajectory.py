@@ -49,8 +49,8 @@ for i in range(9):
 	mazeB.contract()
 
 	# Contract inter maze
-	mazeA.contract_inter()
-	mazeB.contract_inter()
+	mazeA.contract_inter(mazeB)
+	mazeB.contract_inter(mazeA)
 
 	# Visualization
 	visuA = VibesGraph("graphA", graph, mazeA)

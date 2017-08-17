@@ -204,7 +204,7 @@ void Pave_node::get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maz
     }
 }
 
-void Pave_node::get_all_child_rooms_border_outside(std::vector<Room *> &list_room, Maze *maze) const{
+void Pave_node::get_all_child_rooms_inside_outside(std::vector<Room *> &list_room, Maze *maze) const{
     if(is_leaf()){
         Room *r = m_pave->get_rooms()[maze];
         if(!r->is_full() && !r->is_removed())

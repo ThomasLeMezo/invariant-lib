@@ -65,8 +65,6 @@ private:
     void union_vector(short &min_u, short &max_u,short &min_v, short &max_v) const;
 
 private:
-//    ibex::IntervalVector m_position;
-//    ibex::IntervalVector m_vector_field;
 
     signed short m_min_u = 32767;
     signed short m_min_v = 32767;
@@ -77,8 +75,6 @@ private:
 
     NodeCurrent3D * m_children_first;
     NodeCurrent3D * m_children_second;
-
-    PreviMer3D *m_previmer;
 
 };
 

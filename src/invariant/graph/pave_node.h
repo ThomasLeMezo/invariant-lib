@@ -132,7 +132,7 @@ public:
      * @param list_room
      * @param maze
      */
-    void get_all_child_rooms_border_outside(std::vector<Room *> &list_room, Maze *maze) const;
+    void get_all_child_rooms_inside_outside(std::vector<Room *> &list_room, Maze *maze) const;
 
     /**
      * @brief Getter to the children of this pave_node

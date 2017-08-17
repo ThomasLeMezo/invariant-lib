@@ -76,7 +76,7 @@ public:
     /**
      * @brief Contract the Maze by intersecting with other domain mazes
      */
-    void contract_inter();
+    void contract_inter(Maze *maze_n);
 
     /**
      * @brief Add a Room to the deque BUT DO NOT CHECK if already in
@@ -103,7 +103,13 @@ public:
      */
     MazeType get_type() const;
 
-protected:
+    /**
+     * @brief Return true if some trajectory can escape from the search space
+     * @return
+     */
+    bool is_escape_trajectories();
+
+private:
     invariant::Domain *    m_domain = NULL;
     Graph  *    m_graph = NULL; // Graph associated with this maze
     Dynamics *  m_dynamics = NULL;
@@ -114,6 +120,8 @@ protected:
 
     MazeSens m_maze_sens = MAZE_FWD_BWD;
     MazeType m_maze_type = MAZE_CONTRACTOR;
+
+    bool    m_espace_trajectories = true;
 
 };
 }

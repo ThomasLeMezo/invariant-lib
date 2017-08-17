@@ -50,16 +50,16 @@ int Maze::contract(){
     }
 
     /// DEBUG
-//    if(m_maze_type == MAZE_PROPAGATOR){
-//        Vibes_Graph v_graph("graph_debug", m_graph, this);
-//        v_graph.setProperties(0, 0, 512, 512);
-//        v_graph.show();
-//        IntervalVector test(2);
-//        test[0] = Interval(-2);
-//        test[1] = Interval(2);
-//        v_graph.show_room_info(this, test);
-//        cout << "debug graph_debug" << endl;
-//    }
+    //    if(m_maze_type == MAZE_PROPAGATOR){
+    //        Vibes_Graph v_graph("graph_debug", m_graph, this);
+    //        v_graph.setProperties(0, 0, 512, 512);
+    //        v_graph.show();
+    //        IntervalVector test(2);
+    //        test[0] = Interval(-2);
+    //        test[1] = Interval(2);
+    //        v_graph.show_room_info(this, test);
+    //        cout << "debug graph_debug" << endl;
+    //    }
 
     cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << endl;
     t_start = omp_get_wtime();
@@ -67,6 +67,11 @@ int Maze::contract(){
 
     // Propagation of contractions
     bool deque_empty = m_deque_rooms.empty();
+
+    if(deque_empty){
+        cout << " => MAZE EMPTY" << endl;
+        return 0;
+    }
 
 #pragma omp parallel //num_threads(1)
     {
@@ -114,15 +119,15 @@ int Maze::contract(){
                             add_rooms(rooms_update);
 
                             // Increment operations
-                            #pragma omp atomic
+#pragma omp atomic
                             nb_operations++;
                         }
 
                         /// DEBUG
-//                        Vibes_Graph v_graph("graph", m_graph, this);
-//                        v_graph.setProperties(0, 0, 512, 512);
-//                        v_graph.show();
-//                        v_graph.show_room_info(this, test);
+                        //                        Vibes_Graph v_graph("graph", m_graph, this);
+                        //                        v_graph.setProperties(0, 0, 512, 512);
+                        //                        v_graph.show();
+                        //                        v_graph.show_room_info(this, test);
 
                         r->unlock_contraction();
                     }
@@ -146,10 +151,41 @@ int Maze::contract(){
     return nb_operations;
 }
 
-void Maze::contract_inter(){
+void Maze::contract_inter(Maze* maze_inter){
     // Intersect this maze with other mazes
-    invariant::Domain *d = m_domain;
-    d->inter_maze(this);
+    //    invariant::Domain *d = m_domain;
+    //    d->inter_maze(this);
+    if(is_escape_trajectories() && maze_inter->is_escape_trajectories()){
+
+        std::vector<Room *> room_list;
+        m_graph->get_tree()->get_all_child_rooms_not_empty(room_list, this);
+
+#pragma omp parallel for
+        for(size_t i=0; i<room_list.size(); i++){
+            Room *r = room_list[i];
+            Pave *p = r->get_pave();
+            Room *r_inter = p->get_rooms()[maze_inter];
+            if(r_inter->is_empty()){
+                r->set_empty_private();
+                r->synchronize();
+            }
+        }
+    }
+}
+
+bool Maze::is_escape_trajectories(){
+    if(m_espace_trajectories == false)
+        return false;
+    else{
+        std::vector<Pave*> pave_list_border;
+        m_graph->get_tree()->get_border_paves(pave_list_border);
+
+        for(Pave *p:pave_list_border){
+            Room *r = p->get_rooms()[this];
+            if(!(r->is_removed() || r->is_empty()))
+                return true;
+        }
+    }
 }
 
 void Maze::add_rooms(const vector<Room *>& list_rooms){

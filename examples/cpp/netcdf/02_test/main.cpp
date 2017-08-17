@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     vector<double> limit_bisection = {15.0*60.0, 250.0, 250.0}; // Or divide by 2
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 10); // T = 0..96 (in 15*min)
+    search_space[0] = Interval(0, 3); // T = 0..96 (in 15*min)
     search_space[1] = Interval(100, 250); // X = 0..300
     search_space[2] = Interval(420, 600); // Y = 200..500
 
@@ -73,14 +73,15 @@ int main(int argc, char *argv[])
 
     Vtk_Graph vtk_graph("Previmer", &graph, true);
 //    vtk_graph.show_graph();
-    vtk_graph.show_maze(&maze);
+//    vtk_graph.show_maze(&maze);
 //    vector<Pave *> pave_list;
     IntervalVector position(3);
-    position[0] = Interval(0, 3000); // 450, 900
-    position[1] = Interval(39000, 41000); // 37304, 37980
-    position[2] = Interval(135500); // 119766, 120469
+    position[0] = Interval(250); // 450, 900
+    position[1] = Interval(40000); // 37304, 37980
+    position[2] = Interval(133900); // 119766, 120469
 //    graph.get_room_info(&maze, position, pave_list);
-//    vtk_graph.show_room_info(&maze, search_space);
+//    cout << pave_list.size() << endl;
+    vtk_graph.show_room_info(&maze, position);
 
     return 0;
 }

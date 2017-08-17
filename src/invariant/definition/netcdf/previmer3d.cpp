@@ -98,8 +98,11 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
         for(size_t i=0; i<i_max; i++){
             vector<short> line_u, line_v;
             for(size_t j=0; j<j_max; j++){
-                line_u.push_back(raw_u[i_max*j+i]);
-                line_v.push_back(raw_v[i_max*j+i]);
+//                line_u.push_back(raw_u[i_max*j+i]);
+//                line_v.push_back(raw_v[i_max*j+i]);
+                line_u.push_back(0);
+                line_v.push_back(2000);
+
             }
             tab_u.push_back(line_u);
             tab_v.push_back(line_v);
@@ -180,9 +183,9 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec = IntervalVector(3, Interval::EMPTY_SET);
     }
     else{
-        vec[0] = Interval(1.0);
-        vec[1] = Interval(min_u * m_scale_factor, max_u * m_scale_factor) + Interval(-0.01, 0.01);
-        vec[2] = Interval(min_v * m_scale_factor, max_v * m_scale_factor) + Interval(-0.01, 0.01);
+        vec[0] = Interval(0.9, 1.0);
+        vec[1] = Interval(min_u * m_scale_factor, max_u * m_scale_factor) + Interval(-0.1, 0.1);
+        vec[2] = Interval(min_v * m_scale_factor, max_v * m_scale_factor) + Interval(-0.1, 0.1);
     }
     vector_fields.push_back(vec);
     return vector_fields;
