@@ -18,16 +18,21 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g): VibesFigure(
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, g){
-    if(type == VIBES_GRAPH_OUTER)
-        m_maze_outer = outer;
-    else
-        m_maze_inner = outer;
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* maze, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, g){
+    if(type == VIBES_GRAPH_OUTER){
+        m_maze_outer = maze;
+        m_type = VIBES_GRAPH_OUTER;
+    }
+    else{
+        m_maze_inner = maze;
+        m_type = VIBES_GRAPH_INNER;
+    }
 }
 
 Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer, Maze* inner): Vibes_Graph(figure_name, g){
     m_maze_outer = outer;
     m_maze_inner = inner;
+    m_type = VIBES_GRAPH_OUTER_AND_INNER;
 }
 
 void Vibes_Graph::show() const{
@@ -42,6 +47,10 @@ void Vibes_Graph::show() const{
 }
 
 void Vibes_Graph::draw_room_inner(Pave *p) const{
+    // Draw backward
+    if(m_type == VIBES_GRAPH_INNER) // Otherwise draw box only when outer
+        vibes::drawBox(p->get_position(), "black[]");
+
     // Draw Polygon
     vector<double> pt_x, pt_y;
 
@@ -269,6 +278,7 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, double x, double y) const
 
 void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& position) const{
     std::vector<invariant::Pave*> pave_list;
+    std::cout.precision(15);
     m_graph->get_room_info(maze, position, pave_list);
     for(invariant::Pave* p:pave_list){
         vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
@@ -284,10 +294,20 @@ void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& po
         ostringstream name;
         name << p_position;
         vibes::newFigure(name.str());
-        vibes::setFigureProperties(vibesParams("width", 512,"height", 512));
+        vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height));
 
         // Draw Pave
-        draw_room_outer(p);
+        if(m_type == VIBES_GRAPH_INNER){
+            draw_room_inner(p);
+        }
+        else if(m_type == VIBES_GRAPH_OUTER){
+            draw_room_outer(p);
+        }
+        else{
+            draw_room_outer(p);
+            draw_room_inner(p);
+        }
+
 
         // Draw Doors
         for(int face=0; face<2; face++){
@@ -311,7 +331,7 @@ void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& po
 }
 
 void Vibes_Graph::drawCircle(double x_center, double y_center, double radius, string params) const{
-        vibes::drawCircle(x_center, y_center, radius, params);
+    vibes::drawCircle(x_center, y_center, radius, params);
 }
 
 namespace vibes{

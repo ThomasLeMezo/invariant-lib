@@ -204,10 +204,10 @@ void Room:: contract_consistency(){
 
     m_nb_contract++;
 
-//    IntervalVector test(2);
-//    test[0] = Interval(0.75, 1.5);
-//    test[1] = Interval(1.5750000000000002, 3.1);
-//    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
+//    IntervalVector position(2);
+//    position[0] = Interval(-1.5, 0);
+//    position[1] = Interval(1.5, 3);
+//    if(m_pave->get_position().is_subset(position) && get_maze()->get_type() == MAZE_CONTRACTOR){
 //        cout << endl;
 //        cout << "DEBUG ROOM : " << m_pave->get_position() << " Debug ID = " << m_time_debug << endl;
 //        m_debug_room = true;
@@ -385,14 +385,14 @@ void Room:: contract_consistency(){
 }
 
 void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
+    if(m_debug_room)
+        cout << "debug" << endl;
+
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
     int dim = get_pave()->get_dim();
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
-
-    if(m_debug_room)
-        cout << "debug" << endl;
 
     vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
 
@@ -436,6 +436,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
             local_pave = true;
         Room *r_n = pave_n->get_rooms()[m_maze];
         IntervalVector vec_field_local(r_n->get_one_vector_fields(n_vf));
+//        IntervalVector vec_field_local(vec_field);
 
         for(int face_out=0; face_out<dim; face_out++){
             for(int sens_out = 0; sens_out < 2; sens_out ++){
@@ -473,7 +474,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                     // Bug here !!!
                     if(!own_surface.is_empty()){
                         // OUT -> IN
-                        IntervalVector in_tmp_IN(door_in->get_input_private());
+                        IntervalVector in_tmp_IN(door_in->get_face()->get_position()); // bug if set to private door
+                                                                                       // (because only half part is taken into account)
                         IntervalVector out_tmp_IN(own_surface);
                         if(local_pave)
                             out_tmp_IN &= d_out->get_output_private();
@@ -491,7 +493,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                             in_tmp_OUT &= d_out->get_input_private();
                         else
                             in_tmp_OUT &= d_out->get_input();
-                        IntervalVector out_tmp_OUT(door_in->get_output_private());
+                        IntervalVector out_tmp_OUT(door_in->get_face()->get_position());
 
                         if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
                             contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_local); // vec_field_local (NEW) to verify debug
@@ -502,6 +504,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
             }
         }
     }
+
     out_return &= in_return;
     in_return &= out_return;
 }
@@ -561,27 +564,32 @@ bool Room::contract(){
             eval_vector_field_possibility();
             m_first_contract = false;
         }
-
+//        get_private_doors_info("before");
         change |= contract_continuity();
+//        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
+//            get_private_doors_info("consistency");
         }
     }
     return change;
 }
 
-bool Room::get_private_doors_info(){
+bool Room::get_private_doors_info(string message){
     if(m_maze->get_type() != MAZE_CONTRACTOR)
         return false;
     IntervalVector position(2);
-    position[0] = Interval(0.75, 1.5);
-    position[1] = Interval(0.050000000000000044, 1.5750000000000002);
-    IntervalVector position2(2);
-    position2[0] = Interval(0.75, 1.5);
-    position2[1] = Interval(1.5750000000000002, 3.1);
+//    [-1.5, 0] ; [1.5, 3]
+    position[0] = Interval(-1.5, 0);
+    position[1] = Interval(1.5, 3);
+//    IntervalVector position2(2);
+//    position2[0] = Interval(0.75, 1.5);
+//    position2[1] = Interval(1.5750000000000002, 3.1);
+    IntervalVector position2(position);
 
     if(m_pave->get_position() == position || m_pave->get_position() == position2){
+        cout << message << endl;
         if(m_pave->get_position() == position)
             cout << "position 1" << endl;
         else

@@ -25,21 +25,14 @@ int main(int argc, char *argv[])
     // ****** Domain ******* //
     Graph graph(space);
     invariant::Domain dom_outer(&graph);
-    dom_outer.set_border_path_in(false);
+    dom_outer.set_border_path_in(true);
     dom_outer.set_border_path_out(false);
-
-    double x1_c, x2_c, r;
-    x1_c = 0.0;
-    x2_c = 0.0;
-    r = 0.1;
-    Function f_sep_outer(x, pow(x[0]-x1_c, 2)+pow(x[1]-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    dom_outer.set_sep_output(&s_outer);
 
     invariant::Domain dom_inner(&graph);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
+    double x1_c, x2_c, r;
     x1_c = 0.0;
     x2_c = 0.0;
     r = 0.1;
@@ -57,13 +50,13 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn_inner(&f_inner);
 
     // ******* Maze ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
-
+    Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_CONTRACTOR);
     Maze maze_inner(&dom_inner, &dyn_inner, MAZE_BWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_outer.contract();
+    maze_outer.init();
+    maze_inner.init();
     for(int i=0; i<18; i++){
         graph.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << graph.size() << endl;
@@ -83,8 +76,8 @@ int main(int argc, char *argv[])
     v_graph2.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-0.4);
-//    position_info[1] = Interval(1.34);
+//    position_info[0] = Interval(-2.79);
+//    position_info[1] = Interval(2.11);
 //    v_graph.get_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();

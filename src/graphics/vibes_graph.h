@@ -12,10 +12,10 @@ class Vibes_Graph: public VibesFigure
 {
 
 public:
-    enum VIBES_GRAPH_TYPE{VIBES_GRAPH_INNER, VIBES_GRAPH_OUTER};
+    enum VIBES_GRAPH_TYPE{VIBES_GRAPH_INNER, VIBES_GRAPH_OUTER, VIBES_GRAPH_OUTER_AND_INNER};
 public:
     Vibes_Graph(const std::string& figure_name, invariant::Graph *g);
-    Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* outer, VIBES_GRAPH_TYPE type=VIBES_GRAPH_OUTER);
+    Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* maze, VIBES_GRAPH_TYPE type=VIBES_GRAPH_OUTER);
     Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* outer, invariant::Maze* inner);
     ~Vibes_Graph(){}
 
@@ -55,6 +55,8 @@ private:
     invariant::Maze*    m_maze_inner = NULL;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;
+
+    VIBES_GRAPH_TYPE    m_type = VIBES_GRAPH_OUTER;
 
 };
 
