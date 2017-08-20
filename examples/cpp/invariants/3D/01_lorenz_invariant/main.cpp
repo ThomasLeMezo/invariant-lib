@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
     Interval pt_z = rho-1.0;
     double r = 3.0;
 
+    // Remove zeros
     Function f_sep1(x1, x2, x3, pow(x1, 2)+pow(x2, 2)+pow(x3, 2)-pow(r, 2));
     SepFwdBwd s1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT
     Function f_sep2(x1, x2, x3, pow(x1-pt_xy, 2)+pow(x2-pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));

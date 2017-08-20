@@ -237,7 +237,7 @@ public:
      * @brief Debug function to get private doors
      * @param position
      */
-    void get_private_doors_info();
+    bool get_private_doors_info();
 
     /**
      * @brief Get the number of contractions call

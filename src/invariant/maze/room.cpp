@@ -100,7 +100,7 @@ void Room::contract_vector_field(){
     for(Face *f:m_pave->get_faces_vector()){
         Door *d = f->get_doors()[m_maze];
         vector<IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
-//        vector<IntervalVector> vector_fields_face = this->get_vector_fields();
+        //        vector<IntervalVector> vector_fields_face = this->get_vector_fields();
 
         for(const IntervalVector &v:vector_fields_face){
             if(!zero.is_subset(v)){
@@ -205,8 +205,8 @@ void Room:: contract_consistency(){
     m_nb_contract++;
 
 //    IntervalVector test(2);
-//    test[0] = Interval(3, 4.5);
-//    test[1] = Interval(0, 3);
+//    test[0] = Interval(0.75, 1.5);
+//    test[1] = Interval(1.5750000000000002, 3.1);
 //    if(m_pave->get_position().is_subset(test) && get_maze()->get_type() == MAZE_CONTRACTOR){
 //        cout << endl;
 //        cout << "DEBUG ROOM : " << m_pave->get_position() << " Debug ID = " << m_time_debug << endl;
@@ -268,8 +268,8 @@ void Room:: contract_consistency(){
                         Face* f_in = m_pave->get_faces()[face_in][sens_in];
                         Door* door_in = f_in->get_doors()[m_maze];
 
-//                        if(m_debug_room)
-//                            cout << "before " << door_in->get_output_private() << endl;
+                        if(m_debug_room)
+                            cout << "before " << door_in->get_output_private() << endl;
 
                         /// INPUT
                         IntervalVector out_return(dim, Interval::EMPTY_SET);
@@ -282,11 +282,10 @@ void Room:: contract_consistency(){
                         }
                         if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
                             door_in->set_output_private(out_return); // Write output
-                            cout << "set" << endl;
                         }
 
-//                        if(m_debug_room)
-//                            cout << "after " << out_return << endl;
+                        if(m_debug_room)
+                            cout << "after " << out_return << endl;
 
                         /// Impact on other faces (out results)
                         for(int face_out=0; face_out<dim; face_out++){
@@ -392,6 +391,9 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
 
+    if(m_debug_room)
+        cout << "debug" << endl;
+
     vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
 
     // Find adjacent paves
@@ -432,6 +434,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
         bool local_pave = false;
         if(pave_n->get_position() == m_pave->get_position())
             local_pave = true;
+        Room *r_n = pave_n->get_rooms()[m_maze];
+        IntervalVector vec_field_local(r_n->get_one_vector_fields(n_vf));
 
         for(int face_out=0; face_out<dim; face_out++){
             for(int sens_out = 0; sens_out < 2; sens_out ++){
@@ -466,7 +470,9 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                     }
 
                     // Compute the possible IN that can propagate to the OUT own_surface
+                    // Bug here !!!
                     if(!own_surface.is_empty()){
+                        // OUT -> IN
                         IntervalVector in_tmp_IN(door_in->get_input_private());
                         IntervalVector out_tmp_IN(own_surface);
                         if(local_pave)
@@ -475,32 +481,27 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                             out_tmp_IN &= d_out->get_output();
 
                         if(!in_tmp_IN.is_empty() && !out_tmp_IN.is_empty()){
-                            contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
+                            contract_flow(in_tmp_IN, out_tmp_IN, vec_field_local); // vec_field_local (NEW) to verify debug
                             in_return |= in_tmp_IN ;
                         }
 
-                        if(!in_tmp_IN.is_empty()){
-                            IntervalVector in_tmp_OUT(own_surface);
-                            if(local_pave)
-                                in_tmp_OUT &= d_out->get_input_private();
-                            else
-                                in_tmp_OUT &= d_out->get_input();
-                            IntervalVector out_tmp_OUT(door_in->get_output_private());
-                            if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
-                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
-                                out_return |= out_tmp_OUT;
-                            }
+                        // IN -> OUT
+                        IntervalVector in_tmp_OUT(own_surface);
+                        if(local_pave)
+                            in_tmp_OUT &= d_out->get_input_private();
+                        else
+                            in_tmp_OUT &= d_out->get_input();
+                        IntervalVector out_tmp_OUT(door_in->get_output_private());
+
+                        if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
+                            contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_local); // vec_field_local (NEW) to verify debug
+                            out_return |= out_tmp_OUT;
                         }
                     }
                 }
             }
         }
     }
-//    out_return |= in_return; // Not working.... issue : FWD & BWD not equivalent when -f
-//    in_return |= out_return;
-
-    //    if(out_return.is_empty())
-    //        in_return.set_empty();
 }
 
 void Room::set_full_possible(){
@@ -541,6 +542,7 @@ void Room::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, co
 
 bool Room::contract(){
     // Do not synchronization in this function or sub-functions
+
     bool change = false;
     if(!is_removed()){
         MazeType type = m_maze->get_type();
@@ -567,15 +569,15 @@ bool Room::contract(){
     return change;
 }
 
-void Room::get_private_doors_info(){
+bool Room::get_private_doors_info(){
     if(m_maze->get_type() != MAZE_CONTRACTOR)
-        return;
+        return false;
     IntervalVector position(2);
-    position[0] = Interval(3, 4.5);
-    position[1] = Interval(0, 3);
+    position[0] = Interval(0.75, 1.5);
+    position[1] = Interval(0.050000000000000044, 1.5750000000000002);
     IntervalVector position2(2);
-    position2[0] = Interval(0, 3);
-    position2[1] = Interval(-3, 0);
+    position2[0] = Interval(0.75, 1.5);
+    position2[1] = Interval(1.5750000000000002, 3.1);
 
     if(m_pave->get_position() == position || m_pave->get_position() == position2){
         if(m_pave->get_position() == position)
@@ -593,7 +595,9 @@ void Room::get_private_doors_info(){
             cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << endl;
         }
         cout << "----" << endl;
+        return true;
     }
+    return false;
 }
 
 void Room::synchronize_doors(){

@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<15; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
@@ -53,15 +53,16 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-    IntervalVector position_info(2);
+//    IntervalVector position_info(2);
 //    position_info[0] = Interval(0);
 //    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
 
-    position_info[0] = Interval(-1.16);
-    position_info[1] = Interval(3.62);
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(1);
+//    position_info[1] = Interval(1, 2);
 //    v_graph.get_room_info(&maze, position_info);
-    v_graph.show_room_info(&maze, position_info);
+//    v_graph.show_room_info(&maze, position_info);
 
 //    position_info[0] = Interval(0);
 //    position_info[1] = Interval(-1);
