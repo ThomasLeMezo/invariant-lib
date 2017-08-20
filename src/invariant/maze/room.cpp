@@ -502,6 +502,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
             }
         }
     }
+    out_return &= in_return;
+    in_return &= out_return;
 }
 
 void Room::set_full_possible(){
