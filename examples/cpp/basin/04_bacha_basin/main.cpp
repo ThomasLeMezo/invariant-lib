@@ -10,6 +10,10 @@
 #include "graphiz_graph.h"
 #include <omp.h>
 
+// Note : a integration approach for the outer approximation is more suitable
+// In face it avoid any issue with stability point that may let impossible any
+// convergence toward the boundary of the set
+
 using namespace std;
 using namespace ibex;
 using namespace invariant;
@@ -49,8 +53,6 @@ int main(int argc, char *argv[])
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-
-
     ibex::Function f(x, Return((x[1]),
                            (-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
     ibex::Function f_n(x, Return(-(x[1]),
@@ -79,6 +81,7 @@ int main(int argc, char *argv[])
     Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
+    v_graph.drawCircle(x1_c, x2_c, r, "red[]");
 
 //    Vibes_Graph v_graph_inner("graph_inner", &graph,&maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
 //    v_graph_inner.setProperties(0, 0, 512, 512);

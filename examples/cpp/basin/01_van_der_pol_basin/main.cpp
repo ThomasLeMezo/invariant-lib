@@ -78,19 +78,20 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-    Vibes_Graph v_graph_inner("graph_inner", &graph,&maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
-    v_graph_inner.setProperties(0, 0, 512, 512);
-    v_graph_inner.show();
+//    Vibes_Graph v_graph_inner("graph_inner", &graph,&maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
+//    v_graph_inner.setProperties(0, 0, 512, 512);
+//    v_graph_inner.show();
 
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(-0.4);
+//    position_info[1] = Interval(1.34);
+//    v_graph.get_room_info(&maze_inner, position_info);
 
-    IntervalVector position_info(2);
-    position_info[0] = Interval(-0.4);
-    position_info[1] = Interval(1.34);
-    v_graph.get_room_info(&maze_inner, position_info);
+//    position_info[0] = Interval(-0.34);
+//    position_info[1] = Interval(1.34);
+//    v_graph.get_room_info(&maze_inner, position_info);
 
-    position_info[0] = Interval(-0.34);
-    position_info[1] = Interval(1.34);
-    v_graph.get_room_info(&maze_inner, position_info);
+    v_graph.drawCircle(x1_c, x2_c, r, "red[]");
 
     vibes::endDrawing();
 

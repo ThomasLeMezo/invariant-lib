@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
+    v_graph.drawCircle(x1_c, x2_c, r, "red[]");
+
 //    Vibes_Graph v_graph_inner("graph_inner", &graph,&maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
 //    v_graph_inner.setProperties(0, 0, 512, 512);
 //    v_graph_inner.show();
