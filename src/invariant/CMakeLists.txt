@@ -24,12 +24,16 @@ include_directories(../tools/serialization)
     definition/domain.cpp
     definition/dynamics.cpp
     definition/dynamics_function.cpp
-
-    definition/netcdf/nodecurrent.cpp
-    definition/netcdf/previmer.cpp
-    definition/netcdf/previmer3d.cpp
-    definition/netcdf/nodecurrent3d.cpp
   )
+
+  if(WITH_NETCDF)
+    set(SRC ${SRC}
+      definition/netcdf/nodecurrent.cpp
+      definition/netcdf/previmer.cpp
+      definition/netcdf/previmer3d.cpp
+      definition/netcdf/nodecurrent3d.cpp
+    )
+  endif()
 
   set(HEADERS
     graph/graph.h
@@ -44,12 +48,16 @@ include_directories(../tools/serialization)
     definition/domain.h
     definition/dynamics.h
     definition/dynamics_function.h
-
-    definition/netcdf/nodecurrent.h
-    definition/netcdf/previmer.h
-    definition/netcdf/previmer3d.h
-    definition/netcdf/nodecurrent3d.h
   )
+
+  if(WITH_NETCDF)
+    set(HEADERS ${HEADERS}
+      definition/netcdf/nodecurrent.h
+      definition/netcdf/previmer.h
+      definition/netcdf/previmer3d.h
+      definition/netcdf/nodecurrent3d.h
+    )
+  endif()
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
