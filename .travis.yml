@@ -129,18 +129,9 @@ install:
 script:
   - mkdir build/build-release -p
   - cd build/build-release
-  - cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
-    -DIBEX_ROOT=${HOME}/ibex \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DBUILD_TESTS=OFF \
-    -DWITH_PYTHON=ON \
-    -DWITH_3D=OFF \
-    -DWITH_GRAPHIZ=OFF\
-    -DWITH_NETCDF=OFF \
-    -DWITH_PYIBEX_VERSION=ON \
-    $INVARIANTLIB_DIR
+  - cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF -DWITH_PYIBEX_VERSION=ON $INVARIANTLIB_DIR
   - make -j2
   - make pip_package
-  
+
   - export wheel_file=$(ls *.whl)
   - mv $wheel_file $TRAVIS_BUILD_DIR/$wheel_file
