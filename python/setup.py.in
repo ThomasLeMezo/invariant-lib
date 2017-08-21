@@ -19,11 +19,11 @@ setup(
 
   },
   # test_suite='pyinvariant.tests',
-  license="LGPLv3+",
+  license="GPLv3+",
   classifiers=[
       "Development Status :: 3 - Alpha",
       "Topic :: Scientific/Engineering :: Mathematics",
-      "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+      "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   ],
   include_package_data=True,
   zip_safe=False,

@@ -5,9 +5,9 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Settings
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 11)
     set(PACKAGE_NAME      invariant-lib)
-    set(PACKAGE_VERSION "0.1")
+    set(PACKAGE_VERSION "0.1b0")
     project(${PACKAGE_NAME})
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
@@ -32,26 +32,26 @@ cmake_minimum_required(VERSION 3.5)
 
 # IBEX-lib package
 #    set(IbexLib_USE_STATIC 1)
-    set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${IBEX_ROOT}/share/pkgconfig/")
-    message(STATUS "[IBEX] PKG_CONFIG_PATH = $ENV{PKG_CONFIG_PATH}")
-    pkg_search_module(IBEX ibex)
+    # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${IBEX_ROOT}/share/pkgconfig/")
+    # message(STATUS "[IBEX] PKG_CONFIG_PATH = $ENV{PKG_CONFIG_PATH}")
+    # pkg_search_module(IBEX ibex)
 
-    # FIND_PACKAGE(IbexLib REQUIRED)
-#    if(IBEX_FOUND)
+    FIND_PACKAGE(IbexLib REQUIRED)
+   if(IBEX_FOUND)
         # https://cmake.org/Wiki/CMake:How_To_Find_Libraries
         INCLUDE_DIRECTORIES(${IBEX_INCLUDE_DIRS})
         set(LIBS ${LIBS} ${IBEX_LIBRARIES})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math")
+        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math")
 
-        link_directories("${IBEX_ROOT}/lib" "${IBEX_ROOT}/lib/ibex/3rd")
+        # link_directories("${IBEX_ROOT}/lib" "${IBEX_ROOT}/lib/ibex/3rd")
 
         message(STATUS "[IBEX] IBEX_LIBRARIES = ${IBEX_LIBRARIES}")
         message(STATUS "[IBEX] IBEX_INCLUDE_DIRS = ${IBEX_INCLUDE_DIRS}")
         message(STATUS "[IBEX] IBEX_DEFINITIONS = ${IBEX_DEFINITIONS}")
         message(STATUS "[IBEX] CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
-#    else()
-#        message(FATAL_ERROR "Unable to find IBEX-lib. You may need to set IBEX_ROOT ${IBEX_ROOT}")
-#    endif()
+   else()
+       message(FATAL_ERROR "Unable to find IBEX-lib. You may need to set IBEX_ROOT ${IBEX_ROOT}")
+   endif()
 
 
 # Graphiz
