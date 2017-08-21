@@ -109,5 +109,5 @@ script:
   - make pip_package
   - export wheel_file=$(ls *.whl)
   - echo $wheel_file
-  - auditwheel repair $wheel_file
+  - auditwheel repair ${wheel_file}
   - mv $wheel_file $TRAVIS_BUILD_DIR/$wheel_file

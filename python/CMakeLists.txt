@@ -45,6 +45,8 @@ add_custom_command(TARGET pip_package PRE_BUILD
    WORKING_DIRECTORY ${PYTHON_PACKAGE_DIR}
 )
 
+# --build-purelib
+
 # ------------------------------
 #add_custom_target(install_python)
 #add_custom_command(TARGET install_python PRE_BUILD
