@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.5)
 # Settings
     set(CMAKE_CXX_STANDARD 11)
     set(PACKAGE_NAME      invariant-lib)
-    set(PACKAGE_VERSION "0.1b0")
+    set(PACKAGE_VERSION "0.1b1")
     project(${PACKAGE_NAME})
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
@@ -31,7 +31,7 @@ cmake_minimum_required(VERSION 3.5)
     FIND_PACKAGE(PkgConfig)
 
 # IBEX-lib package
-#    set(IbexLib_USE_STATIC 1)
+   set(IbexLib_USE_STATIC 1)
     # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${IBEX_ROOT}/share/pkgconfig/")
     # message(STATUS "[IBEX] PKG_CONFIG_PATH = $ENV{PKG_CONFIG_PATH}")
     # pkg_search_module(IBEX ibex)
