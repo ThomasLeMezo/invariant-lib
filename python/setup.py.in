@@ -1,13 +1,16 @@
 # coding: utf-8
-from setuptools import setup, Distribution, Extension
+from setuptools import setup
+from setuptools.dist import Distribution
+# from setuptools import setup, Distribution, Extension
 
 # force External module
 class BinaryDistribution(Distribution):
     def has_ext_modules(self):
         return True
-
     def is_pure(self):
         return False
+
+Distribution.is_pure = lambda *args: False
 
 setup(
   name='pyinvariant',

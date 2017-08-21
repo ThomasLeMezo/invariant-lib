@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 2.8.12)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder")
 
 # Options
+    option(WITH_EXAMPLES "Build examples" ON)
     option(BUILD_TESTS "Build test" OFF)
     option(WITH_PYTHON "Build python module" OFF)
     option(WITH_3D "Build 3D src and examples" OFF)
@@ -136,7 +137,9 @@ cmake_minimum_required(VERSION 2.8.12)
     endif()
 
 # Examples
-     add_subdirectory(examples)
+    if(WITH_EXAMPLES)
+        add_subdirectory(examples)
+    endif()
 
 # Uninstallation
     configure_file("${CMAKE_HOME_DIRECTORY}/cmake/Modules/cmake_uninstall.cmake.in" "cmake_uninstall.cmake" IMMEDIATE @ONLY)
