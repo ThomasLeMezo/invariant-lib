@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
     double x1_c, x2_c, r;
     x1_c = 210;
-    x2_c = 560;
+    x2_c = 400;
     r = 0.1;
     Variable x1, x2;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));

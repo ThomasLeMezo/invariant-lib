@@ -6,7 +6,7 @@
 
 #set -x # debugging
 
-if [ ! -e "$HOME/ibex/lib/libibex.a" ]; then
+if [ ! -e "${HOME}/ibex/lib/libibex.so" ]; then
   echo 'Installing the IBEX-lib...';
   git clone https://github.com/ibex-team/ibex-lib.git
   cd ibex-lib

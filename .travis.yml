@@ -22,17 +22,17 @@ addons:
     - time
     - pkg-config
     - gcc
-    - graphviz
-    - graphviz-dev
-    - libgraphviz-dev
-    - libgvc5
-    - libgvc5-plugins-gtk
+    # - graphviz
+    # - graphviz-dev
+    # - libgraphviz-dev
+    # - libgvc5
+    # - libgvc5-plugins-gtk
     - python
     - flex 
     - bison 
     - g++ 
     - make
-    - libcppunit-dev
+    # - libcppunit-dev
 
 cache:
   directories:
@@ -49,14 +49,14 @@ matrix:
 #  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install clang-omp; fi
 
 install:
-  - sh ./cmake/build_IbexLib.sh
-  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex/share/pkgconfig
+  - sh ./cmake/build_Ibex4pyIbex.sh
+  # - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex/share/pkgconfig
 
 script:
   #- if [ $TRAVIS_OS_NAME == osx ]; then
   #    CC=clang-omp CXX=clang-omp++ cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DBUILD_TESTS=ON ../ ;
   #  fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sh ./build-debug.sh; fi
-  - cd build/build-debug/
-  - make test
+  - if [ $TRAVIS_OS_NAME == linux ]; then sh ./build-travis.sh; fi
+  # - cd build/build-debug/
+  # - make test
   

@@ -10,7 +10,7 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g): VibesFigure(
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/Vibes_Graph()] dim of graph is not equal to 2");
     m_graph = g;
-    m_overhead_factor = 0.2; // 20%
+    m_overhead_factor = 0.0; // 20%
 
     m_oriented_path.push_back(std::make_tuple(0, 0, true));
     m_oriented_path.push_back(std::make_tuple(1, 1, true));
