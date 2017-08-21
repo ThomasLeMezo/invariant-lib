@@ -107,6 +107,6 @@ script:
   - cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
   - make -j2
   - make pip_package
-  - auditwheel repair pyinvariant-*.whl
   - export wheel_file=$(ls *.whl)
+  - auditwheel repair $wheel_file
   - mv $wheel_file $TRAVIS_BUILD_DIR/$wheel_file
