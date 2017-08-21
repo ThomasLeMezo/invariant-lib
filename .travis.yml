@@ -102,7 +102,7 @@ install:
   # - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex/share/pkgconfig
 
 script:
-  - mkdir build/build-release
+  - mkdir -p build/build-release
   - cd build/build-release
   - cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
   - make -j2
