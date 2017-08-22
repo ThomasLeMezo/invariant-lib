@@ -1,7 +1,3 @@
-# ==================================================================
-#  invariant-lib - travis test script
-# ==================================================================
-
 language: cpp
 sudo: false
 matrix:
@@ -9,36 +5,67 @@ matrix:
   - os: linux
     language: pyhton
     env: PYTHON=2.7 CPP=11 GCC=4.8
-    python: "2.7"
+    python: '2.7'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
   - os: linux
     language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8
-    python: "3.4"
+    python: '3.4'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
   - os: linux
     language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8
-    python: "3.5"
+    python: '3.5'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
   - os: linux
     language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8
-    python: "3.6"
+    python: '3.6'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
-
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
   - os: osx
     osx_image: xcode7.3
     env: PYTHON=2.7 CPP=14 CLANG
@@ -48,66 +75,64 @@ matrix:
   - os: osx
     osx_image: xcode7.3
     env: PYTHON=3.5 CPP=14 CLANG
-
 cache:
   directories:
-  - $HOME/ibex
-
+  - "$HOME/ibex"
 notifications:
   email: false
-    # on_success: never
-    # on_failure: never
-
 before_install:
-  # - if [ $TRAVIS_OS_NAME == linux ]; then python -m pip install auditwheel twine; fi
-  # - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install python3; fi
-  # - if [ $TRAVIS_OS_NAME == osx ]; then pip install --user wheel twine; fi
-#  - if [ $TRAVIS_OS_NAME == osx ]; then brew install clang-omp; fi
-  - bash ./cmake/build_Ibex4pyIbex.sh
-  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
-  - |
-    # Configure build variables
-    if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      if [ -z "$GCC" ]; then export GCC=4.8; fi
-      export CXX=g++-$GCC CC=gcc-$GCC;
-    elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      export CXX=clang++ CC=clang;
-    fi
-    if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
-    if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
-    if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-        if [ "$PY" = "3" ]; then
-          pip install --upgrade pip auditwheel twine;
-        else
-          pip install --user --upgrade pip auditwheel twine;
-        fi
-    elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+- bash ./cmake/build_Ibex4pyIbex.sh
+- export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
+- |
+  # Configure build variables
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    if [ -z "$GCC" ]; then export GCC=4.8; fi
+    export CXX=g++-$GCC CC=gcc-$GCC;
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    export CXX=clang++ CC=clang;
+  fi
+  if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
+  if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       if [ "$PY" = "3" ]; then
-        brew update; brew install python$PY;
+        pip install --upgrade pip auditwheel twine;
       else
-        curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
-        sudo -H python get-pip.py;
+        pip install --user --upgrade pip auditwheel twine;
       fi
-      pip$PY install --user --upgrade pip virtualenv auditwheel twine;
-      python$PY -m virtualenv venv;
-      source venv/bin/activate;
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    if [ "$PY" = "3" ]; then
+      brew update; brew install python$PY;
+    else
+      curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
+      sudo -H python get-pip.py;
     fi
-
-
-#before_install:
-#  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install clang-omp; fi
-
+    pip$PY install --user --upgrade pip virtualenv auditwheel twine;
+    python$PY -m virtualenv venv;
+    source venv/bin/activate;
+  fi
 install:
-  - sh ./cmake/build_Ibex4pyIbex.sh
-  # - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex/share/pkgconfig
-
+- sh ./cmake/build_Ibex4pyIbex.sh
 script:
-  - mkdir -p build/build-release
-  - cd build/build-release
-  - cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DPYTHON_VERSION=${version} -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
-  - make -j2
-  - make pip_package
-  - export wheel_file=$(ls *.whl)
-  - echo $wheel_file
-  - auditwheel repair ${wheel_file}
-  - mv $wheel_file $TRAVIS_BUILD_DIR/$wheel_file
+- mkdir -p build/build-release
+- cd build/build-release
+- cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DPYTHON_VERSION=${version}
+  -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP -DCMAKE_BUILD_TYPE=RELEASE
+  -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF
+  -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
+- make -j2
+- make pip_package
+- export wheel_file=$(ls *.whl)
+- echo $wheel_file
+- auditwheel repair ${wheel_file}
+- mv $wheel_file $TRAVIS_BUILD_DIR/$wheel_file
+
+deploy:
+  provider: releases
+  api_key:
+    secure: NAXVYKKCCBMzCaHEsF9miYaKUMl2H7RZoniXdXx8de96emKsB8MHL2ItqJB+H8MaIr/h68f5KX4614oi6I3LLvI+H7V9clJ77sDR87ZMPmo/LX0rViW3Ijh4ZQ123xw+jtNJCBk9rON8TNNxM9CKmfrEdZjTM+S/48gqcFYDZdCMIPRAJolD2SPGT2eMx3PzKk8OW9te97QjIpRuG67KXV78zet5XGdhp9mQ6DMA+453XiyHb3rh26c9qGm9SFAQstLv0/OfOJ/GaZAKA1toUiJbnk2OAUhI0QUXIMhKH/fZzzajJTfr4rOL2CtDDp677cWmubqctPc8gfXBmu4hI9HV2+vtp7Gj0XP/NkUgv0zYjSnz929saFJ+dHpl3XenxIJkUj7coU8oDzsoKX/Uz5/yNCY1LXZvt7lAKa8j//qpMYUXfSTblSdClSnQ5oGG7nhpPlXVU90GLai1ACR3rI6CFeyuOZlZAG0OcpVA37pQJ18Zl+BIeR6Jsbu0FO3YQ/udQ0mC71++yXFpYnOExFNPAYd/na+JDaDQKf34/GK6x2z4/5qMaivjAtE65Og/ImzejOmw/pwmS47xOxfPRYnkeuSIxi/7a91vujqowIyhGk61knez4xOGlYzAAPG/u0zXVRY99gqVmzfZzcftc/flnyCzuZu4una1P0Pqalw=
+  file: "build/build-debug/pyinvariant-*.whl"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    repo: ThomasLeMezo/invariant-lib
+    tags: true
