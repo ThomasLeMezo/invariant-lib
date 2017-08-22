@@ -1,9 +1,9 @@
 language: cpp
-sudo: true
+sudo: false
 matrix:
   include:
   - os: linux
-    dist: trusty
+    dist: precise
     language: pyhton
     env: PYTHON=2.7 CPP=11 GCC=4.8
     python: '2.7'
@@ -21,7 +21,7 @@ matrix:
         - pkg-config
         - python3-pip
   - os: linux
-    dist: trusty
+    dist: precise
     language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8
     python: '3.4'
@@ -39,7 +39,7 @@ matrix:
         - pkg-config
         - python3-pip
   - os: linux
-    dist: trusty
+    dist: precise
     language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8
     python: '3.5'
@@ -57,7 +57,7 @@ matrix:
         - pkg-config
         - python3-pip
   - os: linux
-    dist: trusty
+    dist: precise
     language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8
     python: '3.6'
@@ -100,8 +100,8 @@ before_install:
   if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      sudo -H pip3 install --upgrade pip;
-      sudo -H pip3 install auditwheel twine
+      pip3 install --upgrade pip --user;
+      pip3 install auditwheel twine --user;
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     if [ "$PY" = "3" ]; then
       brew update; brew install python$PY;
@@ -109,7 +109,7 @@ before_install:
       curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
       sudo -H python get-pip.py;
     fi
-    sudo -H pip$PY install --upgrade pip virtualenv auditwheel twine;
+    pip$PY install --upgrade pip virtualenv auditwheel twine;
     python$PY -m virtualenv venv;
     sudo brew install llvm;
     source venv/bin/activate;
