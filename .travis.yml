@@ -37,6 +37,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
+        - python3-pip
   - os: linux
     dist: trusty
     language: python
@@ -54,6 +55,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
+        - python3-pip
   - os: linux
     dist: trusty
     language: python
@@ -71,6 +73,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
+        - python3-pip
   - os: osx
     env: PYTHON=2.7 CPP=14 CLANG
   - os: osx

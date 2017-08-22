@@ -1,7 +1,8 @@
 #ifndef PAVE_H
 #define PAVE_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
+
 #include <map>
 #include <fstream>
 #include "room.h"

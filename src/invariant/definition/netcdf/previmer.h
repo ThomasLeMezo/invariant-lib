@@ -1,6 +1,7 @@
 #ifndef PREVIMER_H
 #define PREVIMER_H
 
+#include <ibex/ibex_IntervalVector.h>
 #include <string>
 #include "nodecurrent.h"
 #include "dynamics.h"

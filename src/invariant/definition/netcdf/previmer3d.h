@@ -2,6 +2,7 @@
 #define PREVIMER3D_H
 
 #include <string>
+#include <ibex/ibex_IntervalVector.h>
 #include "nodecurrent3d.h"
 #include "dynamics.h"
 #include <utility>

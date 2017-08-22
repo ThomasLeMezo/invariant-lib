@@ -1,7 +1,8 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
+
 #include "pave.h"
 #include "pave_node.h"
 #include <fstream>

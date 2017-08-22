@@ -8,6 +8,8 @@
 
 #include "vtk_graph.h"
 
+#include "ibex/ibex_SepFwdBwd.h"
+
 using namespace std;
 using namespace ibex;
 using namespace invariant;

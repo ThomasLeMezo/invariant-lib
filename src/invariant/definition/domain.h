@@ -1,7 +1,8 @@
 #ifndef DOMAIN_H
 #define DOMAIN_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
+#include <ibex/ibex_Sep.h>
 #include <utility>
 
 #include "graph.h"

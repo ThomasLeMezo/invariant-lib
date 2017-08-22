@@ -1,7 +1,7 @@
 #ifndef Vibes_Graph_H
 #define Vibes_Graph_H
 
-#include "ibex.h"
+#include <ibex/ibex_IntervalVector.h>
 #include "graph.h"
 #include "maze.h"
 #include "pave.h"

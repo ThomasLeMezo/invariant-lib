@@ -1,7 +1,8 @@
 #ifndef FACE_H
 #define FACE_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
+
 #include <fstream>
 #include "pave.h"
 #include <map>

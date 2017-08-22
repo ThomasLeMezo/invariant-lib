@@ -1,8 +1,11 @@
+#include "ibex/ibex_SepFwdBwd.h"
 #include "graph.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
 #include "vibes_graph.h"
+
+#include "ibex/ibex_SepFwdBwd.h"
 
 #include <iostream>
 #include "vibes/vibes.h"

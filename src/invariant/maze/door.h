@@ -1,7 +1,8 @@
 #ifndef DOOR_H
 #define DOOR_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
+
 #include "face.h"
 #include "room.h"
 #include "maze.h"

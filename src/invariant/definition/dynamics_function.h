@@ -2,7 +2,8 @@
 #define DYNAMICS_FUNCTION_H
 
 #include "dynamics.h"
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
+#include <ibex/ibex_Function.h>
 #include "omp.h"
 
 namespace invariant {

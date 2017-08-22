@@ -1,4 +1,5 @@
 #include "nodecurrent.h"
+#include "ibex/ibex_LargestFirst.h"
 
 using namespace ibex;
 using namespace std;

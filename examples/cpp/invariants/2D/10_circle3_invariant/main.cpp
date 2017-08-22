@@ -1,3 +1,4 @@
+#include "ibex/ibex_SepFwdBwd.h"
 #include "graph.h"
 #include "domain.h"
 #include "dynamics_function.h"

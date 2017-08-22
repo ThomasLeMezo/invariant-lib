@@ -1,7 +1,7 @@
 #ifndef DYNAMICS_H
 #define DYNAMICS_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
 
 namespace invariant {
 class Dynamics

@@ -1,7 +1,7 @@
 #ifndef ROOM_H
 #define ROOM_H
 
-#include <ibex.h>
+#include <ibex/ibex_IntervalVector.h>
 #include "pave.h"
 #include "maze.h"
 #include "../definition/dynamics.h"

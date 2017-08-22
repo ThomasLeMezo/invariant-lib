@@ -2,7 +2,10 @@
 #define PAVE_NODE_H
 
 #include <utility>
-#include <ibex.h>
+
+#include <ibex/ibex_IntervalVector.h>
+#include <ibex/ibex_Ctc.h>
+
 #include "pave.h"
 #include "maze.h"
 

@@ -1,3 +1,4 @@
+#include "ibex/ibex_SepFwdBwd.h"
 #include "graph.h"
 #include "domain.h"
 #include "dynamics_function.h"
@@ -9,6 +10,9 @@
 #include "graphiz_graph.h"
 #include <omp.h>
 #include "vtk_graph.h"
+
+#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex/ibex_SepInter.h"
 
 #include <string>
 

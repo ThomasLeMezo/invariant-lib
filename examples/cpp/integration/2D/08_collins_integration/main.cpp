@@ -4,6 +4,9 @@
 #include "maze.h"
 #include "vibes_graph.h"
 
+#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex/ibex_SepUnion.h"
+
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
