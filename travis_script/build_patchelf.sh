@@ -1,13 +1,12 @@
 #!/bin/bash
 
-if [ ! -e "${HOME}/patchelf-0.9/build/patchelf" ]; then
+if [ ! -e "${HOME}/patchelf/patchelf" ]; then
 	wget https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.gz
 	tar -zxvf patchelf-0.9.tar.gz
 	cd patchelf-0.9
-	./configure
+	./configure --prefix=$HOME/patchelf
 	make
-	mkdir build
-	cp src/patchelf build/
+	make install
 else
   echo 'Using cached directory.';
 fi
