@@ -133,7 +133,8 @@ deploy:
   provider: releases
   api_key:
     secure: NAXVYKKCCBMzCaHEsF9miYaKUMl2H7RZoniXdXx8de96emKsB8MHL2ItqJB+H8MaIr/h68f5KX4614oi6I3LLvI+H7V9clJ77sDR87ZMPmo/LX0rViW3Ijh4ZQ123xw+jtNJCBk9rON8TNNxM9CKmfrEdZjTM+S/48gqcFYDZdCMIPRAJolD2SPGT2eMx3PzKk8OW9te97QjIpRuG67KXV78zet5XGdhp9mQ6DMA+453XiyHb3rh26c9qGm9SFAQstLv0/OfOJ/GaZAKA1toUiJbnk2OAUhI0QUXIMhKH/fZzzajJTfr4rOL2CtDDp677cWmubqctPc8gfXBmu4hI9HV2+vtp7Gj0XP/NkUgv0zYjSnz929saFJ+dHpl3XenxIJkUj7coU8oDzsoKX/Uz5/yNCY1LXZvt7lAKa8j//qpMYUXfSTblSdClSnQ5oGG7nhpPlXVU90GLai1ACR3rI6CFeyuOZlZAG0OcpVA37pQJ18Zl+BIeR6Jsbu0FO3YQ/udQ0mC71++yXFpYnOExFNPAYd/na+JDaDQKf34/GK6x2z4/5qMaivjAtE65Og/ImzejOmw/pwmS47xOxfPRYnkeuSIxi/7a91vujqowIyhGk61knez4xOGlYzAAPG/u0zXVRY99gqVmzfZzcftc/flnyCzuZu4una1P0Pqalw=
-  file: wheelhouse/*
+  file_glob: true
+  file: pyinvariant-*.whl
   skip_cleanup: true
   overwrite: true
   on:
