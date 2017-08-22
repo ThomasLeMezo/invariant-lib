@@ -92,8 +92,8 @@ before_install:
   if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      sudo pip install --upgrade pip;
-      sudo pip install auditwheel twine;
+      sudo -H pip install --upgrade pip;
+      sudo -H pip install auditwheel twine;
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     if [ "$PY" = "3" ]; then
       brew update; brew install python$PY;
@@ -101,7 +101,7 @@ before_install:
       curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
       sudo -H python get-pip.py;
     fi
-    sudo pip$PY install --upgrade pip virtualenv auditwheel twine;
+    sudo -H pip$PY install --upgrade pip virtualenv auditwheel twine;
     python$PY -m virtualenv venv;
     sudo brew install llvm;
     source venv/bin/activate;
