@@ -127,7 +127,11 @@ script:
 - make pip_package
 - export wheel_file=$(ls *.whl)
 - echo $wheel_file
-- ~/.local/bin/auditwheel repair $wheel_file
+- if [ "$PY" = "3" ]; then
+    auditwheel repair $wheel_file;
+  else
+    ~/.local/bin/auditwheel repair $wheel_file;
+  fi
 - ls $TRAVIS_BUILD_DIR/build/build-release
 
 deploy:
