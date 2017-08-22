@@ -19,6 +19,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
+        - python3-pip
   - os: linux
     dist: trusty
     language: python
@@ -96,8 +97,8 @@ before_install:
   if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      sudo -H pip install --upgrade pip;
-      sudo -H pip install auditwheel twine;
+      sudo -H pip3 install --upgrade pip;
+      sudo pip3 install auditwheel twine
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     if [ "$PY" = "3" ]; then
       brew update; brew install python$PY;
@@ -114,7 +115,7 @@ install:
 - sh ./cmake/build_Ibex4pyIbex.sh
 - sh ./travis_script/build_patchelf.sh
 script:
-- export PATH=$PATH:~/patchelf/
+- export PATH=$PATH:~/patchelf/bin
 - mkdir -p build/build-release
 - cd build/build-release
 - cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DPYTHON_VERSION=${version}
@@ -125,7 +126,7 @@ script:
 - make pip_package
 - export wheel_file=$(ls *.whl)
 - echo $wheel_file
-- auditwheel repair $wheel_file;
+- python3 -m auditwheel repair $wheel_file;
 - ls $TRAVIS_BUILD_DIR/build/build-release
 
 deploy:
