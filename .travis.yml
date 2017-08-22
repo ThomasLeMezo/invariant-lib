@@ -18,7 +18,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        - patchelf
+        # - patchelf
   - os: linux
     language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8
@@ -35,7 +35,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        - patchelf
+        # - patchelf
   - os: linux
     language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8
@@ -52,7 +52,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        - patchelf
+        # - patchelf
   - os: linux
     language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8
@@ -128,7 +128,7 @@ script:
 - make pip_package
 - export wheel_file=$(ls *.whl)
 - echo $wheel_file
-- auditwheel repair $wheel_file
+# - auditwheel repair $wheel_file
 # - auditwheel repair ${wheel_file}
 # - mkdir -p $TRAVIS_BUILD_DIR/wheelhouse
 # - mv $wheel_file $TRAVIS_BUILD_DIR/wheelhouse
