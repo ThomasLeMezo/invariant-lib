@@ -1,7 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <ibex.h>
+#include "ibex/ibex_IntervalVector.h"
+#include "ibex/ibex_Function.h"
+
 #include "graph.h"
 #include "domain.h"
 #include "maze.h"

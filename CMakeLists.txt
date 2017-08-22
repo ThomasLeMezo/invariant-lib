@@ -19,10 +19,10 @@ cmake_minimum_required(VERSION 3.2.2)
 # Options
     option(WITH_EXAMPLES "Build examples" ON)
     option(BUILD_TESTS "Build test" OFF)
-    option(WITH_PYTHON "Build python module" OFF)
-    option(WITH_3D "Build 3D src and examples" OFF)
+    option(WITH_PYTHON "Build python module" ON)
+    option(WITH_3D "Build 3D src and examples" ON)
     option(WITH_GRAPHIZ "Build graphiz src and examples" OFF)
-    option(WITH_NETCDF "Build netcdf src and examples" OFF)
+    option(WITH_NETCDF "Build netcdf src and examples" ON)
     option(WITH_PYIBEX_VERSION "Build with ibex version of pyibex" OFF)
 
     if(NOT WIN32)
