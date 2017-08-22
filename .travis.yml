@@ -126,11 +126,7 @@ script:
 - make pip_package
 - export wheel_file=$(ls *.whl)
 - echo $wheel_file
-# - auditwheel repair $wheel_file
-# - auditwheel repair ${wheel_file}
-# - mkdir -p $TRAVIS_BUILD_DIR/wheelhouse
-# - mv $wheel_file $TRAVIS_BUILD_DIR/wheelhouse
-# - echo $TRAVIS_BUILD_DIR
+- auditwheel repair $wheel_file
 - ls $TRAVIS_BUILD_DIR/build/build-release
 
 deploy:
