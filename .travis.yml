@@ -1,9 +1,9 @@
 language: cpp
-sudo: false
+sudo: true
 matrix:
   include:
   - os: linux
-    dist: precise
+    dist: trusty
     language: pyhton
     env: PYTHON=2.7 CPP=11 GCC=4.8
     python: '2.7'
@@ -19,9 +19,9 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: linux
-    dist: precise
+    dist: trusty
     language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8
     python: '3.4'
@@ -37,9 +37,9 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: linux
-    dist: precise
+    dist: trusty
     language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8
     python: '3.5'
@@ -55,9 +55,9 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: linux
-    dist: precise
+    dist: trusty
     language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8
     python: '3.6'
@@ -73,7 +73,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: osx
     env: PYTHON=2.7 CPP=14 CLANG
   - os: osx
@@ -100,8 +100,8 @@ before_install:
   if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      pip3 install --upgrade pip --user;
-      pip3 install auditwheel twine --user;
+      sudo -H pip3 install --upgrade pip;
+      sudo -H pip3 install auditwheel twine
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     if [ "$PY" = "3" ]; then
       brew update; brew install python$PY;
@@ -109,7 +109,7 @@ before_install:
       curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
       sudo -H python get-pip.py;
     fi
-    pip$PY install --upgrade pip virtualenv auditwheel twine;
+    sudo -H pip$PY install --upgrade pip virtualenv auditwheel twine;
     python$PY -m virtualenv venv;
     sudo brew install llvm;
     source venv/bin/activate;
@@ -130,7 +130,7 @@ script:
 - export wheel_file=$(ls *.whl)
 - echo $wheel_file
 # - python3 -m auditwheel repair $wheel_file;
-# - ls $TRAVIS_BUILD_DIR/build/build-release
+- ls $TRAVIS_BUILD_DIR/build/build-release
 
 deploy:
   provider: releases
