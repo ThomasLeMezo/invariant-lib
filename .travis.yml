@@ -103,7 +103,7 @@ before_install:
       curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
       sudo -H python get-pip.py;
     fi
-    pip$PY install --user --upgrade pip virtualenv auditwheel twine;
+    pip$PY install --user --upgrade pip virtualenv auditwheel==1.4 twine;
     python$PY -m virtualenv venv;
     brew install llvm;
     source venv/bin/activate;
@@ -121,6 +121,7 @@ script:
 - make pip_package
 - export wheel_file=$(ls *.whl)
 - echo $wheel_file
+- auditwheel repair $wheel_file
 # - auditwheel repair ${wheel_file}
 # - mkdir -p $TRAVIS_BUILD_DIR/wheelhouse
 # - mv $wheel_file $TRAVIS_BUILD_DIR/wheelhouse

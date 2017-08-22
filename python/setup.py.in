@@ -1,7 +1,7 @@
 # coding: utf-8
-from setuptools import setup
-from setuptools.dist import Distribution
-# from setuptools import setup, Distribution, Extension
+# from setuptools import setup
+# from setuptools.dist import Distribution
+from setuptools import setup, Distribution, Extension
 
 # force External module
 class BinaryDistribution(Distribution):
@@ -21,8 +21,7 @@ setup(
   # ext_modules=[],
   packages=['pyinvariant'],
   package_data={
-      'pyinvariant': ['pyinvariant${PYTHON_MODULE_EXTENSION}'],
-
+      'pyinvariant': ['pyinvariant${PYTHON_MODULE_EXTENSION}']
   },
   # test_suite='pyinvariant.tests',
   license="GPLv3+",
@@ -31,8 +30,8 @@ setup(
       "Topic :: Scientific/Engineering :: Mathematics",
       "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   ],
-  # include_package_data=True,
-  zip_safe=False,
+  include_package_data=True,
+  # zip_safe=False,
   install_requires=[
       'pyibex',
   ],
