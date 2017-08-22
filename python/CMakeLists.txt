@@ -7,6 +7,8 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOUR
 
 # find_package(pybind11)
 
+file(WRITE "${PYTHON_PACKAGE_DIR}/empty.c" "// empty source file")
+
 configure_file(
  ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
  ${PYTHON_PACKAGE_DIR}/setup.py

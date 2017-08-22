@@ -18,7 +18,7 @@ setup(
   url='https://github.com/ThomasLeMezo/invariant-lib',
   description='A python interface of the Invariant library',
   long_description='',
-  # ext_modules=[],
+  ext_modules=[Extension("pyinvariant.empty", sources=["empty.c"])],
   packages=['pyinvariant'],
   package_data={
       'pyinvariant': ['pyinvariant${PYTHON_MODULE_EXTENSION}']
