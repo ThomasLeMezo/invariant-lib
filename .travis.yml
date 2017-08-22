@@ -3,6 +3,7 @@ sudo: true
 matrix:
   include:
   - os: linux
+    dist: trusty
     language: pyhton
     env: PYTHON=2.7 CPP=11 GCC=4.8
     python: '2.7'
@@ -19,6 +20,7 @@ matrix:
         - cmake-data
         - pkg-config
   - os: linux
+    dist: trusty
     language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8
     python: '3.4'
@@ -35,6 +37,7 @@ matrix:
         - cmake-data
         - pkg-config
   - os: linux
+    dist: trusty
     language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8
     python: '3.5'
@@ -51,6 +54,7 @@ matrix:
         - cmake-data
         - pkg-config
   - os: linux
+    dist: trusty
     language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8
     python: '3.6'
