@@ -100,9 +100,11 @@ before_install:
   if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      echo "linux system";
       # sudo -H pip3 install --upgrade pip;
       # sudo -H pip3 install auditwheel twine
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    echo "osx system";
     if [ "$PY" = "3" ]; then
       brew update; brew install python$PY;
     else
