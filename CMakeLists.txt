@@ -23,7 +23,7 @@ cmake_minimum_required(VERSION 3.2.2)
     option(WITH_3D "Build 3D src and examples" ON)
     option(WITH_GRAPHIZ "Build graphiz src and examples" OFF)
     option(WITH_NETCDF "Build netcdf src and examples" ON)
-    option(WITH_PYIBEX_VERSION "Build with ibex version of pyibex" OFF)
+    option(WITH_PYIBEX_VERSION "Build with ibex version of pyibex" ON)
 
     if(NOT WIN32)
         set(CMAKE_CXX_FLAGS " -fPIC ${CMAKE_CXX_FLAGS}")
