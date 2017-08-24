@@ -75,11 +75,11 @@ matrix:
         - pkg-config
         # - python3-pip
   - os: osx
-    env: PYTHON=2.7 CPP=11 CLANG CXX=clang++ CC=clang-omp
+    env: PYTHON=2.7 CPP=11 CXX=clang++ CC=clang-omp
   - os: osx
-    env: PYTHON=3.6 CPP=11 CLANG CXX=clang++ CC=clang-omp
+    env: PYTHON=3.6 CPP=11 CXX=clang++ CC=clang-omp
   - os: osx
-    env: PYTHON=3.5 CPP=11 CLANG CXX=clang++ CC=clang-omp
+    env: PYTHON=3.5 CPP=11 CXX=clang++ CC=clang-omp
 cache:
   directories:
   - "$HOME/ibex"
@@ -122,6 +122,8 @@ before_install:
     brew install llvm; brew upgrade llvm;
     ln -s /usr/local/opt/llvm/bin/clang /usr/local/bin/clang-omp
     source venv/bin/activate;
+    export CXX=clang++;
+    export CC=clang-omp;
   fi
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
@@ -130,10 +132,7 @@ script:
 # - export PATH=$PATH:~/patchelf/bin
 - mkdir -p build/build-release
 - cd build/build-release
-- cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DPYTHON_VERSION=${version}
-  -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP -DCMAKE_BUILD_TYPE=RELEASE
-  -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF
-  -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
+- cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DPYTHON_VERSION=${version} -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
 - make -j2
 - make pip_package
 # - export wheel_file=$(ls *.whl)
