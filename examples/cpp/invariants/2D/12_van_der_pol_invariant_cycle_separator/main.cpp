@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
     v_graph.show();
 
     cout << "box = " << box_in << endl;
-    vibes::drawBox(box_in, "red[]");
+//    vibes::drawBox(box_in, "red[]");
     maze.separate(box_in, box_out);
-    vibes::drawBox(box_in, "green[]");
-    vibes::drawBox(box_out, "white[]");
+    vibes::drawBox(box_in, "red[]");
+    vibes::drawBox(box_out, "green[]");
 
     cout << "in = " << box_in << endl;
     cout << "out = " << box_out << endl;
