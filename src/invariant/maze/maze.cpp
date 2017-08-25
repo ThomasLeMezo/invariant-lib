@@ -186,6 +186,27 @@ bool Maze::is_escape_trajectories(){
                 return true;
         }
     }
+    return true;
+}
+
+void Maze::separate(IntervalVector &in, IntervalVector &out){
+    vector<Room *> list_room_not_empty, list_room_empty;
+    this->get_graph()->get_tree()->get_intersection_polygon_not_empty(list_room_not_empty, out, this);
+    this->get_graph()->get_tree()->get_intersection_polygon_empty(list_room_empty, in, this);
+
+    IntervalVector in_tmp(in.size(), Interval::EMPTY_SET);
+    IntervalVector out_tmp(out.size(), Interval::EMPTY_SET);
+
+    for(Room* r:list_room_not_empty){
+        out_tmp |= (r->get_hull() & out);
+    }
+
+    for(Room* r:list_room_empty){
+        in_tmp |= (r->get_hull_complementary() & in);
+        cout << in_tmp << endl;
+    }
+    in &= in_tmp;
+    out &= out_tmp;
 }
 
 void Maze::add_rooms(const vector<Room *>& list_rooms){

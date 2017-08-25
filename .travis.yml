@@ -89,14 +89,14 @@ notifications:
 before_install:
 - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
 - |
-  # Configure build variables
-  # if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-  #   if [ -z "$GCC" ]; then export GCC=4.8; fi
-  #   export CXX=g++-$GCC CC=gcc-$GCC;
-  # elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-  #   export CXX=clang++ CC=clang-omp;
-  # fi
-  # if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
+  Configure build variables
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    if [ -z "$GCC" ]; then export GCC=4.8; fi
+    export CXX=g++-$GCC CC=gcc-$GCC;
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    export CXX=clang++ CC=clang;
+  fi
+  if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
         if [ "$PY" = "3" ]; then
@@ -119,11 +119,13 @@ before_install:
     # pip$PY install --upgrade auditwheel twine;
     python$PY -m virtualenv venv;
     brew upgrade;
-    brew install llvm;
-    brew install gcc --without-multilib
-    export CXX=g++-4.8 CC=gcc-4.8;
-    ln -s /usr/local/opt/llvm/bin/clang /usr/local/bin/clang-omp
+    brew install llvm; brew upgrade llvm;
     source venv/bin/activate;
+
+    export PATH="/usr/local/opt/llvm/bin:$PATH;
+    export LDFLAGS=-L/usr/local/opt/llvm/lib;
+    export CPPFLAGS= -I/usr/local/opt/llvm/include;
+
   fi
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
@@ -132,7 +134,20 @@ script:
 - export PATH=$PATH:~/patchelf/bin
 - mkdir -p build/build-release
 - cd build/build-release
-- cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DPYTHON_VERSION=${version} -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=OFF -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=OFF -DWITH_PYIBEX_VERSION=ON -DWITH_EXAMPLES=OFF ../..
+- cmake -DCMAKE_INSTALL_PREFIX=${HOME} 
+        -DIBEX_ROOT=${HOME}/ibex 
+        -DPYTHON_VERSION=${version} 
+        -DPYBIND11_PYTHON_VERSION=$PYTHON 
+        -DPYBIND11_CPP_STANDARD=$CPP 
+        -DCMAKE_BUILD_TYPE=RELEASE 
+        -DBUILD_TESTS=OFF 
+        -DWITH_PYTHON=ON 
+        -DWITH_3D=OFF 
+        -DWITH_GRAPHIZ=OFF 
+        -DWITH_NETCDF=OFF 
+        -DWITH_PYIBEX_VERSION=ON 
+        -DWITH_EXAMPLES=OFF 
+        ../..
 - make -j2
 - make pip_package
 # - export wheel_file=$(ls *.whl)

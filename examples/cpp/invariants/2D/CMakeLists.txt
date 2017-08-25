@@ -15,3 +15,5 @@ add_subdirectory(09_balancing_invariant)
 add_subdirectory(10_circle3_invariant)
 add_subdirectory(11_rayleigh_invariant)
 
+add_subdirectory(12_van_der_pol_invariant_cycle_separator)
+

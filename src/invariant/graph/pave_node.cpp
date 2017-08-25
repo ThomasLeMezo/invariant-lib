@@ -205,6 +205,7 @@ void Pave_node::get_all_child_rooms_not_full(std::vector<Room *> &list_room, Maz
 }
 
 void Pave_node::get_all_child_rooms_inside_outside(std::vector<Room *> &list_room, Maze *maze) const{
+    // ToDo : verify ? => why not called recursively ?
     if(is_leaf()){
         Room *r = m_pave->get_rooms()[maze];
         if(!r->is_full() && !r->is_removed())
@@ -226,6 +227,36 @@ void Pave_node::get_border_paves(std::vector<Pave*>& pave_list) const{
         if(m_border_pave){
             m_children.first->get_border_paves(pave_list);
             m_children.second->get_border_paves(pave_list);
+        }
+    }
+}
+
+void Pave_node::get_intersection_polygon_not_empty(std::vector<Room*> &l, const ibex::IntervalVector &box, Maze *maze) const{
+    if(!(box & m_position).is_empty()){
+        if(m_leaf){
+            Room *r = m_pave->get_rooms()[maze];
+            if(!r->is_removed() && !r->is_empty()){
+                l.push_back(r);
+            }
+        }
+        else{
+            m_children.first->get_intersection_polygon_not_empty(l, box, maze);
+            m_children.second->get_intersection_polygon_not_empty(l, box, maze);
+        }
+    }
+}
+
+void Pave_node::get_intersection_polygon_empty(std::vector<Room*> &l, const ibex::IntervalVector &box, Maze *maze) const{
+    if(!(box & m_position).is_empty()){
+        if(m_leaf){
+            Room *r = m_pave->get_rooms()[maze];
+            if(r->is_removed() || !r->is_full()){
+                l.push_back(r);
+            }
+        }
+        else{
+            m_children.first->get_intersection_polygon_empty(l, box, maze);
+            m_children.second->get_intersection_polygon_empty(l, box, maze);
         }
     }
 }

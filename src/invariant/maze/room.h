@@ -185,6 +185,18 @@ public:
      */
     std::vector<bool> get_vector_fields_zero();
 
+    /**
+     * @brief Get the box convex hull of the polygon
+     * @return
+     */
+    const ibex::IntervalVector get_hull() const;
+
+    /**
+     * @brief Get the complementary box convex hull of the polygon
+     * @return
+     */
+    const ibex::IntervalVector get_hull_complementary();
+
 
 protected:
     /**
@@ -251,8 +263,8 @@ protected:
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
     std::vector<bool>    m_vector_field_zero;
 
-    bool    m_empty = false;
-    bool    m_full = false;
+    mutable bool    m_empty = false;
+    mutable bool    m_full = false;
 
     bool m_full_first_eval = true;
     bool m_empty_first_eval = false;

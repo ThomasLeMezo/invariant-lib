@@ -196,6 +196,12 @@ public:
      */
     void set_removed();
 
+    /**
+     * @brief Get the hull of the door
+     * @return
+     */
+    const ibex::IntervalVector get_hull() const;
+
 protected:
     ibex::IntervalVector m_input_public;
     ibex::IntervalVector m_output_public; //input and output doors public

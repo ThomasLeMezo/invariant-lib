@@ -631,7 +631,6 @@ bool Room::is_empty(){
         m_empty_first_eval = false;
         for(Face *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_empty()){
-
                 return false;
             }
         }
@@ -722,6 +721,29 @@ void Room::set_removed(){
         Door *d = f->get_doors()[m_maze];
         d->set_removed();
     }
+}
+
+const IntervalVector Room::get_hull() const{
+    IntervalVector result(m_pave->get_position().size(), Interval::EMPTY_SET);
+    for(Face *f:get_pave()->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        result |= d->get_hull();
+    }
+    return result;
+}
+
+const IntervalVector Room::get_hull_complementary(){
+    if(is_empty())
+        return m_pave->get_position();
+    IntervalVector hull = get_hull();
+    IntervalVector *result;
+    int nb_box = m_pave->get_position().diff(hull,result);
+
+    IntervalVector complementary(hull.size(), Interval::EMPTY_SET);
+    for(int i=0; i<nb_box; i++){
+        complementary |= result[i];
+    }
+    return complementary;
 }
 
 }

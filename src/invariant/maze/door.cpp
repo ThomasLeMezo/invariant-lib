@@ -40,6 +40,10 @@ void Door::set_removed(){
     m_input_private = NULL;
 }
 
+const IntervalVector Door::get_hull() const{
+    return m_input_public | m_output_public;
+}
+
 void Door::synchronize(){
     omp_set_lock(&m_lock_read);
     m_input_public = *m_input_private;

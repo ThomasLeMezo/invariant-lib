@@ -201,6 +201,21 @@ public:
      */
     void get_border_paves(std::vector<Pave*> &pave_list) const;
 
+    /**
+     * @brief Get not empty rooms inside the box that intersect the polygon
+     * @param l
+     * @param box
+     * @param maze
+     */
+    void get_intersection_polygon_not_empty(std::vector<Room*> &l, const ibex::IntervalVector &box, Maze *maze) const;
+
+    /**
+     * @brief Get empty rooms inside the box that intersect the polygon
+     * @param l
+     * @param box
+     * @param maze
+     */
+    void get_intersection_polygon_empty(std::vector<Room*> &l, const ibex::IntervalVector &box, Maze *maze) const;
 
 private:
     bool                                m_leaf = true;
