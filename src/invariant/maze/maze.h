@@ -109,11 +109,11 @@ public:
      */
     bool is_escape_trajectories();
 
-    /**
-     * @brief Separator to the maze polygon
-     * @param box
-     */
-    void separate(ibex::IntervalVector &in, ibex::IntervalVector &out);
+//    /**
+//     * @brief Separator to the maze polygon
+//     * @param box
+//     */
+//    void separate(ibex::IntervalVector &in, ibex::IntervalVector &out);
 
 private:
     invariant::Domain *    m_domain = NULL;

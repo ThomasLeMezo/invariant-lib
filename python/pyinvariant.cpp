@@ -3,10 +3,12 @@
 
 #include "ibex/ibex_IntervalVector.h"
 #include "ibex/ibex_Function.h"
+#include "ibex/ibex_Sep.h"
 
 #include "graph.h"
 #include "domain.h"
 #include "maze.h"
+#include "sepmaze.h"
 #include "dynamics.h"
 #include "dynamics_function.h"
 #include "vibes_graph.h"
@@ -30,6 +32,8 @@ PYBIND11_MODULE(pyinvariant, m){
           .def("bisect", &Graph::bisect)
           .def("size", &Graph::size)
   ;
+
+  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
@@ -66,6 +70,12 @@ PYBIND11_MODULE(pyinvariant, m){
           .def("contract_inter", &invariant::Maze::contract_inter)
           .def("init", &invariant::Maze::init)
     ;
+
+  // SepMaze
+  py::class_<invariant::SepMaze>(m, "SepMaze", sep)
+          .def(py::init<invariant::Maze*>(),"maze"_a)
+          .def("separate", &invariant::SepMaze::separate)
+      ;
 
   // ********* Vibes_Graph *********
   py::enum_<Vibes_Graph::VIBES_GRAPH_TYPE>(m, "VIBES_GRAPH_TYPE")

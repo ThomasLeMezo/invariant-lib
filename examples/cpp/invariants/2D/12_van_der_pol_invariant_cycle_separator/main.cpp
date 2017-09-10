@@ -5,6 +5,8 @@
 #include "maze.h"
 #include "vibes_graph.h"
 
+#include "sepmaze.h"
+
 #include "ibex/ibex_SepFwdBwd.h"
 
 #include <iostream>
@@ -53,10 +55,10 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     IntervalVector box_in(2), box_out(2);
-    box_in[0] = Interval(2.1, 2.4);
-    box_in[1] = Interval(-0.370, -0.05);
-//    box_in[0] = Interval(1.8, 2.8);
-//    box_in[1] = Interval(-2, -0.5);
+//    box_in[0] = Interval(2.1, 2.4);
+//    box_in[1] = Interval(-0.370, -0.05);
+    box_in[0] = Interval(1.8, 2.8);
+    box_in[1] = Interval(-2, -0.5);
     box_out = box_in;
 
     cout << graph << endl;
@@ -66,9 +68,11 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
+    SepMaze sepMaze(&maze);
+
     cout << "box = " << box_in << endl;
 //    vibes::drawBox(box_in, "red[]");
-    maze.separate(box_in, box_out);
+    sepMaze.separate(box_in, box_out);
     vibes::drawBox(box_in, "red[]");
     vibes::drawBox(box_out, "green[]");
 

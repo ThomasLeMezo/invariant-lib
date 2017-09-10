@@ -20,6 +20,7 @@ include_directories(../tools/serialization)
     maze/maze.cpp
     maze/room.cpp
     maze/door.cpp
+    maze/sepmaze.cpp
 
     definition/domain.cpp
     definition/dynamics.cpp
@@ -44,6 +45,7 @@ include_directories(../tools/serialization)
     maze/maze.h
     maze/room.h
     maze/door.h
+    maze/sepmaze.h
 
     definition/domain.h
     definition/dynamics.h
