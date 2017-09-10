@@ -2,7 +2,7 @@ from pyibex import *
 from pyinvariant import *
 
 # Define the search space
-space = IntervalVector([[-3, 3],[-3,3]])
+space = IntervalVector([[-6, 6],[-6,6]])
 
 # Create the grpah structure
 graph = Graph(space)
@@ -10,7 +10,7 @@ graph = Graph(space)
 # Create the Domain
 dom = Domain(graph)
 
-dom.set_border_path_in(False)
+dom.set_border_path_in(True)
 dom.set_border_path_out(False)
 
 # Create the Dynamics
@@ -21,7 +21,7 @@ dyn = DynamicsFunction(f)
 maze = Maze(dom, dyn, MAZE_FWD, MAZE_CONTRACTOR)
 
 # Contract the system
-for i in range(10):
+for i in range(15):
 	print(i)
 	graph.bisect()
 	maze.contract()

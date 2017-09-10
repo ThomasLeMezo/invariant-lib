@@ -55,12 +55,12 @@ int main(int argc, char *argv[])
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x, Return((x[1]),
-                           (-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
-    ibex::Function f_n(x, Return(-(x[1]),
+    ibex::Function f_outer(x, Return(-(x[1]),
                            -(-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
-    Dynamics_Function dyn_outer(&f_n);
-    Dynamics_Function dyn_inner(&f);
+    ibex::Function f_inner(x, Return((x[1]),
+                           (-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
+    Dynamics_Function dyn_outer(&f_outer);
+    Dynamics_Function dyn_inner(&f_inner);
 
     // ******* Maze ********* //
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);

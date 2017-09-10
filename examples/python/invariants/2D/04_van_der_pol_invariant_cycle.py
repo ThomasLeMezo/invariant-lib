@@ -10,8 +10,12 @@ graph = Graph(space)
 # Create the Domain
 dom = Domain(graph)
 
-dom.set_border_path_in(False)
+dom.set_border_path_in(True)
 dom.set_border_path_out(False)
+
+f_sep = Function("x[2]", "(x[0])^2+(x[1])^2-(1.0)^2")
+s = SepFwdBwd(f_sep, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
+dom.set_sep(s);
 
 # Create the Dynamics
 f = Function("x[2]", "(x[1],(1.0*(1.0-x[0]^2))*x[1]-x[0])")
@@ -21,7 +25,7 @@ dyn = DynamicsFunction(f)
 maze = Maze(dom, dyn, MAZE_FWD, MAZE_CONTRACTOR)
 
 # Contract the system
-for i in range(10):
+for i in range(15):
 	print(i)
 	graph.bisect()
 	maze.contract()

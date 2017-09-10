@@ -507,6 +507,9 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
 
     out_return &= in_return;
     in_return &= out_return;
+
+    in_return &= door_in->get_input_private();
+    out_return &= door_in->get_output_private();
 }
 
 void Room::set_full_possible(){
@@ -581,8 +584,8 @@ bool Room::get_private_doors_info(string message){
         return false;
     IntervalVector position(2);
 //    [-1.5, 0] ; [1.5, 3]
-    position[0] = Interval(-1.5, 0);
-    position[1] = Interval(1.5, 3);
+    position[0] = Interval(-2.25, -1.875);
+    position[1] = Interval(2.71875, 3.1);
 //    IntervalVector position2(2);
 //    position2[0] = Interval(0.75, 1.5);
 //    position2[1] = Interval(1.5750000000000002, 3.1);

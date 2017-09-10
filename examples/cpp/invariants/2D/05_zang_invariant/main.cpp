@@ -60,9 +60,9 @@ int main(int argc, char *argv[])
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(-2.9);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(-2);
+    position_info[1] = Interval(2.9);
 //    v_graph.get_room_info(&maze, position_info);
 //    v_graph.show_room_info(&maze, position_info);
 

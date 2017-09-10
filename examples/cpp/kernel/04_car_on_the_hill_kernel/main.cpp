@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     // ****** Domain Outer ******* //
     invariant::Domain dom_outer(&graph);
 
-    dom_outer.set_border_path_in(false);
+    dom_outer.set_border_path_in(true);
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
