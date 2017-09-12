@@ -88,8 +88,7 @@ notifications:
   email: false
 before_install:
 - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
-- |
-  Configure build variables
+- # Configure build variables;
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     if [ -z "$GCC" ]; then export GCC=4.8; fi
     export CXX=g++-$GCC CC=gcc-$GCC;
@@ -125,7 +124,6 @@ before_install:
     export PATH="/usr/local/opt/llvm/bin:$PATH;
     export LDFLAGS=-L/usr/local/opt/llvm/lib;
     export CPPFLAGS= -I/usr/local/opt/llvm/include;
-
   fi
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
