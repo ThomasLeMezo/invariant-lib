@@ -1,5 +1,5 @@
 language: cpp
-# sudo: false
+sudo: false
 matrix:
   include:
   - os: linux
@@ -19,7 +19,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: linux
     dist: trusty
     language: python
@@ -37,7 +37,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: linux
     dist: trusty
     language: python
@@ -55,7 +55,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: linux
     dist: trusty
     language: python
@@ -73,7 +73,7 @@ matrix:
         - cmake
         - cmake-data
         - pkg-config
-        # - python3-pip
+        - python3-pip
   - os: osx
     env: PYTHON=2.7 CPP=11
   - os: osx
@@ -88,8 +88,7 @@ notifications:
   email: false
 before_install:
 - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
-- # Configure build variables;
-  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     if [ -z "$GCC" ]; then export GCC=4.8; fi
     export CXX=g++-$GCC CC=gcc-$GCC;
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
