@@ -20,15 +20,15 @@ using namespace pybind11::literals;
 using namespace invariant;
 using namespace ibex;
 
-PYBIND11_MODULE(pyinvariant, m){
-  m.doc() = "Python binding of invariant-lib";
-//PYBIND11_PLUGIN(pyinvariant) {
-//  py::module m("pyinvariant", "Python binding of invariant-lib");
-//  py::module pyibex = (py::object) py::module::import("pyibex");
+// PYBIND11_MODULE(pyinvariant, m){
+  // m.doc() = "Python binding of invariant-lib";
+PYBIND11_PLUGIN(pyinvariant) {
+ py::module m("pyinvariant", "Python binding of invariant-lib");
+ py::module pyibex = (py::object) py::module::import("pyibex");
 
   // ********* Graphs *********
   py::class_<Graph>(m, "Graph")
-          .def(py::init<const IntervalVector&>(), "IntervalVector"_a )
+          .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
           .def("bisect", &Graph::bisect)
           .def("size", &Graph::size)
   ;

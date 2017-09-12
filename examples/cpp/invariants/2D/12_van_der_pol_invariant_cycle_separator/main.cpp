@@ -55,10 +55,10 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     IntervalVector box_in(2), box_out(2);
-//    box_in[0] = Interval(2.1, 2.4);
-//    box_in[1] = Interval(-0.370, -0.05);
-    box_in[0] = Interval(1.8, 2.8);
-    box_in[1] = Interval(-2, -0.5);
+    box_in[0] = Interval(2.1, 2.4);
+    box_in[1] = Interval(-0.370, -0.05);
+//    box_in[0] = Interval(1.8, 2.8);
+//    box_in[1] = Interval(-2, -0.5);
     box_out = box_in;
 
     cout << graph << endl;
