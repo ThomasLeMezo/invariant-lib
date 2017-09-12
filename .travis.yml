@@ -3,7 +3,7 @@ sudo: false
 matrix:
   include:
   - os: linux
-    dist: precise
+    dist: trusty
     language: pyhton
     env: PYTHON=2.7 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '2.7'
@@ -13,7 +13,7 @@ matrix:
         - ubuntu-toolchain-r-test
         - kubuntu-backports
         - deadsnakes
-        - george-edison55-precise-backports
+        - george-edison55-trusty-backports
         packages:
         - g++-4.8
         - cmake
@@ -21,7 +21,7 @@ matrix:
         - pkg-config
         # - python3-pip
   - os: linux
-    dist: precise
+    dist: trusty
     language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '3.4'
@@ -31,7 +31,7 @@ matrix:
         - ubuntu-toolchain-r-test
         - kubuntu-backports
         - deadsnakes
-        - george-edison55-precise-backports
+        - george-edison55-trusty-backports
         packages:
         - g++-4.8
         - cmake
@@ -39,7 +39,7 @@ matrix:
         - pkg-config
         # - python3-pip
   - os: linux
-    dist: precise
+    dist: trusty
     language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '3.5'
@@ -49,7 +49,7 @@ matrix:
         - ubuntu-toolchain-r-test
         - kubuntu-backports
         - deadsnakes
-        - george-edison55-precise-backports
+        - george-edison55-trusty-backports
         packages:
         - g++-4.8
         - cmake
@@ -57,7 +57,7 @@ matrix:
         - pkg-config
         # - python3-pip
   - os: linux
-    dist: precise
+    dist: trusty
     language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '3.6'
@@ -67,7 +67,7 @@ matrix:
         - ubuntu-toolchain-r-test
         - kubuntu-backports
         - deadsnakes
-        - george-edison55-precise-backports
+        - george-edison55-trusty-backports
         packages:
         - g++-4.8
         - cmake
