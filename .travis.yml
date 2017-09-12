@@ -1,10 +1,9 @@
 language: cpp
-# sudo: false
+sudo: false
 matrix:
   include:
   - os: linux
     dist: trusty
-    language: pyhton
     env: PYTHON=2.7 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '2.7'
     addons:
@@ -22,7 +21,6 @@ matrix:
         - python3-pip
   - os: linux
     dist: trusty
-    language: python
     env: PYTHON=3.4 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '3.4'
     addons:
@@ -40,7 +38,6 @@ matrix:
         - python3-pip
   - os: linux
     dist: trusty
-    language: python
     env: PYTHON=3.5 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '3.5'
     addons:
@@ -58,7 +55,6 @@ matrix:
         - python3-pip
   - os: linux
     dist: trusty
-    language: python
     env: PYTHON=3.6 CPP=11 GCC=4.8 CXX=g++-4.8 CC=gcc-4.8
     python: '3.6'
     addons:
@@ -88,7 +84,9 @@ notifications:
   email: false
 before_install:
 - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
-- if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+- |
+  # Configure build variables
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     if [ -z "$GCC" ]; then export GCC=4.8; fi
     export CXX=g++-$GCC CC=gcc-$GCC;
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
