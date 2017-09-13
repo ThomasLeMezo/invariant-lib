@@ -20,11 +20,10 @@ using namespace pybind11::literals;
 using namespace invariant;
 using namespace ibex;
 
-// PYBIND11_MODULE(pyinvariant, m){
-  // m.doc() = "Python binding of invariant-lib";
-PYBIND11_PLUGIN(pyinvariant) {
- py::module m("pyinvariant", "Python binding of invariant-lib");
-// py::module pyibex = (py::object) py::module::import("pyibex");
+ PYBIND11_MODULE(pyinvariant, m){
+   m.doc() = "Python binding of invariant-lib";
+//PYBIND11_PLUGIN(pyinvariant) {
+// py::module m("pyinvariant", "Python binding of invariant-lib");
 
   // ********* Graphs *********
   py::class_<Graph>(m, "Graph")
@@ -33,7 +32,7 @@ PYBIND11_PLUGIN(pyinvariant) {
           .def("size", &Graph::size)
   ;
 
-  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
+//  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
@@ -72,10 +71,10 @@ PYBIND11_PLUGIN(pyinvariant) {
     ;
 
   // SepMaze
-  py::class_<invariant::SepMaze, ibex::Sep>(m, "SepMaze")
-          .def(py::init<invariant::Maze*>(),"maze"_a)
+//  py::class_<invariant::SepMaze>(m, "SepMaze", sep)
+//          .def(py::init<invariant::Maze*>(),"maze"_a)
 //          .def("separate", &invariant::SepMaze::separate)
-      ;
+//      ;
 
   // ********* Vibes_Graph *********
   py::enum_<Vibes_Graph::VIBES_GRAPH_TYPE>(m, "VIBES_GRAPH_TYPE")
@@ -114,5 +113,5 @@ PYBIND11_PLUGIN(pyinvariant) {
       .value("NOT_LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::NOT_LINK_TO_INITIAL_CONDITION)
       .export_values();
 
-  return m.ptr();
+//  return m.ptr();
 }

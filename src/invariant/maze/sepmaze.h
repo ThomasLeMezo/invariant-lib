@@ -21,7 +21,7 @@ public:
      * @brief Separator to the maze polygon
      * @param box
      */
-    void separate(ibex::IntervalVector& x_in, ibex::IntervalVector& x_out);
+    virtual void separate(ibex::IntervalVector& x_in, ibex::IntervalVector& x_out);
 
 private:
     Maze *m_maze;

@@ -73,7 +73,7 @@ int Maze::contract(){
         return 0;
     }
 
-#pragma omp parallel num_threads(1)
+#pragma omp parallel //num_threads(1)
     {
 #pragma omp single
         {
