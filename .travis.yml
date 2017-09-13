@@ -57,7 +57,7 @@ before_install:
     if [ -z "$GCC" ]; then export GCC=4.8; fi
     export CXX=g++-$GCC CC=gcc-$GCC;
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    export CXX=g++-5 CC=gcc-5;
+    export CXX=g++ CC=gcc;
   fi
   if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
   if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
@@ -75,7 +75,6 @@ before_install:
       sudo -H python get-pip.py;
     fi
     brew install llvm
-    brew reinstall gcc --without-multilib
     # pip$PY install --user --upgrade pip virtualenv auditwheel twine;
     python$PY -m virtualenv venv;
     source venv/bin/activate;

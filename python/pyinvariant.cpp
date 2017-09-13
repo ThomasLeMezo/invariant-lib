@@ -24,7 +24,7 @@ using namespace ibex;
   // m.doc() = "Python binding of invariant-lib";
 PYBIND11_PLUGIN(pyinvariant) {
  py::module m("pyinvariant", "Python binding of invariant-lib");
- py::module pyibex = (py::object) py::module::import("pyibex");
+// py::module pyibex = (py::object) py::module::import("pyibex");
 
   // ********* Graphs *********
   py::class_<Graph>(m, "Graph")
@@ -72,9 +72,9 @@ PYBIND11_PLUGIN(pyinvariant) {
     ;
 
   // SepMaze
-  py::class_<invariant::SepMaze>(m, "SepMaze", sep)
+  py::class_<invariant::SepMaze, ibex::Sep>(m, "SepMaze")
           .def(py::init<invariant::Maze*>(),"maze"_a)
-          .def("separate", &invariant::SepMaze::separate)
+//          .def("separate", &invariant::SepMaze::separate)
       ;
 
   // ********* Vibes_Graph *********

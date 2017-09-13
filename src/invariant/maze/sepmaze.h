@@ -11,13 +11,17 @@ class SepMaze : public ibex::Sep
 {
 public:
 
+    /**
+     * @brief Constructor of the Maze separator
+     * @param maze
+     */
     SepMaze(Maze *maze);
 
     /**
      * @brief Separator to the maze polygon
      * @param box
      */
-    virtual void separate(ibex::IntervalVector& x_in, ibex::IntervalVector& x_out);
+    void separate(ibex::IntervalVector& x_in, ibex::IntervalVector& x_out);
 
 private:
     Maze *m_maze;

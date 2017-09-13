@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.2.2)
 # Settings
     set(CMAKE_CXX_STANDARD 11)
     set(PACKAGE_NAME      invariant-lib)
-    set(PACKAGE_VERSION "0.1b4")
+    set(PACKAGE_VERSION "0.1b5")
     project(${PACKAGE_NAME})
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
