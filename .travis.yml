@@ -76,7 +76,7 @@ before_install:
       sudo -H python get-pip.py;
     fi
     brew install gcc48
-    # pip$PY install --user --upgrade pip virtualenv auditwheel twine;
+    pip$PY install --user --upgrade pip virtualenv;
     python$PY -m virtualenv venv;
     source venv/bin/activate;
   fi

@@ -26,7 +26,6 @@ f_sep_inner = Function("x[2]", "(x[0])^2+(x[1])^2-(3.0)^2")
 s_inner = SepFwdBwd(f_sep_inner, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 dom_inner.set_sep(s_inner);
 
-
 # Create the Dynamics
 f_outer = Function("x[2]", "(-(-x[0]+x[1]), -(0.1*x[0]-2*x[1]-x[0]^2-0.1*x[0]^3))")
 dyn_outer = DynamicsFunction(f_outer)

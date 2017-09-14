@@ -21,7 +21,7 @@ dyn = DynamicsFunction(f)
 maze = Maze(dom, dyn, MAZE_BWD, MAZE_CONTRACTOR)
 
 # Contract the system
-for i in range(10):
+for i in range(15):
 	print(i)
 	graph.bisect()
 	maze.contract()

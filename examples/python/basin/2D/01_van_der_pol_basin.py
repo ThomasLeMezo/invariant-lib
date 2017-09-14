@@ -2,7 +2,7 @@ from pyibex import *
 from pyinvariant import *
 
 # Define the search space
-space = IntervalVector([[-4, 4],[-4,4]])
+space = IntervalVector([[-4.0, 4.0],[-4.0,4.0]])
 
 # Create the grpah structure
 graph = Graph(space)
@@ -26,12 +26,11 @@ f_sep_inner = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
 s_inner = SepFwdBwd(f_sep_inner, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 dom_inner.set_sep(s_inner);
 
-
 # Create the Dynamics
-f_outer = Function("x[2]", "(x[1],(1.0*(1.0-x[0]^2))*x[1]-x[0])")
+f_outer = Function("x[2]", "(x[1],(1.0-(x[0]^2))*x[1]-x[0])")
 dyn_outer = DynamicsFunction(f_outer)
 
-f_inner = Function("x[2]", "(-x[1],-((1.0*(1.0-x[0]^2))*x[1]-x[0]))")
+f_inner = Function("x[2]", "-(x[1],(1.0-(x[0]^2))*x[1]-x[0])")
 dyn_inner = DynamicsFunction(f_inner)
 
 # Create the Maze associated with the Domain and the dynamics
@@ -40,11 +39,12 @@ maze_inner = Maze(dom_inner, dyn_inner, MAZE_BWD, MAZE_CONTRACTOR)
 
 # Contract the system
 maze_outer.init()
-for i in range(10):
+maze_inner.init()
+for i in range(13):
 	print(i)
 	graph.bisect()
-	maze_outer.contract()
 	maze_inner.contract()
+	maze_outer.contract()
 
 # Visualization
 visu = VibesGraph("graph", graph, maze_outer, maze_inner)

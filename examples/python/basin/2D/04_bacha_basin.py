@@ -26,7 +26,6 @@ f_sep_inner = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
 s_inner = SepFwdBwd(f_sep_inner, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 dom_inner.set_sep(s_inner);
 
-
 # Create the Dynamics
 f_outer = Function("x[2]", "(-(x[1]), -(-0.5*x[1]-sin(x[0]+0.412)+sin(0.412)))")
 dyn_outer = DynamicsFunction(f_outer)
@@ -40,7 +39,7 @@ maze_inner = Maze(dom_inner, dyn_inner, MAZE_BWD, MAZE_CONTRACTOR)
 
 # Contract the system
 maze_outer.init()
-for i in range(10):
+for i in range(15):
 	print(i)
 	graph.bisect()
 	maze_outer.contract()

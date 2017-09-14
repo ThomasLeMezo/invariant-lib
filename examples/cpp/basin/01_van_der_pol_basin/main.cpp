@@ -54,19 +54,19 @@ int main(int argc, char *argv[])
                                     (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
     Dynamics_Function dyn_outer(&f_outer);
 
-    ibex::Function f_inner(x, Return(-x[1],
-                                    -(1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
+    ibex::Function f_inner(x, -Return(x[1],
+                           (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
     Dynamics_Function dyn_inner(&f_inner);
 
     // ******* Maze ********* //
     Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_PROPAGATOR);
-
     Maze maze_inner(&dom_inner, &dyn_inner, MAZE_BWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_outer.init();
-    for(int i=0; i<18; i++){
+    maze_inner.init();
+    for(int i=0; i<13; i++){
         graph.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << graph.size() << endl;
         cout << i << " - " << maze_inner.contract() << " - " << graph.size() << endl;
