@@ -22,17 +22,13 @@ using namespace ibex;
 
  PYBIND11_MODULE(pyinvariant, m){
    m.doc() = "Python binding of invariant-lib";
-//PYBIND11_PLUGIN(pyinvariant) {
-// py::module m("pyinvariant", "Python binding of invariant-lib");
 
   // ********* Graphs *********
   py::class_<Graph>(m, "Graph")
           .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
           .def("bisect", &Graph::bisect)
           .def("size", &Graph::size)
-  ;
-
-//  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
+  ;  
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
@@ -71,6 +67,7 @@ using namespace ibex;
     ;
 
   // SepMaze
+//  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
 //  py::class_<invariant::SepMaze>(m, "SepMaze", sep)
 //          .def(py::init<invariant::Maze*>(),"maze"_a)
 //          .def("separate", &invariant::SepMaze::separate)
@@ -113,5 +110,4 @@ using namespace ibex;
       .value("NOT_LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::NOT_LINK_TO_INITIAL_CONDITION)
       .export_values();
 
-//  return m.ptr();
 }

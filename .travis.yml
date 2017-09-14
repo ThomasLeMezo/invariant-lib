@@ -69,12 +69,12 @@ before_install:
       fi
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     if [ "$PY" = "3" ]; then
-      brew update; brew install python$PY;
+      brew install python$PY;
     else
       curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
       sudo -H python get-pip.py;
     fi
-    brew install llvm
+    brew install clang-omp
     # pip$PY install --user --upgrade pip virtualenv auditwheel twine;
     python$PY -m virtualenv venv;
     source venv/bin/activate;
