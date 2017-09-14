@@ -67,11 +67,11 @@ using namespace ibex;
     ;
 
   // SepMaze
-//  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
-//  py::class_<invariant::SepMaze>(m, "SepMaze", sep)
-//          .def(py::init<invariant::Maze*>(),"maze"_a)
-//          .def("separate", &invariant::SepMaze::separate)
-//      ;
+  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
+  py::class_<invariant::SepMaze>(m, "SepMaze", sep)
+          .def(py::init<invariant::Maze*>(),"maze"_a)
+          .def("separate", &invariant::SepMaze::separate)
+      ;
 
   // ********* Vibes_Graph *********
   py::enum_<Vibes_Graph::VIBES_GRAPH_TYPE>(m, "VIBES_GRAPH_TYPE")
