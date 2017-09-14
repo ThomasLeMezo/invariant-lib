@@ -88,6 +88,14 @@ using namespace ibex;
                "graph"_a,
                "maze"_a,
                "VIBES_GRAPH_TYPE"_a = Vibes_Graph::VIBES_GRAPH_OUTER)
+          .def(py::init<const std::string&,
+               invariant::Graph*,
+               invariant::Maze*,
+               invariant::Maze*>(),
+               "name"_a,
+               "graph"_a,
+               "maze_outer"_a,
+               "maze_inner"_a)
           .def("setProperties", &Vibes_Graph::setProperties)
           .def("show", &Vibes_Graph::show)
           .def("drawCircle", &Vibes_Graph::drawCircle)

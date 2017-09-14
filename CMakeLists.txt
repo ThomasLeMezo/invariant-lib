@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.2.2)
 # Settings
     set(CMAKE_CXX_STANDARD 11)
     set(PACKAGE_NAME      invariant-lib)
-    set(PACKAGE_VERSION "0.1b6")
+    set(PACKAGE_VERSION "0.1b7")
     project(${PACKAGE_NAME})
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
@@ -119,7 +119,7 @@ cmake_minimum_required(VERSION 3.2.2)
 # Pybind11
     if(WITH_PYTHON)
         message(STATUS "[PYTHON] ON")
-#        set(PYBIND11_CPP_STANDARD -std=c++14)
+#        set(PYBIND11_CPP_STANDARD -std=c++11)
         add_subdirectory(pybind11)
         add_subdirectory(python)
     else()

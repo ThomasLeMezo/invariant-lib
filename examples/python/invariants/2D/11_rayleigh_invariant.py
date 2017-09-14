@@ -23,7 +23,7 @@ f = Function("x[2]", "(x[1],(-1.0*(x[0]+x[1]^3-x[1])))")
 dyn = DynamicsFunction(f)
 
 # Create the Maze associated with the Domain and the dynamics
-maze = Maze(dom, dyn, MAZE_FWD, MAZE_CONTRACTOR)
+maze = Maze(dom, dyn, MAZE_BWD, MAZE_CONTRACTOR)
 
 # Contract the system
 for i in range(15):

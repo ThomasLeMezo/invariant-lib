@@ -36,13 +36,13 @@ matrix:
         packages: [g++-4.8, cmake, cmake-data, pkg-config]
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=2.7 CPP=14 CLANG
+    env: PYTHON=2.7 CPP=11 CLANG
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=3.6 CPP=14 CLANG
+    env: PYTHON=3.6 CPP=11 CLANG
   - os: osx
     osx_image: xcode7.3
-env: PYTHON=3.5 CPP=14 CLANG
+env: PYTHON=3.5 CPP=11 CLANG
 cache:
   directories:
   - "$HOME/ibex"
