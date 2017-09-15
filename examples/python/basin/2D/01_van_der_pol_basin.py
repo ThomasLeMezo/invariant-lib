@@ -34,23 +34,32 @@ f_inner = Function("x[2]", "-(x[1],(1.0-(x[0]^2))*x[1]-x[0])")
 dyn_inner = DynamicsFunction(f_inner)
 
 # Create the Maze associated with the Domain and the dynamics
-maze_outer = Maze(dom_outer, dyn_outer, MAZE_FWD, MAZE_PROPAGATOR)
 maze_inner = Maze(dom_inner, dyn_inner, MAZE_BWD, MAZE_CONTRACTOR)
+maze_outer = Maze(dom_outer, dyn_outer, MAZE_FWD, MAZE_PROPAGATOR)
 
 # Contract the system
 maze_outer.init()
 maze_inner.init()
-for i in range(13):
+for i in range(15):
 	print(i)
 	graph.bisect()
-	maze_inner.contract()
 	maze_outer.contract()
+	maze_inner.contract()
 
 # Visualization
-visu = VibesGraph("graph", graph, maze_outer, maze_inner)
+visu = VibesGraph("graph_inner", graph, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-
 visu.drawCircle(0.0, 0.0, 0.4, "red[]");
+
+visu2 = VibesGraph("graph_outer", graph, maze_outer)
+visu2.setProperties(0,0,512,512)
+visu2.show()
+visu2.drawCircle(0.0, 0.0, 0.4, "red[]");
+
+visu3 = VibesGraph("graph", graph, maze_outer, maze_inner)
+visu3.setProperties(0,0,512,512)
+visu3.show()
+visu3.drawCircle(0.0, 0.0, 0.4, "red[]");
 
 

@@ -567,13 +567,13 @@ bool Room::contract(){
             eval_vector_field_possibility();
             m_first_contract = false;
         }
-//        get_private_doors_info("before");
+        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
-//            get_private_doors_info("consistency");
+            get_private_doors_info("consistency");
         }
     }
     return change;
@@ -583,9 +583,9 @@ bool Room::get_private_doors_info(string message){
     if(m_maze->get_type() != MAZE_CONTRACTOR)
         return false;
     IntervalVector position(2);
-//    [-1.5, 0] ; [1.5, 3]
-    position[0] = Interval(-2.25, -1.875);
-    position[1] = Interval(2.71875, 3.1);
+//
+    position[0] = Interval(-0.890625, -0.84375);
+    position[1] = Interval(-1.3796875000000002, -1.355859375);
 //    IntervalVector position2(2);
 //    position2[0] = Interval(0.75, 1.5);
 //    position2[1] = Interval(1.5750000000000002, 3.1);

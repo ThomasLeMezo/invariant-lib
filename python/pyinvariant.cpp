@@ -33,7 +33,9 @@ using namespace ibex;
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
           .def(py::init<invariant::Graph*>(), "graph"_a)
-          .def(py::init<invariant::Graph*, DOMAIN_PROPAGATION_START>(), "graph"_a, "DOMAIN_PROPAGATION_START"_a)
+          .def(py::init<invariant::Graph*, DOMAIN_PROPAGATION_START>(),
+               "graph"_a,
+               "DOMAIN_PROPAGATION_START"_a = invariant::NOT_LINK_TO_INITIAL_CONDITION)
           .def("set_border_path_in", &invariant::Domain::set_border_path_in)
           .def("set_border_path_out", &invariant::Domain::set_border_path_out)
           .def("set_sep", &invariant::Domain::set_sep)
@@ -59,8 +61,8 @@ using namespace ibex;
           .def(py::init<invariant::Domain*, invariant::Dynamics*, invariant::MazeSens, invariant::MazeType>(),
                "domain"_a,
                "dynamics"_a,
-               "MazeSens"_a,
-               "MazeType"_a)
+               "MazeSens"_a = invariant::MAZE_FWD_BWD,
+               "MazeType"_a = invariant::MAZE_CONTRACTOR)
           .def("contract", &invariant::Maze::contract)
           .def("contract_inter", &invariant::Maze::contract_inter)
           .def("init", &invariant::Maze::init)

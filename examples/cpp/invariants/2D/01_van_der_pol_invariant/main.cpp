@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_BWD, MAZE_CONTRACTOR);
+    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<12; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;
@@ -59,9 +59,9 @@ int main(int argc, char *argv[])
 //    position_info[1] = Interval(1);
 //    v_graph.get_room_info(&maze, position_info);
 
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(1);
-//    position_info[1] = Interval(1, 2);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(-2.5);
+    position_info[1] = Interval(2.9);
 //    v_graph.get_room_info(&maze, position_info);
 //    v_graph.show_room_info(&maze, position_info);
 

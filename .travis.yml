@@ -46,7 +46,7 @@ env: PYTHON=3.5 CPP=11 CLANG
 cache:
   directories:
   - "$HOME/ibex"
-  - "$HOME/patchelf"
+  # - "$HOME/patchelf"
 notifications:
   email: false
 before_install:
@@ -82,7 +82,7 @@ before_install:
   fi
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
-- sh ./travis_script/build_patchelf.sh
+# - sh ./travis_script/build_patchelf.sh
 script:
 - export PATH=$PATH:~/patchelf/bin
 - mkdir -p build/build-release
