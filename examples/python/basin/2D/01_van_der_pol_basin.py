@@ -15,7 +15,7 @@ dom_outer.set_border_path_out(False)
 
 f_sep_outer = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
 s_outer = SepFwdBwd(f_sep_outer, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom_outer.set_sep(s_outer);
+dom_outer.set_sep_output(s_outer);
 
 # - Innter
 dom_inner = Domain(graph)
@@ -24,7 +24,7 @@ dom_inner.set_border_path_out(True)
 
 f_sep_inner = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
 s_inner = SepFwdBwd(f_sep_inner, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom_inner.set_sep(s_inner);
+dom_inner.set_sep_input(s_inner);
 
 # Create the Dynamics
 f_outer = Function("x[2]", "(x[1],(1.0-(x[0]^2))*x[1]-x[0])")
@@ -47,15 +47,15 @@ for i in range(15):
 	maze_inner.contract()
 
 # Visualization
-visu = VibesGraph("graph_inner", graph, maze_inner)
-visu.setProperties(0,0,512,512)
-visu.show()
-visu.drawCircle(0.0, 0.0, 0.4, "red[]");
+# visu = VibesGraph("graph_inner", graph, maze_inner)
+# visu.setProperties(0,0,512,512)
+# visu.show()
+# visu.drawCircle(0.0, 0.0, 0.4, "red[]");
 
-visu2 = VibesGraph("graph_outer", graph, maze_outer)
-visu2.setProperties(0,0,512,512)
-visu2.show()
-visu2.drawCircle(0.0, 0.0, 0.4, "red[]");
+# visu2 = VibesGraph("graph_outer", graph, maze_outer)
+# visu2.setProperties(0,0,512,512)
+# visu2.show()
+# visu2.drawCircle(0.0, 0.0, 0.4, "red[]");
 
 visu3 = VibesGraph("graph", graph, maze_outer, maze_inner)
 visu3.setProperties(0,0,512,512)

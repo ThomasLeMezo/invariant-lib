@@ -57,12 +57,12 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     Vibes_Graph v_graph("graph", &graph, &maze);
-    v_graph.setProperties(0, 0, 512, 512);
+    v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-0.88, -0.86);
-    position_info[1] = Interval(-1.4, -1.37);
+    position_info[0] = Interval(1.9);
+    position_info[1] = Interval(0.3, 0.32);
 //    v_graph.get_room_info(&maze, position_info);
     v_graph.show_room_info(&maze, position_info);
 

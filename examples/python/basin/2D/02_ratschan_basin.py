@@ -15,7 +15,7 @@ dom_outer.set_border_path_out(False)
 
 f_sep_outer = Function("x[2]", "(x[0])^2+(x[1])^2-(0.1)^2")
 s_outer = SepFwdBwd(f_sep_outer, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom_outer.set_sep(s_outer);
+dom_outer.set_sep_output(s_outer);
 
 # - Innter
 dom_inner = Domain(graph)
@@ -24,7 +24,7 @@ dom_inner.set_border_path_out(True)
 
 f_sep_inner = Function("x[2]", "(x[0])^2+(x[1])^2-(0.1)^2")
 s_inner = SepFwdBwd(f_sep_inner, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom_inner.set_sep(s_inner);
+dom_inner.set_sep_input(s_inner);
 
 # Create the Dynamics
 f_outer = Function("x[2]", "-((-4*x[0]^3+6*x[0]^2-2*x[0]), (-2*x[1]))")
