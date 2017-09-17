@@ -204,15 +204,15 @@ void Room:: contract_consistency(){
 
     m_nb_contract++;
 
-//    IntervalVector position(2);
-//    position[0] = Interval(-1.5, 0);
-//    position[1] = Interval(1.5, 3);
-//    if(m_pave->get_position().is_subset(position) && get_maze()->get_type() == MAZE_CONTRACTOR){
-//        cout << endl;
-//        cout << "DEBUG ROOM : " << m_pave->get_position() << " Debug ID = " << m_time_debug << endl;
-//        m_debug_room = true;
-//        m_time_debug++;
-//    }
+    //    IntervalVector position(2);
+    //    position[0] = Interval(-1.5, 0);
+    //    position[1] = Interval(1.5, 3);
+    //    if(m_pave->get_position().is_subset(position) && get_maze()->get_type() == MAZE_CONTRACTOR){
+    //        cout << endl;
+    //        cout << "DEBUG ROOM : " << m_pave->get_position() << " Debug ID = " << m_time_debug << endl;
+    //        m_debug_room = true;
+    //        m_time_debug++;
+    //    }
 
     MazeSens sens = m_maze->get_sens();
     MazeType type = m_maze->get_type();
@@ -241,7 +241,6 @@ void Room:: contract_consistency(){
             }
             if(type == MAZE_CONTRACTOR)
                 compute = false;
-
         }
         // Create tmp output doors
         if(compute){
@@ -275,29 +274,35 @@ void Room:: contract_consistency(){
                         IntervalVector out_return(dim, Interval::EMPTY_SET);
                         IntervalVector in_return(dim, Interval::EMPTY_SET);
                         contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_return);
-                        out_results[n_vf][face_in][sens_in] = out_return;
+
+                        //                        if(get_private_doors_info("consistency"))
+                        //                            cout << "out_return = " << out_return << " in_return = " << in_return << endl;
+
+                        if(m_debug_room)
+                            cout << "after " << out_return << endl;
 
                         if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
                             door_in->set_input_private(in_return); // Write input
                         }
                         if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+                            /// Write output here to improve standard mode efficency
                             door_in->set_output_private(out_return); // Write output
-                        }
+                            out_results[n_vf][face_in][sens_in] = out_return;
 
-                        if(m_debug_room)
-                            cout << "after " << out_return << endl;
-
-                        /// Impact on other faces (out results)
-                        for(int face_out=0; face_out<dim; face_out++){
-                            for(int sens_out = 0; sens_out < 2; sens_out++){
-                                if(!(face_out == face_in && sens_in == sens_out)){
-                                    Face* f_out = m_pave->get_faces()[face_out][sens_out];
-                                    Door* door_out = f_out->get_doors()[m_maze];
-                                    IntervalVector out_tmp(door_out->get_output_private());
-                                    IntervalVector in_tmp(door_in->get_input_private());
-                                    if(!out_tmp.is_empty() && !in_tmp.is_empty()){
-                                        this->contract_flow(in_tmp, out_tmp, vec_field);
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+                            /// Impact on other faces (IN -> OUT)
+                            if(!in_return.is_empty()){
+                                for(int face_out=0; face_out<dim; face_out++){
+                                    for(int sens_out = 0; sens_out < 2; sens_out++){
+                                        if(!(face_out == face_in && sens_in == sens_out)){
+                                            Face* f_out = m_pave->get_faces()[face_out][sens_out];
+                                            Door* door_out = f_out->get_doors()[m_maze];
+                                            IntervalVector out_tmp(door_out->get_output_private());
+                                            IntervalVector in_tmp(in_return);
+                                            if(!out_tmp.is_empty()){
+                                                this->contract_flow(in_tmp, out_tmp, vec_field);
+                                                out_results[n_vf][face_out][sens_out] |= out_tmp;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -375,8 +380,9 @@ void Room:: contract_consistency(){
                     door_out_iv.set_empty();
                 }
 
-                if(type == MAZE_CONTRACTOR)
+                if(type == MAZE_CONTRACTOR){
                     door_out->set_output_private(door_out_iv & door_out->get_output_private());
+                }
                 else
                     door_out->set_output_private(door_out->get_output_private() | door_out_iv);
             }
@@ -393,6 +399,15 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
     int dim = get_pave()->get_dim();
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
+
+    /// Compute IN_OUT door
+    IntervalVector output_global_door(door_in->get_output_private());
+    IntervalVector input_global_door(door_in->get_input_private());
+    for(Face *f_n:f_in->get_neighbors()){
+        Door* d_n = f_n->get_doors()[m_maze];
+        output_global_door |= (d_n->get_output() & f_in->get_position());
+        input_global_door |= (d_n->get_input() & f_in->get_position());
+    }
 
     /// ************* Find adjacent paves *************
     /// --> In the direction of the zeros
@@ -415,7 +430,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
         // Find adjacent paves that extrude this pave in the directions of zeros
         IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
 
-        if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){
+        if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
             adjacent_paves_valid.push_back(pave_adj);
             Room *room_n= pave_adj->get_rooms()[m_maze];
             vec_field_global |= room_n->get_one_vector_fields(n_vf);
@@ -458,16 +473,21 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
 
                         /// Find if this face is on the adjacent paves valid list ?
                         bool is_in_adj_pave_list = false;
+                        bool is_same_face = false;
                         for(Pave *pave_test:adjacent_paves_valid){
                             if(pave_test->get_position() == pave_out_n->get_position()){ // Pointer comparison (?working?)
                                 is_in_adj_pave_list = true;
+                                if(face_out_n->get_position() == f_out_adj->get_position())
+                                    is_same_face = true;
                                 break;
                             }
                         }
 
                         /// Compute the part of the face which is on the hull (reduce the size of own_surface)
                         /// There is an over approximation made because of the diff operator
-                        if(is_in_adj_pave_list){
+                        if(is_same_face)
+                            own_surface.set_empty();
+                        else if(is_in_adj_pave_list){
                             IntervalVector *diff_list;
                             int nb_boxes = f_out_adj->get_position().diff(face_out_n->get_position() & f_out_adj->get_position(), diff_list);
                             IntervalVector union_of_diff(dim, Interval::EMPTY_SET);
@@ -475,44 +495,54 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 union_of_diff |= diff_list[i];
                             own_surface &= union_of_diff;
                         }
+
+                        /// Note : computation of the own_surface will remove the propagation of exact face_in to itself
                     }
+                    if(get_nb_dim_flat(own_surface)==2)
+                        own_surface.set_empty();
 
                     /// ************* Compute the propagation *************
-                    // Bug here ??
                     if(!own_surface.is_empty()){
                         // OUT -> IN
-                        IntervalVector in_tmp_IN(door_in->get_face()->get_position()); // WARNING : do no set to private door
-                                                                                       // (because only half part is taken into account)
-                        IntervalVector out_tmp_IN(own_surface);
-                        if(local_pave)
-                            out_tmp_IN &= d_out_adj->get_output_private();
-                        else
-                            out_tmp_IN &= d_out_adj->get_output(); // Can't use the private door here !
+                        if(!input_global_door.is_empty()){
+                            /// WARNING : do no set in_tmp_IN only to private door
+                            /// because only half part is taken into account => take the union with the IN of the neighbour
+                            IntervalVector in_tmp_IN(input_global_door);
 
-                        // Case degenerated out_tmp_IN (when own_surface makes out_tmp_IN degenerated to dim-2)
-                        if(get_nb_dim_flat(out_tmp_IN)==2)
-                            out_tmp_IN.set_empty();
+                            IntervalVector out_tmp_IN(own_surface);
+                            if(local_pave)
+                                out_tmp_IN &= d_out_adj->get_output_private();
+                            else
+                                out_tmp_IN &= d_out_adj->get_output(); // Do not use the private door here !
 
-                        if(!in_tmp_IN.is_empty() && !out_tmp_IN.is_empty()){
-                            contract_flow(in_tmp_IN, out_tmp_IN, vec_field_adj); // vec_field_local (NEW) to verify debug
-                            in_return |= in_tmp_IN ;
+                            // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
+                            if(get_nb_dim_flat(out_tmp_IN)==2)
+                                out_tmp_IN.set_empty();
+
+                            if(!out_tmp_IN.is_empty()){
+                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field_global);
+                                in_return |= in_tmp_IN ;
+                            }
                         }
 
                         // IN -> OUT
-                        IntervalVector in_tmp_OUT(own_surface);
-                        if(local_pave)
-                            in_tmp_OUT &= d_out_adj->get_input_private();
-                        else
-                            in_tmp_OUT &= d_out_adj->get_input();
+                        if(!output_global_door.is_empty()){
+                            IntervalVector out_tmp_OUT(output_global_door);
+                            IntervalVector in_tmp_OUT(own_surface);
+                            if(local_pave)
+                                in_tmp_OUT &= d_out_adj->get_input_private();
+                            else
+                                in_tmp_OUT &= d_out_adj->get_input();
 
-                        if(get_nb_dim_flat(in_tmp_OUT)==2)
-                            in_tmp_OUT.set_empty();
+                            if(get_nb_dim_flat(in_tmp_OUT)==2)
+                                in_tmp_OUT.set_empty();
 
-                        IntervalVector out_tmp_OUT(door_in->get_face()->get_position());
-
-                        if(!in_tmp_OUT.is_empty() && !out_tmp_OUT.is_empty()){
-                            contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_adj); // vec_field_local (NEW) to verify debug
-                            out_return |= out_tmp_OUT;
+                            if(!in_tmp_OUT.is_empty()){
+                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_global);
+                                out_return |= out_tmp_OUT;
+                                if(get_private_doors_info("test", false) && sens_in==0)
+                                    cout << "out_tmp_OUT = " << out_tmp_OUT << "local_pave = " << local_pave << " face = " << face_out_adj << " sens = " << sens_out_adj << endl;
+                            }
                         }
                     }
                 }
@@ -582,47 +612,49 @@ bool Room::contract(){
             eval_vector_field_possibility();
             m_first_contract = false;
         }
-//        get_private_doors_info("before");
+        //        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        //        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
-//            get_private_doors_info("consistency");
+            //            get_private_doors_info("consistency");
         }
     }
     return change;
 }
 
-bool Room::get_private_doors_info(string message){
+bool Room::get_private_doors_info(string message, bool cout_message){
     if(m_maze->get_type() != MAZE_CONTRACTOR)
         return false;
     IntervalVector position(2);
-//
-    position[0] = Interval(-0.890625, -0.84375);
-    position[1] = Interval(-1.3796875000000002, -1.355859375);
-//    IntervalVector position2(2);
-//    position2[0] = Interval(0.75, 1.5);
-//    position2[1] = Interval(1.5750000000000002, 3.1);
+    //
+    position[0] = Interval(-0.84375, -0.796875);
+    position[1] = Interval(1.2890625, 1.312890625);
+    //    IntervalVector position2(2);
+    //    position2[0] = Interval(0.75, 1.5);
+    //    position2[1] = Interval(1.5750000000000002, 3.1);
     IntervalVector position2(position);
 
-    if(m_pave->get_position() == position || m_pave->get_position() == position2){
-        cout << message << endl;
-        if(m_pave->get_position() == position)
-            cout << "position 1" << endl;
-        else
-            cout << "position 2" << endl;
+    if((m_pave->get_position() == position || m_pave->get_position() == position2)){
+        if(cout_message){
+            cout << message << endl;
+            if(m_pave->get_position() == position)
+                cout << "position 1" << endl;
+            else
+                cout << "position 2" << endl;
 
-        cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << endl;
-        for(Face *f:m_pave->get_faces_vector()){
-            Door *d = f->get_doors()[m_maze];
-            cout << " Face : ";
-            std::ostringstream input, output;
-            input << d->get_input_private();
-            output << d->get_output_private();
-            cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << endl;
+            cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << endl;
+            for(Face *f:m_pave->get_faces_vector()){
+                Door *d = f->get_doors()[m_maze];
+                cout << " Face : ";
+                std::ostringstream input, output;
+                input << d->get_input_private();
+                output << d->get_output_private();
+                cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << endl;
+            }
+            cout << "----" << endl;
         }
-        cout << "----" << endl;
         return true;
     }
     return false;

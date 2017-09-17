@@ -249,7 +249,7 @@ public:
      * @brief Debug function to get private doors
      * @param position
      */
-    bool get_private_doors_info(std::string message="");
+    bool get_private_doors_info(std::string message="", bool cout_message=true);
 
     /**
      * @brief Get the number of contractions call

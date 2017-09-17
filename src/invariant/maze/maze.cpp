@@ -73,7 +73,7 @@ int Maze::contract(){
         return 0;
     }
 
-#pragma omp parallel //num_threads(1)
+#pragma omp parallel num_threads(1)
     {
 #pragma omp single
         {
@@ -106,8 +106,8 @@ int Maze::contract(){
 
                         if(change){
                             // Analyse changes
-                            vector<Room *> rooms_update;
-                            r->analyze_change(rooms_update);
+                            vector<Room *> rooms_to_update;
+                            r->analyze_change(rooms_to_update);
 
                             // Synchronize
                             r->synchronize_doors();
@@ -116,7 +116,7 @@ int Maze::contract(){
                                 r->set_removed();
 
                             // Add Rooms to the Deque
-                            add_rooms(rooms_update);
+                            add_rooms(rooms_to_update);
 
                             // Increment operations
 #pragma omp atomic

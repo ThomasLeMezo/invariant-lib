@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(true);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(Interval(1), Interval(1)));
+    ibex::Function f(x1, x2, Return(Interval(-0.01, 0.01), Interval(1)));
     Dynamics_Function dyn(&f);
 
     // ******* Maze *********
