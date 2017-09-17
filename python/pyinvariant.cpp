@@ -23,6 +23,23 @@ using namespace ibex;
  PYBIND11_MODULE(pyinvariant, m){
    m.doc() = "Python binding of invariant-lib";
 
+   // ********* ENUM *********
+   py::enum_<invariant::MazeSens>(m, "MazeSens")
+       .value("MAZE_FWD", invariant::MazeSens::MAZE_FWD)
+       .value("MAZE_BWD", invariant::MazeSens::MAZE_BWD)
+       .value("MAZE_FWD_BWD", invariant::MazeSens::MAZE_FWD_BWD)
+       .export_values();
+
+   py::enum_<MazeType>(m, "MazeType")
+       .value("MAZE_CONTRACTOR", MazeType::MAZE_CONTRACTOR)
+       .value("MAZE_PROPAGATOR", MazeType::MAZE_PROPAGATOR)
+       .export_values();
+
+   py::enum_<DOMAIN_PROPAGATION_START>(m, "DOMAIN_PROPAGATION_START")
+       .value("LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::LINK_TO_INITIAL_CONDITION)
+       .value("NOT_LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::NOT_LINK_TO_INITIAL_CONDITION)
+       .export_values();
+
   // ********* Graphs *********
   py::class_<Graph>(m, "Graph")
           .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
@@ -54,7 +71,7 @@ using namespace ibex;
 //    ;
   py::class_<invariant::Dynamics_Function>(m, "DynamicsFunction", dynamics)
           .def(py::init<ibex::Function*>(), "f"_a)
-    ;
+  ;
 
   // ********* Maze *********
   py::class_<invariant::Maze>(m, "Maze")
@@ -73,13 +90,14 @@ using namespace ibex;
   py::class_<invariant::SepMaze>(m, "SepMaze", sep)
           .def(py::init<invariant::Maze*>(),"maze"_a)
           .def("separate", &invariant::SepMaze::separate)
-      ;
+  ;
 
   // ********* Vibes_Graph *********
   py::enum_<Vibes_Graph::VIBES_GRAPH_TYPE>(m, "VIBES_GRAPH_TYPE")
       .value("VIBES_GRAPH_INNER", Vibes_Graph::VIBES_GRAPH_INNER)
       .value("VIBES_GRAPH_OUTER", Vibes_Graph::VIBES_GRAPH_OUTER)
-      .export_values();
+      .export_values()
+  ;
 
   py::class_<Vibes_Graph>(m, "VibesGraph")
           .def(py::init<const std::string&,
@@ -101,23 +119,6 @@ using namespace ibex;
           .def("setProperties", &Vibes_Graph::setProperties)
           .def("show", &Vibes_Graph::show)
           .def("drawCircle", &Vibes_Graph::drawCircle)
-          ;
-
-  // ********* ENUM *********
-  py::enum_<invariant::MazeSens>(m, "MazeSens")
-      .value("MAZE_FWD", invariant::MazeSens::MAZE_FWD)
-      .value("MAZE_BWD", invariant::MazeSens::MAZE_BWD)
-      .value("MAZE_FWD_BWD", invariant::MazeSens::MAZE_FWD_BWD)
-      .export_values();
-
-  py::enum_<MazeType>(m, "MazeType")
-      .value("MAZE_CONTRACTOR", MazeType::MAZE_CONTRACTOR)
-      .value("MAZE_PROPAGATOR", MazeType::MAZE_PROPAGATOR)
-      .export_values();
-
-  py::enum_<DOMAIN_PROPAGATION_START>(m, "DOMAIN_PROPAGATION_START")
-      .value("LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::LINK_TO_INITIAL_CONDITION)
-      .value("NOT_LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::NOT_LINK_TO_INITIAL_CONDITION)
-      .export_values();
+  ;
 
 }
