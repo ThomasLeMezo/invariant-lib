@@ -128,7 +128,7 @@ public:
      * add the neighbor room to the list
      * @param list_rooms
      */
-    void analyze_change(std::vector<Room *>&list_rooms);
+    bool analyze_change(std::vector<Room *>&list_rooms);
 
     /**
      * @brief Return true if input & output doors are empty

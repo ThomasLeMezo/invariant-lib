@@ -88,13 +88,15 @@ bool Door::contract_continuity_private(){
     return change;
 }
 
-void Door::analyze_change(vector<Room *>&list_rooms){
+bool Door::analyze_change(vector<Room *>&list_rooms){
     if((*m_input_private) != get_input()
             || (*m_output_private) != get_output()){
         vector<Face *> l_face = m_face->get_neighbors();
         for(Face* f:l_face)
             list_rooms.push_back(f->get_pave()->get_rooms()[m_room->get_maze()]);
+        return true;
     }
+    return false;
 }
 
 void Door::set_full_private_output(){

@@ -61,10 +61,10 @@ int main(int argc, char *argv[])
     v_graph.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-0.81);
-    position_info[1] = Interval(1.27, 1.305);
+    position_info[0] = Interval(-0.84, -0.81);
+    position_info[1] = Interval(-1.35, -1.31);
 //    v_graph.get_room_info(&maze, position_info);
-    v_graph.show_room_info(&maze, position_info);
+//    v_graph.show_room_info(&maze, position_info);
 
     vibes::endDrawing();
 

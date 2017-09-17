@@ -107,7 +107,13 @@ public:
      * @brief Return a list of neighbor Rooms that need an update according after contraction
      * @param list_rooms
      */
-    void analyze_change(std::vector<Room *> &list_rooms);
+    void analyze_change(std::vector<Room *> &list_rooms) const;
+
+    /**
+     * @brief Get the list of all the not removed neighbors of this room
+     * @param list_rooms
+     */
+    void get_all_active_neighbors(std::vector<Room *> &list_rooms) const;
 
     /**
      * @brief Reset deque state to false
@@ -197,6 +203,12 @@ public:
      */
     const ibex::IntervalVector get_hull_complementary();
 
+    /**
+     * @brief Return true if one vector field has a zero on one of its coordinate
+     * @return
+     */
+    bool get_contain_zero() const;
+
 
 protected:
     /**
@@ -262,6 +274,7 @@ protected:
     Maze*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
     std::vector<bool>    m_vector_field_zero;
+    bool            m_contain_zero = false;
 
     mutable bool    m_empty = false;
     mutable bool    m_full = false;
@@ -338,6 +351,10 @@ inline int Room::get_nb_contractions() const{
 
 inline std::vector<bool> Room::get_vector_fields_zero(){
     return m_vector_field_zero;
+}
+
+inline bool Room::get_contain_zero() const{
+    return m_contain_zero;
 }
 
 }

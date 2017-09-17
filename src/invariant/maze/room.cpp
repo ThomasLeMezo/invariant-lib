@@ -17,11 +17,17 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
     for(IntervalVector &vector_field:vector_field_list){
         // Test if 0 is inside the vector_field IV
         IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
-        if((zero.is_subset(vector_field)))
+        if((zero.is_subset(vector_field))){
             m_vector_field_zero.push_back(true);
-        else
+        }
+        else{
             m_vector_field_zero.push_back(false);
+        }
         m_vector_fields.push_back(vector_field);
+        for(int i=0; i<vector_field.size(); i++){
+            if(!(vector_field[i] & Interval::ZERO).is_empty())
+                m_contain_zero = true;
+        }
     }
 
     // Create Doors
@@ -417,7 +423,6 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
 
     // Remove pave not in the zero(s) direction
     IntervalVector vec_field_global(dim, Interval::EMPTY_SET);
-    IntervalVector vec_field_adj(dim, Interval::EMPTY_SET);
     vector<Pave *> adjacent_paves_valid;
     IntervalVector pave_extrude(f_in->get_position());
     vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
@@ -435,9 +440,6 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
             adjacent_paves_valid.push_back(pave_adj);
             Room *room_n= pave_adj->get_rooms()[m_maze];
             vec_field_global |= room_n->get_one_vector_fields(n_vf);
-
-            if(room_n != this)
-                vec_field_adj |= room_n->get_one_vector_fields(n_vf);
         }
     }
 
@@ -455,10 +457,6 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
         bool local_pave = false;
         if(pave_adj->get_position() == m_pave->get_position())
             local_pave = true;
-        Room *r_adj = pave_adj->get_rooms()[m_maze];
-        IntervalVector vec_field(r_adj->get_one_vector_fields(n_vf));
-        if(!local_pave)
-            vec_field = vec_field_adj;
 
         for(int face_out_adj=0; face_out_adj<dim; face_out_adj++){
             for(int sens_out_adj = 0; sens_out_adj < 2; sens_out_adj ++){
@@ -526,7 +524,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 out_tmp_IN.set_empty();
 
                             if(!out_tmp_IN.is_empty()){
-                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
+                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field_global);
                                 in_return |= in_tmp_IN ;
                             }
                         }
@@ -544,10 +542,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 in_tmp_OUT.set_empty();
 
                             if(!in_tmp_OUT.is_empty()){
-                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
+                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_global);
                                 out_return |= out_tmp_OUT;
-                                if(get_private_doors_info("test", false) && sens_in==0)
-                                    cout << "out_tmp_OUT = " << out_tmp_OUT << "local_pave = " << local_pave << " face = " << face_out_adj << " sens = " << sens_out_adj << endl;
                             }
                         }
                     }
@@ -578,6 +574,11 @@ bool Room::contract_continuity(){
             change |= d->contract_continuity_private();
         }
     }
+    /// In the case of sliding mode (only in case of contraction),
+    /// a change on the door of an adjacent room which is not on
+    /// the boundary can permit contraction (change in the hull)
+    if(m_contain_zero && m_maze->get_type() == MAZE_CONTRACTOR)
+        change = true;
     return change;
 }
 
@@ -636,7 +637,7 @@ bool Room::get_private_doors_info(string message, bool cout_message){
     IntervalVector position(2);
     //
     position[0] = Interval(-0.84375, -0.796875);
-    position[1] = Interval(1.2890625, 1.312890625);
+    position[1] = Interval(-1.355859375, -1.33203125);
     //    IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
@@ -673,10 +674,24 @@ void Room::synchronize_doors(){
     }
 }
 
-void Room::analyze_change(std::vector<Room *>&list_rooms){
+void Room::analyze_change(std::vector<Room *>&list_rooms) const{
+    bool change = false;
     for(Face* f:m_pave->get_faces_vector()){
         Door *d = f->get_doors()[m_maze];
-        d->analyze_change(list_rooms);
+        change |= d->analyze_change(list_rooms);
+    }
+    if(m_contain_zero && change){
+        get_all_active_neighbors(list_rooms);
+    }
+}
+
+void Room::get_all_active_neighbors(std::vector<Room *> &list_rooms) const{
+    for(Face* f:m_pave->get_faces_vector()){
+        for(Face *f_n:f->get_neighbors()){
+            Room *r_n = f_n->get_pave()->get_rooms()[m_maze];
+            if(!r_n->is_removed())
+                list_rooms.push_back(r_n);
+        }
     }
 }
 
@@ -728,6 +743,7 @@ std::ostream& operator<< (std::ostream& stream, const Room& r) {
         Door *d = f->get_doors()[r.get_maze()];
         stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << endl;
     }
+    stream << " contain_zero = " << r.get_contain_zero() << endl;
     return stream;
 }
 
