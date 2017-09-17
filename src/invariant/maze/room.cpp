@@ -417,6 +417,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
 
     // Remove pave not in the zero(s) direction
     IntervalVector vec_field_global(dim, Interval::EMPTY_SET);
+    IntervalVector vec_field_adj(dim, Interval::EMPTY_SET);
     vector<Pave *> adjacent_paves_valid;
     IntervalVector pave_extrude(f_in->get_position());
     vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
@@ -434,6 +435,9 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
             adjacent_paves_valid.push_back(pave_adj);
             Room *room_n= pave_adj->get_rooms()[m_maze];
             vec_field_global |= room_n->get_one_vector_fields(n_vf);
+
+            if(room_n != this)
+                vec_field_adj |= room_n->get_one_vector_fields(n_vf);
         }
     }
 
@@ -452,7 +456,9 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
         if(pave_adj->get_position() == m_pave->get_position())
             local_pave = true;
         Room *r_adj = pave_adj->get_rooms()[m_maze];
-        IntervalVector vec_field_adj(r_adj->get_one_vector_fields(n_vf));
+        IntervalVector vec_field(r_adj->get_one_vector_fields(n_vf));
+        if(!local_pave)
+            vec_field = vec_field_adj;
 
         for(int face_out_adj=0; face_out_adj<dim; face_out_adj++){
             for(int sens_out_adj = 0; sens_out_adj < 2; sens_out_adj ++){
@@ -520,7 +526,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 out_tmp_IN.set_empty();
 
                             if(!out_tmp_IN.is_empty()){
-                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field_global);
+                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field);
                                 in_return |= in_tmp_IN ;
                             }
                         }
@@ -538,7 +544,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 in_tmp_OUT.set_empty();
 
                             if(!in_tmp_OUT.is_empty()){
-                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_global);
+                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field);
                                 out_return |= out_tmp_OUT;
                                 if(get_private_doors_info("test", false) && sens_in==0)
                                     cout << "out_tmp_OUT = " << out_tmp_OUT << "local_pave = " << local_pave << " face = " << face_out_adj << " sens = " << sens_out_adj << endl;
