@@ -21,7 +21,7 @@ f_sep_A = Function("x[2]", "x[0]^2+(x[1]+2)^2-1.0")
 s_A = SepFwdBwd(f_sep_A, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 
 domA.set_sep(s_A);
-mazeA = Maze(domA, dyn, MAZE_FWD, MAZE_PROPAGATOR)
+mazeA = Maze(domA, dyn, MAZE_FWD, MAZE_WALL)
 
 # Create the Domain for the ending condition
 domB = Domain(graph, LINK_TO_INITIAL_CONDITION)
@@ -32,7 +32,7 @@ f_sep_B = Function("x[2]", "x[0]^2+(x[1]-1)^2-9.0/100.0")
 s_B = SepFwdBwd(f_sep_B, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 
 domB.set_sep(s_B);
-mazeB = Maze(domB, dyn, MAZE_FWD, MAZE_PROPAGATOR)
+mazeB = Maze(domB, dyn, MAZE_FWD, MAZE_DOOR)
 
 domB.add_maze(mazeA)
 domA.add_maze(mazeB)

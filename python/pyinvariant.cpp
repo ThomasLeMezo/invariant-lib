@@ -31,8 +31,8 @@ using namespace ibex;
        .export_values();
 
    py::enum_<MazeType>(m, "MazeType")
-       .value("MAZE_CONTRACTOR", MazeType::MAZE_CONTRACTOR)
-       .value("MAZE_PROPAGATOR", MazeType::MAZE_PROPAGATOR)
+       .value("MAZE_DOOR", MazeType::MAZE_DOOR)
+       .value("MAZE_WALL", MazeType::MAZE_WALL)
        .export_values();
 
    py::enum_<DOMAIN_PROPAGATION_START>(m, "DOMAIN_PROPAGATION_START")
@@ -79,7 +79,7 @@ using namespace ibex;
                "domain"_a,
                "dynamics"_a,
                "MazeSens"_a = invariant::MAZE_FWD_BWD,
-               "MazeType"_a = invariant::MAZE_CONTRACTOR)
+               "MazeType"_a = invariant::MAZE_DOOR)
           .def("contract", &invariant::Maze::contract)
           .def("contract_inter", &invariant::Maze::contract_inter)
           .def("init", &invariant::Maze::init)

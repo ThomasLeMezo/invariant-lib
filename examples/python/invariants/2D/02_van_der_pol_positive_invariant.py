@@ -18,7 +18,7 @@ f = Function("x[2]", "(x[1],(1.0*(1.0-x[0]^2))*x[1]-x[0])")
 dyn = DynamicsFunction(f)
 
 # Create the Maze associated with the Domain and the dynamics
-maze = Maze(dom, dyn, MAZE_BWD, MAZE_CONTRACTOR)
+maze = Maze(dom, dyn, MAZE_BWD, MAZE_DOOR)
 
 # Contract the system
 for i in range(15):

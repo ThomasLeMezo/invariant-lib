@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_CONTRACTOR);
+    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_DOOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

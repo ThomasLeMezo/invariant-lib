@@ -50,7 +50,7 @@ int Maze::contract(){
     }
 
     /// DEBUG
-    //    if(m_maze_type == MAZE_PROPAGATOR){
+    //    if(m_maze_type == MAZE_WALL){
     //        Vibes_Graph v_graph("graph_debug", m_graph, this);
     //        v_graph.setProperties(0, 0, 512, 512);
     //        v_graph.show();
@@ -112,7 +112,7 @@ int Maze::contract(){
                             // Synchronize
                             r->synchronize_doors();
 
-                            if(m_maze_type == MAZE_CONTRACTOR && r->is_empty())
+                            if(m_maze_type == MAZE_DOOR && r->is_empty())
                                 r->set_removed();
 
                             // Add Rooms to the Deque

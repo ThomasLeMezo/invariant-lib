@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn_inner(f_list_inner);
 
     // ******* Mazes ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer, MAZE_BWD, MAZE_CONTRACTOR);
-    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze_outer(&dom_outer, &dyn_outer, MAZE_BWD, MAZE_DOOR);
+    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_WALL);
 
     // ******* Algorithm ********* //
     vibes::beginDrawing();

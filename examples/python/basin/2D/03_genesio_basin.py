@@ -34,8 +34,8 @@ f_inner = Function("x[2]", "((-x[0]+x[1]), (0.1*x[0]-2*x[1]-x[0]^2-0.1*x[0]^3))"
 dyn_inner = DynamicsFunction(f_inner)
 
 # Create the Maze associated with the Domain and the dynamics
-maze_outer = Maze(dom_outer, dyn_outer, MAZE_FWD, MAZE_PROPAGATOR)
-maze_inner = Maze(dom_inner, dyn_inner, MAZE_BWD, MAZE_CONTRACTOR)
+maze_outer = Maze(dom_outer, dyn_outer, MAZE_FWD, MAZE_WALL)
+maze_inner = Maze(dom_inner, dyn_inner, MAZE_BWD, MAZE_DOOR)
 
 # Contract the system
 maze_outer.init()

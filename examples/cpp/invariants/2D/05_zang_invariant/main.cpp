@@ -42,11 +42,11 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(&f);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_CONTRACTOR);
+    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_DOOR);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<17; i++){
         graph.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << graph.size() << endl;

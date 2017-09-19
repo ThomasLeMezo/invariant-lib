@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_A(f_sep_A, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A.set_sep(&s_A);
 
-    Maze maze_A(&dom_A, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze_A(&dom_A, &dyn, MAZE_FWD, MAZE_WALL);
 
     invariant::Domain dom_B(&graph, LINK_TO_INITIAL_CONDITION);
     dom_B.set_border_path_in(false);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_B(f_sep_B, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_B.set_sep(&s_B);
 
-    Maze maze_B(&dom_B, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze_B(&dom_B, &dyn, MAZE_FWD, MAZE_WALL);
 
     dom_B.add_maze(&maze_A);
     dom_A.add_maze(&maze_B);

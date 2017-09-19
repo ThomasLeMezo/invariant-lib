@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(f_list);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_WALL);
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in

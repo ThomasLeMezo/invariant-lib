@@ -22,7 +22,7 @@ enum MazeSens {MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD};
 /**
  * @brief The MazeType enum
  */
-enum MazeType {MAZE_CONTRACTOR, MAZE_PROPAGATOR};
+enum MazeType {MAZE_DOOR, MAZE_WALL};
 
 class Graph; // declared only for friendship
 class Domain; // declared only for friendship
@@ -37,7 +37,7 @@ public:
      * @param f_vect
      * @param type of operation (forward, backward or both)
      */
-    Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens =MAZE_FWD_BWD, MazeType maze_type=MAZE_CONTRACTOR);
+    Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens =MAZE_FWD_BWD, MazeType maze_type=MAZE_DOOR);
 
     /**
      * @brief Maze destructor
@@ -119,7 +119,7 @@ private:
     omp_lock_t  m_deque_access;
 
     MazeSens m_maze_sens = MAZE_FWD_BWD;
-    MazeType m_maze_type = MAZE_CONTRACTOR;
+    MazeType m_maze_type = MAZE_DOOR;
 
     bool    m_espace_trajectories = true;
 

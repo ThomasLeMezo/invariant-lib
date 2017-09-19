@@ -127,7 +127,7 @@ void Graph::bisect(){
         else{
             // I
 //            for(Maze *maze:m_mazes){
-//                if(maze->get_type() == MAZE_PROPAGATOR){
+//                if(maze->get_type() == MAZE_WALL){
 //                    Room *r = p->get_rooms()[maze];
 //                    r->set_empty_private();
 //                    r->synchronize();

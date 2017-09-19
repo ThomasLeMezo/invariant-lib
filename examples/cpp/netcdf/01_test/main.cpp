@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ******* Maze *********
-    Maze maze(&dom, &pm, MAZE_FWD, MAZE_PROPAGATOR);
+    Maze maze(&dom, &pm, MAZE_FWD, MAZE_WALL);
 
     double max_diam = max(search_space[0].diam(), search_space[1].diam());
     int iterations_max = 2*(ceil(log(max_diam)/log(2)));

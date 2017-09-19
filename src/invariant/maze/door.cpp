@@ -16,7 +16,7 @@ Door::Door(Face *face, Room *room):
     m_room = room;
     omp_init_lock(&m_lock_read);
 
-    if(m_room->get_maze()->get_type() == MAZE_PROPAGATOR){
+    if(m_room->get_maze()->get_type() == MAZE_WALL){
         m_input_private->set_empty();
         m_output_private->set_empty();
         m_input_public.set_empty();
@@ -64,9 +64,9 @@ bool Door::contract_continuity_private(){
         }
         if(door_input != *m_input_private){
             change = true;
-            if(type == MAZE_CONTRACTOR)
+            if(type == MAZE_DOOR)
                 (*m_input_private) &= door_input;
-            else if(type == MAZE_PROPAGATOR)
+            else if(type == MAZE_WALL)
                 (*m_input_private) |= door_input;
         }
     }
@@ -79,9 +79,9 @@ bool Door::contract_continuity_private(){
         }
         if(door_output != (*m_output_private)){
             change = true;
-            if(type == MAZE_CONTRACTOR)
+            if(type == MAZE_DOOR)
                 (*m_output_private) &= door_output;
-            else if(type == MAZE_PROPAGATOR)
+            else if(type == MAZE_WALL)
                 (*m_output_private) |= door_output;
         }
     }
