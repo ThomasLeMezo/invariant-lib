@@ -98,10 +98,10 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
         for(size_t i=0; i<i_max; i++){
             vector<short> line_u, line_v;
             for(size_t j=0; j<j_max; j++){
-//                line_u.push_back(raw_u[i_max*j+i]);
-//                line_v.push_back(raw_v[i_max*j+i]);
-                line_u.push_back(0);
-                line_v.push_back(2000);
+                line_u.push_back(raw_u[i_max*j+i]);
+                line_v.push_back(raw_v[i_max*j+i]);
+//                line_u.push_back(0);
+//                line_v.push_back(2000);
 
             }
             tab_u.push_back(line_u);
