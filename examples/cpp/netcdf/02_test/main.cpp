@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     vtk_graph.show_maze(&maze);
 //    vector<Pave *> pave_list;
     IntervalVector position(3);
-    position[0] = Interval(t_c, 100); // 450, 900
+    position[0] = Interval(t_c, 2400); // 450, 900
     position[1] = Interval(x_c); // 37304, 37980
     position[2] = Interval(y_c); // 119766, 120469
 //    graph.get_room_info(&maze, position, pave_list);

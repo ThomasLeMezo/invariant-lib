@@ -11,10 +11,12 @@ for key, value in GetSources().items():
 	if(key[0][-16:]=='doors_output.vtp'):
 		display = GetDisplayProperties(value, view=renderView1)
 		display.DiffuseColor = [0.0, 0.0, 1.0] # BLUE
+        display.Opacity = 0.4
 
 	if(key[0][-15:]=='doors_input.vtp'):
 		display = GetDisplayProperties(value, view=renderView1)
 		display.DiffuseColor = [1.0, 0.0, 0.0] # RED
+        display.Opacity = 0.4
 
 	if(key[0][-9:]=='paves.vtp'):
 		display = GetDisplayProperties(value, view=renderView1)
@@ -36,3 +38,7 @@ for key, value in GetSources().items():
 		# trace defaults for the display properties.
 		glyph1Display.ColorArrayName = [None, '']
 		glyph1Display.GlyphType = 'Arrow'
+
+	if(key[0][-11:]=='polygon.vtp'):
+		display.Opacity = 0.2
+
