@@ -8,7 +8,7 @@ if [ ! -e "${HOME}/ibex/lib/libibex.a" ]; then
 	git checkout with_cmake
 	mkdir build
 	cd build
-	cmake -DBUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=${HOME}/ibex ../
+	cmake -DBUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=${HOME}/ibex -DCMAKE_BUILD_TYPE=RELEASE ../
 	make -j2
 	make install
 else

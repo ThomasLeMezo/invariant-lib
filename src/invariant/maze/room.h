@@ -207,6 +207,12 @@ public:
      * @brief Return true if one vector field has a zero on one of its coordinate
      * @return
      */
+    bool get_contain_zero_coordinate() const;
+
+    /**
+     * @brief Return true if one vector field contains zero value
+     * @return
+     */
     bool get_contain_zero() const;
 
 
@@ -274,6 +280,7 @@ protected:
     Maze*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
     std::vector<bool>    m_vector_field_zero;
+    bool            m_contain_zero_coordinate = false;
     bool            m_contain_zero = false;
 
     mutable bool    m_empty = false;
@@ -351,6 +358,10 @@ inline int Room::get_nb_contractions() const{
 
 inline std::vector<bool> Room::get_vector_fields_zero(){
     return m_vector_field_zero;
+}
+
+inline bool Room::get_contain_zero_coordinate() const{
+    return m_contain_zero_coordinate;
 }
 
 inline bool Room::get_contain_zero() const{
