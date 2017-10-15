@@ -50,8 +50,9 @@ using namespace ibex;
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
           .def(py::init<invariant::Graph*>(), "graph"_a)
-          .def(py::init<invariant::Graph*, DOMAIN_PROPAGATION_START>(),
+          .def(py::init<invariant::Graph*, DOMAIN_INITIALIZATION, DOMAIN_PROPAGATION_START>(),
                "graph"_a,
+               "DOMAIN_INITIALIZATION"_a = invariant::FULL_DOOR,
                "DOMAIN_PROPAGATION_START"_a = invariant::NOT_LINK_TO_INITIAL_CONDITION)
           .def("set_border_path_in", &invariant::Domain::set_border_path_in)
           .def("set_border_path_out", &invariant::Domain::set_border_path_out)

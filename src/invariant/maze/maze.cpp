@@ -10,8 +10,10 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens, Ma
 {
     m_maze_sens = maze_sens;
     m_maze_type = maze_type;
+
     m_domain = domain;
     m_dynamics = dynamics;
+
     m_graph = domain->get_graph();
     omp_init_lock(&m_deque_access);
 

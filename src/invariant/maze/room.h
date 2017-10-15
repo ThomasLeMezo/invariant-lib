@@ -74,7 +74,7 @@ public:
     /**
      * @brief Set all input and output private doors to full
      */
-    void set_full();
+    void set_full_private();
 
     /**
      * @brief Set full the room according to vector field possibilities

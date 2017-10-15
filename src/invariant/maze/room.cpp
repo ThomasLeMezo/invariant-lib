@@ -86,7 +86,7 @@ void Room::set_empty_private(){
     }
 }
 
-void Room::set_full(){
+void Room::set_full_private(){
     for(Face *f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->set_full_private();
     }
