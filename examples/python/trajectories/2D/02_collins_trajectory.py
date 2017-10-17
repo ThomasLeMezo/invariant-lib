@@ -28,11 +28,13 @@ domB = Domain(graph, LINK_TO_INITIAL_CONDITION)
 domB.set_border_path_in(False)
 domB.set_border_path_out(False)
 
-f_sep_B = Function("x[2]", "x[0]^2+(x[1]-1)^2-9.0/100.0")
+f_sep_B = Function("x[2]", "x[0]^2+(x[1]-1)^2-(9.0/100.0)^2")
 s_B = SepFwdBwd(f_sep_B, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 
 domB.set_sep(s_B);
-mazeB = Maze(domB, dyn, MAZE_FWD, MAZE_DOOR)
+f_B = Function("x[2]", "-(2*x[0]-x[0]*x[1],2*x[0]^2-x[1])")
+dyn_B = DynamicsFunction(f_B)
+mazeB = Maze(domB, dyn_B, MAZE_FWD, MAZE_WALL)
 
 domB.add_maze(mazeA)
 domA.add_maze(mazeB)
@@ -40,7 +42,7 @@ domA.add_maze(mazeB)
 # Contract the system
 mazeA.init()
 mazeB.init()
-for i in range(9):
+for i in range(16):
 	print(i)
 	graph.bisect()
 
@@ -52,7 +54,10 @@ for i in range(9):
 	mazeA.contract_inter(mazeB)
 	mazeB.contract_inter(mazeA)
 
-	# Visualization
+	# mazeA.contract()
+	# mazeB.contract()
+
+# Visualization
 	visuA = VibesGraph("graphA", graph, mazeA)
 	visuA.setProperties(0,0,512,512)
 	visuA.show()
@@ -62,7 +67,7 @@ for i in range(9):
 	visuB.setProperties(512,0,512,512)
 	visuB.show()
 	visuB.drawCircle(0.0, 1.0, 9.0/100.0, "r[]") # (x_center, y_center, radius, color)
-
+	
 	input()
 
 

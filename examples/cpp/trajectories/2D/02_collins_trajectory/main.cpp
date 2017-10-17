@@ -16,7 +16,7 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    int iterations = 9;
+    int iterations = 16;
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
@@ -45,11 +45,16 @@ int main(int argc, char *argv[])
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
 
-    Function f_sep_B(x1, x2, pow(x1, 2)+pow(x2-1, 2)-9.0/100.0);
+    Function f_sep_B(x1, x2, pow(x1, 2)+pow(x2-1, 2)-pow(9.0/100.0,2));
     SepFwdBwd s_B(f_sep_B, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_B.set_sep(&s_B);
 
-    Maze maze_B(&dom_B, &dyn, MAZE_FWD, MAZE_WALL);
+    ibex::Function fB(x1, x2, Return(-(2*x1-x1*x2),-(2*pow(x1,2)-x2)));
+    vector<Function *> f_listB;
+    f_listB.push_back(&fB);
+    Dynamics_Function dynB(f_listB);
+
+    Maze maze_B(&dom_B, &dynB, MAZE_FWD, MAZE_WALL);
 
     dom_B.add_maze(&maze_A);
     dom_A.add_maze(&maze_B);
@@ -65,6 +70,9 @@ int main(int argc, char *argv[])
 
         maze_A.contract_inter(&maze_B);
         maze_B.contract_inter(&maze_A);
+
+        maze_A.contract();
+        maze_B.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

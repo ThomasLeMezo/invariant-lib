@@ -168,6 +168,7 @@ void Maze::contract_inter(Maze* maze_inter){
             if(r_inter->is_empty()){
                 r->set_empty_private();
                 r->synchronize();
+                r->set_removed();
             }
         }
     }

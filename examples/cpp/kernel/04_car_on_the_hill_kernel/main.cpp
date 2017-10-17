@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 //    space[0] = Interval(-1.0, 13.0);
 //    space[1] = Interval(-16, 16);
     space[0] = Interval(-1.0, 13.0);
-    space[1] = Interval(-7, 7);
+    space[1] = Interval(-6, 6);
 
     Graph graph(space);
 
@@ -39,11 +39,13 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(false);
 
+
+
     // ****** Dynamics Outer ******* //
 //    ibex::Function f_outer(x1, x2, Return(x2,
 //                                     (-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5, 0.5))));
     ibex::Function f_outer(x1, x2, Return(x2,
-                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-2.0, 2.0)));
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-3.0, 3.0)));
 
     Dynamics_Function dyn_outer(&f_outer);
 
@@ -53,9 +55,9 @@ int main(int argc, char *argv[])
 //    ibex::Function f_inner2(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(0.5))));
     ibex::Function f_inner1(x1, x2, Return(-x2,
-                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-2.0))));
+                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-3.0))));
     ibex::Function f_inner2(x1, x2, Return(-x2,
-                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(2.0))));
+                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(3.0))));
 
 
     vector<Function *> f_list_inner;
@@ -87,7 +89,7 @@ int main(int argc, char *argv[])
     IntervalVector position_info(2);
     position_info[0] = Interval(12.74);
     position_info[1] = Interval(2.14, 2.25);
-    v_graph.show_room_info(&maze_outer, position_info);
+//    v_graph.show_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 }
