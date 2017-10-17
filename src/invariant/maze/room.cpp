@@ -19,6 +19,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
         if((zero.is_subset(vector_field))){
             m_vector_field_zero.push_back(true);
+            m_contain_zero = true;
         }
         else{
             m_vector_field_zero.push_back(false);
@@ -26,7 +27,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
         m_vector_fields.push_back(vector_field);
         for(int i=0; i<vector_field.size(); i++){
             if(!(vector_field[i] & Interval::ZERO).is_empty())
-                m_contain_zero = true;
+                m_contain_zero_coordinate = true;
         }
     }
 
@@ -85,7 +86,7 @@ void Room::set_empty_private(){
     }
 }
 
-void Room::set_full(){
+void Room::set_full_private(){
     for(Face *f:m_pave->get_faces_vector()){
         f->get_doors()[m_maze]->set_full_private();
     }
@@ -577,7 +578,7 @@ bool Room::contract_continuity(){
     /// In the case of sliding mode (only in case of contraction),
     /// a change on the door of an adjacent room which is not on
     /// the boundary can permit contraction (change in the hull)
-    if(m_contain_zero && m_maze->get_type() == MAZE_DOOR)
+    if(m_contain_zero_coordinate && m_maze->get_type() == MAZE_DOOR)
         change = true;
     return change;
 }
@@ -680,7 +681,7 @@ void Room::analyze_change(std::vector<Room *>&list_rooms) const{
         Door *d = f->get_doors()[m_maze];
         change |= d->analyze_change(list_rooms);
     }
-    if(m_contain_zero && change){
+    if(m_contain_zero_coordinate && change){
         get_all_active_neighbors(list_rooms);
     }
 }
@@ -743,7 +744,7 @@ std::ostream& operator<< (std::ostream& stream, const Room& r) {
         Door *d = f->get_doors()[r.get_maze()];
         stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << endl;
     }
-    stream << " contain_zero = " << r.get_contain_zero() << endl;
+    stream << " contain_zero = " << r.get_contain_zero_coordinate() << endl;
     return stream;
 }
 

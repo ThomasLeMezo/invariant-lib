@@ -15,6 +15,8 @@ namespace invariant{
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
 enum DOMAIN_PROPAGATION_START{LINK_TO_INITIAL_CONDITION, NOT_LINK_TO_INITIAL_CONDITION};
 
+enum DOMAIN_INITIALIZATION{FULL_DOOR, FULL_WALL};
+
 class Graph; // declared only for friendship
 class Maze; // declared only for friendship
 class Pave_node; // declared only for friendship
@@ -28,7 +30,7 @@ public:
      * @param graph
      * @param link : specify if the initial condition in the case of a propagation maze is always link to the yellow zone
      */
-    Domain(Graph* graph, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
+    Domain(Graph* graph, DOMAIN_INITIALIZATION initialization =FULL_DOOR, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
 
     // *************** Intput & Output *********************
 
@@ -166,6 +168,7 @@ private:
     bool m_border_path_out = true;
 
     DOMAIN_PROPAGATION_START m_link_start = NOT_LINK_TO_INITIAL_CONDITION;
+    DOMAIN_INITIALIZATION m_initialization = FULL_DOOR;
 
     std::vector<Maze *> m_maze_list;
 };

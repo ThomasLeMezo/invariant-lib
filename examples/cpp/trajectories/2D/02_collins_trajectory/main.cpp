@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(f_list);
 
     // ****** Domain & Maze *******
-    invariant::Domain dom_A(&graph, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom_A(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     Maze maze_A(&dom_A, &dyn, MAZE_FWD, MAZE_WALL);
 
-    invariant::Domain dom_B(&graph, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom_B(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
 

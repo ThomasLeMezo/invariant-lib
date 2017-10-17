@@ -5,12 +5,24 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-Domain::Domain(Graph *graph, DOMAIN_PROPAGATION_START link){
+Domain::Domain(Graph *graph, DOMAIN_INITIALIZATION initialization, DOMAIN_PROPAGATION_START link){
     m_graph = graph;
     m_link_start = link;
+    m_initialization = initialization;
 }
 
 void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
+    // ********** Initialize the maze ********** //
+#pragma omp parallel for
+    for(size_t i=0; i<m_graph->get_paves().size(); i++){
+        Pave *p = m_graph->get_paves()[i];
+        Room *r = p->get_rooms()[maze];
+        if(m_initialization == FULL_DOOR)
+            r->set_full_private();
+        else if(m_initialization == FULL_WALL)
+            r->set_empty_private();
+    }
+
     // ********** Separator contraction ********** //
     if(m_sep_output != NULL)
         contract_separator(maze, m_graph->get_tree(), list_room_deque, true, SEP_UNKNOWN); // Output
