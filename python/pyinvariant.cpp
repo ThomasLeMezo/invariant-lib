@@ -24,15 +24,15 @@ using namespace ibex;
    m.doc() = "Python binding of invariant-lib";
 
    // ********* ENUM *********
-   py::enum_<invariant::MazeSens>(m, "MazeSens")
-       .value("MAZE_FWD", invariant::MazeSens::MAZE_FWD)
-       .value("MAZE_BWD", invariant::MazeSens::MAZE_BWD)
-       .value("MAZE_FWD_BWD", invariant::MazeSens::MAZE_FWD_BWD)
+   py::enum_<invariant::DOMAIN_INITIALIZATION>(m, "DOMAIN_INITIALIZATION")
+       .value("FULL_WALL", invariant::DOMAIN_INITIALIZATION::FULL_WALL)
+       .value("FULL_DOOR", invariant::DOMAIN_INITIALIZATION::FULL_WALL)
        .export_values();
 
-   py::enum_<MazeType>(m, "MazeType")
-       .value("MAZE_DOOR", MazeType::MAZE_DOOR)
-       .value("MAZE_WALL", MazeType::MAZE_WALL)
+   py::enum_<invariant::DYNAMICS_SENS>(m, "DYNAMICS_SENS")
+       .value("FWD", invariant::DYNAMICS_SENS::FWD)
+       .value("BWD", invariant::DYNAMICS_SENS::BWD)
+       .value("FWD_BWD", invariant::DYNAMICS_SENS::FWD_BWD)
        .export_values();
 
    py::enum_<DOMAIN_PROPAGATION_START>(m, "DOMAIN_PROPAGATION_START")
@@ -49,10 +49,9 @@ using namespace ibex;
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
-          .def(py::init<invariant::Graph*>(), "graph"_a)
-          .def(py::init<invariant::Graph*, DOMAIN_INITIALIZATION, DOMAIN_PROPAGATION_START>(),
+          .def(py::init<invariant::Graph*, invariant::DOMAIN_INITIALIZATION, invariant::DOMAIN_PROPAGATION_START>(),
                "graph"_a,
-               "DOMAIN_INITIALIZATION"_a = invariant::FULL_DOOR,
+               "DOMAIN_INITIALIZATION"_a,
                "DOMAIN_PROPAGATION_START"_a = invariant::NOT_LINK_TO_INITIAL_CONDITION)
           .def("set_border_path_in", &invariant::Domain::set_border_path_in)
           .def("set_border_path_out", &invariant::Domain::set_border_path_out)
@@ -67,20 +66,20 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-  py::class_<invariant::Dynamics> dynamics(m, "Dynamics");
-//          dynamics.def(py::init<>())
-//    ;
+  py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
+  ;
+
   py::class_<invariant::Dynamics_Function>(m, "DynamicsFunction", dynamics)
-          .def(py::init<ibex::Function*>(), "f"_a)
+          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS>(),
+               "f"_a,
+               "DYNAMICS_SENS"_a)
   ;
 
   // ********* Maze *********
   py::class_<invariant::Maze>(m, "Maze")
-          .def(py::init<invariant::Domain*, invariant::Dynamics*, invariant::MazeSens, invariant::MazeType>(),
+          .def(py::init<invariant::Domain*, invariant::Dynamics*>(),
                "domain"_a,
-               "dynamics"_a,
-               "MazeSens"_a = invariant::MAZE_FWD_BWD,
-               "MazeType"_a = invariant::MAZE_DOOR)
+               "dynamics"_a)
           .def("contract", &invariant::Maze::contract)
           .def("contract_inter", &invariant::Maze::contract_inter)
           .def("init", &invariant::Maze::init)

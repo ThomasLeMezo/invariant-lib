@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     Graph graph(space);
-    invariant::Domain dom(&graph);
+    invariant::Domain dom(&graph, FULL_WALL);
 
     Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
@@ -48,10 +48,10 @@ int main(int argc, char *argv[])
     vector<Function *> f_list;
     f_list.push_back(&f1);
     f_list.push_back(&f2);
-    Dynamics_Function dyn(f_list);
+    Dynamics_Function dyn(f_list, FWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_WALL);
+    Maze maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

@@ -30,7 +30,7 @@ public:
      * @param graph
      * @param link : specify if the initial condition in the case of a propagation maze is always link to the yellow zone
      */
-    Domain(Graph* graph, DOMAIN_INITIALIZATION initialization =FULL_DOOR, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
+    Domain(Graph* graph, DOMAIN_INITIALIZATION domain_init, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
 
     // *************** Intput & Output *********************
 
@@ -141,6 +141,12 @@ public:
      */
     void inter_maze(Maze *maze);
 
+    /**
+     * @brief Get the initialization condition on Room (Full door or Full wall)
+     * @return
+     */
+    DOMAIN_INITIALIZATION get_init() const;
+
 private:
     /**
      * @brief Contract all output or input doors of the maze according to the separator contractor
@@ -168,13 +174,18 @@ private:
     bool m_border_path_out = true;
 
     DOMAIN_PROPAGATION_START m_link_start = NOT_LINK_TO_INITIAL_CONDITION;
-    DOMAIN_INITIALIZATION m_initialization = FULL_DOOR;
+    DOMAIN_INITIALIZATION m_domain_init = FULL_DOOR;
 
     std::vector<Maze *> m_maze_list;
 };
 }
 
 namespace invariant{
+
+inline DOMAIN_INITIALIZATION Domain::get_init() const{
+    return m_domain_init;
+}
+
 inline void Domain::add_remove_maze_input(Maze *maze, bool complementary){
     m_remove_mazes_input.push_back(std::make_pair(maze, complementary));
 }

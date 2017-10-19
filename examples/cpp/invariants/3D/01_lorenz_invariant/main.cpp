@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     Graph graph(space);
-    invariant::Domain dom(&graph);
+    invariant::Domain dom(&graph, FULL_DOOR);
     Interval pt_xy = sqrt(beta*(rho-1.0));
     Interval pt_z = rho-1.0;
     double r = 3.0;
@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
                                         x1*(rho - x3) - x2,
                                         x1*x2 - beta * x3));
-    Dynamics_Function dyn(&f);
+    Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_FWD_BWD, MAZE_DOOR);
+    Maze maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

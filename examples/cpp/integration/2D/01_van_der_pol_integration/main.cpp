@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain *******
     Graph graph(space);
-    invariant::Domain dom(&graph);
+    invariant::Domain dom(&graph, FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -42,10 +42,10 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     vector<Function *> f_list;
     f_list.push_back(&f);
-    Dynamics_Function dyn(f_list);
+    Dynamics_Function dyn(f_list, FWD);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn, MAZE_FWD, MAZE_WALL);
+    Maze maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in

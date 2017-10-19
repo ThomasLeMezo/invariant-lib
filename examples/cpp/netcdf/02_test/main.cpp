@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ******* Maze *********
-    Maze maze(&dom, &pm3d, MAZE_FWD, MAZE_WALL);
+    Maze maze(&dom, &pm3d);
 
     cout << "Domain = " << search_space << endl;
 //    double max_diam = search_space.max_diam();

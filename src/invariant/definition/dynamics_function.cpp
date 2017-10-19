@@ -4,12 +4,16 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-Dynamics_Function::Dynamics_Function(const vector<Function*> functions){
+Dynamics_Function::Dynamics_Function(const vector<Function*> functions, const DYNAMICS_SENS sens):
+Dynamics(sens)
+{
     m_functions = functions;
     omp_init_lock(&m_lock_dynamics);
 }
 
-Dynamics_Function::Dynamics_Function(Function *functions){
+Dynamics_Function::Dynamics_Function(Function *functions, const DYNAMICS_SENS sens):
+    Dynamics(sens)
+{
     m_functions.push_back(functions);
     omp_init_lock(&m_lock_dynamics);
 }

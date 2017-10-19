@@ -25,17 +25,17 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     Graph graph(space);
-    invariant::Domain dom(&graph);
+    invariant::Domain dom(&graph, FULL_DOOR);
 
     dom.set_border_path_in(true);
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn, MAZE_BWD, MAZE_DOOR);
+    Maze maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

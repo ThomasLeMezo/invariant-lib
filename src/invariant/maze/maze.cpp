@@ -6,11 +6,8 @@ using namespace std;
 using namespace ibex;
 namespace invariant {
 
-Maze::Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens, MazeType maze_type)
+Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
 {
-    m_maze_sens = maze_sens;
-    m_maze_type = maze_type;
-
     m_domain = domain;
     m_dynamics = dynamics;
 
@@ -114,7 +111,7 @@ int Maze::contract(){
                             // Synchronize
                             r->synchronize_doors();
 
-                            if(m_maze_type == MAZE_DOOR && r->is_empty())
+                            if(m_domain->get_init() == FULL_DOOR && r->is_empty())
                                 r->set_removed();
 
                             // Add Rooms to the Deque

@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return(2*x1-x1*x2,2*pow(x1,2)-x2));
     vector<Function *> f_list;
     f_list.push_back(&f);
-    Dynamics_Function dyn(f_list);
+    Dynamics_Function dyn(f_list, FWD);
 
     // ****** Domain & Maze *******
     invariant::Domain dom_A(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_A(f_sep_A, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A.set_sep(&s_A);
 
-    Maze maze_A(&dom_A, &dyn, MAZE_FWD, MAZE_WALL);
+    Maze maze_A(&dom_A, &dyn);
 
     invariant::Domain dom_B(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
     dom_B.set_border_path_in(false);
@@ -52,9 +52,9 @@ int main(int argc, char *argv[])
     ibex::Function fB(x1, x2, Return(-(2*x1-x1*x2),-(2*pow(x1,2)-x2)));
     vector<Function *> f_listB;
     f_listB.push_back(&fB);
-    Dynamics_Function dynB(f_listB);
+    Dynamics_Function dynB(f_listB, FWD);
 
-    Maze maze_B(&dom_B, &dynB, MAZE_FWD, MAZE_WALL);
+    Maze maze_B(&dom_B, &dynB);
 
     dom_B.add_maze(&maze_A);
     dom_A.add_maze(&maze_B);

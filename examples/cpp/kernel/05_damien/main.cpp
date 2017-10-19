@@ -26,13 +26,13 @@ int main(int argc, char *argv[])
     Graph graph(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph);
+    invariant::Domain dom_outer(&graph, FULL_DOOR);
 
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&graph);
+    invariant::Domain dom_inner(&graph, FULL_WALL);
 
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(false);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     ibex::Function f_outer(x1, x2, Return(pow(x2, 2),
                                           Interval(-1, 1)));
 
-    Dynamics_Function dyn_outer(&f_outer);
+    Dynamics_Function dyn_outer(&f_outer, BWD);
 
     // ****** Dynamics Inner ******* //
     ibex::Function f_inner1(x1, x2, Return(pow(x2, 2),
@@ -52,11 +52,11 @@ int main(int argc, char *argv[])
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
-    Dynamics_Function dyn_inner(f_list_inner);
+    Dynamics_Function dyn_inner(f_list_inner, FWD);
 
     // ******* Mazes ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer, MAZE_BWD, MAZE_DOOR);
-    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_FWD, MAZE_WALL);
+    Maze maze_outer(&dom_outer, &dyn_outer);
+    Maze maze_inner(&dom_inner, &dyn_inner);
 
     // ******* Algorithm ********* //
     vibes::beginDrawing();

@@ -16,7 +16,7 @@ Door::Door(Face *face, Room *room):
     m_room = room;
     omp_init_lock(&m_lock_read);
 
-    if(m_room->get_maze()->get_type() == MAZE_WALL){
+    if(m_room->get_maze()->get_domain()->get_init() == FULL_WALL){
         m_input_private->set_empty();
         m_output_private->set_empty();
         m_input_public.set_empty();
@@ -52,11 +52,12 @@ void Door::synchronize(){
 }
 
 bool Door::contract_continuity_private(){
-    MazeSens sens = m_room->get_maze()->get_sens();
-    MazeType type = m_room->get_maze()->get_type();
+    DYNAMICS_SENS dynamics_sens = m_room->get_maze()->get_dynamics()->get_sens();
+    DOMAIN_INITIALIZATION domain_init = m_room->get_maze()->get_domain()->get_init();
+
     bool change = false;
 
-    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+    if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
         IntervalVector door_input = ibex::IntervalVector(m_input_private->size(), Interval::EMPTY_SET);
         for(Face* f:m_face->get_neighbors()){
             Door *d = f->get_doors()[m_room->get_maze()];
@@ -64,14 +65,14 @@ bool Door::contract_continuity_private(){
         }
         if(door_input != *m_input_private){
             change = true;
-            if(type == MAZE_DOOR)
+            if(domain_init == FULL_DOOR)
                 (*m_input_private) &= door_input;
-            else if(type == MAZE_WALL)
+            else if(domain_init == FULL_WALL)
                 (*m_input_private) |= door_input;
         }
     }
 
-    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
+    if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
         IntervalVector door_output = ibex::IntervalVector(m_output_private->size(), Interval::EMPTY_SET);
         for(Face* f:m_face->get_neighbors()){
             Door *d = f->get_doors()[m_room->get_maze()];
@@ -79,9 +80,9 @@ bool Door::contract_continuity_private(){
         }
         if(door_output != (*m_output_private)){
             change = true;
-            if(type == MAZE_DOOR)
+            if(domain_init == FULL_DOOR)
                 (*m_output_private) &= door_output;
-            else if(type == MAZE_WALL)
+            else if(domain_init == FULL_WALL)
                 (*m_output_private) |= door_output;
         }
     }

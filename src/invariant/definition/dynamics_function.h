@@ -14,13 +14,13 @@ public:
      * @brief Dynamics constructor
      * @param functions
      */
-    Dynamics_Function(const std::vector<ibex::Function *> functions);
+    Dynamics_Function(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief Dynamics constructor
      * @param functions
      */
-    Dynamics_Function(ibex::Function *functions);
+    Dynamics_Function(ibex::Function *functions, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief Dynamics destructor

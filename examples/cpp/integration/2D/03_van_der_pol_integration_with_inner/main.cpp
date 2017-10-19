@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     Graph graph(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph);
+    invariant::Domain dom_outer(&graph, FULL_WALL);
 
     double x1_c, x2_c, r;
 //    x1_c = 3.0;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&graph);
+    invariant::Domain dom_inner(&graph, FULL_DOOR);
 
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -59,12 +59,12 @@ int main(int argc, char *argv[])
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
     ibex::Function f_inner(x1, x2, Return(-x2,
                                         -(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn_outer(&f_outer);
-    Dynamics_Function dyn_inner(&f_inner);
+    Dynamics_Function dyn_outer(&f_outer, FWD);
+    Dynamics_Function dyn_inner(&f_inner, BWD);
 
     // ******* Mazes ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer, MAZE_FWD, MAZE_WALL);
-    Maze maze_inner(&dom_inner, &dyn_inner, MAZE_BWD, MAZE_DOOR);
+    Maze maze_outer(&dom_outer, &dyn_outer);
+    Maze maze_inner(&dom_inner, &dyn_inner);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

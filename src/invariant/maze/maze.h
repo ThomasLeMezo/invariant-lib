@@ -11,19 +11,6 @@
 
 namespace invariant {
 
-/**
- * @brief The MazeType enum
- * MAZE_FWD : propagation or contraction in the sens of the vector field
- * MAZE_BWD : propagation or contraction in the opposite sens of the vector field
- * MAZE_FWD_BWD : propagation or contraction in both sens
- */
-enum MazeSens {MAZE_FWD, MAZE_BWD, MAZE_FWD_BWD};
-
-/**
- * @brief The MazeType enum
- */
-enum MazeType {MAZE_DOOR, MAZE_WALL};
-
 class Graph; // declared only for friendship
 class Domain; // declared only for friendship
 class Dynamics; // declared only for friendship
@@ -37,7 +24,7 @@ public:
      * @param f_vect
      * @param type of operation (forward, backward or both)
      */
-    Maze(invariant::Domain *domain, Dynamics *dynamics, MazeSens maze_sens =MAZE_FWD_BWD, MazeType maze_type=MAZE_DOOR);
+    Maze(invariant::Domain *domain, Dynamics *dynamics);
 
     /**
      * @brief Maze destructor
@@ -92,18 +79,6 @@ public:
     void add_rooms(const std::vector<Room *> &list_rooms);
 
     /**
-     * @brief Return the sens of the Maze
-     * @return
-     */
-    MazeSens get_sens() const;
-
-    /**
-     * @brief Return the type of the Maze
-     * @return
-     */
-    MazeType get_type() const;
-
-    /**
      * @brief Return true if some trajectory can escape from the search space
      * @return
      */
@@ -117,9 +92,6 @@ private:
     std::deque<Room *> m_deque_rooms;
 
     omp_lock_t  m_deque_access;
-
-    MazeSens m_maze_sens = MAZE_FWD_BWD;
-    MazeType m_maze_type = MAZE_DOOR;
 
     bool    m_espace_trajectories = true;
 
@@ -145,15 +117,6 @@ inline void Maze::add_to_deque(Room *r){
     m_deque_rooms.push_back(r);
     omp_unset_lock(&m_deque_access);
 }
-
-inline MazeSens Maze::get_sens() const{
-    return m_maze_sens;
-}
-
-inline MazeType Maze::get_type() const{
-    return m_maze_type;
-}
-
 
 }
 #endif // MAZE_H

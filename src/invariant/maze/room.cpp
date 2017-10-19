@@ -101,7 +101,7 @@ void Room::contract_vector_field(){
     //        cout << "TEST" << endl;
 
     int dim = m_pave->get_dim();
-    MazeSens sens = m_maze->get_sens();
+    DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     IntervalVector zero(dim, Interval::ZERO);
 
     for(Face *f:m_pave->get_faces_vector()){
@@ -127,11 +127,11 @@ void Room::contract_vector_field(){
                 }
 
                 if((f->get_orientation() & v_bool_in).is_empty()){
-                    if(sens == MAZE_BWD || sens == MAZE_FWD_BWD)
+                    if(dynamics_sens == BWD || dynamics_sens == FWD_BWD)
                         d->set_empty_private_input();
                 }
                 if((f->get_orientation() & v_bool_out).is_empty()){
-                    if(sens == MAZE_FWD || sens == MAZE_FWD_BWD)
+                    if(dynamics_sens == FWD || dynamics_sens == FWD_BWD)
                         d->set_empty_private_output();
                 }
             }
@@ -221,8 +221,8 @@ void Room:: contract_consistency(){
     //        m_time_debug++;
     //    }
 
-    MazeSens sens = m_maze->get_sens();
-    MazeType type = m_maze->get_type();
+    DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
+    DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
 
     vector<vector< array<IntervalVector, 2>>> out_results; // One per vec_field, dim, sens
     const int nb_vec = m_vector_fields.size();
@@ -242,11 +242,11 @@ void Room:: contract_consistency(){
     for(IntervalVector &vec_field:m_vector_fields){
         bool compute = true;
         if(m_vector_field_zero[n_vf]){
-            if(type == MAZE_WALL && m_vector_fields.size()==1){
+            if(domain_init == FULL_WALL && m_vector_fields.size()==1){
                 this->set_full_possible();
                 compute = false;
             }
-            if(type == MAZE_DOOR)
+            if(domain_init == FULL_DOOR)
                 compute = false;
         }
         // Create tmp output doors
@@ -270,7 +270,7 @@ void Room:: contract_consistency(){
             // ************* SLIDING MODE *************
             for(int face_in=0; face_in<dim; face_in++){
                 for(int sens_in = 0; sens_in < 2; sens_in++){
-                    if(type == MAZE_DOOR && collinear[face_in][sens_in]){
+                    if(domain_init == FULL_DOOR && collinear[face_in][sens_in]){
                         Face* f_in = m_pave->get_faces()[face_in][sens_in];
                         Door* door_in = f_in->get_doors()[m_maze];
 
@@ -288,10 +288,10 @@ void Room:: contract_consistency(){
                         if(m_debug_room)
                             cout << "after " << out_return << endl;
 
-                        if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
+                        if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
                             door_in->set_input_private(in_return); // Write input
                         }
-                        if(sens == MAZE_FWD || sens == MAZE_FWD_BWD){
+                        if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
                             /// Write output here to improve standard mode efficency
                             door_in->set_output_private(out_return); // Write output
                             out_results[n_vf][face_in][sens_in] = out_return;
@@ -321,7 +321,7 @@ void Room:: contract_consistency(){
             // ************* STANDARD MODE *************
             for(int face_in=0; face_in<dim; face_in++){
                 for(int sens_in = 0; sens_in < 2; sens_in++){
-                    if(!(type == MAZE_DOOR && collinear[face_in][sens_in])){
+                    if(!(domain_init == FULL_DOOR && collinear[face_in][sens_in])){
 
                         Face* f_in = m_pave->get_faces()[face_in][sens_in];
                         Door* door_in = f_in->get_doors()[m_maze];
@@ -337,7 +337,7 @@ void Room:: contract_consistency(){
 
                                     IntervalVector out_return(dim);
                                     if(/*type == MAZE_WALL ||*/ !(face_out == face_in && sens_out == sens_in)){
-                                        if(type == MAZE_DOOR)
+                                        if(domain_init == FULL_DOOR)
                                             out_return = door_out->get_output_private();
                                         else
                                             out_return = f_out->get_position();
@@ -346,14 +346,14 @@ void Room:: contract_consistency(){
                                             this->contract_flow(in_tmp, out_return, vec_field);
 
                                             in_result |= in_tmp;
-                                            if(type == MAZE_WALL || !collinear[face_out][sens_out])
+                                            if(domain_init == FULL_WALL || !collinear[face_out][sens_out])
                                                 out_results[n_vf][face_out][sens_out] |= out_return;
                                         }
                                     }
                                 }
                             }
-                            if(sens == MAZE_BWD || sens == MAZE_FWD_BWD){
-                                if(type == MAZE_DOOR)
+                            if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
+                                if(domain_init == FULL_DOOR)
                                     door_in->set_input_private(in & in_result);
                                 else{
                                     if(door_in->is_possible_in()[n_vf])
@@ -369,7 +369,7 @@ void Room:: contract_consistency(){
         }
     }
 
-    if(global_compute && (sens == MAZE_FWD || sens == MAZE_FWD_BWD)){
+    if(global_compute && (dynamics_sens == FWD || dynamics_sens == FWD_BWD)){
         for(int face_out = 0; face_out<dim; face_out++){
             for(int sens_out = 0; sens_out < 2; sens_out++){
                 Face* f_out = m_pave->get_faces()[face_out][sens_out];
@@ -378,7 +378,7 @@ void Room:: contract_consistency(){
                 IntervalVector door_out_iv(door_out->get_face()->get_position());
                 bool one_possible = false;
                 for(int n_vf=0; n_vf<nb_vec; n_vf++){
-                    if((type == MAZE_WALL && door_out->is_possible_out()[n_vf]) || type == MAZE_DOOR){
+                    if((domain_init == FULL_WALL && door_out->is_possible_out()[n_vf]) || domain_init == FULL_DOOR){
                         one_possible = true;
                         door_out_iv &= out_results[n_vf][face_out][sens_out];
                     }
@@ -387,7 +387,7 @@ void Room:: contract_consistency(){
                     door_out_iv.set_empty();
                 }
 
-                if(type == MAZE_DOOR){
+                if(domain_init == FULL_DOOR){
                     door_out->set_output_private(door_out_iv & door_out->get_output_private());
                 }
                 else
@@ -578,7 +578,7 @@ bool Room::contract_continuity(){
     /// In the case of sliding mode (only in case of contraction),
     /// a change on the door of an adjacent room which is not on
     /// the boundary can permit contraction (change in the hull)
-    if(m_contain_zero_coordinate && m_maze->get_type() == MAZE_DOOR)
+    if(m_contain_zero_coordinate && m_maze->get_domain()->get_init() == FULL_DOOR)
         change = true;
     return change;
 }
@@ -606,12 +606,12 @@ bool Room::contract(){
 
     bool change = false;
     if(!is_removed()){
-        MazeType type = m_maze->get_type();
-        if(m_first_contract && type == MAZE_DOOR){
+        DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
+        if(m_first_contract && domain_init == FULL_DOOR){
             contract_vector_field();
             change = true;
         }
-        else if(m_first_contract && type == MAZE_WALL){
+        else if(m_first_contract && domain_init == FULL_WALL){
             if(m_pave->is_border()) // Case only the border is full
                 change = true;
         }
@@ -633,7 +633,7 @@ bool Room::contract(){
 }
 
 bool Room::get_private_doors_info(string message, bool cout_message){
-    if(m_maze->get_type() != MAZE_DOOR)
+    if(m_maze->get_domain()->get_init() != FULL_DOOR)
         return false;
     IntervalVector position(2);
     //

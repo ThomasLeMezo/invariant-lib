@@ -45,7 +45,7 @@ int getValue(){ //Note: this value is in KB!
 }
 
 PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level):
-    m_search_space(search_space)
+    Dynamics(FWD), m_search_space(search_space)
 {
     int ram_init = getValue()/1000;
     cout << "Mem 0 = " << ram_init << " Mo" << endl;
