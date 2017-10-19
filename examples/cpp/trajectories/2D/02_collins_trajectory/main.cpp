@@ -16,7 +16,6 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    int iterations = 16;
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
@@ -62,6 +61,8 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_A.init(); // To set first pave to be in
     maze_B.init(); // To set first pave to be in
+
+    int iterations = 16;
     for(int i=0; i<iterations; i++){
         cout << i << "/" << iterations-1 << endl;
         graph.bisect();
@@ -71,8 +72,8 @@ int main(int argc, char *argv[])
         maze_A.contract_inter(&maze_B);
         maze_B.contract_inter(&maze_A);
 
-        maze_A.contract();
-        maze_B.contract();
+//        maze_A.contract();
+//        maze_B.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

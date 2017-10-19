@@ -17,10 +17,12 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
     for(size_t i=0; i<m_graph->get_paves().size(); i++){
         Pave *p = m_graph->get_paves()[i];
         Room *r = p->get_rooms()[maze];
-        if(m_domain_init == FULL_DOOR)
-            r->set_full_private();
-        else if(m_domain_init == FULL_WALL)
-            r->set_empty_private();
+        if(!r->is_removed()){
+            if(m_domain_init == FULL_DOOR)
+                r->set_full_private();
+            else if(m_domain_init == FULL_WALL)
+                r->set_empty_private();
+        }
     }
 
     // ********** Separator contraction ********** //
