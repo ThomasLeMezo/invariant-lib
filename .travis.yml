@@ -72,8 +72,8 @@ before_install:
     fi
     brew install gcc48
     pip$PY install --user --upgrade pip virtualenv;
-    python$PY -m virtualenv venv;
-    source venv/bin/activate;
+    #python$PY -m virtualenv venv;
+    #source venv/bin/activate;
   fi
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
