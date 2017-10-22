@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -23,16 +23,16 @@ int main(int argc, char *argv[])
     space[0] = Interval(-1, 1);
     space[1] = Interval(-1, 1);
 
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph, FULL_DOOR);
+    invariant::Domain dom_outer(&paving, FULL_DOOR);
 
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&graph, FULL_WALL);
+    invariant::Domain dom_inner(&paving, FULL_WALL);
 
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(false);
@@ -63,15 +63,15 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_inner.contract();
     for(int i=0; i<15; i++){
-        graph.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
+        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vibes_Graph v_graph("graph_inner", &graph, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("graph_inner", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 

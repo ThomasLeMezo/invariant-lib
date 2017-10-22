@@ -14,7 +14,7 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
     m_graph = domain->get_graph();
     omp_init_lock(&m_deque_access);
 
-    Graph *g = domain->get_graph();
+    SmartSubPaving *g = domain->get_graph();
     for(Pave*p:g->get_paves()){
         Room *r = new Room(p, this, dynamics);
         p->add_room(r);
@@ -123,7 +123,7 @@ int Maze::contract(){
                         }
 
                         /// DEBUG
-                        //                        Vibes_Graph v_graph("graph", m_graph, this);
+                        //                        Vibes_Graph v_graph("paving", m_graph, this);
                         //                        v_graph.setProperties(0, 0, 512, 512);
                         //                        v_graph.show();
                         //                        v_graph.show_room_info(this, test);

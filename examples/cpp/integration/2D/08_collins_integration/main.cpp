@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
     space[0] = Interval(-4,4);
     space[1] = Interval(-3.5,6);
 
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph, FULL_WALL);
+    invariant::Domain dom_outer(&paving, FULL_WALL);
 
     double x1_c, x2_c, r;
     x1_c = 0.0;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&graph, FULL_DOOR);
+    invariant::Domain dom_inner(&paving, FULL_DOOR);
 
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -73,16 +73,16 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_outer.contract();
     for(int i=0; i<15; i++){
-        graph.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
+        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("paving", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
     v_graph.drawCircle(x1_c, x2_c, r, "black[red]");

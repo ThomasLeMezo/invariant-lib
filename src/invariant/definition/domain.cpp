@@ -5,8 +5,8 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-Domain::Domain(Graph *graph, DOMAIN_INITIALIZATION domain_init, DOMAIN_PROPAGATION_START link){
-    m_graph = graph;
+Domain::Domain(SmartSubPaving *paving, DOMAIN_INITIALIZATION domain_init, DOMAIN_PROPAGATION_START link){
+    m_graph = paving;
     m_link_start = link;
     m_domain_init = domain_init;
 }

@@ -2,7 +2,7 @@
 #define Vibes_Graph_H
 
 #include <ibex/ibex_IntervalVector.h>
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "maze.h"
 #include "pave.h"
 #include "VibesFigure.h"
@@ -14,9 +14,9 @@ class Vibes_Graph: public VibesFigure
 public:
     enum VIBES_GRAPH_TYPE{VIBES_GRAPH_INNER, VIBES_GRAPH_OUTER, VIBES_GRAPH_OUTER_AND_INNER};
 public:
-    Vibes_Graph(const std::string& figure_name, invariant::Graph *g);
-    Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* maze, VIBES_GRAPH_TYPE type=VIBES_GRAPH_OUTER);
-    Vibes_Graph(const std::string& figure_name, invariant::Graph *g, invariant::Maze* outer, invariant::Maze* inner);
+    Vibes_Graph(const std::string& figure_name, invariant::SmartSubPaving *g);
+    Vibes_Graph(const std::string& figure_name, invariant::SmartSubPaving *g, invariant::Maze* maze, VIBES_GRAPH_TYPE type=VIBES_GRAPH_OUTER);
+    Vibes_Graph(const std::string& figure_name, invariant::SmartSubPaving *g, invariant::Maze* outer, invariant::Maze* inner);
     ~Vibes_Graph(){}
 
     virtual void show() const;
@@ -48,7 +48,7 @@ private:
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
-    invariant::Graph*   m_graph = NULL;
+    invariant::SmartSubPaving*   m_graph = NULL;
     double              m_overhead_factor;
 
     invariant::Maze*    m_maze_outer = NULL;
@@ -61,7 +61,7 @@ private:
 };
 
 namespace vibes{
-    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::Graph &, g)
+    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::SmartSubPaving &, g)
     VIBES_FUNC_COLOR_PARAM_1(drawPave,const invariant::Pave &, p)
     VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::Face &, f)
     VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::Pave*> &, l_p)

@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     IntervalVector space(2);
     space[0] = Interval(-6,6);
     space[1] = Interval(-6,6);
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(f_list, FWD);
 
     // ****** Domain & Maze *******
-    invariant::Domain dom_A(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom_A(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     Maze maze_A(&dom_A, &dyn);
 
-    invariant::Domain dom_B(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom_B(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     double xc_2, yc_2, r_2;
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     maze_B.init(); // To set first pave to be in
     for(int i=0; i<iterations; i++){
         cout << i << "/" << iterations-1 << endl;
-        graph.bisect();
+        paving.bisect();
         maze_A.contract();
         maze_B.contract();
 
@@ -74,14 +74,14 @@ int main(int argc, char *argv[])
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vibes_Graph v_graphA("graph_A", &graph, &maze_A);
+    Vibes_Graph v_graphA("graph_A", &paving, &maze_A);
     v_graphA.setProperties(0, 0, 512, 512);
     v_graphA.show();
     vibes::drawCircle(xc_1, yc_1, r_1, "r[]");
 
-    Vibes_Graph v_graphB("graph_B", &graph, &maze_B);
+    Vibes_Graph v_graphB("graph_B", &paving, &maze_B);
     v_graphB.setProperties(0, 0, 512, 512);
     v_graphB.show();
     vibes::drawCircle(xc_2, yc_2, r_2, "r[]");

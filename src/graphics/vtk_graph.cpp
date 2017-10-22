@@ -27,7 +27,7 @@ using namespace invariant;
 using namespace std;
 using namespace ibex;
 
-Vtk_Graph::Vtk_Graph(const std::string &file_name, Graph *g, bool memory_optimization){
+Vtk_Graph::Vtk_Graph(const std::string &file_name, SmartSubPaving *g, bool memory_optimization){
     m_graph = g;
     m_file_name = file_name;
     m_memory_optimization = memory_optimization;
@@ -150,7 +150,7 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
 }
 
 void Vtk_Graph::show_graph(){
-    cout << "vtk graph" << endl;
+    cout << "vtk paving" << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_paves = vtkSmartPointer<vtkAppendPolyData>::New();
     int nb_paves = m_graph->get_paves().size();

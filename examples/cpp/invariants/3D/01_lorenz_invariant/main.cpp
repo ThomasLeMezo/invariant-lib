@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     Interval beta = Interval(8.0/3.0);
 
     // ****** Domain ******* //
-    Graph graph(space);
-    invariant::Domain dom(&graph, FULL_DOOR);
+    SmartSubPaving paving(space);
+    invariant::Domain dom(&paving, FULL_DOOR);
     Interval pt_xy = sqrt(beta*(rho-1.0));
     Interval pt_z = rho-1.0;
     double r = 3.0;
@@ -76,14 +76,14 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     for(int i=0; i<20; i++){
         cout << "-----" << i << "-----" << endl;
-        graph.bisect();
-        cout << "nb contractions = " << maze.contract() << " - " << "graph size = " << graph.size() << endl;
+        paving.bisect();
+        cout << "nb contractions = " << maze.contract() << " - " << "paving size = " << paving.size() << endl;
         //        vtk_graph.show_maze(&maze, std::to_string(i));
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vtk_Graph vtk_graph("lorenz", &graph, true);
+    Vtk_Graph vtk_graph("lorenz", &paving, true);
 //    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 
@@ -93,6 +93,6 @@ int main(int argc, char *argv[])
 //    position_info[2] = Interval(0.5);
 //    vtk_graph.show_room_info(&maze, position_info);
     //        vector<Pave*> pave_list;
-    //        graph.get_room_info(&maze, position_info, pave_list);
+    //        paving.get_room_info(&maze, position_info, pave_list);
 
 }

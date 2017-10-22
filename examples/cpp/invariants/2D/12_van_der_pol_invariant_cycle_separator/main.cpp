@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     space[1] = Interval(-3,3);
 
     // ****** Domain ******* //
-    Graph graph(space);
-    invariant::Domain dom(&graph, FULL_DOOR);
+    SmartSubPaving paving(space);
+    invariant::Domain dom(&paving, FULL_DOOR);
 
     Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
     SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -49,8 +49,8 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     for(int i=0; i<10; i++){
-        graph.bisect();
-        cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -61,10 +61,10 @@ int main(int argc, char *argv[])
 //    box_in[1] = Interval(-2, -0.5);
     box_out = box_in;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("graph", &graph, &maze);
+    Vibes_Graph v_graph("paving", &paving, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 

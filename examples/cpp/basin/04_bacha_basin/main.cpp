@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
     space[1] = Interval(-6,6);
 
     // ****** Domain ******* //
-    Graph graph(space);
-    invariant::Domain dom_outer(&graph, FULL_WALL);
+    SmartSubPaving paving(space);
+    invariant::Domain dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_outer.set_sep_output(&s_outer);
 
-    invariant::Domain dom_inner(&graph, FULL_DOOR);
+    invariant::Domain dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
@@ -72,28 +72,28 @@ int main(int argc, char *argv[])
     maze_inner.init();
     maze_outer.init();
     for(int i=0; i<15; i++){
-        graph.bisect();
-        cout << i << " - " << maze_outer.contract() << " - " << graph.size() << endl;
-        cout << i << " - " << maze_inner.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
+        cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("paving", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
     v_graph.drawCircle(x1_c, x2_c, r, "red[]");
 
-//    Vibes_Graph v_graph_inner("graph_inner", &graph,&maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
+//    Vibes_Graph v_graph_inner("graph_inner", &paving,&maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
 //    v_graph_inner.setProperties(0, 0, 512, 512);
 //    v_graph_inner.show();
 
-//    Vibes_Graph v_graph_outer("graph_outer", &graph,&maze_outer, Vibes_Graph::VIBES_GRAPH_OUTER);
+//    Vibes_Graph v_graph_outer("graph_outer", &paving,&maze_outer, Vibes_Graph::VIBES_GRAPH_OUTER);
 //    v_graph_outer.setProperties(0, 0, 512, 512);
 //    v_graph_outer.show();
 
-//    Vibes_Graph v_graph_info("graph_info", &graph, &maze_inner);
+//    Vibes_Graph v_graph_info("graph_info", &paving, &maze_inner);
 //    v_graph_info.setProperties(0, 0, 512, 512);
 //    v_graph_info.show();
 //    IntervalVector position_info(2);

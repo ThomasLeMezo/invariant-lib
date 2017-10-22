@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
 //    IntervalVector search_space(2);
 //    search_space[0] = Interval(0, 300);
 //    search_space[1] = Interval(200, 500);
-    Graph graph(search_space);
-    invariant::Domain dom(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    SmartSubPaving paving(search_space);
+    invariant::Domain dom(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -48,14 +48,14 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
     for(int i=0; i<iterations_max+1; i++){
-        graph.bisect();
-        cout << i << " - " << maze.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vibes_Graph v_graph("graph", &graph, &maze);
+    Vibes_Graph v_graph("paving", &paving, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 

@@ -6,16 +6,16 @@
 # Sources
 include_directories(definition)
 include_directories(definition/netcdf)
-include_directories(graph)
+include_directories(smartSubPaving)
 include_directories(maze)
 include_directories(../tools/serialization)
 
 
   set(SRC
-    graph/graph.cpp
-    graph/pave.cpp
-    graph/face.cpp
-    graph/pave_node.cpp
+    smartSubPaving/smartSubPaving.cpp
+    smartSubPaving/pave.cpp
+    smartSubPaving/face.cpp
+    smartSubPaving/pave_node.cpp
 
     maze/maze.cpp
     maze/room.cpp
@@ -37,10 +37,10 @@ include_directories(../tools/serialization)
   endif()
 
   set(HEADERS
-    graph/graph.h
-    graph/pave.h
-    graph/face.h
-    graph/pave_node.h
+    smartSubPaving/smartSubPaving.h
+    smartSubPaving/pave.h
+    smartSubPaving/face.h
+    smartSubPaving/pave_node.h
 
     maze/maze.h
     maze/room.h

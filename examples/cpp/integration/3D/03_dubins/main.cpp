@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -28,10 +28,10 @@ int main(int argc, char *argv[])
     Interval v = Interval(0.1);
     Interval u = Interval(0.3);
 
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph, FULL_WALL);
+    invariant::Domain dom_outer(&paving, FULL_WALL);
 
     double x_c, y_c, theta_c, r;
     x_c = 0.0;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-//    invariant::Domain dom_inner(&graph, FULL_DOOR);
+//    invariant::Domain dom_inner(&paving, FULL_DOOR);
 
 //    SepFwdBwd s_inner(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
 //    dom_inner.set_sep(&s_inner);
@@ -71,15 +71,15 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_outer.contract();
     for(int i=0; i<25; i++){
-        graph.bisect();
-//        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+//        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
+        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vtk_Graph vtk_graph("dubins", &graph, true);
+    Vtk_Graph vtk_graph("dubins", &paving, true);
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze_outer, "outer");
 //    vtk_graph.show_maze(&maze_inner, "inner");

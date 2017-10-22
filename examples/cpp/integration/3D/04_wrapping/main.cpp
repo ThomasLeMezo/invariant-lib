@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
     space[1] = Interval(-1, 1);
     space[2] = Interval(-1, 1);
 
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph, FULL_WALL);
+    invariant::Domain dom_outer(&paving, FULL_WALL);
 
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
@@ -47,12 +47,12 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze.contract();
     for(int i=0; i<10; i++){
-        graph.bisect();
-        cout << i << " outer - " << maze.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " outer - " << maze.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    Vtk_Graph vtk_graph("wrapping", &graph, false);
+    Vtk_Graph vtk_graph("wrapping", &paving, false);
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze, "outer");
 

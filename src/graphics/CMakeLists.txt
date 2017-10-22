@@ -4,7 +4,7 @@
 
 # Sources
 
-include_directories(../invariant/graph)
+include_directories(../invariant/smartSubPaving)
 include_directories(../invariant/maze)
 include_directories(../invariant/definition)
 include_directories(vibes)

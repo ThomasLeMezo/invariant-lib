@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -23,12 +23,12 @@ int main(int argc, char *argv[])
     space[0] = Interval(-6,6);
     space[1] = Interval(-6,6);
 
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     double r = 1.0;
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph, FULL_DOOR);
+    invariant::Domain dom_outer(&paving, FULL_DOOR);
 
     Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&graph, FULL_WALL);
+    invariant::Domain dom_inner(&paving, FULL_WALL);
 
     Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, LEQ); // LT, LEQ, EQ, GEQ, GT
@@ -68,19 +68,19 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_inner.contract();
     for(int i=0; i<18; i++){
-        graph.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << graph.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
+        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("paving", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
-//    Vibes_Graph v_graph2("graph_2", &graph, &maze_inner);
+//    Vibes_Graph v_graph2("graph_2", &paving, &maze_inner);
 //    v_graph2.setProperties(0, 0, 1024, 1024);
 //    v_graph2.show();
 

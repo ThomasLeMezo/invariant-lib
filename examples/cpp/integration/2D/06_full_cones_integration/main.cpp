@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     space[0] = Interval(-1, 1);
     space[1] = Interval(-1, 1);
 
-    Graph graph(space);
+    SmartSubPaving paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&graph, FULL_WALL);
+    invariant::Domain dom_outer(&paving, FULL_WALL);
 
     double x1_0, x2_0, r;
     x1_0 = 0.0;
@@ -55,15 +55,15 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_outer.contract();
     for(int i=0; i<15; i++){
-        graph.bisect();
-        cout << i << " outer - " << maze_outer.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("graph", &graph, &maze_outer);
+    Vibes_Graph v_graph("paving", &paving, &maze_outer);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 

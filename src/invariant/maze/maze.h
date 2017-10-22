@@ -11,7 +11,7 @@
 
 namespace invariant {
 
-class Graph; // declared only for friendship
+class SmartSubPaving; // declared only for friendship
 class Domain; // declared only for friendship
 class Dynamics; // declared only for friendship
 class Room; // declared only for friendship
@@ -38,10 +38,10 @@ public:
     Domain * get_domain() const;
 
     /**
-     * @brief Getter to the Graph
+     * @brief Getter to the SmartSubPaving
      * @return
      */
-    Graph * get_graph() const;
+    SmartSubPaving * get_graph() const;
 
     /**
      * @brief Getter to the dynamics
@@ -86,7 +86,7 @@ public:
 
 private:
     invariant::Domain *    m_domain = NULL;
-    Graph  *    m_graph = NULL; // Graph associated with this maze
+    SmartSubPaving  *    m_graph = NULL; // SmartSubPaving associated with this maze
     Dynamics *  m_dynamics = NULL;
 
     std::deque<Room *> m_deque_rooms;
@@ -108,7 +108,7 @@ inline Dynamics * Maze::get_dynamics() const{
     return m_dynamics;
 }
 
-inline Graph * Maze::get_graph() const{
+inline SmartSubPaving * Maze::get_graph() const{
     return m_graph;
 }
 

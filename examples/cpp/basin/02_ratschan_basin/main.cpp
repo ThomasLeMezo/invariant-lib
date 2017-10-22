@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
     space[1] = Interval(-1,1);
 
     // ****** Domain ******* //
-    Graph graph(space);
-    invariant::Domain dom_outer(&graph, FULL_WALL);
+    SmartSubPaving paving(space);
+    invariant::Domain dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_outer.set_sep_output(&s_outer);
 
-    invariant::Domain dom_inner(&graph, FULL_DOOR);
+    invariant::Domain dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
@@ -64,22 +64,22 @@ int main(int argc, char *argv[])
     maze_outer.init();
     maze_inner.init();
     for(int i=0; i<15; i++){
-        graph.bisect();
-        cout << i << " - " << maze_outer.contract() << " - " << graph.size() << endl;
-        cout << i << " - " << maze_inner.contract() << " - " << graph.size() << endl;
+        paving.bisect();
+        cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
+        cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("graph", &graph, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("paving", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
     v_graph.drawCircle(x1_c, x2_c, r, "red[]");
 
-//    Vibes_Graph v_graph2("graph2", &graph, &maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
+//    Vibes_Graph v_graph2("graph2", &paving, &maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
 //    v_graph2.setProperties(0, 0, 512, 512);
 //    v_graph2.show();
 

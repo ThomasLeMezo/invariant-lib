@@ -5,7 +5,7 @@
 #include <ibex/ibex_Sep.h>
 #include <utility>
 
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "maze.h"
 #include "room.h"
 #include "pave_node.h"
@@ -17,7 +17,7 @@ enum DOMAIN_PROPAGATION_START{LINK_TO_INITIAL_CONDITION, NOT_LINK_TO_INITIAL_CON
 
 enum DOMAIN_INITIALIZATION{FULL_DOOR, FULL_WALL};
 
-class Graph; // declared only for friendship
+class SmartSubPaving; // declared only for friendship
 class Maze; // declared only for friendship
 class Pave_node; // declared only for friendship
 class Room; // declared only for friendship
@@ -27,10 +27,10 @@ class Domain
 public:
     /**
      * @brief Constructor of a domain
-     * @param graph
+     * @param paving
      * @param link : specify if the initial condition in the case of a propagation maze is always link to the yellow zone
      */
-    Domain(Graph* graph, DOMAIN_INITIALIZATION domain_init, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
+    Domain(SmartSubPaving* paving, DOMAIN_INITIALIZATION domain_init, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
 
     // *************** Intput & Output *********************
 
@@ -112,10 +112,10 @@ public:
     void contract_domain(Maze *maze, std::vector<Room *> &list_room_deque);
 
     /**
-     * @brief Return the graph associated with this domain
+     * @brief Return the paving associated with this domain
      * @return
      */
-    Graph* get_graph() const;
+    SmartSubPaving* get_graph() const;
 
     /**
      * @brief Set "in" to true if there are incoming paths on the border
@@ -164,7 +164,7 @@ private:
     void contract_border(Maze *maze, std::vector<Room*> &list_room_deque);
 
 private:
-    Graph * m_graph;
+    SmartSubPaving * m_graph;
 
     std::vector<std::pair<invariant::Maze*, bool>> m_remove_mazes_input, m_remove_mazes_output;
     ibex::Sep* m_sep_input = NULL;
@@ -225,7 +225,7 @@ inline void Domain::set_sep_output(ibex::Sep* sep){
     m_sep_output = sep;
 }
 
-inline Graph* Domain::get_graph() const{
+inline SmartSubPaving* Domain::get_graph() const{
     return m_graph;
 }
 

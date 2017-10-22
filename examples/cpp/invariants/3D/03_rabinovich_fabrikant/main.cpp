@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
     space[2] = Interval(-2, 3);
 
     // ****** Domain ******* //
-    Graph graph(space);
-    invariant::Domain dom(&graph, FULL_DOOR);
+    SmartSubPaving paving(space);
+    invariant::Domain dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -52,15 +52,15 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     for(int i=0; i<20; i++){
         cout << "-----" << i << "-----" << endl;
-        graph.bisect();
+        paving.bisect();
         cout << "nb contractions = " << maze.contract() << " - ";
-        cout << "graph size = " << graph.size() << endl;
+        cout << "paving size = " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vtk_Graph vtk_graph("rabinovich-fabrikant", &graph, true);
+    Vtk_Graph vtk_graph("rabinovich-fabrikant", &paving, true);
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 

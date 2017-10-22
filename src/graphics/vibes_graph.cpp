@@ -6,9 +6,9 @@ using namespace invariant;
 using namespace ibex;
 using namespace std;
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g): VibesFigure(figure_name){
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g): VibesFigure(figure_name){
     if(g->dim() != 2)
-        throw std::runtime_error("in [vibes_graph.cpp/Vibes_Graph()] dim of graph is not equal to 2");
+        throw std::runtime_error("in [vibes_graph.cpp/Vibes_Graph()] dim of paving is not equal to 2");
     m_graph = g;
     m_overhead_factor = 0.0; // 20%
 
@@ -18,7 +18,7 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g): VibesFigure(
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* maze, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, g){
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g, Maze* maze, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, g){
     if(type == VIBES_GRAPH_OUTER){
         m_maze_outer = maze;
         m_type = VIBES_GRAPH_OUTER;
@@ -29,7 +29,7 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* maze, V
     }
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Graph *g, Maze* outer, Maze* inner): Vibes_Graph(figure_name, g){
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g, Maze* outer, Maze* inner): Vibes_Graph(figure_name, g){
     m_maze_outer = outer;
     m_maze_inner = inner;
     m_type = VIBES_GRAPH_OUTER_AND_INNER;
@@ -341,7 +341,7 @@ void Vibes_Graph::drawCircle(double x_center, double y_center, double radius, st
 }
 
 namespace vibes{
-inline void drawGraph(const invariant::Graph &g, Params params){
+inline void drawGraph(const invariant::SmartSubPaving &g, Params params){
     vibes::drawPave(g.get_paves(), params);
     vibes::drawPave(g.get_paves_not_bisectable(), params);
 }

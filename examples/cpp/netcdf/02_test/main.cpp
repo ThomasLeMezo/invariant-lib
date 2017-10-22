@@ -34,13 +34,13 @@ int main(int argc, char *argv[])
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
 
     // ****** Domain *******
-    Graph graph(search_space);
-    invariant::Domain dom(&graph, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    SmartSubPaving paving(search_space);
+    invariant::Domain dom(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
-    graph.set_limit_bisection(limit_bisection);
+    paving.set_limit_bisection(limit_bisection);
 
     double t_c, x_c, y_c, r;
     t_c = 0 * grid_size[0];
@@ -64,15 +64,15 @@ int main(int argc, char *argv[])
     for(int i=0; i<iterations_max; i++){
         cout << i << "/" << iterations_max << endl;
         double time_start_bisection = omp_get_wtime();
-        graph.bisect();
-        cout << " => bisection : " << omp_get_wtime() - time_start_bisection << "s - " << graph.size() << endl;
+        paving.bisect();
+        cout << " => bisection : " << omp_get_wtime() - time_start_bisection << "s - " << paving.size() << endl;
         maze.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
-    Vtk_Graph vtk_graph("Previmer", &graph, false);
+    Vtk_Graph vtk_graph("Previmer", &paving, false);
 //    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 //    vector<Pave *> pave_list;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     position[0] = Interval(t_c, 2400); // 450, 900
     position[1] = Interval(x_c); // 37304, 37980
     position[2] = Interval(y_c); // 119766, 120469
-//    graph.get_room_info(&maze, position, pave_list);
+//    paving.get_room_info(&maze, position, pave_list);
 //    cout << pave_list.size() << endl;
     vtk_graph.show_room_info(&maze, position);
 

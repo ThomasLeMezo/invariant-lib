@@ -5,7 +5,7 @@
 #include "ibex/ibex_Function.h"
 #include "ibex/ibex_Sep.h"
 
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "maze.h"
 #include "sepmaze.h"
@@ -41,16 +41,16 @@ using namespace ibex;
        .export_values();
 
   // ********* Graphs *********
-  py::class_<Graph>(m, "Graph")
+  py::class_<SmartSubPaving>(m, "SmartSubPaving")
           .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
-          .def("bisect", &Graph::bisect)
-          .def("size", &Graph::size)
+          .def("bisect", &SmartSubPaving::bisect)
+          .def("size", &SmartSubPaving::size)
   ;  
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
-          .def(py::init<invariant::Graph*, invariant::DOMAIN_INITIALIZATION, invariant::DOMAIN_PROPAGATION_START>(),
-               "graph"_a,
+          .def(py::init<invariant::SmartSubPaving*, invariant::DOMAIN_INITIALIZATION, invariant::DOMAIN_PROPAGATION_START>(),
+               "paving"_a,
                "DOMAIN_INITIALIZATION"_a,
                "DOMAIN_PROPAGATION_START"_a = invariant::NOT_LINK_TO_INITIAL_CONDITION)
           .def("set_border_path_in", &invariant::Domain::set_border_path_in)
@@ -101,19 +101,19 @@ using namespace ibex;
 
   py::class_<Vibes_Graph>(m, "VibesGraph")
           .def(py::init<const std::string&,
-               invariant::Graph*,
+               invariant::SmartSubPaving*,
                invariant::Maze*,
                Vibes_Graph::VIBES_GRAPH_TYPE>(),
                "name"_a,
-               "graph"_a,
+               "paving"_a,
                "maze"_a,
                "VIBES_GRAPH_TYPE"_a = Vibes_Graph::VIBES_GRAPH_OUTER)
           .def(py::init<const std::string&,
-               invariant::Graph*,
+               invariant::SmartSubPaving*,
                invariant::Maze*,
                invariant::Maze*>(),
                "name"_a,
-               "graph"_a,
+               "paving"_a,
                "maze_outer"_a,
                "maze_inner"_a)
           .def("setProperties", &Vibes_Graph::setProperties)

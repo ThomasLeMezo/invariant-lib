@@ -1,5 +1,5 @@
 #include "ibex/ibex_SepFwdBwd.h"
-#include "graph.h"
+#include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
     space[1] = Interval(-4,4);
 
     // ****** Domain ******* //
-    Graph graph(space);
-    invariant::Domain dom(&graph, FULL_DOOR);
+    SmartSubPaving paving(space);
+    invariant::Domain dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -41,16 +41,16 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){
-        graph.bisect();
+        paving.bisect();
         cout << i << " - " << maze.contract() << " - ";
-        cout << graph.size() << endl;
+        cout << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << graph << endl;
+    cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("graph", &graph, &maze);
+    Vibes_Graph v_graph("paving", &paving, &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 
