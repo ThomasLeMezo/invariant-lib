@@ -74,9 +74,10 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("paving", &paving, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("SmartSubPaving", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
+        v_graph.drawCircle(1.0, 1.0, 1, "black[red]");
 
     //    IntervalVector position_info(2);
     //    position_info[0] = Interval(-2);

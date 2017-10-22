@@ -123,7 +123,7 @@ int Maze::contract(){
                         }
 
                         /// DEBUG
-                        //                        Vibes_Graph v_graph("paving", m_graph, this);
+                        //                        Vibes_Graph v_graph("SmartSubPaving", m_graph, this);
                         //                        v_graph.setProperties(0, 0, 512, 512);
                         //                        v_graph.show();
                         //                        v_graph.show_room_info(this, test);

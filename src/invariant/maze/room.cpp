@@ -578,6 +578,8 @@ bool Room::contract_continuity(){
     /// In the case of sliding mode (only in case of contraction),
     /// a change on the door of an adjacent room which is not on
     /// the boundary can permit contraction (change in the hull)
+    /// ie force to proceed to consistency contraction (because
+    /// a change may have appended in a distant border).
     if(m_contain_zero_coordinate && m_maze->get_domain()->get_init() == FULL_DOOR)
         change = true;
     return change;
