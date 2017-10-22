@@ -16,7 +16,7 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
     // Eval Vector field
     for(IntervalVector &vector_field:vector_field_list){
         // Test if 0 is inside the vector_field IV
-        IntervalVector zero(m_maze->get_graph()->dim(), Interval::ZERO);
+        IntervalVector zero(m_pave->get_dim(), Interval::ZERO);
         if((zero.is_subset(vector_field))){
             m_vector_field_zero.push_back(true);
             m_contain_zero = true;
@@ -49,11 +49,13 @@ Room::Room(Pave *p, Maze *m, Dynamics *dynamics)
 
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);
+    omp_init_lock(&m_lock_vector_field);
 }
 
 Room::~Room(){
     omp_destroy_lock(&m_lock_contraction);
     omp_destroy_lock(&m_lock_deque);
+    omp_destroy_lock(&m_lock_vector_field);
 }
 
 void Room::set_empty_private_output(){
@@ -179,7 +181,7 @@ void Room::eval_vector_field_possibility(){
             // Note : synchronization will be proceed at the end of all contractors
             // to avoid unecessary lock
 
-            for(const IntervalVector&v:m_vector_fields){
+            for(const IntervalVector&v:get_vector_fields()){
                 IntervalVector product = hadamard_product(v, f->get_normal());
                 vector<bool> where_zeros;
 
@@ -204,7 +206,7 @@ void Room:: contract_consistency(){
     const int dim = m_pave->get_dim();
 
     IntervalVector empty = IntervalVector(dim, Interval::EMPTY_SET);
-    for(IntervalVector &vec_field:m_vector_fields){
+    for(IntervalVector &vec_field:get_vector_fields()){
         if(vec_field == empty)
             return;
     }
@@ -225,7 +227,7 @@ void Room:: contract_consistency(){
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
 
     vector<vector< array<IntervalVector, 2>>> out_results; // One per vec_field, dim, sens
-    const int nb_vec = m_vector_fields.size();
+    const int nb_vec = m_pave->get_dim();
 
     for(int vf=0; vf<nb_vec; vf++){
         std::vector< std::array<IntervalVector, 2>> out_result;
@@ -239,10 +241,10 @@ void Room:: contract_consistency(){
     bool global_compute = false;
     int n_vf = 0;
 
-    for(IntervalVector &vec_field:m_vector_fields){
+    for(IntervalVector &vec_field:get_vector_fields()){
         bool compute = true;
         if(m_vector_field_zero[n_vf]){
-            if(domain_init == FULL_WALL && m_vector_fields.size()==1){
+            if(domain_init == FULL_WALL && get_vector_fields().size()==1){
                 this->set_full_possible();
                 compute = false;
             }
@@ -403,7 +405,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
 
     Face* f_in = m_pave->get_faces()[face_in][sens_in];
     Door* door_in = f_in->get_doors()[m_maze];
-    int dim = get_pave()->get_dim();
+    int dim = m_pave->get_dim();
     in_return = IntervalVector(dim, Interval::EMPTY_SET);
     out_return = IntervalVector(dim, Interval::EMPTY_SET);
 
@@ -735,7 +737,7 @@ bool Room::request_bisection(){
 std::ostream& operator<< (std::ostream& stream, const Room& r) {
     stream << "Room = " << r.get_pave()->get_position() << " - " << r.get_pave()->get_faces_vector().size() << " faces";
     stream << ", vector field = ";
-    for(const IntervalVector &v:r.get_vector_fields()){
+    for(IntervalVector &v:r.get_vector_fields()){
         stream << v << " ";
     }
     stream << endl;
@@ -770,10 +772,6 @@ void Room::synchronize(){
 //    }
 //    return false;
 //}
-
-const ibex::IntervalVector Room::get_one_vector_fields(int n_vf) const{
-    return m_vector_fields[n_vf];
-}
 
 const bool Room::get_one_vector_fields_zero(int n_vf) const{
     return m_vector_field_zero[n_vf];

@@ -144,13 +144,13 @@ public:
      * @brief Getter to the vector fields
      * @return
      */
-    const std::vector<ibex::IntervalVector>& get_vector_fields() const;
+    std::vector<ibex::IntervalVector> get_vector_fields() const;
 
     /**
      * @brief Getter to one of the the vector fields
      * @return
      */
-    const ibex::IntervalVector get_one_vector_fields(int n_vf) const;
+    const ibex::IntervalVector get_one_vector_fields(int n_vf);
 
     /**
      * @brief Getter to one of the the vector fields zero evaluation
@@ -292,6 +292,7 @@ protected:
     bool    m_first_contract = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
     omp_lock_t   m_lock_deque; // Lock in_deque variable access
+    omp_lock_t   m_lock_vector_field; // Lock m_vector_fields variable access
 
     bool    m_in_deque = false;
     bool    m_removed = false;
@@ -336,7 +337,7 @@ inline void Room::reset_deque(){
     omp_unset_lock(&m_lock_deque);
 }
 
-inline const std::vector<ibex::IntervalVector>& Room::get_vector_fields() const{
+inline std::vector<ibex::IntervalVector> Room::get_vector_fields() const{
     return m_vector_fields;
 }
 
@@ -366,6 +367,14 @@ inline bool Room::get_contain_zero_coordinate() const{
 
 inline bool Room::get_contain_zero() const{
     return m_contain_zero;
+}
+
+inline const ibex::IntervalVector Room::get_one_vector_fields(int n_vf){
+//    omp_set_lock(&m_lock_vector_field);
+//    ibex::IntervalVector vec(m_vector_fields[n_vf]);
+//    omp_unset_lock(&m_lock_vector_field);
+//    return vec;
+    return m_vector_fields[n_vf];
 }
 
 }
