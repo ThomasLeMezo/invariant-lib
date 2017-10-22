@@ -54,11 +54,11 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics Outer & Inner ******* //
     ibex::Function f_outer(x1, x2, Return(x2,
-                                    -x1-10.0*x2));
+                                    -x1-0.5*x2));
     Dynamics_Function dyn_outer(&f_outer, FWD);
 
     ibex::Function f_inner(x1, x2, Return(-x2,
-                                    -(-x1-10.0*x2)));
+                                    -(-x1-0.5*x2)));
     Dynamics_Function dyn_inner(&f_inner, BWD);
 
     // ******* Mazes ********* //
@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
     Vibes_Graph v_graph("paving", &paving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
+    v_graph.drawCircle(-2, 4, 0.3, "balck[red]");
 
 //    Vibes_Graph v_graph_inner("inner", &paving, &maze_inner);
 //    v_graph_inner.setProperties(0, 0, 1024, 1024);
