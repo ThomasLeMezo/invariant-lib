@@ -460,6 +460,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
         bool local_pave = false;
         if(pave_adj->get_position() == m_pave->get_position())
             local_pave = true;
+        IntervalVector vec_field_local(pave_adj->get_rooms()[m_maze]->get_one_vector_fields(n_vf));
 
         for(int face_out_adj=0; face_out_adj<dim; face_out_adj++){
             for(int sens_out_adj = 0; sens_out_adj < 2; sens_out_adj ++){
@@ -527,7 +528,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 out_tmp_IN.set_empty();
 
                             if(!out_tmp_IN.is_empty()){
-                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field_global);
+//                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field_global);
+                                contract_flow(in_tmp_IN, out_tmp_IN, vec_field_local);
                                 in_return |= in_tmp_IN ;
                             }
                         }
@@ -545,7 +547,8 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
                                 in_tmp_OUT.set_empty();
 
                             if(!in_tmp_OUT.is_empty()){
-                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_global);
+//                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_global);
+                                contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_local);
                                 out_return |= out_tmp_OUT;
                             }
                         }
@@ -624,13 +627,13 @@ bool Room::contract(){
             eval_vector_field_possibility();
             m_first_contract = false;
         }
-        //        get_private_doors_info("before");
+//        get_private_doors_info("before");
         change |= contract_continuity();
-        //        get_private_doors_info("continuity");
+//        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
-            //            get_private_doors_info("consistency");
+//            get_private_doors_info("consistency");
         }
     }
     return change;
@@ -641,8 +644,8 @@ bool Room::get_private_doors_info(string message, bool cout_message){
         return false;
     IntervalVector position(2);
     //
-    position[0] = Interval(-0.84375, -0.796875);
-    position[1] = Interval(-1.355859375, -1.33203125);
+    position[0] = Interval(-0.0625, 0.03125);
+    position[1] = Interval(0.125, 0.1875);
     //    IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);

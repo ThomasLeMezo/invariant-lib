@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
+    maze.init();
     for(int i=0; i<20; i++){
         cout << "-----" << i << "-----" << endl;
         paving.bisect();

@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
     space[1] = Interval(-1,1);
 
     // ****** Domain ******* //
-    SmartSubPaving paving(space);
-    invariant::Domain dom_outer(&paving, FULL_WALL);
+    SmartSubPaving subPaving(space);
+    invariant::Domain dom_outer(&subPaving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_outer.set_sep_output(&s_outer);
 
-    invariant::Domain dom_inner(&paving, FULL_DOOR);
+    invariant::Domain dom_inner(&subPaving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
@@ -64,29 +64,33 @@ int main(int argc, char *argv[])
     maze_outer.init();
     maze_inner.init();
     for(int i=0; i<15; i++){
-        paving.bisect();
-        cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
-        cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
+        subPaving.bisect();
+        cout << i << " - " << maze_outer.contract() << " - " << subPaving.size() << endl;
+        cout << i << " - " << maze_inner.contract() << " - " << subPaving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << paving << endl;
+    cout << subPaving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("SmartSubPaving", &paving, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("SmartSubPaving", &subPaving, &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
-
     v_graph.drawCircle(x1_c, x2_c, r, "red[]");
 
-//    Vibes_Graph v_graph2("graph2", &paving, &maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
+//    Vibes_Graph v_graph2("graph2", &subPaving, &maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
 //    v_graph2.setProperties(0, 0, 512, 512);
 //    v_graph2.show();
 
+
+//    Vibes_Graph v_graph_inner("SmartSubPaving inner", &subPaving, &maze_inner);
+//    v_graph_inner.setProperties(0, 0, 512, 512);
+//    v_graph_inner.show();
+
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2.79);
-//    position_info[1] = Interval(2.11);
-//    v_graph.get_room_info(&maze_inner, position_info);
+//    position_info[0] = Interval(-0.1, 0.0);
+//    position_info[1] = Interval(0.16);
+//    v_graph_inner.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 
