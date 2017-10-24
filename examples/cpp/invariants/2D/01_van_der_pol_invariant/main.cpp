@@ -40,7 +40,8 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+//    maze.init();
+    for(int i=0; i<12; i++){
         paving.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << paving.size() << endl;
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     Vibes_Graph v_graph("SmartSubPaving", &paving, &maze);
-    v_graph.setProperties(0, 0, 512, 512);
+    v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
 //    IntervalVector position_info(2);

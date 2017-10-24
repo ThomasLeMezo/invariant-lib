@@ -53,9 +53,11 @@ int main(int argc, char *argv[])
     Interval a = Interval(10.0);
     ibex::Function f(t, x, Return(Interval(1.0),
                                     -a*x+(-1+a)*sin(t)+(1+a)*cos(t)));
+    ibex::Function f2(t, x, -Return(Interval(1.0),
+                                    -a*x+(-1+a)*sin(t)+(1+a)*cos(t)));
 
     Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn_inner(&f2, BWD);
 
     // ******* Mazes ********* //
     Maze maze_outer(&dom_outer, &dyn_outer);

@@ -60,8 +60,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics Outer & Inner ******* //
     ibex::Function f(x1, x2, Return(Interval(1.0),
                                     -sin(x2)));
+    ibex::Function f2(x1, x2, -Return(Interval(1.0),
+                                    -sin(x2)));
     Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn_inner(&f2, BWD);
 
     // ******* Mazes ********* //
     Maze maze_outer(&dom_outer, &dyn_outer);
