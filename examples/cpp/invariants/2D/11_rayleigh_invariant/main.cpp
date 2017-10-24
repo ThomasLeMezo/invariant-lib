@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-4,4);
-    space[1] = Interval(-4,4);
+    space[0] = Interval(-2,2);
+    space[1] = Interval(-2,2);
 
     // ****** Domain ******* //
     SmartSubPaving paving(space);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     Vibes_Graph v_graph("SmartSubPaving", &paving, &maze);
-    v_graph.setProperties(0, 0, 512, 512);
+    v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
 //    IntervalVector position_info(2);

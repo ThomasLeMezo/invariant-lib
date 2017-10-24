@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_DOOR);
+    invariant::Domain dom(&paving, FULL_WALL);
 
     dom.set_border_path_in(true);
     dom.set_border_path_out(true);
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     Vibes_Graph v_graph("SmartSubPaving", &paving, &maze);
-    v_graph.setProperties(0, 0, 512, 512);
+    v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
     vibes::endDrawing();
 

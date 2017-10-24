@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = Interval(-3,3);
+    space[1] = Interval(-3,3);
 
     // ****** Domain ******* //
     SmartSubPaving paving(space);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, FWD);
+    Dynamics_Function dyn(&f, BWD);
 
     // ******* Maze ********* //
     Maze maze(&dom, &dyn);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     Vibes_Graph v_graph("SmartSubPaving", &paving, &maze);
-    v_graph.setProperties(0, 0, 512, 512);
+    v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
     vibes::endDrawing();
 }
