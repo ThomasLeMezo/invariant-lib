@@ -227,7 +227,7 @@ void Room:: contract_consistency(){
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
 
     vector<vector< array<IntervalVector, 2>>> out_results; // One per vec_field, dim, sens
-    const int nb_vec = m_pave->get_dim();
+    const int nb_vec = m_vector_fields.size();;
 
     for(int vf=0; vf<nb_vec; vf++){
         std::vector< std::array<IntervalVector, 2>> out_result;
