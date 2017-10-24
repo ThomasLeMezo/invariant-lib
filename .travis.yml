@@ -67,6 +67,7 @@ before_install:
         pip install --user --upgrade pip auditwheel twine;
       fi
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    export CXX=g++ CC=gcc;
     if [ "$PY" = "3" ]; then
       brew install python$PY;
     else
