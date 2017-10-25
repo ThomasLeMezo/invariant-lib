@@ -67,14 +67,14 @@ before_install:
         pip install --user --upgrade pip auditwheel twine;
       fi
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    export CXX=g++ CC=gcc;
     if [ "$PY" = "3" ]; then
       brew install python$PY;
     else
       curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
       sudo -H python get-pip.py;
     fi
-    brew install gcc48
+    brew install gcc48;
+    export CXX=g++-4.8 CC=gcc-4.8;
     pip$PY install --user --upgrade pip virtualenv;
   fi
 install:
