@@ -1,34 +1,31 @@
-from pyibex import *
 from pyinvariant import *
 
 # Define the search space
 space = IntervalVector([[-3, 3],[-3,3]])
 
 # Create the grpah structure
-graph = Graph(space)
+subPaving = SmartSubPaving(space)
 
 # Create the Domain
-dom = Domain(graph)
-
+dom = Domain(subPaving, FULL_DOOR)
 dom.set_border_path_in(False)
 dom.set_border_path_out(False)
 
 # Create the Dynamics
 f = Function("x[2]", "(x[1],(1.0*(1.0-x[0]^2))*x[1]-x[0])")
-dyn = DynamicsFunction(f)
+dyn = DynamicsFunction(f, FWD_BWD)
 
 # Create the Maze associated with the Domain and the dynamics
-maze = Maze(dom, dyn, MAZE_FWD_BWD, MAZE_DOOR)
+maze = Maze(dom, dyn)
 
 # Contract the system
-for i in range(12):
+maze.init()
+for i in range(1):
 	print(i)
-	graph.bisect()
+	subPaving.bisect()
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("graph", graph, maze)
+visu = VibesGraph("Van Der Pol Invariant", subPaving, maze)
 visu.setProperties(0,0,512,512)
 visu.show()
-
-

@@ -26,7 +26,7 @@ using namespace ibex;
    // ********* ENUM *********
    py::enum_<invariant::DOMAIN_INITIALIZATION>(m, "DOMAIN_INITIALIZATION")
        .value("FULL_WALL", invariant::DOMAIN_INITIALIZATION::FULL_WALL)
-       .value("FULL_DOOR", invariant::DOMAIN_INITIALIZATION::FULL_WALL)
+       .value("FULL_DOOR", invariant::DOMAIN_INITIALIZATION::FULL_DOOR)
        .export_values();
 
    py::enum_<invariant::DYNAMICS_SENS>(m, "DYNAMICS_SENS")
