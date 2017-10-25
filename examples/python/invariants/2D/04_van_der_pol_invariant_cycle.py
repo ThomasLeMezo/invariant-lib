@@ -1,37 +1,35 @@
-from pyibex import *
 from pyinvariant import *
 
 # Define the search space
 space = IntervalVector([[-3, 3],[-3,3]])
 
 # Create the grpah structure
-graph = Graph(space)
+smartSubPaving = SmartSubPaving(space)
 
 # Create the Domain
-dom = Domain(graph)
-
-dom.set_border_path_in(True)
+dom = Domain(smartSubPaving, FULL_DOOR)
+dom.set_border_path_in(False)
 dom.set_border_path_out(False)
 
 f_sep = Function("x[2]", "(x[0])^2+(x[1])^2-(1.0)^2")
 s = SepFwdBwd(f_sep, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom.set_sep(s);
+dom.set_sep(s); # Reduce the domain with a separator
 
 # Create the Dynamics
 f = Function("x[2]", "(x[1],(1.0*(1.0-x[0]^2))*x[1]-x[0])")
-dyn = DynamicsFunction(f)
+dyn = DynamicsFunction(f, FWD_BWD)
 
 # Create the Maze associated with the Domain and the dynamics
-maze = Maze(dom, dyn, MAZE_FWD_BWD, MAZE_DOOR)
+maze = Maze(dom, dyn)
 
 # Contract the system
 for i in range(15):
 	print(i)
-	graph.bisect()
+	smartSubPaving.bisect()
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("graph", graph, maze)
+visu = VibesGraph("smartSubPaving", smartSubPaving, maze)
 visu.setProperties(0,0,512,512)
 visu.show()
 

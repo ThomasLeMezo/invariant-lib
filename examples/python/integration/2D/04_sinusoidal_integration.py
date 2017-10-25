@@ -1,7 +1,7 @@
 from pyinvariant import *
 
 # Define the search space
-space = IntervalVector([[-6.0, 6.0],[-6.0,6.0]])
+space = IntervalVector([[0,6],[-3,3]])
 
 # Create the grpah structure
 smartSubPaving = SmartSubPaving(space)
@@ -10,22 +10,26 @@ smartSubPaving = SmartSubPaving(space)
 dom_outer = Domain(smartSubPaving, FULL_WALL)
 dom_outer.set_border_path_in(False)
 dom_outer.set_border_path_out(False)
-f_sep_outer = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
-s_outer = SepFwdBwd(f_sep_outer, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom_outer.set_sep_output(s_outer);
+f_sep1 = Function("x[2]", "x[0]-0.5")
+f_sep2 = Function("x[2]", "x[1]^2-(2)^2")
+s_outer1 = SepFwdBwd(f_sep1, LT) # possible options : LT, LEQ, EQ, GEQ, GT
+s_outer2 = SepFwdBwd(f_sep2, LT) # possible options : LT, LEQ, EQ, GEQ, GT
+s_outer_inter = SepInter([s_outer1, s_outer2])
+dom_outer.set_sep_output(s_outer_inter);
 
 dom_inner = Domain(smartSubPaving, FULL_DOOR)
 dom_inner.set_border_path_in(True)
 dom_inner.set_border_path_out(True)
-f_sep_inner = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
-s_inner = SepFwdBwd(f_sep_inner, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
-dom_inner.set_sep_input(s_inner);
+s_inner1 = SepFwdBwd(f_sep1, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
+s_inner2 = SepFwdBwd(f_sep2, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
+s_inner_union = SepUnion([s_inner1, s_inner2])
+dom_inner.set_sep_output(s_inner_union);
 
 # Create the Dynamics
-f_outer = Function("x[2]", "-(x[1], -0.5*x[1]-sin(x[0]+0.412)+sin(0.412))")
+f_outer = Function("x[2]", "(1,-sin(x[1]))")
 dyn_outer = DynamicsFunction(f_outer, FWD)
 
-f_inner = Function("x[2]", "(x[1], -0.5*x[1]-sin(x[0]+0.412)+sin(0.412))")
+f_inner = Function("x[2]", "-(1,-sin(x[1]))")
 dyn_inner = DynamicsFunction(f_inner, BWD)
 
 # Create the two Maze associated with the Domain and the dynamics
@@ -42,7 +46,7 @@ for i in range(15):
 	maze_inner.contract()
 
 # Visualization
-visu = VibesGraph("Synchronous generator Basin of Capture", smartSubPaving, maze_outer, maze_inner)
+visu = VibesGraph("Sinusoidal Intergation", smartSubPaving, maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-visu.drawCircle(0.0, 0.0, 0.4, "black[red]");
+# visu.drawBox(0, 1, -2, 2, "black[red]")
