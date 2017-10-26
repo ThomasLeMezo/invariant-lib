@@ -115,7 +115,7 @@ int Maze::contract(){
                             r->analyze_change(rooms_to_update);
 
                             // Synchronize
-                            r->synchronize_doors();
+                            r->synchronize();
 
                             if(m_domain->get_init() == FULL_DOOR && r->is_empty())
                                 r->set_removed();

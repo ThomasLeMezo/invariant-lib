@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     Function f_sep_outer_x1(x1, x2, x1-x1_max);
     Function f_sep_outer_x2(x1, x2, pow(x2, 2)-pow(x2_norm, 2));
 
-    SepFwdBwd s_outer_x1(f_sep_outer_x1, LT); // LT, LEQ, EQ, GEQ, GT
-    SepFwdBwd s_outer_x2(f_sep_outer_x2, LT); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s_outer_x1(f_sep_outer_x1, LEQ); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s_outer_x2(f_sep_outer_x2, LEQ); // LT, LEQ, EQ, GEQ, GT
     SepInter s_outer(s_outer_x1, s_outer_x2);
 
     dom_outer.set_sep_input(&s_outer);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
-    vibes::drawBox(Interval(0, 0.5), Interval(-2, 2), "black[red]");
+    vibes::drawBox(Interval(0, 0.5), Interval(-2, 2), "red[]");
 
 //    v_maze.drawCircle(0.0, 0.0, 2, "balck[red]");
     //    IntervalVector position_info(2);

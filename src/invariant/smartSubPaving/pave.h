@@ -188,6 +188,14 @@ public:
      */
     void set_removed_rooms();
 
+    /**
+     * @brief Get the dimension of the result of the intersection of a box
+     * and the boundary of the pave
+     * @param box
+     * @return
+     */
+    int get_dim_inter_boundary(const ibex::IntervalVector &box);
+
 private:
 
     /** Class Variable **/

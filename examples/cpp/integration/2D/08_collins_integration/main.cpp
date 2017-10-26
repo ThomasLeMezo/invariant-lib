@@ -6,6 +6,7 @@
 
 #include "ibex/ibex_SepFwdBwd.h"
 #include "ibex/ibex_SepUnion.h"
+#include "ibex/ibex_SepInter.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -54,7 +55,10 @@ int main(int argc, char *argv[])
 
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom_inner.set_sep(&s_inner);
+    Function f_sep_inner_bis(x1, x2, pow(x1-1, 2)+pow(x2+3, 2)-pow(0.1, 2));
+    SepFwdBwd s_inner_bis(f_sep_inner_bis, GEQ); // LT, LEQ, EQ, GEQ, GT)
+    SepInter sep_i(s_inner, s_inner_bis);
+    dom_inner.set_sep(&sep_i);
 
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
@@ -85,8 +89,8 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
-    v_maze.drawCircle(1, -3, 0.1, "black[red]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red[]");
+    v_maze.drawCircle(1, -3, 0.1, "red[]");
     v_maze.drawCircle(0.0, 1.0, 9.0/100.0, "black[green]");
 
     //    IntervalVector position_info(2);

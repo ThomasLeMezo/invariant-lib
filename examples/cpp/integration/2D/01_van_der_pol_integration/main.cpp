@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     x2_c = 2.0;
     r = 0.3;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
+    SepFwdBwd s(f_sep, LT); // LT, LEQ, EQ, GEQ, GT)
     dom.set_sep(&s);
 
     // ****** Dynamics *******
@@ -61,11 +61,19 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze);
     v_maze.setProperties(0, 0, 512, 512);
     v_maze.show();
-    vibes::endDrawing();
+    v_maze.drawCircle(3, 2, 0.3, "red[]");
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-2);
-    position_info[1] = Interval(4);
-    v_maze.get_room_info(&maze, position_info);
+    position_info[0] = Interval(2.7);
+    position_info[1] = Interval(2.12);
+    v_maze.show_room_info(&maze, position_info);
+
+    IntervalVector pave_in(2);
+    pave_in[0] = Interval(2.67188, 2.71875);
+    pave_in[1] = Interval(2.0625, 2.15625);
+    IntervalVector pave_out(pave_in);
+    s.separate(pave_in, pave_out);
+    cout << "pave_in = " << pave_in << " pave_out = " << pave_out << endl;
+    vibes::drawBox(pave_out, "black[]");
 
 }

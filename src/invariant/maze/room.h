@@ -99,11 +99,6 @@ public:
     void set_in_queue();
 
     /**
-     * @brief Synchronize all the private doors to the public one
-     */
-    void synchronize_doors();
-
-    /**
      * @brief Return a list of neighbor Rooms that need an update according after contraction
      * @param list_rooms
      */
@@ -232,6 +227,12 @@ public:
      */
     friend Room& operator|=(Room& r1, const Room& r2);
 
+    /**
+     * @brief Contract doors according to a virtual door inside the room
+     * @param box
+     * @param output
+     */
+    void contract_box(ibex::IntervalVector& virtual_door, ibex::Sep *sep_output);
 
 protected:
     /**

@@ -287,4 +287,12 @@ void Pave::get_neighbors_room(Maze *maze, std::vector<Room*>& room_list){
     }
 }
 
+int Pave::get_dim_inter_boundary(const ibex::IntervalVector &box){
+    IntervalVector intersection(get_dim(), Interval::EMPTY_SET);
+    for(Face *f:m_faces_vector){
+        intersection |= (box & f->get_position());
+    }
+    return m_dim-get_nb_dim_flat(intersection);
+}
+
 }

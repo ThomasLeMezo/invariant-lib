@@ -155,7 +155,7 @@ public:
      * @brief Get the initialization condition on Room (Full door or Full wall)
      * @return
      */
-    DOMAIN_INITIALIZATION get_init() const;
+    invariant::DOMAIN_INITIALIZATION get_init() const;
 
 private:
     /**
@@ -203,7 +203,7 @@ private:
 
 namespace invariant{
 
-inline DOMAIN_INITIALIZATION Domain::get_init() const{
+inline invariant::DOMAIN_INITIALIZATION Domain::get_init() const{
     return m_domain_init;
 }
 

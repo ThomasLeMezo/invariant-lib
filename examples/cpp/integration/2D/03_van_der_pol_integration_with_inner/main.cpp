@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
                                         (1.0*(1.0-pow(x1, 2))*x2-x1)));
 //    ibex::Function f(x1, x2, Return(x2,
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
-    ibex::Function f_inner(x1, x2, Return(-x2,
-                                        -(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    ibex::Function f_inner(x1, x2, -Return(x2,
+                                        (1.0*(1.0-pow(x1, 2))*x2-x1)));
     Dynamics_Function dyn_outer(&f_outer, FWD);
     Dynamics_Function dyn_inner(&f_inner, BWD);
 
@@ -82,13 +82,22 @@ int main(int argc, char *argv[])
 //    VibesMaze v_maze("SmartSubPaving", &maze_inner);
     v_maze.setProperties(0, 0, 1048, 1048);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "balck[red]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red[]");
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-1.2, -1.16);
-    position_info[1] = Interval(3.62);
+    position_info[0] = Interval(-2.28);
+    position_info[1] = Interval(3.89);
 //    v_maze.get_room_info(&maze_inner, position_info);
 //    v_maze.show_room_info(&maze_inner, position_info);
+
+//    IntervalVector pave_in(2);
+//    pave_in[0] = Interval(-2.375, -1.78125);
+//    pave_in[1] = Interval(3.625, 4.8125);
+//    IntervalVector pave_out(pave_in);
+//    vibes::drawBox(pave_out, "black[]");
+//    s_inner.separate(pave_in, pave_out);
+//    cout << "pave_in = " << pave_in << " pave_out = " << pave_out << endl;
+//    vibes::drawBox(pave_in, "green[]");
 
     vibes::endDrawing();
 

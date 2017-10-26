@@ -639,13 +639,13 @@ bool Room::contract(){
             eval_vector_field_possibility();
             m_first_contract = false;
         }
-//        get_private_doors_info("before");
+        //        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        //        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
-//            get_private_doors_info("consistency");
+            //            get_private_doors_info("consistency");
         }
     }
     return change;
@@ -687,10 +687,10 @@ bool Room::get_private_doors_info(string message, bool cout_message){
     return false;
 }
 
-void Room::synchronize_doors(){
-    for(Face* f:m_pave->get_faces_vector()){
-        Door *r = f->get_doors()[m_maze];
-        r->synchronize();
+void Room::synchronize(){
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d = f->get_doors()[m_maze];
+        d->synchronize();
     }
 }
 
@@ -769,12 +769,7 @@ std::ostream& operator<< (std::ostream& stream, const Room& r) {
     return stream;
 }
 
-void Room::synchronize(){
-    for(Face *f:m_pave->get_faces_vector()){
-        Door *d = f->get_doors()[m_maze];
-        d->synchronize();
-    }
-}
+
 
 //bool Room::is_degenerated(const IntervalVector& iv){
 //    int compt = 0;
@@ -852,6 +847,50 @@ Room& operator|=(Room& r1, const Room& r2){
         *d1 |= *d2;
     }
     return r1;
+}
+
+void Room::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep_output){
+    IntervalVector in(m_pave->get_dim()), out(m_pave->get_dim());
+    IntervalVector v_door(virtual_door_out & m_pave->get_position());
+    DYNAMICS_SENS sens = m_maze->get_dynamics()->get_sens();
+    DOMAIN_INITIALIZATION init = m_maze->get_domain()->get_init();
+
+    for(Face *f:m_pave->get_faces_vector()){
+        Door *d_out = f->get_doors()[m_maze];
+
+        // IN -> OUTPUT
+        if(init!=FULL_DOOR){
+            d_out->set_output_private(IntervalVector::empty(m_pave->get_dim()));
+            d_out->set_input_private(IntervalVector::empty(m_pave->get_dim()));
+            for(IntervalVector vect:m_vector_fields){
+                in = v_door;
+                out = f->get_position();
+                if(sens != FWD_BWD){
+                    contract_flow(in, out, ((sens==FWD)?1:-1)*vect);
+                    out &= f->get_position();
+                    d_out->set_output_private(d_out->get_output_private() | out);
+                    d_out->set_input_private(d_out->get_input_private() | out);
+                }
+                else{
+                    IntervalVector out2(out);
+                    contract_flow(in, out, vect);
+                    in = v_door;
+                    contract_flow(in, out2, -vect);
+                    out &= f->get_position();
+                    out2 &= f->get_position();
+                    d_out->set_output_private(d_out->get_output_private() | out | out2);
+                    d_out->set_input_private(d_out->get_input_private() | out | out2);
+                }
+            }
+        }
+        else{
+            IntervalVector x_in(f->get_position()), x_out(f->get_position());
+            sep_output->separate(x_in, x_out);
+            d_out->set_output_private(x_out);
+            d_out->set_input_private(x_out);
+        }
+    }
+    synchronize();
 }
 
 }
