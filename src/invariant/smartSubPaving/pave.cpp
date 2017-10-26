@@ -227,12 +227,26 @@ void Pave::bisect(){
 }
 
 const bool Pave::request_bisection(){
-    bool request = true;
+    bool request_wall = false;
+    bool one_wall = false;
+
+    bool request_door = false;
+    bool one_door = false;
+
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room *r = it->second;
-        request &= r->request_bisection();
+        Maze *maze = it->first;
+        if(maze->get_domain()->get_init()==FULL_WALL){
+            request_wall |= r->request_bisection();
+            one_wall = true;
+        }
+        else{
+            request_door |= r->request_bisection();
+            one_door = true;
+        }
     }
-    return request;
+
+    return (!one_wall | request_wall) & (!one_door | request_door);
 }
 
 void Pave::set_removed_rooms(){

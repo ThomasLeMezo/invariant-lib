@@ -36,6 +36,7 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
     contract_border(maze, list_room_deque);
 
     // ********** Intersection/Union contraction with other mazes ********** //
+    // => Proceed after initial set
     contract_inter_maze(maze);
     contract_union_maze(maze);
 

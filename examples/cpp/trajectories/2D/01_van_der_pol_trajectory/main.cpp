@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = Interval(-4,4);
+    space[1] = Interval(-4,4);
     SmartSubPaving paving(space);
 
     // ****** Dynamics *******
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     Maze maze_B(&dom_B, &dyn);
 
     dom_B.add_maze_inter(&maze_A);
-    dom_A.add_maze_inter(&maze_B);
+//    dom_A.add_maze_inter(&maze_B);
 
     double time_start = omp_get_wtime();
     for(int i=0; i<iterations; i++){
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     v_mazeA.drawCircle(xc_1, yc_1, r_1, "r[]");
 
     VibesMaze v_mazeB("graph_B", &maze_B);
-    v_mazeB.setProperties(0, 0, 512, 512);
+    v_mazeB.setProperties(600, 0, 512, 512);
     v_mazeB.show();
     v_mazeB.drawBox(box_B, "r[]");
 

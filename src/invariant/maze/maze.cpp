@@ -188,11 +188,19 @@ bool Maze::is_escape_trajectories(){
 
         for(Pave *p:pave_list_border){
             Room *r = p->get_rooms()[this];
-            if(!(r->is_removed() || r->is_empty()))
-                return true;
+            if(!r->is_removed()){
+                for(Face *f:p->get_faces_vector()){
+                    if(f->is_border()){
+                        Door *d = f->get_doors()[this];
+                        if(!d->is_empty())
+                            return true;
+                    }
+                }
+            }
         }
+        m_espace_trajectories = false;
+        return false;
     }
-    return true;
 }
 
 void Maze::add_rooms(const vector<Room *>& list_rooms){
