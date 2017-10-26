@@ -54,10 +54,10 @@ int main(int argc, char *argv[])
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(-0.5))));
 //    ibex::Function f_inner2(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + Interval(0.5))));
-    ibex::Function f_inner1(x1, x2, Return(-x2,
-                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-3.0))));
-    ibex::Function f_inner2(x1, x2, Return(-x2,
-                                     -(-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(3.0))));
+    ibex::Function f_inner1(x1, x2, -Return(x2,
+                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-3.0))));
+    ibex::Function f_inner2(x1, x2, -Return(x2,
+                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(3.0))));
 
 
     vector<Function *> f_list_inner;

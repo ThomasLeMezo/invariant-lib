@@ -725,7 +725,8 @@ bool Room::is_empty(){
                 return false;
             }
         }
-        m_empty = true;
+        if(m_maze->get_domain()->get_init()!=FULL_WALL)
+            m_empty = true;
         return true;
     }
 }
@@ -737,7 +738,8 @@ bool Room::is_full(){
         m_full_first_eval = false;
         for(Face *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_full()){
-                m_full = false;
+                if(m_maze->get_domain()->get_init()!=FULL_WALL)
+                    m_full = false;
                 return false;
             }
         }

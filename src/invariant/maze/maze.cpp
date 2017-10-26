@@ -21,6 +21,7 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
     }
 
     g->add_maze(this);
+    m_empty = false;
 }
 
 Maze::~Maze(){
@@ -34,6 +35,10 @@ void Maze::init(){
 }
 
 int Maze::contract(){
+    if(m_empty){
+        cout << " ==> MAZE EMPTY" << endl;
+        return 0;
+    }
     // Domain contraction
     vector<Room *> list_room_to_contract;
     invariant::Domain *d = m_domain;
@@ -69,6 +74,7 @@ int Maze::contract(){
 
     if(deque_empty){
         cout << " => MAZE EMPTY" << endl;
+        m_empty = true;
         return 0;
     }
 
@@ -145,6 +151,7 @@ int Maze::contract(){
             }
         }
     }
+
     cout << " => contractions : " << omp_get_wtime() - t_start << endl;
     return nb_operations;
 }

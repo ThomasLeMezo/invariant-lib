@@ -84,6 +84,12 @@ public:
      */
     bool is_escape_trajectories();
 
+    /**
+     * @brief Return true if all rooms of the maze are empty
+     * @return
+     */
+    bool is_empty();
+
 private:
     invariant::Domain *    m_domain = NULL;
     SmartSubPaving  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
@@ -96,6 +102,8 @@ private:
     bool    m_espace_trajectories = true;
 
     bool    m_contract_once = false;
+
+    bool m_empty = false;
 
 };
 }

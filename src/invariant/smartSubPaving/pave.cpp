@@ -121,8 +121,8 @@ const bool Pave::is_equal(const Pave& p) const{
 }
 
 void Pave::bisect(){
-//    ibex::LargestFirst bisector(0, 0.5);
-//    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
+    //    ibex::LargestFirst bisector(0, 0.5);
+    //    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
 
     std::pair<IntervalVector, IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
     const size_t dim = m_dim;
@@ -238,9 +238,11 @@ const bool Pave::request_bisection(){
 void Pave::set_removed_rooms(){
     for(std::map<Maze*,Room*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room* r = it->second;
-//        if(r->is_empty()) //?
-        r->set_removed();
-        m_tree->set_removed(it->first);
+        //        if(r->is_empty()) //?
+        if(r->is_empty() || r->get_maze()->get_domain()->get_init()!=FULL_WALL){
+            r->set_removed();
+            m_tree->set_removed(it->first);
+        }
     }
 }
 

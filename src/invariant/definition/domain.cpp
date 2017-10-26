@@ -22,6 +22,7 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
                 r->set_full_private();
             else if(m_domain_init == FULL_WALL)
                 r->set_empty_private();
+            r->synchronize();
         }
     }
 
@@ -227,7 +228,7 @@ void Domain::contract_union_maze(Maze *maze){
     if(m_maze_list_union.empty())
         return;
     std::vector<Room *> room_list;
-    m_subpaving->get_tree()->get_all_child_rooms_not_empty(room_list, maze);
+    m_subpaving->get_tree()->get_all_child_rooms_not_full(room_list, maze);
 
     for(Maze *maze_union:m_maze_list_union){
 #pragma omp parallel for
@@ -235,7 +236,7 @@ void Domain::contract_union_maze(Maze *maze){
             Room *r = room_list[i];
             Pave *p = r->get_pave();
             Room *r_inter = p->get_rooms()[maze_union];
-            *r &= *r_inter;
+            *r |= *r_inter;
             r->synchronize();
         }
     }

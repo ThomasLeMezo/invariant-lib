@@ -54,17 +54,17 @@ int main(int argc, char *argv[])
 
     Maze maze_B(&dom_B, &dynB);
 
-//    dom_B.add_maze_inter(&maze_A);
-//    dom_A.add_maze_inter(&maze_B);
+    dom_B.add_maze_inter(&maze_A);
+    dom_A.add_maze_inter(&maze_B);
 
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<10; i++){
+    for(int i=0; i<17; i++){
         cout << i << endl;
         paving.bisect();
-//        maze_A.contract();
+        maze_A.contract();
         maze_B.contract();
-//        maze_A.contract();
+        maze_A.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -76,15 +76,13 @@ int main(int argc, char *argv[])
     vibes::drawCircle(0.0, -2.0, 1.0, "r[]");
 
     Vibes_Graph v_graphB("graph_B", &maze_B);
-    v_graphB.setProperties(0, 0, 512, 512);
+    v_graphB.setProperties(600, 0, 512, 512);
     v_graphB.show();
     vibes::drawCircle(0.0, 1.0, 9.0/100.0, "r[]");
 
-    vibes::endDrawing();
-
 //    IntervalVector position_info(2);
 //    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(4);
-//    v_graph.get_room_info(&maze, position_info);
+//    position_info[1] = Interval(8);
+//    v_graphA.show_room_info(&maze_A, position_info);
 
 }
