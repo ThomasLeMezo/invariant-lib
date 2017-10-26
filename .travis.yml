@@ -36,15 +36,15 @@ matrix:
         packages: [g++-4.8, cmake, cmake-data, pkg-config]
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=2.7 CPP=11
+    env: PYTHON=2.7 CPP=11 GCC=4.8
     compiler: gcc
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=3.6 CPP=11
+    env: PYTHON=3.6 CPP=11 GCC=4.8
     compiler: gcc
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=3.5 CPP=11
+    env: PYTHON=3.5 CPP=11 GCC=4.8
     compiler: gcc
 cache:
   directories:
@@ -54,29 +54,36 @@ notifications:
   email: false
 before_install:
 - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
-- |
-  # Configure build variables
-  if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
-  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+  - |
+    # Configure build variables
+    if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       if [ -z "$GCC" ]; then export GCC=4.8; fi
       export CXX=g++-$GCC CC=gcc-$GCC;
-      if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
-      if [ "$PY" = "3" ]; then
-        pip install --upgrade pip auditwheel twine;
-      else
-        pip install --user --upgrade pip auditwheel twine;
-      fi
-  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    if [ "$PY" = "3" ]; then
-      brew install python$PY;
-    else
-      curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
-      sudo -H python get-pip.py;
+    elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      export CXX=g++-$GCC CC=gcc-$GCC;
     fi
-    brew install gcc48;
-    export CXX=g++-4.8 CC=gcc-4.8;
-    pip$PY install --user --upgrade pip virtualenv;
-  fi
+    if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
+    if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
+    if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        if [ "$PY" = "3" ]; then
+          pip install --upgrade pip auditwheel twine;
+        else
+          pip install --user --upgrade pip auditwheel twine;
+        fi
+    elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      brew update;
+      brew install gcc48;
+      if [ "$PY" = "3" ]; then
+        brew install python$PY;
+      else
+        curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
+        sudo -H python get-pip.py;
+      fi
+      pip$PY install --user --upgrade pip virtualenv auditwheel twine;
+      python$PY -m virtualenv venv;
+      source venv/bin/activate;
+    fi
+
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
 # - sh ./travis_script/build_patchelf.sh
