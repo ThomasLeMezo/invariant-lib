@@ -202,6 +202,22 @@ public:
      */
     const ibex::IntervalVector get_hull() const;
 
+    /**
+     * @brief operator &=
+     * @param d1
+     * @param d2
+     * @return
+     */
+    friend Door& operator&=(Door& d1, const Door& d2);
+
+    /**
+     * @brief operator |=
+     * @param d1
+     * @param d2
+     * @return
+     */
+    friend Door& operator|=(Door& d1, const Door& d2);
+
 protected:
     ibex::IntervalVector m_input_public;
     ibex::IntervalVector m_output_public; //input and output doors public

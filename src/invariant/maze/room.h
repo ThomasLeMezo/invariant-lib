@@ -216,6 +216,23 @@ public:
     bool get_contain_zero() const;
 
 
+    /**
+     * @brief operator &=
+     * @param r1
+     * @param r2
+     * @return
+     */
+    friend Room& operator&=(Room& r1, const Room& r2);
+
+    /**
+     * @brief operator |=
+     * @param r1
+     * @param r2
+     * @return
+     */
+    friend Room& operator|=(Room& r1, const Room& r2);
+
+
 protected:
     /**
      * @brief Contract doors according to the neighbors
@@ -370,10 +387,6 @@ inline bool Room::get_contain_zero() const{
 }
 
 inline const ibex::IntervalVector Room::get_one_vector_fields(int n_vf){
-//    omp_set_lock(&m_lock_vector_field);
-//    ibex::IntervalVector vec(m_vector_fields[n_vf]);
-//    omp_unset_lock(&m_lock_vector_field);
-//    return vec;
     return m_vector_fields[n_vf];
 }
 

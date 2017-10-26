@@ -23,68 +23,59 @@ int main(int argc, char *argv[])
     space[1] = Interval(-3.5,10);
     SmartSubPaving paving(space);
 
-    // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(2*x1-x1*x2,2*pow(x1,2)-x2));
-    vector<Function *> f_list;
-    f_list.push_back(&f);
-    Dynamics_Function dyn(f_list, FWD);
+    // ****** MAZE A ******
+    // Dynamics
+    ibex::Function f_A(x1, x2, Return(2*x1-x1*x2,2*pow(x1,2)-x2));
+    Dynamics_Function dynA(&f_A, FWD);
 
-    // ****** Domain & Maze *******
-    invariant::Domain dom_A(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    // Domain
+    invariant::Domain dom_A(&paving, FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
-
     Function f_sep_A(x1, x2, pow(x1, 2)+pow(x2+2, 2)-1);
     SepFwdBwd s_A(f_sep_A, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A.set_sep(&s_A);
 
-    Maze maze_A(&dom_A, &dyn);
+    // Maze
+    Maze maze_A(&dom_A, &dynA);
 
-    invariant::Domain dom_B(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    // ****** MAZE B ******
+    // Dynamics
+    ibex::Function f_B(x1, x2, -Return(2*x1-x1*x2,2*pow(x1,2)-x2));
+    Dynamics_Function dynB(&f_B, FWD);
+
+    // Domain
+    invariant::Domain dom_B(&paving, FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
-
     Function f_sep_B(x1, x2, pow(x1, 2)+pow(x2-1, 2)-pow(9.0/100.0,2));
     SepFwdBwd s_B(f_sep_B, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_B.set_sep(&s_B);
 
-    ibex::Function fB(x1, x2, Return(-(2*x1-x1*x2),-(2*pow(x1,2)-x2)));
-    vector<Function *> f_listB;
-    f_listB.push_back(&fB);
-    Dynamics_Function dynB(f_listB, FWD);
-
     Maze maze_B(&dom_B, &dynB);
 
-    dom_B.add_maze(&maze_A);
-    dom_A.add_maze(&maze_B);
+//    dom_B.add_maze_inter(&maze_A);
+//    dom_A.add_maze_inter(&maze_B);
 
     double time_start = omp_get_wtime();
-    maze_A.init(); // To set first pave to be in
-    maze_B.init(); // To set first pave to be in
 
-    int iterations = 16;
-    for(int i=0; i<iterations; i++){
-        cout << i << "/" << iterations-1 << endl;
+    for(int i=0; i<10; i++){
+        cout << i << endl;
         paving.bisect();
-        maze_A.contract();
-        maze_B.contract();
-
-        maze_A.contract_inter(&maze_B);
-        maze_B.contract_inter(&maze_A);
-
 //        maze_A.contract();
-//        maze_B.contract();
+        maze_B.contract();
+//        maze_A.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    Vibes_Graph v_graphA("graph_A", &paving, &maze_A);
+    Vibes_Graph v_graphA("graph_A", &maze_A);
     v_graphA.setProperties(0, 0, 512, 512);
     v_graphA.show();
     vibes::drawCircle(0.0, -2.0, 1.0, "r[]");
 
-    Vibes_Graph v_graphB("graph_B", &paving, &maze_B);
+    Vibes_Graph v_graphB("graph_B", &maze_B);
     v_graphB.setProperties(0, 0, 512, 512);
     v_graphB.show();
     vibes::drawCircle(0.0, 1.0, 9.0/100.0, "r[]");

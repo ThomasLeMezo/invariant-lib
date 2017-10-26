@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("SmartSubPaving", &paving, &maze);
+    Vibes_Graph v_graph("SmartSubPaving", &maze);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
 

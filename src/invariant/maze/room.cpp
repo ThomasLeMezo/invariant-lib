@@ -242,7 +242,9 @@ void Room:: contract_consistency(){
     int n_vf = 0;
 
     for(IntervalVector &vec_field:get_vector_fields()){
+        // For each vec field, try to compute the consistency function
         bool compute = true;
+        // Case Zero in f
         if(m_vector_field_zero[n_vf]){
             if(domain_init == FULL_WALL && get_vector_fields().size()==1){
                 this->set_full_possible();
@@ -422,7 +424,7 @@ void Room::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVec
     /// --> In the direction of the zeros
 
     vector<Pave *> adjacent_paves;
-    m_maze->get_graph()->get_tree()->get_intersection_pave_outer(adjacent_paves, f_in->get_position());
+    m_maze->get_subpaving()->get_tree()->get_intersection_pave_outer(adjacent_paves, f_in->get_position());
 
     // Remove pave not in the zero(s) direction
     IntervalVector vec_field_global(dim, Interval::EMPTY_SET);
@@ -774,7 +776,7 @@ void Room::synchronize(){
 
 //bool Room::is_degenerated(const IntervalVector& iv){
 //    int compt = 0;
-//    int dim = m_maze->get_graph()->dim();
+//    int dim = m_maze->get_subpaving()->dim();
 //    for(int i=0; i<dim; i++){
 //        if(iv[i].is_degenerated() && !iv[i].is_unbounded()){
 //            compt++;
@@ -830,6 +832,24 @@ const IntervalVector Room::get_hull_complementary(){
         complementary |= result[i];
     }
     return complementary;
+}
+
+Room& operator&=(Room& r1, const Room& r2){
+    for(Face *f:r1.get_pave()->get_faces_vector()){
+        Door *d1 = f->get_doors()[r1.get_maze()];
+        Door *d2 = f->get_doors()[r2.get_maze()];
+        *d1 &= *d2;
+    }
+    return r1;
+}
+
+Room& operator|=(Room& r1, const Room& r2){
+    for(Face *f:r1.get_pave()->get_faces_vector()){
+        Door *d1 = f->get_doors()[r1.get_maze()];
+        Door *d2 = f->get_doors()[r2.get_maze()];
+        *d1 |= *d2;
+    }
+    return r1;
 }
 
 }

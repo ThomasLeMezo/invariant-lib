@@ -58,11 +58,8 @@ using namespace ibex;
           .def("set_sep", &invariant::Domain::set_sep)
           .def("set_sep_input", &invariant::Domain::set_sep_input)
           .def("set_sep_output", &invariant::Domain::set_sep_output)
-          .def("add_maze", &invariant::Domain::add_maze)
-//          .def("add_remove_maze", &invariant::Domain::add_remove_maze)
-//          .def("add_remove_mazes", &invariant::Domain::add_remove_mazes)
-//          .def("add_remove_mazes_input", &invariant::Domain::add_remove_mazes_input)
-//          .def("add_remove_mazes_output", &invariant::Domain::add_remove_mazes_output)
+          .def("add_maze_union", &invariant::Domain::add_maze_union)
+          .def("add_maze_inter", &invariant::Domain::add_maze_inter)
     ;
 
   // ********* Dynamics Function *********
@@ -81,7 +78,6 @@ using namespace ibex;
                "domain"_a,
                "dynamics"_a)
           .def("contract", &invariant::Maze::contract)
-          .def("contract_inter", &invariant::Maze::contract_inter)
           .def("init", &invariant::Maze::init)
     ;
 
@@ -101,19 +97,15 @@ using namespace ibex;
 
   py::class_<Vibes_Graph>(m, "VibesGraph")
           .def(py::init<const std::string&,
-               invariant::SmartSubPaving*,
                invariant::Maze*,
                Vibes_Graph::VIBES_GRAPH_TYPE>(),
                "name"_a,
-               "paving"_a,
                "maze"_a,
                "VIBES_GRAPH_TYPE"_a = Vibes_Graph::VIBES_GRAPH_OUTER)
           .def(py::init<const std::string&,
-               invariant::SmartSubPaving*,
                invariant::Maze*,
                invariant::Maze*>(),
                "name"_a,
-               "paving"_a,
                "maze_outer"_a,
                "maze_inner"_a)
           .def("setProperties", &Vibes_Graph::setProperties)

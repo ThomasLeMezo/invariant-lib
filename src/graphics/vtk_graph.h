@@ -35,7 +35,7 @@ public:
     void show_room_info(invariant::Maze *maze, ibex::IntervalVector position);
 
 private:
-    invariant::SmartSubPaving*   m_graph = NULL;
+    invariant::SmartSubPaving*   m_subpaving = NULL;
 
     invariant::Maze*    m_maze_outer = NULL;
     invariant::Maze*    m_maze_inner = NULL;

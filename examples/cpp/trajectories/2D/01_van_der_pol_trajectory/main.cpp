@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
 
     Maze maze_B(&dom_B, &dyn);
 
-    dom_B.add_maze(&maze_A);
-    dom_A.add_maze(&maze_B);
+    dom_B.add_maze_inter(&maze_A);
+    dom_A.add_maze_inter(&maze_B);
 
     double time_start = omp_get_wtime();
     maze_A.init(); // To set first pave to be in
@@ -68,20 +68,18 @@ int main(int argc, char *argv[])
         paving.bisect();
         maze_A.contract();
         maze_B.contract();
-
-        maze_A.contract_inter(&maze_B);
-        maze_B.contract_inter(&maze_A);
+        maze_A.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    Vibes_Graph v_graphA("graph_A", &paving, &maze_A);
+    Vibes_Graph v_graphA("graph_A", &maze_A);
     v_graphA.setProperties(0, 0, 512, 512);
     v_graphA.show();
     vibes::drawCircle(xc_1, yc_1, r_1, "r[]");
 
-    Vibes_Graph v_graphB("graph_B", &paving, &maze_B);
+    Vibes_Graph v_graphB("graph_B", &maze_B);
     v_graphB.setProperties(0, 0, 512, 512);
     v_graphB.show();
     vibes::drawCircle(xc_2, yc_2, r_2, "r[]");

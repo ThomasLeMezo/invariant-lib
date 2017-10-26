@@ -28,14 +28,14 @@ using namespace std;
 using namespace ibex;
 
 Vtk_Graph::Vtk_Graph(const std::string &file_name, SmartSubPaving *g, bool memory_optimization){
-    m_graph = g;
+    m_subpaving = g;
     m_file_name = file_name;
     m_memory_optimization = memory_optimization;
 }
 
 void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector position){
     std::vector<invariant::Pave*> pave_list;
-    m_graph->get_room_info(maze, position, pave_list);
+    m_subpaving->get_room_info(maze, position, pave_list);
     vector<string> name_files;
 
     for(invariant::Pave* p:pave_list){
@@ -153,11 +153,11 @@ void Vtk_Graph::show_graph(){
     cout << "vtk paving" << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_paves = vtkSmartPointer<vtkAppendPolyData>::New();
-    int nb_paves = m_graph->get_paves().size();
+    int nb_paves = m_subpaving->get_paves().size();
 
 #pragma omp parallel for
     for(int pave_id=0; pave_id<nb_paves; pave_id++){
-        Pave *p = m_graph->get_paves()[pave_id];
+        Pave *p = m_subpaving->get_paves()[pave_id];
         vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
         IntervalVector position(p->get_position());
         cubedata->SetBounds(position[0].lb(), position[0].ub(),
@@ -169,7 +169,7 @@ void Vtk_Graph::show_graph(){
             polyData_paves->AddInputData(cubedata->GetOutput());
         }
     }
-    //    for(Pave *p:m_graph->get_paves_not_bisectable()){
+    //    for(Pave *p:m_subpaving->get_paves_not_bisectable()){
     //        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
     //        IntervalVector position(p->get_position());
     //        cubedata->SetBounds(position[0].lb(), position[0].ub(),
@@ -191,12 +191,12 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
 //    vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
-    int dim_paves_list = m_graph->get_paves().size();
+    int dim_paves_list = m_subpaving->get_paves().size();
     int step = 0;
 
 #pragma omp parallel for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
-        Pave *p = m_graph->get_paves()[pave_id];
+        Pave *p = m_subpaving->get_paves()[pave_id];
         Room *r = p->get_rooms()[maze];
 #pragma omp atomic
         step ++;
@@ -301,7 +301,7 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
             }
         }
         if(m_memory_optimization){
-            m_graph->delete_pave(pave_id);
+            m_subpaving->delete_pave(pave_id);
         }
     }
 

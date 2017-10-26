@@ -76,11 +76,11 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vibes_Graph v_graph("SmartSubPaving", &paving, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("SmartSubPaving", &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 
-//    Vibes_Graph v_graph2("graph_2", &paving, &maze_inner);
+//    Vibes_Graph v_graph2("graph_2", &maze_inner);
 //    v_graph2.setProperties(0, 0, 1024, 1024);
 //    v_graph2.show();
 

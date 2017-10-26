@@ -41,7 +41,7 @@ public:
      * @brief Getter to the SmartSubPaving
      * @return
      */
-    SmartSubPaving * get_graph() const;
+    SmartSubPaving * get_subpaving() const;
 
     /**
      * @brief Getter to the dynamics
@@ -63,7 +63,7 @@ public:
     /**
      * @brief Contract the Maze by intersecting with other domain mazes
      */
-    void contract_inter(Maze *maze_n);
+//    void contract_inter(Maze *maze_n);
 
     /**
      * @brief Add a Room to the deque BUT DO NOT CHECK if already in
@@ -86,7 +86,7 @@ public:
 
 private:
     invariant::Domain *    m_domain = NULL;
-    SmartSubPaving  *    m_graph = NULL; // SmartSubPaving associated with this maze
+    SmartSubPaving  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
     Dynamics *  m_dynamics = NULL;
 
     std::deque<Room *> m_deque_rooms;
@@ -94,6 +94,8 @@ private:
     omp_lock_t  m_deque_access;
 
     bool    m_espace_trajectories = true;
+
+    bool    m_contract_once = false;
 
 };
 }
@@ -108,8 +110,8 @@ inline Dynamics * Maze::get_dynamics() const{
     return m_dynamics;
 }
 
-inline SmartSubPaving * Maze::get_graph() const{
-    return m_graph;
+inline SmartSubPaving * Maze::get_subpaving() const{
+    return m_subpaving;
 }
 
 inline void Maze::add_to_deque(Room *r){

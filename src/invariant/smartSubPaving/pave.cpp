@@ -10,7 +10,7 @@ namespace invariant {
 Pave::Pave(const ibex::IntervalVector &position, SmartSubPaving *g):
     m_position(position)
 {
-    m_graph = g;
+    m_subpaving = g;
     m_serialization_id = 0;
     m_dim = g->dim();
 
@@ -48,7 +48,7 @@ Pave::Pave(const ibex::IntervalVector &position, SmartSubPaving *g):
 Pave::Pave(SmartSubPaving *g):
     m_position(0)
 {
-    m_graph = g;
+    m_subpaving = g;
 }
 
 Pave::~Pave(){
@@ -124,7 +124,7 @@ void Pave::bisect(){
 //    ibex::LargestFirst bisector(0, 0.5);
 //    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
 
-    std::pair<IntervalVector, IntervalVector> result_boxes = m_graph->bisect_largest_first(m_position);
+    std::pair<IntervalVector, IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
     const size_t dim = m_dim;
     // Find the axe of bissection
     size_t bisect_axis = 0;
@@ -136,8 +136,8 @@ void Pave::bisect(){
     }
 
     // Create new Paves
-    Pave *pave0 = new Pave(result_boxes.first, m_graph); // lb
-    Pave *pave1 = new Pave(result_boxes.second, m_graph); // ub
+    Pave *pave0 = new Pave(result_boxes.first, m_subpaving); // lb
+    Pave *pave1 = new Pave(result_boxes.second, m_subpaving); // ub
     std::array<Pave*, 2> pave_result = {pave0, pave1};
 
     // 1) Update paves neighbors with the new two paves
@@ -174,8 +174,8 @@ void Pave::bisect(){
     pave_result[0]->get_faces()[bisect_axis][1]->add_neighbor(pave_result[1]->get_faces()[bisect_axis][0]);
 
     // 4) Add Paves to the paving
-    m_graph->add_paves(pave_result[0]);
-    m_graph->add_paves(pave_result[1]);
+    m_subpaving->add_paves(pave_result[0]);
+    m_subpaving->add_paves(pave_result[1]);
 
     // 5) Analyze border
     if(this->is_border()){
@@ -200,8 +200,6 @@ void Pave::bisect(){
 
         if(r->is_empty()){
             m_tree->add_emptyness((it->first), true);
-            r_first->set_empty_private();
-            r_second->set_empty_private();
         }
         else
             m_tree->add_emptyness((it->first), false);

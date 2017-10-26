@@ -15,8 +15,8 @@ public:
     enum VIBES_GRAPH_TYPE{VIBES_GRAPH_INNER, VIBES_GRAPH_OUTER, VIBES_GRAPH_OUTER_AND_INNER};
 public:
     Vibes_Graph(const std::string& figure_name, invariant::SmartSubPaving *g);
-    Vibes_Graph(const std::string& figure_name, invariant::SmartSubPaving *g, invariant::Maze* maze, VIBES_GRAPH_TYPE type=VIBES_GRAPH_OUTER);
-    Vibes_Graph(const std::string& figure_name, invariant::SmartSubPaving *g, invariant::Maze* outer, invariant::Maze* inner);
+    Vibes_Graph(const std::string& figure_name, invariant::Maze* maze, VIBES_GRAPH_TYPE type=VIBES_GRAPH_OUTER);
+    Vibes_Graph(const std::string& figure_name, invariant::Maze* outer, invariant::Maze* inner);
     ~Vibes_Graph(){}
 
     virtual void show() const;
@@ -48,7 +48,7 @@ private:
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
-    invariant::SmartSubPaving*   m_graph = NULL;
+    invariant::SmartSubPaving*   m_subpaving = NULL;
     double              m_overhead_factor;
 
     invariant::Maze*    m_maze_outer = NULL;

@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     cout << subPaving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("SmartSubPaving", &subPaving, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("SmartSubPaving", &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 512, 512);
     v_graph.show();
     v_graph.drawCircle(x1_c, x2_c, r, "red[]");

@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vibes_Graph v_graph("graph_inner", &paving, &maze_outer, &maze_inner);
+    Vibes_Graph v_graph("graph_inner", &maze_outer, &maze_inner);
     v_graph.setProperties(0, 0, 1024, 1024);
     v_graph.show();
 

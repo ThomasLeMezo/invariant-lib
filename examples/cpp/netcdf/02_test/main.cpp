@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("Previmer", &paving, false);
+    Vtk_Graph vtk_graph("Previmer", false);
 //    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 //    vector<Pave *> pave_list;

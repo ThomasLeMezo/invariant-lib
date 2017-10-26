@@ -115,7 +115,7 @@ public:
      * @brief Return the paving associated with this domain
      * @return
      */
-    SmartSubPaving* get_graph() const;
+    SmartSubPaving* get_subpaving() const;
 
     /**
      * @brief Set "in" to true if there are incoming paths on the border
@@ -130,16 +130,28 @@ public:
     void set_border_path_out(bool out);
 
     /**
-     * @brief Add a maze to intersect with
+     * @brief add maze for domain intersection
      * @param maze
      */
-    void add_maze(Maze *maze);
+    void add_maze_inter(Maze *maze);
 
     /**
-     * @brief Intersect the initial condition with the maze state
+     * @brief add maze list for domain intersection
+     * @param maze_list
+     */
+//    void add_maze_inter(std::vector<Maze*> maze_list);
+
+    /**
+     * @brief add maze for domain union
      * @param maze
      */
-    void inter_maze(Maze *maze);
+    void add_maze_union(Maze *maze);
+
+    /**
+     * @brief add maze list for domain union
+     * @param maze_list
+     */
+//    void add_maze_union(std::vector<Maze*> maze_list);
 
     /**
      * @brief Get the initialization condition on Room (Full door or Full wall)
@@ -163,10 +175,21 @@ private:
      */
     void contract_border(Maze *maze, std::vector<Room*> &list_room_deque);
 
-private:
-    SmartSubPaving * m_graph;
+    /**
+     * @brief Contract the domain by intersecting with maze list
+     * @param maze
+     */
+    void contract_inter_maze(Maze *maze);
 
-    std::vector<std::pair<invariant::Maze*, bool>> m_remove_mazes_input, m_remove_mazes_output;
+    /**
+     * @brief Contract the domain by union with maze list
+     * @param maze
+     */
+    void contract_union_maze(Maze *maze);
+
+private:
+    SmartSubPaving * m_subpaving;
+
     ibex::Sep* m_sep_input = NULL;
     ibex::Sep* m_sep_output = NULL;
 
@@ -176,7 +199,8 @@ private:
     DOMAIN_PROPAGATION_START m_link_start = NOT_LINK_TO_INITIAL_CONDITION;
     DOMAIN_INITIALIZATION m_domain_init = FULL_DOOR;
 
-    std::vector<Maze *> m_maze_list;
+    std::vector<Maze *> m_maze_list_inter;
+    std::vector<Maze *> m_maze_list_union;
 };
 }
 
@@ -184,32 +208,6 @@ namespace invariant{
 
 inline DOMAIN_INITIALIZATION Domain::get_init() const{
     return m_domain_init;
-}
-
-inline void Domain::add_remove_maze_input(Maze *maze, bool complementary){
-    m_remove_mazes_input.push_back(std::make_pair(maze, complementary));
-}
-
-inline void Domain::add_remove_maze_output(Maze *maze, bool complementary){
-    m_remove_mazes_output.push_back(std::make_pair(maze, complementary));
-}
-
-inline void Domain::add_remove_maze(Maze *maze, bool complementary){
-    add_remove_maze_output(maze, complementary);
-    add_remove_maze_input(maze, complementary);
-}
-
-inline void Domain::add_remove_mazes_input(const std::vector<std::pair<Maze *, bool> > &pairs){
-    m_remove_mazes_input.insert(m_remove_mazes_input.begin(), pairs.begin(), pairs.end());
-}
-
-inline void Domain::add_remove_mazes_output(const std::vector<std::pair<Maze *, bool> > &pairs){
-    m_remove_mazes_output.insert(m_remove_mazes_output.begin(), pairs.begin(), pairs.end());
-}
-
-inline void Domain::add_remove_mazes(const std::vector<std::pair<Maze *, bool> > &pairs){
-    add_remove_mazes_input(pairs);
-    add_remove_mazes_output(pairs);
 }
 
 inline void Domain::set_sep(ibex::Sep* sep){
@@ -225,8 +223,8 @@ inline void Domain::set_sep_output(ibex::Sep* sep){
     m_sep_output = sep;
 }
 
-inline SmartSubPaving* Domain::get_graph() const{
-    return m_graph;
+inline SmartSubPaving* Domain::get_subpaving() const{
+    return m_subpaving;
 }
 
 inline void Domain::set_border_path_in(bool in){
@@ -237,9 +235,21 @@ inline void Domain::set_border_path_out(bool out){
     m_border_path_out = out;
 }
 
-inline void Domain::add_maze(Maze *maze){
-    m_maze_list.push_back(maze);
+inline void Domain::add_maze_inter(Maze *maze){
+    m_maze_list_inter.push_back(maze);
 }
+
+inline void Domain::add_maze_union(Maze *maze){
+    m_maze_list_union.push_back(maze);
+}
+
+//inline void Domain::add_maze_inter(std::vector<Maze *> maze_list){
+//    m_maze_list_inter.insert(m_maze_list_inter.end(), maze_list.begin(), maze_list.end());
+//}
+
+//inline void Domain::add_maze_union(std::vector<Maze *> maze_list){
+//    m_maze_list_union.insert(m_maze_list_union.end(), maze_list.begin(), maze_list.end());
+//}
 
 }
 

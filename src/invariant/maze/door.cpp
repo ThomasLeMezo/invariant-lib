@@ -16,12 +16,12 @@ Door::Door(Face *face, Room *room):
     m_room = room;
     omp_init_lock(&m_lock_read);
 
-    if(m_room->get_maze()->get_domain()->get_init() == FULL_WALL){
-        m_input_private->set_empty();
-        m_output_private->set_empty();
-        m_input_public.set_empty();
-        m_output_public.set_empty();
-    }
+//    if(m_room->get_maze()->get_domain()->get_init() == FULL_WALL){
+//        m_input_private->set_empty();
+//        m_output_private->set_empty();
+//        m_input_public.set_empty();
+//        m_output_public.set_empty();
+//    }
 }
 
 Door::~Door(){
@@ -127,6 +127,18 @@ bool Door::is_full(){
         return true;
     else
         return false;
+}
+
+Door& operator|=(Door& d1, const Door& d2){
+    d1.set_input_private(d1.get_input_private() | d2.get_input());
+    d1.set_output_private(d1.get_output_private() | d2.get_output());
+    return d1;
+}
+
+Door& operator&=(Door& d1, const Door& d2){
+    d1.set_input_private(d1.get_input_private() & d2.get_input());
+    d1.set_output_private(d1.get_output_private() & d2.get_output());
+    return d1;
 }
 
 }

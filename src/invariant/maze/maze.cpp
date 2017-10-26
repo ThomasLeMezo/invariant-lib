@@ -11,10 +11,10 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
     m_domain = domain;
     m_dynamics = dynamics;
 
-    m_graph = domain->get_graph();
+    m_subpaving = domain->get_subpaving();
     omp_init_lock(&m_deque_access);
 
-    SmartSubPaving *g = domain->get_graph();
+    SmartSubPaving *g = domain->get_subpaving();
     for(Pave*p:g->get_paves()){
         Room *r = new Room(p, this, dynamics);
         p->add_room(r);
@@ -50,7 +50,7 @@ int Maze::contract(){
 
     /// DEBUG
     //    if(m_maze_type == MAZE_WALL){
-    //        Vibes_Graph v_graph("graph_debug", m_graph, this);
+    //        Vibes_Graph v_graph("graph_debug", m_subpaving, this);
     //        v_graph.setProperties(0, 0, 512, 512);
     //        v_graph.show();
     //        IntervalVector test(2);
@@ -123,7 +123,7 @@ int Maze::contract(){
                         }
 
                         /// DEBUG
-                        //                        Vibes_Graph v_graph("SmartSubPaving", m_graph, this);
+                        //                        Vibes_Graph v_graph("SmartSubPaving", m_subpaving, this);
                         //                        v_graph.setProperties(0, 0, 512, 512);
                         //                        v_graph.show();
                         //                        v_graph.show_room_info(this, test);
@@ -145,40 +145,39 @@ int Maze::contract(){
             }
         }
     }
-
     cout << " => contractions : " << omp_get_wtime() - t_start << endl;
     return nb_operations;
 }
 
-void Maze::contract_inter(Maze* maze_inter){
-    // Intersect this maze with other mazes
-    //    invariant::Domain *d = m_domain;
-    //    d->inter_maze(this);
-    if(is_escape_trajectories() && maze_inter->is_escape_trajectories()){
+//void Maze::contract_inter(Maze* maze_inter){
+//    // Intersect this maze with other mazes
+//    //    invariant::Domain *d = m_domain;
+//    //    d->inter_maze(this);
+//    if(is_escape_trajectories() && maze_inter->is_escape_trajectories()){
 
-        std::vector<Room *> room_list;
-        m_graph->get_tree()->get_all_child_rooms_not_empty(room_list, this);
+//        std::vector<Room *> room_list;
+//        m_subpaving->get_tree()->get_all_child_rooms_not_empty(room_list, this);
 
-#pragma omp parallel for
-        for(size_t i=0; i<room_list.size(); i++){
-            Room *r = room_list[i];
-            Pave *p = r->get_pave();
-            Room *r_inter = p->get_rooms()[maze_inter];
-            if(r_inter->is_empty()){
-                r->set_empty_private();
-                r->synchronize();
-                r->set_removed();
-            }
-        }
-    }
-}
+//#pragma omp parallel for
+//        for(size_t i=0; i<room_list.size(); i++){
+//            Room *r = room_list[i];
+//            Pave *p = r->get_pave();
+//            Room *r_inter = p->get_rooms()[maze_inter];
+//            if(r_inter->is_empty()){
+//                r->set_empty_private();
+//                r->synchronize();
+//                r->set_removed();
+//            }
+//        }
+//    }
+//}
 
 bool Maze::is_escape_trajectories(){
     if(m_espace_trajectories == false)
         return false;
     else{
         std::vector<Pave*> pave_list_border;
-        m_graph->get_tree()->get_border_paves(pave_list_border);
+        m_subpaving->get_tree()->get_border_paves(pave_list_border);
 
         for(Pave *p:pave_list_border){
             Room *r = p->get_rooms()[this];

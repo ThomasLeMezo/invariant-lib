@@ -9,7 +9,7 @@ using namespace std;
 Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g): VibesFigure(figure_name){
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/Vibes_Graph()] dim of paving is not equal to 2");
-    m_graph = g;
+    m_subpaving = g;
     m_overhead_factor = 0.0; // 20%
 
     m_oriented_path.push_back(std::make_tuple(0, 0, true));
@@ -18,7 +18,7 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g): Vib
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g, Maze* maze, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, g){
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, Maze* maze, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, maze->get_subpaving()){
     if(type == VIBES_GRAPH_OUTER){
         m_maze_outer = maze;
         m_type = VIBES_GRAPH_OUTER;
@@ -29,7 +29,7 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g, Maze
     }
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g, Maze* outer, Maze* inner): Vibes_Graph(figure_name, g){
+Vibes_Graph::Vibes_Graph(const std::string& figure_name, Maze* outer, Maze* inner): Vibes_Graph(figure_name, outer->get_subpaving()){
     m_maze_outer = outer;
     m_maze_inner = inner;
     m_type = VIBES_GRAPH_OUTER_AND_INNER;
@@ -124,10 +124,10 @@ void Vibes_Graph::draw_room_outer(Pave *p) const{
 }
 
 void Vibes_Graph::show_maze_outer() const{
-    for(Pave *p:m_graph->get_paves()){
+    for(Pave *p:m_subpaving->get_paves()){
         draw_room_outer(p);
     }
-    for(Pave *p:m_graph->get_paves_not_bisectable()){
+    for(Pave *p:m_subpaving->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_outer];
             //            if(!r->is_removed()){
@@ -140,10 +140,10 @@ void Vibes_Graph::show_maze_outer() const{
 }
 
 void Vibes_Graph::show_maze_inner() const{
-    for(Pave *p:m_graph->get_paves()){
+    for(Pave *p:m_subpaving->get_paves()){
         draw_room_inner(p);
     }
-    for(Pave *p:m_graph->get_paves_not_bisectable()){
+    for(Pave *p:m_subpaving->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r = p->get_rooms()[m_maze_inner];
             //            if(!r->is_removed()){
@@ -156,7 +156,7 @@ void Vibes_Graph::show_maze_inner() const{
 }
 
 void Vibes_Graph::show_maze_outer_inner() const{
-    for(Pave *p:m_graph->get_paves()){
+    for(Pave *p:m_subpaving->get_paves()){
         draw_room_outer(p);
 
         Room *r_inner = p->get_rooms()[m_maze_inner];
@@ -165,7 +165,7 @@ void Vibes_Graph::show_maze_outer_inner() const{
         }
     }
 
-    for(Pave *p:m_graph->get_paves_not_bisectable()){
+    for(Pave *p:m_subpaving->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
             Room *r_outer = p->get_rooms()[m_maze_outer];
             Room *r_inner = p->get_rooms()[m_maze_inner];
@@ -238,7 +238,7 @@ std::vector<ibex::Interval> Vibes_Graph::compute_theta(ibex::Interval dx, ibex::
 }
 
 void Vibes_Graph::show_graph() const{
-    IntervalVector bounding_box(m_graph->dim(), Interval::EMPTY_SET);
+    IntervalVector bounding_box(m_subpaving->dim(), Interval::EMPTY_SET);
     vibes::newGroup("graph_bisectable", "gray[gray]", vibesParams("figure", m_name));
     vibes::newGroup("graph_not_bisectable", "lightGray[lightGray]", vibesParams("figure", m_name));
 
@@ -247,12 +247,12 @@ void Vibes_Graph::show_graph() const{
     params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
     params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
-    for(Pave*p:m_graph->get_paves()){
+    for(Pave*p:m_subpaving->get_paves()){
         ibex::IntervalVector box(p->get_position());
         vibes::drawBox(box, params_bisectable);
         bounding_box |= box;
     }
-    for(Pave*p:m_graph->get_paves_not_bisectable()){
+    for(Pave*p:m_subpaving->get_paves_not_bisectable()){
         if(!p->get_position().is_unbounded()){
             vibes::drawBox(p->get_position(), params_not_bisectable);
             bounding_box |= p->get_position();
@@ -268,7 +268,7 @@ void Vibes_Graph::show_graph() const{
 
 void Vibes_Graph::get_room_info(invariant::Maze *maze, const ibex::IntervalVector& position) const{
     std::vector<invariant::Pave*> pave_list;
-    m_graph->get_room_info(maze, position, pave_list);
+    m_subpaving->get_room_info(maze, position, pave_list);
     for(invariant::Pave* p:pave_list){
         vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
                 0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]");
@@ -285,7 +285,7 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, double x, double y) const
 void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& position) const{
     std::vector<invariant::Pave*> pave_list;
     std::cout.precision(15);
-    m_graph->get_room_info(maze, position, pave_list);
+    m_subpaving->get_room_info(maze, position, pave_list);
     for(invariant::Pave* p:pave_list){
         vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
                 0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]", vibesParams("figure", m_name));
