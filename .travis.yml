@@ -118,4 +118,4 @@ deploy:
   overwrite: true
   on:
     repo: ThomasLeMezo/invariant-lib
-    tags: true
+    tags: false
