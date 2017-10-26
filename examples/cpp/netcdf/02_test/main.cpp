@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain *******
     SmartSubPaving paving(search_space);
-    invariant::Domain dom(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom(&paving, FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);

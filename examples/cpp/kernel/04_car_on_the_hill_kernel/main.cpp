@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<18; i++){
+    for(int i=0; i<13; i++){
         paving.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;

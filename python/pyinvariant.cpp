@@ -35,11 +35,6 @@ using namespace ibex;
        .value("FWD_BWD", invariant::DYNAMICS_SENS::FWD_BWD)
        .export_values();
 
-   py::enum_<DOMAIN_PROPAGATION_START>(m, "DOMAIN_PROPAGATION_START")
-       .value("LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::LINK_TO_INITIAL_CONDITION)
-       .value("NOT_LINK_TO_INITIAL_CONDITION", DOMAIN_PROPAGATION_START::NOT_LINK_TO_INITIAL_CONDITION)
-       .export_values();
-
   // ********* Graphs *********
   py::class_<SmartSubPaving>(m, "SmartSubPaving")
           .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
@@ -49,10 +44,9 @@ using namespace ibex;
 
   // ********* Domain *********
   py::class_<invariant::Domain>(m, "Domain")
-          .def(py::init<invariant::SmartSubPaving*, invariant::DOMAIN_INITIALIZATION, invariant::DOMAIN_PROPAGATION_START>(),
+          .def(py::init<invariant::SmartSubPaving*, invariant::DOMAIN_INITIALIZATION>(),
                "paving"_a,
-               "DOMAIN_INITIALIZATION"_a,
-               "DOMAIN_PROPAGATION_START"_a = invariant::NOT_LINK_TO_INITIAL_CONDITION)
+               "DOMAIN_INITIALIZATION"_a)
           .def("set_border_path_in", &invariant::Domain::set_border_path_in)
           .def("set_border_path_out", &invariant::Domain::set_border_path_out)
           .def("set_sep", &invariant::Domain::set_sep)

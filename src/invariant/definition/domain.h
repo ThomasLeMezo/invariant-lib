@@ -13,8 +13,6 @@
 namespace invariant{
 
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
-enum DOMAIN_PROPAGATION_START{LINK_TO_INITIAL_CONDITION, NOT_LINK_TO_INITIAL_CONDITION};
-
 enum DOMAIN_INITIALIZATION{FULL_DOOR, FULL_WALL};
 
 class SmartSubPaving; // declared only for friendship
@@ -30,7 +28,7 @@ public:
      * @param paving
      * @param link : specify if the initial condition in the case of a propagation maze is always link to the yellow zone
      */
-    Domain(SmartSubPaving* paving, DOMAIN_INITIALIZATION domain_init, DOMAIN_PROPAGATION_START link=NOT_LINK_TO_INITIAL_CONDITION);
+    Domain(SmartSubPaving* paving, DOMAIN_INITIALIZATION domain_init);
 
     // *************** Intput & Output *********************
 
@@ -196,7 +194,6 @@ private:
     bool m_border_path_in = true;
     bool m_border_path_out = true;
 
-    DOMAIN_PROPAGATION_START m_link_start = NOT_LINK_TO_INITIAL_CONDITION;
     DOMAIN_INITIALIZATION m_domain_init = FULL_DOOR;
 
     std::vector<Maze *> m_maze_list_inter;
