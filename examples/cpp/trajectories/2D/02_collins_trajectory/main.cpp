@@ -3,7 +3,7 @@
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -70,19 +70,19 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vibes_Graph v_graphA("graph_A", &maze_A);
-    v_graphA.setProperties(0, 0, 512, 512);
-    v_graphA.show();
+    VibesMaze v_mazeA("graph_A", &maze_A);
+    v_mazeA.setProperties(0, 0, 512, 512);
+    v_mazeA.show();
     vibes::drawCircle(0.0, -2.0, 1.0, "r[]");
 
-    Vibes_Graph v_graphB("graph_B", &maze_B);
-    v_graphB.setProperties(600, 0, 512, 512);
-    v_graphB.show();
+    VibesMaze v_mazeB("graph_B", &maze_B);
+    v_mazeB.setProperties(600, 0, 512, 512);
+    v_mazeB.show();
     vibes::drawCircle(0.0, 1.0, 9.0/100.0, "r[]");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = Interval(-2);
 //    position_info[1] = Interval(8);
-//    v_graphA.show_room_info(&maze_A, position_info);
+//    v_mazeA.show_room_info(&maze_A, position_info);
 
 }

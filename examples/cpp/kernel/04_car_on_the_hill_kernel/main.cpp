@@ -3,7 +3,7 @@
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -38,8 +38,6 @@ int main(int argc, char *argv[])
 
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(false);
-
-
 
     // ****** Dynamics Outer ******* //
 //    ibex::Function f_outer(x1, x2, Return(x2,
@@ -82,14 +80,14 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vibes_Graph v_graph("graph_inner", &maze_outer, &maze_inner);
-    v_graph.setProperties(0, 0, 1024, 1024);
-    v_graph.show();
+    VibesMaze v_maze("graph_inner", &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.show();
 
     IntervalVector position_info(2);
     position_info[0] = Interval(12.74);
     position_info[1] = Interval(2.14, 2.25);
-//    v_graph.show_room_info(&maze_outer, position_info);
+//    v_maze.show_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 }

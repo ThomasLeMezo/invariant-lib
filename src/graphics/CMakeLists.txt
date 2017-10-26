@@ -51,14 +51,14 @@ endif()
   set(SRC
     vibes/vibes.cpp
     VibesFigure.cpp
-    vibes_graph.cpp
+    vibesMaze.cpp
   )
 
   set(HEADERS
     vibes/vibes.h
 
     VibesFigure.h
-    vibes_graph.h
+    vibesMaze.h
 
   )
 

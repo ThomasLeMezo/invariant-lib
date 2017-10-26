@@ -5,7 +5,7 @@
 #include <ibex.h>
 #include <math.h>
 
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 using namespace std;
 using namespace invariant;
@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vibes_Graph v_graph("SmartSubPaving", &maze);
-    v_graph.setProperties(0, 0, 512, 512);
-    v_graph.show();
+    VibesMaze v_maze("SmartSubPaving", &maze);
+    v_maze.setProperties(0, 0, 512, 512);
+    v_maze.show();
 
     IntervalVector position_info(2);
     position_info[0] = Interval(x1_c);
     position_info[1] = Interval(x2_c);
-    v_graph.get_room_info(&maze, position_info);
+    v_maze.get_room_info(&maze, position_info);
 
 
     vibes::endDrawing();

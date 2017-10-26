@@ -11,7 +11,7 @@
 #include "sepmaze.h"
 #include "dynamics.h"
 #include "dynamics_function.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 #include <string>
 
 namespace py = pybind11;
@@ -58,8 +58,10 @@ using namespace ibex;
           .def("set_sep", &invariant::Domain::set_sep)
           .def("set_sep_input", &invariant::Domain::set_sep_input)
           .def("set_sep_output", &invariant::Domain::set_sep_output)
-          .def("add_maze_union", &invariant::Domain::add_maze_union)
-          .def("add_maze_inter", &invariant::Domain::add_maze_inter)
+          .def("add_maze_union", (void (invariant::Domain::*)(std::vector<Maze *> maze_list)) &invariant::Domain::add_maze_union)
+          .def("add_maze_union", (void (invariant::Domain::*)(Maze *maze)) &invariant::Domain::add_maze_union)
+          .def("add_maze_inter", (void (invariant::Domain::*)(std::vector<Maze *> maze_list)) &invariant::Domain::add_maze_inter)
+          .def("add_maze_inter", (void (invariant::Domain::*)(Maze *maze)) &invariant::Domain::add_maze_inter)
     ;
 
   // ********* Dynamics Function *********
@@ -88,29 +90,31 @@ using namespace ibex;
           .def("separate", &invariant::SepMaze::separate)
   ;
 
-  // ********* Vibes_Graph *********
-  py::enum_<Vibes_Graph::VIBES_GRAPH_TYPE>(m, "VIBES_GRAPH_TYPE")
-      .value("VIBES_GRAPH_INNER", Vibes_Graph::VIBES_GRAPH_INNER)
-      .value("VIBES_GRAPH_OUTER", Vibes_Graph::VIBES_GRAPH_OUTER)
+  // ********* VibesMaze *********
+  py::enum_<VibesMaze::VIBES_MAZE_TYPE>(m, "VIBES_MAZE_TYPE")
+      .value("VIBES_MAZE_INNER", VibesMaze::VIBES_MAZE_INNER)
+      .value("VIBES_MAZE_OUTER", VibesMaze::VIBES_MAZE_OUTER)
       .export_values()
   ;
 
-  py::class_<Vibes_Graph>(m, "VibesGraph")
+  py::class_<VibesMaze>(m, "VibesMaze")
           .def(py::init<const std::string&,
                invariant::Maze*,
-               Vibes_Graph::VIBES_GRAPH_TYPE>(),
+               VibesMaze::VIBES_MAZE_TYPE>(),
                "name"_a,
                "maze"_a,
-               "VIBES_GRAPH_TYPE"_a = Vibes_Graph::VIBES_GRAPH_OUTER)
+               "VIBES_MAZE_TYPE"_a = VibesMaze::VIBES_MAZE_OUTER)
           .def(py::init<const std::string&,
                invariant::Maze*,
                invariant::Maze*>(),
                "name"_a,
                "maze_outer"_a,
                "maze_inner"_a)
-          .def("setProperties", &Vibes_Graph::setProperties)
-          .def("show", &Vibes_Graph::show)
-          .def("drawCircle", &Vibes_Graph::drawCircle)
+          .def("setProperties", &VibesMaze::setProperties)
+          .def("show", &VibesMaze::show)
+          .def("drawCircle", &VibesMaze::drawCircle)
+          .def("drawBox", (void (VibesMaze::*)(const ibex::IntervalVector &box, std::string params) const) &VibesMaze::drawBox)
+          .def("drawBox", (void (VibesMaze::*)(double x_min, double x_max, double y_min, double y_max, std::string params) const) &VibesMaze::drawBox)
   ;
 
 }

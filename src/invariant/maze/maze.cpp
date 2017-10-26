@@ -1,6 +1,6 @@
 #include "maze.h"
 
-#include "../../graphics/vibes_graph.h"
+#include "../../graphics/vibesMaze.h"
 
 using namespace std;
 using namespace ibex;
@@ -55,13 +55,13 @@ int Maze::contract(){
 
     /// DEBUG
     //    if(m_maze_type == MAZE_WALL){
-    //        Vibes_Graph v_graph("graph_debug", m_subpaving, this);
-    //        v_graph.setProperties(0, 0, 512, 512);
-    //        v_graph.show();
+    //        VibesMaze v_maze("graph_debug", m_subpaving, this);
+    //        v_maze.setProperties(0, 0, 512, 512);
+    //        v_maze.show();
     //        IntervalVector test(2);
     //        test[0] = Interval(-2);
     //        test[1] = Interval(2);
-    //        v_graph.show_room_info(this, test);
+    //        v_maze.show_room_info(this, test);
     //        cout << "debug graph_debug" << endl;
     //    }
 
@@ -129,10 +129,10 @@ int Maze::contract(){
                         }
 
                         /// DEBUG
-                        //                        Vibes_Graph v_graph("SmartSubPaving", m_subpaving, this);
-                        //                        v_graph.setProperties(0, 0, 512, 512);
-                        //                        v_graph.show();
-                        //                        v_graph.show_room_info(this, test);
+                        //                        VibesMaze v_maze("SmartSubPaving", m_subpaving, this);
+                        //                        v_maze.setProperties(0, 0, 512, 512);
+                        //                        v_maze.show();
+                        //                        v_maze.show_room_info(this, test);
 
                         r->unlock_contraction();
                     }

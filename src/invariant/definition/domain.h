@@ -139,7 +139,7 @@ public:
      * @brief add maze list for domain intersection
      * @param maze_list
      */
-//    void add_maze_inter(std::vector<Maze*> maze_list);
+    void add_maze_inter(std::vector<Maze*> maze_list);
 
     /**
      * @brief add maze for domain union
@@ -151,7 +151,7 @@ public:
      * @brief add maze list for domain union
      * @param maze_list
      */
-//    void add_maze_union(std::vector<Maze*> maze_list);
+    void add_maze_union(std::vector<Maze*> maze_list);
 
     /**
      * @brief Get the initialization condition on Room (Full door or Full wall)
@@ -243,13 +243,13 @@ inline void Domain::add_maze_union(Maze *maze){
     m_maze_list_union.push_back(maze);
 }
 
-//inline void Domain::add_maze_inter(std::vector<Maze *> maze_list){
-//    m_maze_list_inter.insert(m_maze_list_inter.end(), maze_list.begin(), maze_list.end());
-//}
+inline void Domain::add_maze_inter(std::vector<Maze *> maze_list){
+    m_maze_list_inter.insert(m_maze_list_inter.end(), maze_list.begin(), maze_list.end());
+}
 
-//inline void Domain::add_maze_union(std::vector<Maze *> maze_list){
-//    m_maze_list_union.insert(m_maze_list_union.end(), maze_list.begin(), maze_list.end());
-//}
+inline void Domain::add_maze_union(std::vector<Maze *> maze_list){
+    m_maze_list_union.insert(m_maze_list_union.end(), maze_list.begin(), maze_list.end());
+}
 
 }
 

@@ -3,7 +3,7 @@
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 #include "ibex/ibex_SepFwdBwd.h"
 
@@ -56,15 +56,15 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("SmartSubPaving", &maze);
-    v_graph.setProperties(0, 0, 1024, 1024);
-    v_graph.show();
+    VibesMaze v_maze("SmartSubPaving", &maze);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.show();
 
     IntervalVector position_info(2);
     position_info[0] = Interval(-0.84, -0.81);
     position_info[1] = Interval(-1.35, -1.31);
-//    v_graph.get_room_info(&maze, position_info);
-//    v_graph.show_room_info(&maze, position_info);
+//    v_maze.get_room_info(&maze, position_info);
+//    v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();
 

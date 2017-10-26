@@ -2,7 +2,7 @@
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 #include "ibex/ibex_SepFwdBwd.h"
 
@@ -73,24 +73,24 @@ int main(int argc, char *argv[])
     cout << subPaving << endl;
 
     vibes::beginDrawing();
-    Vibes_Graph v_graph("SmartSubPaving", &maze_outer, &maze_inner);
-    v_graph.setProperties(0, 0, 512, 512);
-    v_graph.show();
-    v_graph.drawCircle(x1_c, x2_c, r, "red[]");
+    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 512, 512);
+    v_maze.show();
+    v_maze.drawCircle(x1_c, x2_c, r, "red[]");
 
-//    Vibes_Graph v_graph2("graph2", &subPaving, &maze_inner, Vibes_Graph::VIBES_GRAPH_INNER);
-//    v_graph2.setProperties(0, 0, 512, 512);
-//    v_graph2.show();
+//    VibesMaze v_maze2("graph2", &subPaving, &maze_inner, VibesMaze::VIBES_MAZE_INNER);
+//    v_maze2.setProperties(0, 0, 512, 512);
+//    v_maze2.show();
 
 
-//    Vibes_Graph v_graph_inner("SmartSubPaving inner", &subPaving, &maze_inner);
-//    v_graph_inner.setProperties(0, 0, 512, 512);
-//    v_graph_inner.show();
+//    VibesMaze v_maze_inner("SmartSubPaving inner", &subPaving, &maze_inner);
+//    v_maze_inner.setProperties(0, 0, 512, 512);
+//    v_maze_inner.show();
 
 //    IntervalVector position_info(2);
 //    position_info[0] = Interval(-0.1, 0.0);
 //    position_info[1] = Interval(0.16);
-//    v_graph_inner.show_room_info(&maze_inner, position_info);
+//    v_maze_inner.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 

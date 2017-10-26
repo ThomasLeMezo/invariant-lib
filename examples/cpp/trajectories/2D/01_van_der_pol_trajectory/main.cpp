@@ -3,7 +3,7 @@
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(f_list, FWD);
 
     // ****** Domain & Maze *******
-    invariant::Domain dom_A(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom_A(&paving, FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
@@ -44,15 +44,14 @@ int main(int argc, char *argv[])
 
     Maze maze_A(&dom_A, &dyn);
 
-    invariant::Domain dom_B(&paving, FULL_WALL, LINK_TO_INITIAL_CONDITION);
+    invariant::Domain dom_B(&paving, FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
-    double xc_2, yc_2, r_2;
-    xc_2 = 0.0;
-    yc_2 = -2.0;
-    r_2 = 0.5;
-    Function f_sep_B(x1, x2, pow(x1-xc_2, 2)+pow(x2-yc_2, 2)-pow(r_2, 2));
-    SepFwdBwd s_B(f_sep_B, LEQ); // LT, LEQ, EQ, GEQ, GT)
+    IntervalVector box_B(2);
+    box_B[0] = Interval(-0.5, 0.5);
+    box_B[1] = Interval(-2.5, -1.5);
+    Function f_sep_B(x1, x2, Return(x1, x2));
+    SepFwdBwd s_B(f_sep_B, box_B);
     dom_B.set_sep(&s_B);
 
     Maze maze_B(&dom_B, &dyn);
@@ -61,34 +60,32 @@ int main(int argc, char *argv[])
     dom_A.add_maze_inter(&maze_B);
 
     double time_start = omp_get_wtime();
-    maze_A.init(); // To set first pave to be in
-    maze_B.init(); // To set first pave to be in
     for(int i=0; i<iterations; i++){
         cout << i << "/" << iterations-1 << endl;
         paving.bisect();
         maze_A.contract();
         maze_B.contract();
         maze_A.contract();
+        maze_B.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    Vibes_Graph v_graphA("graph_A", &maze_A);
-    v_graphA.setProperties(0, 0, 512, 512);
-    v_graphA.show();
-    vibes::drawCircle(xc_1, yc_1, r_1, "r[]");
+    VibesMaze v_mazeA("graph_A", &maze_A);
+    v_mazeA.setProperties(0, 0, 512, 512);
+    v_mazeA.show();
+    v_mazeA.drawCircle(xc_1, yc_1, r_1, "r[]");
 
-    Vibes_Graph v_graphB("graph_B", &maze_B);
-    v_graphB.setProperties(0, 0, 512, 512);
-    v_graphB.show();
-    vibes::drawCircle(xc_2, yc_2, r_2, "r[]");
-
-    vibes::endDrawing();
+    VibesMaze v_mazeB("graph_B", &maze_B);
+    v_mazeB.setProperties(0, 0, 512, 512);
+    v_mazeB.show();
+    v_mazeB.drawBox(box_B, "r[]");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = Interval(-2);
 //    position_info[1] = Interval(4);
-//    v_graph.get_room_info(&maze, position_info);
+//    v_maze.get_room_info(&maze, position_info);
 
+    vibes::endDrawing();
 }

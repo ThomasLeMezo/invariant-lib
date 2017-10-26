@@ -1,4 +1,4 @@
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 #include "ostream"
 #include <ibex/ibex_IntervalVector.h>
 
@@ -6,9 +6,9 @@ using namespace invariant;
 using namespace ibex;
 using namespace std;
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g): VibesFigure(figure_name){
+VibesMaze::VibesMaze(const std::string& figure_name, SmartSubPaving *g): VibesFigure(figure_name){
     if(g->dim() != 2)
-        throw std::runtime_error("in [vibes_graph.cpp/Vibes_Graph()] dim of paving is not equal to 2");
+        throw std::runtime_error("in [vibes_graph.cpp/VibesMaze()] dim of paving is not equal to 2");
     m_subpaving = g;
     m_overhead_factor = 0.0; // 20%
 
@@ -18,24 +18,24 @@ Vibes_Graph::Vibes_Graph(const std::string& figure_name, SmartSubPaving *g): Vib
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Maze* maze, VIBES_GRAPH_TYPE type): Vibes_Graph(figure_name, maze->get_subpaving()){
-    if(type == VIBES_GRAPH_OUTER){
+VibesMaze::VibesMaze(const std::string& figure_name, Maze* maze, VIBES_MAZE_TYPE type): VibesMaze(figure_name, maze->get_subpaving()){
+    if(type == VIBES_MAZE_OUTER){
         m_maze_outer = maze;
-        m_type = VIBES_GRAPH_OUTER;
+        m_type = VIBES_MAZE_OUTER;
     }
     else{
         m_maze_inner = maze;
-        m_type = VIBES_GRAPH_INNER;
+        m_type = VIBES_MAZE_INNER;
     }
 }
 
-Vibes_Graph::Vibes_Graph(const std::string& figure_name, Maze* outer, Maze* inner): Vibes_Graph(figure_name, outer->get_subpaving()){
+VibesMaze::VibesMaze(const std::string& figure_name, Maze* outer, Maze* inner): VibesMaze(figure_name, outer->get_subpaving()){
     m_maze_outer = outer;
     m_maze_inner = inner;
-    m_type = VIBES_GRAPH_OUTER_AND_INNER;
+    m_type = VIBES_MAZE_OUTER_AND_INNER;
 }
 
-void Vibes_Graph::show() const{
+void VibesMaze::show() const{
     show_graph();
     if(m_maze_outer != NULL && m_maze_inner == NULL)
         show_maze_outer();
@@ -46,9 +46,9 @@ void Vibes_Graph::show() const{
 
 }
 
-void Vibes_Graph::draw_room_inner(Pave *p) const{
+void VibesMaze::draw_room_inner(Pave *p) const{
     // Draw backward
-    if(m_type == VIBES_GRAPH_INNER) // Otherwise draw box only when outer
+    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
         vibes::drawBox(p->get_position(), "black[]");
 
     // Draw Polygon
@@ -85,7 +85,7 @@ void Vibes_Graph::draw_room_inner(Pave *p) const{
 
 }
 
-void Vibes_Graph::draw_room_outer(Pave *p) const{
+void VibesMaze::draw_room_outer(Pave *p) const{
     // Draw backward
     vibes::drawBox(p->get_position(), "[blue]");
 
@@ -123,7 +123,7 @@ void Vibes_Graph::draw_room_outer(Pave *p) const{
     show_theta(p, m_maze_outer);
 }
 
-void Vibes_Graph::show_maze_outer() const{
+void VibesMaze::show_maze_outer() const{
     for(Pave *p:m_subpaving->get_paves()){
         draw_room_outer(p);
     }
@@ -139,7 +139,7 @@ void Vibes_Graph::show_maze_outer() const{
     }
 }
 
-void Vibes_Graph::show_maze_inner() const{
+void VibesMaze::show_maze_inner() const{
     for(Pave *p:m_subpaving->get_paves()){
         draw_room_inner(p);
     }
@@ -155,7 +155,7 @@ void Vibes_Graph::show_maze_inner() const{
     }
 }
 
-void Vibes_Graph::show_maze_outer_inner() const{
+void VibesMaze::show_maze_outer_inner() const{
     for(Pave *p:m_subpaving->get_paves()){
         draw_room_outer(p);
 
@@ -177,7 +177,7 @@ void Vibes_Graph::show_maze_outer_inner() const{
     }
 }
 
-void Vibes_Graph::show_theta(Pave *p, Maze* maze) const{
+void VibesMaze::show_theta(Pave *p, Maze* maze) const{
     IntervalVector position(p->get_position());
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.0;
     Room *r = p->get_rooms()[maze];
@@ -202,7 +202,7 @@ void Vibes_Graph::show_theta(Pave *p, Maze* maze) const{
 
 }
 
-std::vector<ibex::Interval> Vibes_Graph::compute_theta(ibex::Interval dx, ibex::Interval dy) const{
+std::vector<ibex::Interval> VibesMaze::compute_theta(ibex::Interval dx, ibex::Interval dy) const{
     std::vector<ibex::Interval> theta_list;
 
     for(int i=0; i<2; i++)
@@ -218,7 +218,7 @@ std::vector<ibex::Interval> Vibes_Graph::compute_theta(ibex::Interval dx, ibex::
                 theta_list[1] = ((thetaR + Interval::PI) & (Interval::PI | Interval::TWO_PI)) - Interval::TWO_PI; // theta[1] in [-pi, 0]
             }
             else
-                throw runtime_error("in [Vibes_Graph.cpp/compute_theta] error with the computation of theta");
+                throw runtime_error("in [VibesMaze.cpp/compute_theta] error with the computation of theta");
         }
         else
             theta_list[0] = theta;
@@ -228,7 +228,7 @@ std::vector<ibex::Interval> Vibes_Graph::compute_theta(ibex::Interval dx, ibex::
     else
         theta_list[0] = theta;
     if(theta_list[0].is_empty())
-        throw runtime_error("in [Vibes_Graph.cpp/compute_theta] error with the computation of theta");
+        throw runtime_error("in [VibesMaze.cpp/compute_theta] error with the computation of theta");
 
 
     if(theta_list[1].is_empty())
@@ -237,7 +237,7 @@ std::vector<ibex::Interval> Vibes_Graph::compute_theta(ibex::Interval dx, ibex::
     return theta_list;
 }
 
-void Vibes_Graph::show_graph() const{
+void VibesMaze::show_graph() const{
     IntervalVector bounding_box(m_subpaving->dim(), Interval::EMPTY_SET);
     vibes::newGroup("graph_bisectable", "gray[gray]", vibesParams("figure", m_name));
     vibes::newGroup("graph_not_bisectable", "lightGray[lightGray]", vibesParams("figure", m_name));
@@ -266,7 +266,7 @@ void Vibes_Graph::show_graph() const{
             m_name);
 }
 
-void Vibes_Graph::get_room_info(invariant::Maze *maze, const ibex::IntervalVector& position) const{
+void VibesMaze::get_room_info(invariant::Maze *maze, const ibex::IntervalVector& position) const{
     std::vector<invariant::Pave*> pave_list;
     m_subpaving->get_room_info(maze, position, pave_list);
     for(invariant::Pave* p:pave_list){
@@ -275,14 +275,14 @@ void Vibes_Graph::get_room_info(invariant::Maze *maze, const ibex::IntervalVecto
     }
 }
 
-void Vibes_Graph::get_room_info(invariant::Maze *maze, double x, double y) const{
+void VibesMaze::get_room_info(invariant::Maze *maze, double x, double y) const{
     IntervalVector pos(2);
     pos[0] = Interval(x);
     pos[1] = Interval(y);
     get_room_info(maze, pos);
 }
 
-void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& position) const{
+void VibesMaze::show_room_info(invariant::Maze *maze, const IntervalVector& position) const{
     std::vector<invariant::Pave*> pave_list;
     std::cout.precision(15);
     m_subpaving->get_room_info(maze, position, pave_list);
@@ -303,10 +303,10 @@ void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& po
         vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height));
 
         // Draw Pave
-        if(m_type == VIBES_GRAPH_INNER){
+        if(m_type == VIBES_MAZE_INNER){
             draw_room_inner(p);
         }
-        else if(m_type == VIBES_GRAPH_OUTER){
+        else if(m_type == VIBES_MAZE_OUTER){
             draw_room_outer(p);
         }
         else{
@@ -336,8 +336,16 @@ void Vibes_Graph::show_room_info(invariant::Maze *maze, const IntervalVector& po
     }
 }
 
-void Vibes_Graph::drawCircle(double x_center, double y_center, double radius, string params) const{
+void VibesMaze::drawCircle(double x_center, double y_center, double radius, string params) const{
     vibes::drawCircle(x_center, y_center, radius, params);
+}
+
+void VibesMaze::drawBox(double x_min, double x_max, double y_min, double y_max, std::string params) const{
+    vibes::drawBox(x_min, x_max, y_min, y_max, params);
+}
+
+void VibesMaze::drawBox(const ibex::IntervalVector &box, std::string params) const{
+    vibes::drawBox(box, params);
 }
 
 namespace vibes{

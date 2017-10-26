@@ -3,7 +3,7 @@
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-#include "vibes_graph.h"
+#include "vibesMaze.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -63,6 +63,6 @@ int main(int argc, char *argv[])
     //    IntervalVector position_info(2);
     //    position_info[0] = Interval(-1.7);
     //    position_info[1] = Interval(1);
-    //    v_graph.get_room_info(&maze, position_info);
+    //    v_maze.get_room_info(&maze, position_info);
 
 }
