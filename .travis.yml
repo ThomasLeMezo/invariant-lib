@@ -54,35 +54,35 @@ notifications:
   email: false
 before_install:
 - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
-  - |
-    # Configure build variables
-    if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      if [ -z "$GCC" ]; then export GCC=4.8; fi
-      export CXX=g++-$GCC CC=gcc-$GCC;
-    elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      export CXX=g++-$GCC CC=gcc-$GCC;
-    fi
-    if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
-    if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
-    if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-        if [ "$PY" = "3" ]; then
-          pip install --upgrade pip auditwheel twine;
-        else
-          pip install --user --upgrade pip auditwheel twine;
-        fi
-    elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      brew update;
-      brew install gcc48;
+- |
+  # Configure build variables
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    if [ -z "$GCC" ]; then export GCC=4.8; fi
+    export CXX=g++-$GCC CC=gcc-$GCC;
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    export CXX=g++-$GCC CC=gcc-$GCC;
+  fi
+  if [ -n "$CPP" ]; then export CPP=-std=c++$CPP; fi
+  if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       if [ "$PY" = "3" ]; then
-        brew install python$PY;
+        pip install --upgrade pip auditwheel twine;
       else
-        curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
-        sudo -H python get-pip.py;
+        pip install --user --upgrade pip auditwheel twine;
       fi
-      pip$PY install --user --upgrade pip virtualenv auditwheel twine;
-      python$PY -m virtualenv venv;
-      source venv/bin/activate;
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    brew update;
+    brew install gcc48;
+    if [ "$PY" = "3" ]; then
+      brew install python$PY;
+    else
+      curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
+      sudo -H python get-pip.py;
     fi
+    pip$PY install --user --upgrade pip virtualenv auditwheel twine;
+    python$PY -m virtualenv venv;
+    source venv/bin/activate;
+  fi
 
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
