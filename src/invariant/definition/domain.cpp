@@ -44,9 +44,11 @@ void Domain::contract_domain(Maze *maze, std::vector<Room*> &list_room_deque){
         m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
     }
     if(m_domain_init == FULL_WALL && m_subpaving->get_paves().size()>1){ // When initial condition is not link with active paves
-        //        m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
-        m_subpaving->get_tree()->get_all_child_rooms_inside_outside(list_room_deque, maze);
+//                m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+//        m_subpaving->get_tree()->get_all_child_rooms_inside_outside(list_room_deque, maze);
         // (OK ?) Wrong function -> need to add neighbours of full paves instead of not_empty
+        // TODO : correction of this method ?
+        m_subpaving->get_tree()->get_all_child_rooms(list_room_deque, maze);
     }
 }
 

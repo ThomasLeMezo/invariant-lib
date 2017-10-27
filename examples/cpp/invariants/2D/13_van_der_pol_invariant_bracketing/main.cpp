@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     maze_inner.init();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<10; i++){
         subpaving.bisect();
-        cout << i << " - " << maze_outer.contract() << " - ";
-        cout << i << " - " << maze_inner.contract() << " - ";
+        cout << i << " - " << maze_outer.contract() << endl;
+        cout << i << " - " << maze_inner.contract() << endl;
         cout << subpaving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;

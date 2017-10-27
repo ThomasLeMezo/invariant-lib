@@ -122,7 +122,7 @@ void Door::set_full_possible_private(){
     }
 }
 
-bool Door::is_full(){
+bool Door::is_full() const{
     if(m_input_public == m_face->get_position() && m_output_public == m_face->get_position())
         return true;
     else

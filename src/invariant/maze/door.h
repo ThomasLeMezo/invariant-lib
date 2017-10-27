@@ -134,13 +134,13 @@ public:
      * @brief Return true if input & output doors are empty
      * @return
      */
-    bool is_empty();
+    bool is_empty() const;
 
     /**
      * @brief Return true if input & output doors are full (ie equal to position)
      * @return
      */
-    bool is_full();
+    bool is_full() const;
 
     /**
      * @brief Set if this door is a possible out for propagation
@@ -287,7 +287,7 @@ inline void Door::set_empty_private(){
     m_input_private->set_empty();
 }
 
-inline bool Door::is_empty(){
+inline bool Door::is_empty() const{
     if(m_input_public.is_empty() && m_output_public.is_empty())
         return true;
     else

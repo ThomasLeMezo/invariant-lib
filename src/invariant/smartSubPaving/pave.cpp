@@ -207,7 +207,7 @@ void Pave::bisect(){
         if(r->is_full()){
             m_tree->add_fullness((it->first), true);
             // Child cannot be set to full because of overapproximation
-            // in the case of MAZE_WALL & MAZE_DOOR is already full
+            // in the case of FULL_WALL & FULL_DOOR is already full
         }
         else
             m_tree->add_fullness((it->first), false);
