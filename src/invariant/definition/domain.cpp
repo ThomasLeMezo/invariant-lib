@@ -125,10 +125,18 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_empty_private_input();
                 }
                 else{ // Inside & Outside the constraint => all full (over approximation)
-                    if(output)
-                        r->contract_box(x_out, m_sep_output);
-                    else
-                        r->contract_box(x_out, m_sep_input);
+//                    if(m_domain_init == FULL_DOOR){
+                        if(output)
+                            r->set_full_private_output();
+                        else
+                            r->set_full_private_input();
+//                    }
+//                    else{
+//                        if(output)
+//                            r->contract_box(x_out, m_sep_output);
+//                        else
+//                            r->contract_box(x_out, m_sep_input);
+//                    }
 
                     if(m_domain_init == FULL_WALL){
                         p->get_neighbors_room(maze, list_room_deque);

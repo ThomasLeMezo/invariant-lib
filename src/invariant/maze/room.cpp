@@ -890,7 +890,6 @@ void Room::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep_o
             d_out->set_input_private(x_out);
         }
     }
-    synchronize();
 }
 
 }

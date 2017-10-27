@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("graph_inner", &maze_outer, &maze_inner);
+    VibesMaze v_maze("graph_inner", /*&maze_outer,*/ &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 

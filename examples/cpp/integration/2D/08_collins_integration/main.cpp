@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 //    x2_c = 1.0;
 //    r = 9.0/100.0;
 
-    Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
+    Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2+2, 2)-pow(1.0, 2));
     SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT
     Function f_sep_outer_bis(x1, x2, pow(x1-1, 2)+pow(x2+3, 2)-pow(0.1, 2));
     SepFwdBwd s_outer_bis(f_sep_outer_bis, LEQ); // LT, LEQ, EQ, GEQ, GT)
@@ -93,10 +93,23 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(1, -3, 0.1, "red[]");
     v_maze.drawCircle(0.0, 1.0, 9.0/100.0, "black[green]");
 
-    //    IntervalVector position_info(2);
-    //    position_info[0] = Interval(-2);
-    //    position_info[1] = Interval(-2);
-    //    v_maze_outer.get_room_info(&maze_outer, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(-0.015);
+//    position_info[1] = Interval(-3);
+//    v_maze.show_room_info(&maze_outer, position_info);
+
+//    IntervalVector x_out(2);
+//    x_out[0] = Interval(0);
+//    x_out[1] = Interval(-3.0546875, -2.98046875);
+//    IntervalVector x_in(x_out);
+//    sep_u.separate(x_out, x_in);
+//    cout << "x_out = " << x_out << " x_in = " << x_in << endl;
+
+//    x_out[0] = Interval(-0.03125);
+//    x_out[1] = Interval(-3.0546875, -2.98046875);
+//    x_in = x_out;
+//    sep_u.separate(x_out, x_in);
+//    cout << "x_out = " << x_out << " x_in = " << x_in << endl;
 
     vibes::endDrawing();
 
