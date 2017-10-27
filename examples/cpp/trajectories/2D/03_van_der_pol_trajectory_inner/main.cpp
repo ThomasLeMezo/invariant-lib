@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
-    xc_1 = -1.0; yc_1 = 1.0; r_1 = 0.5;
+    xc_1 = 0.8; yc_1 = 1.3; r_1 = 0.2;
     Function f_sep_A(x1, x2, pow(x1-xc_1, 2)+pow(x2-yc_1, 2)-pow(r_1, 2));
     SepFwdBwd s_A(f_sep_A, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A.set_sep(&s_A);
@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     IntervalVector box_B(2);
-    box_B[0] = Interval(-0.5, 0.5);
-    box_B[1] = Interval(-2.5, -1.5);
+    box_B[0] = Interval(0.8, 1.6);
+    box_B[1] = Interval(-0.7, -0.5);
     Function f_sep_B(x1, x2, Return(x1, x2));
     SepFwdBwd s_B(f_sep_B, box_B);
     dom_B.set_sep(&s_B);
@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
     Maze maze_B(&dom_B, &dyn);
 
     dom_B.add_maze_inter(&maze_A);
-    dom_A.add_maze_inter(&maze_B);
-    dom_A_inner.add_maze_union(&maze_B);
+//    dom_A.add_maze_inter(&maze_B);
+//    dom_A_inner.add_maze_union(&maze_B);
 
     double time_start = omp_get_wtime();
     for(int i=0; i<iterations; i++){
@@ -75,11 +75,7 @@ int main(int argc, char *argv[])
         paving.bisect();
         maze_A.contract();
         maze_A_inner.contract();
-
         maze_B.contract();
-
-        maze_A.contract();
-        maze_A_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

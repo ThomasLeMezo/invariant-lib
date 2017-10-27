@@ -125,18 +125,18 @@ void Domain::contract_separator(Maze *maze, Pave_node *pave_node, std::vector<Ro
                         r->set_empty_private_input();
                 }
                 else{ // Inside & Outside the constraint => all full (over approximation)
-//                    if(m_domain_init == FULL_DOOR){
-                        if(output)
-                            r->set_full_private_output();
-                        else
-                            r->set_full_private_input();
-//                    }
-//                    else{
-//                        if(output)
-//                            r->contract_box(x_out, m_sep_output);
-//                        else
-//                            r->contract_box(x_out, m_sep_input);
-//                    }
+                    //                    if(m_domain_init == FULL_DOOR){
+                    if(output)
+                        r->set_full_private_output();
+                    else
+                        r->set_full_private_input();
+                    //                    }
+                    //                    else{
+                    //                        if(output)
+                    //                            r->contract_box(x_out, m_sep_output);
+                    //                        else
+                    //                            r->contract_box(x_out, m_sep_input);
+                    //                    }
 
                     if(m_domain_init == FULL_WALL){
                         p->get_neighbors_room(maze, list_room_deque);
@@ -178,7 +178,9 @@ void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
     vector<Pave*> pave_border_list;
     m_subpaving->get_tree()->get_border_paves(pave_border_list);
 
-    for(Pave *p:pave_border_list){
+#pragma omp parallel for
+    for(size_t i=0; i<pave_border_list.size(); i++){
+        Pave *p = pave_border_list[i];
         Room *r = p->get_rooms()[maze];
         if(!r->is_removed()){
             for(Face *f:p->get_faces_vector()){
@@ -202,12 +204,20 @@ void Domain::contract_border(Maze *maze, std::vector<Room*> &list_room_deque){
             }
 
             if(m_domain_init == FULL_WALL && (m_border_path_in || m_border_path_out)){
-                if(!p->get_rooms()[maze]->is_full())
-                    list_room_deque.push_back(p->get_rooms()[maze]);
+                if(!p->get_rooms()[maze]->is_full()){
+#pragma omp critical(dqueue)
+                    {
+                        list_room_deque.push_back(p->get_rooms()[maze]);
+                    }
+                }
             }
             if(m_domain_init == FULL_DOOR && (!m_border_path_in || !m_border_path_out)){
-                if(!p->get_rooms()[maze]->is_empty())
-                    list_room_deque.push_back(p->get_rooms()[maze]);
+                if(!p->get_rooms()[maze]->is_empty()){
+#pragma omp critical(dqueue)
+                    {
+                        list_room_deque.push_back(p->get_rooms()[maze]);
+                    }
+                }
             }
         }
     }

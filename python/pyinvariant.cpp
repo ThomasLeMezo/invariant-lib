@@ -66,6 +66,9 @@ using namespace ibex;
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS>(),
                "f"_a,
                "DYNAMICS_SENS"_a)
+          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS>(),
+               "f_list"_a,
+               "DYNAMICS_SENS"_a)
   ;
 
   // ********* Maze *********
