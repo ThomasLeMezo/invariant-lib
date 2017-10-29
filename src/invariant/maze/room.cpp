@@ -343,7 +343,7 @@ void Room::contract_consistency(){
     bool global_compute = false;
     for(int n_vf=0; n_vf<nb_vec; n_vf++){
         if(m_vector_field_zero[n_vf]){ // Case Zero in f
-            if(domain_init == FULL_WALL && get_vector_fields().size()==1)
+            if(domain_init == FULL_WALL)
                 this->set_full_possible();
         }
         else{
