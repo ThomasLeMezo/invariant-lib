@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("torus", false);
+    Vtk_Graph vtk_graph("torus", &paving, false);
     vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
 

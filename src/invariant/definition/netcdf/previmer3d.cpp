@@ -77,7 +77,8 @@ PreviMer3D::PreviMer3D(const std::string& file_directory, const IntervalVector &
     for(int file_id = t_min; file_id<t_max; file_id++){
         const string file_name = file_list[file_id];
 
-        cout << "load file : " << ++cpt << "/" << t_max << " T+" << floor(cpt*0.25) << "h" << (cpt*15)%60 << "min" << endl;
+        cout << "load file : " << cpt << "/" << t_max << " T+" << floor(cpt*0.25) << "h" << (cpt*15)%60 << "min" << endl;
+        cpt++;
         NcFile dataFile(file_directory+file_name, NcFile::read);
 
         NcVar u_var=dataFile.getVar("U");

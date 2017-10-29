@@ -63,17 +63,17 @@ int main(int argc, char *argv[])
     v_maze.show();
     v_maze.drawCircle(3, 2, 0.3, "red[]");
 
-    IntervalVector position_info(2);
-    position_info[0] = Interval(2.7);
-    position_info[1] = Interval(2.12);
-    v_maze.show_room_info(&maze, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = Interval(2.7);
+//    position_info[1] = Interval(2.12);
+//    v_maze.show_room_info(&maze, position_info);
 
-    IntervalVector pave_in(2);
-    pave_in[0] = Interval(2.67188, 2.71875);
-    pave_in[1] = Interval(2.0625, 2.15625);
-    IntervalVector pave_out(pave_in);
-    s.separate(pave_in, pave_out);
-    cout << "pave_in = " << pave_in << " pave_out = " << pave_out << endl;
-    vibes::drawBox(pave_out, "black[]");
+//    IntervalVector pave_in(2);
+//    pave_in[0] = Interval(2.67188, 2.71875);
+//    pave_in[1] = Interval(2.0625, 2.15625);
+//    IntervalVector pave_out(pave_in);
+//    s.separate(pave_in, pave_out);
+//    cout << "pave_in = " << pave_in << " pave_out = " << pave_out << endl;
+//    vibes::drawBox(pave_out, "black[]");
 
 }

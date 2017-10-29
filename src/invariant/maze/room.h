@@ -280,6 +280,20 @@ protected:
      */
     void contract_sliding_mode(int n_vf, int face_in, int sens_in, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return);
 
+    /**
+     * @brief compute_sliding_mode
+     * @param n_vf
+     * @param out_results
+     */
+    void compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<ibex::IntervalVector, 2>>> &out_results, std::vector<std::vector< std::array<ibex::IntervalVector, 2>>> &in_results);
+
+    /**
+     * @brief compute_standard_mode
+     * @param n_vf
+     * @param out_results
+     */
+    void compute_standard_mode(const int n_vf, std::vector<std::vector< std::array<ibex::IntervalVector, 2>>> &out_results, std::vector<std::vector< std::array<ibex::IntervalVector, 2>>> &in_results);
+
 public:
     /**
      * @brief Debug function to get private doors
@@ -300,6 +314,8 @@ protected:
     std::vector<bool>    m_vector_field_zero;
     bool            m_contain_zero_coordinate = false;
     bool            m_contain_zero = false;
+
+    std::vector< std::vector <std::vector<bool>>> m_door_collinearity;
 
     mutable bool    m_empty = false;
     mutable bool    m_full = false;
