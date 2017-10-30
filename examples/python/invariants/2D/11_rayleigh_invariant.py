@@ -29,7 +29,7 @@ for i in range(15): # Number of bisections
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("Rayleigh Invariant", smartSubPaving, maze)
+visu = VibesMaze("Rayleigh Invariant", maze)
 visu.setProperties(0,0,512,512)
 visu.show()
 

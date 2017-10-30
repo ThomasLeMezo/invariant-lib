@@ -58,12 +58,12 @@ for i in range(16):
 	# mazeB.contract()
 
 # Visualization
-	visuA = VibesGraph("graphA", graph, mazeA)
+	visuA = VibesMaze("graphA", graph, mazeA)
 	visuA.setProperties(0,0,512,512)
 	visuA.show()
 	visuA.drawCircle(0.0, -2.0, 1.0, "r[]") # (x_center, y_center, radius, color)
 
-	visuB = VibesGraph("graphB", graph, mazeB)
+	visuB = VibesMaze("graphB", graph, mazeB)
 	visuB.setProperties(512,0,512,512)
 	visuB.show()
 	visuB.drawCircle(0.0, 1.0, 9.0/100.0, "r[]") # (x_center, y_center, radius, color)

@@ -25,8 +25,6 @@ maze_outer = Maze(dom_outer, dyn_outer)
 maze_inner = Maze(dom_inner, dyn_inner)
 
 # Contract the system
-maze_outer.init()
-maze_inner.init()
 for i in range(15): # Number of bisections
 	print(i)
 	subPaving.bisect()
@@ -34,6 +32,6 @@ for i in range(15): # Number of bisections
 	maze_inner.contract()
 
 # Visualization
-visu = VibesGraph("Van Der Pol Bracketing Invariant", subPaving, maze_outer, maze_inner)
+visu = VibesMaze("Van Der Pol Bracketing Invariant", maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()

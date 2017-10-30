@@ -19,13 +19,12 @@ dyn = DynamicsFunction(f, FWD_BWD)
 maze = Maze(dom, dyn)
 
 # Contract the system
-maze.init()
 for i in range(12): # Number of bisections
 	print(i)
 	subPaving.bisect()
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("Van Der Pol Invariant", subPaving, maze)
+visu = VibesMaze("Van Der Pol Invariant", maze)
 visu.setProperties(0,0,512,512)
 visu.show()

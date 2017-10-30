@@ -29,7 +29,7 @@ for i in range(15):
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("smartSubPaving", smartSubPaving, maze)
+visu = VibesMaze("smartSubPaving", maze)
 visu.setProperties(0,0,512,512)
 visu.show()
 

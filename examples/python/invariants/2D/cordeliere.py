@@ -34,6 +34,6 @@ for i in range(0): # Number of bisections
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("Cordeliere Invariant", subPaving, maze)
+visu = VibesMaze("Cordeliere Invariant", maze)
 visu.setProperties(0,0,512,512)
 visu.show()

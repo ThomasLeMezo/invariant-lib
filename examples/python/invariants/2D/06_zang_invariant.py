@@ -30,6 +30,6 @@ for i in range(17): # Number of bisections
 	maze.contract()
 
 # Visualization
-visu = VibesGraph("Zang Invariant", smartSubPaving, maze)
+visu = VibesMaze("Zang Invariant", maze)
 visu.setProperties(0,0,512,512)
 visu.show()
