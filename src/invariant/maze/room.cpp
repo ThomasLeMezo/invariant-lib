@@ -745,6 +745,15 @@ bool Room::is_full(){
     }
 }
 
+bool Room::is_full_union() const{
+    for(Face *f:m_pave->get_faces_vector()){
+        if(!f->get_doors()[m_maze]->is_full_union()){
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Room::request_bisection(){
     return !(is_empty());
 }

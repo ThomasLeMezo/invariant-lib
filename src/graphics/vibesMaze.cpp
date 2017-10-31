@@ -48,8 +48,8 @@ void VibesMaze::show() const{
 
 void VibesMaze::draw_room_inner(Pave *p) const{
     // Draw backward
-    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
-        vibes::drawBox(p->get_position(), "black[]");
+//    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
+//        vibes::drawBox(p->get_position(), "black[]");
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
@@ -78,23 +78,46 @@ void VibesMaze::draw_room_inner(Pave *p) const{
             }
         }
     }
-    vibes::drawPolygon(pt_x, pt_y, "[#FF00FF]");
+    if(!pt_x.empty())
+        vibes::drawPolygon(pt_x, pt_y, "black[#FF00FF]");
+
+    pt_x.clear(); pt_y.clear();
+    for(const tuple<int, int, bool> &t:m_oriented_path){
+        Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
+        IntervalVector d_iv(d->get_input() | d->get_output());
+
+        if(!d_iv.is_empty()){
+            if(get<2>(t)){
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+            }
+            else{
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+            }
+        }
+    }
+    if(!pt_x.empty())
+        vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
 
     // Draw Cone
     show_theta(p, m_maze_inner);
-
 }
 
 void VibesMaze::draw_room_outer(Pave *p) const{
     // Draw backward
-    vibes::drawBox(p->get_position(), "[blue]");
+    vibes::drawBox(p->get_position(), "black[blue]");
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
 
     Room *r = p->get_rooms()[m_maze_outer];
     if(!r->is_removed() && r->get_contain_zero()){
-        vibes::drawBox(p->get_position(), "[yellow]");
+        vibes::drawBox(p->get_position(), "black[yellow]");
     }
     else{
         for(const tuple<int, int, bool> &t:m_oriented_path){
@@ -116,7 +139,7 @@ void VibesMaze::draw_room_outer(Pave *p) const{
                 }
             }
         }
-        vibes::drawPolygon(pt_x, pt_y, "[yellow]");
+        vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
     }
 
     // Draw Cone
@@ -157,12 +180,11 @@ void VibesMaze::show_maze_inner() const{
 
 void VibesMaze::show_maze_outer_inner() const{
     for(Pave *p:m_subpaving->get_paves()){
-        draw_room_outer(p);
-
         Room *r_inner = p->get_rooms()[m_maze_inner];
-        if(!r_inner->is_full()){
+        if(!r_inner->is_full_union())
             draw_room_inner(p);
-        }
+        else
+            draw_room_outer(p);
     }
 
     for(Pave *p:m_subpaving->get_paves_not_bisectable()){
@@ -170,9 +192,9 @@ void VibesMaze::show_maze_outer_inner() const{
             Room *r_outer = p->get_rooms()[m_maze_outer];
             Room *r_inner = p->get_rooms()[m_maze_inner];
             if(r_outer->is_empty())
-                vibes::drawBox(p->get_position(), "[blue]");
+                vibes::drawBox(p->get_position(), "black[blue]");
             if(r_inner->is_empty())
-                vibes::drawBox(p->get_position(), "[#FF00FF]");
+                vibes::drawBox(p->get_position(), "black[#FF00FF]");
         }
     }
 }
@@ -239,22 +261,21 @@ std::vector<ibex::Interval> VibesMaze::compute_theta(ibex::Interval dx, ibex::In
 
 void VibesMaze::show_graph() const{
     IntervalVector bounding_box(m_subpaving->dim(), Interval::EMPTY_SET);
-    vibes::newGroup("graph_bisectable", "gray[gray]", vibesParams("figure", m_name));
-    vibes::newGroup("graph_not_bisectable", "lightGray[lightGray]", vibesParams("figure", m_name));
+//    vibes::newGroup("graph_bisectable", "gray[gray]", vibesParams("figure", m_name));
+//    vibes::newGroup("graph_not_bisectable", "lightGray[lightGray]", vibesParams("figure", m_name));
 
-
-    vibes::Params params_bisectable, params_not_bisectable;
-    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
-    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
+//    vibes::Params params_bisectable, params_not_bisectable;
+//    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
+//    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
     for(Pave*p:m_subpaving->get_paves()){
         ibex::IntervalVector box(p->get_position());
-        vibes::drawBox(box, params_bisectable);
+//        vibes::drawBox(box, params_bisectable);
         bounding_box |= box;
     }
     for(Pave*p:m_subpaving->get_paves_not_bisectable()){
         if(!p->get_position().is_unbounded()){
-            vibes::drawBox(p->get_position(), params_not_bisectable);
+//            vibes::drawBox(p->get_position(), params_not_bisectable);
             bounding_box |= p->get_position();
         }
     }

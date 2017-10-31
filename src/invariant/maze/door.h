@@ -143,6 +143,12 @@ public:
     bool is_full() const;
 
     /**
+     * @brief Return true if the union of input & output doors are full
+     * @return
+     */
+    bool is_full_union() const;
+
+    /**
      * @brief Set if this door is a possible out for propagation
      * @param val
      */

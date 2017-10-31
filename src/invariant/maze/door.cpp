@@ -129,6 +129,13 @@ bool Door::is_full() const{
         return false;
 }
 
+bool Door::is_full_union() const{
+    if((m_input_public | m_output_public) == m_face->get_position())
+        return true;
+    else
+        return false;
+}
+
 Door& operator|=(Door& d1, const Door& d2){
     d1.set_input_private(d1.get_input_private() | d2.get_input());
     d1.set_output_private(d1.get_output_private() | d2.get_output());

@@ -12,6 +12,10 @@
 #include "graphiz_graph.h"
 #include <omp.h>
 
+// Note : a integration approach for the outer approximation is more suitable
+// In face it avoid any issue with stability point that may let impossible any
+// convergence toward the boundary of the set
+
 using namespace std;
 using namespace ibex;
 using namespace invariant;
@@ -21,16 +25,16 @@ int main(int argc, char *argv[])
     ibex::Variable x(2);
 
     IntervalVector space(2);
-    space[0] = Interval(-4,4);
-    space[1] = Interval(-4,4);
+    space[0] = Interval(-3,3);
+    space[1] = Interval(-3,3);
 
     // ****** Domain ******* //
     SmartSubPaving paving(space);
 
     double x1_c, x2_c, r;
     x1_c = 0.0;
-    x2_c = 0.0;
-    r = 0.4;
+    x2_c = 0.5;
+    r = 0.2;
     Function f_sep(x, pow(x[0]-x1_c, 2)+pow(x[1]-x2_c, 2)-pow(r, 2));
 
     invariant::Domain dom_outer(&paving, FULL_WALL);
@@ -47,7 +51,7 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f(x, Return(x[1],
-                                    (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
+                                    (8.0/25.0*pow(x[0],5)-4.0/3.0*pow(x[0],3)+4.0/5.0*x[0])));
     Dynamics_Function dyn(&f, BWD);
 
     // ******* Maze ********* //
@@ -55,10 +59,9 @@ int main(int argc, char *argv[])
     Maze maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
+//    vibes::beginDrawing();
     double time_start = omp_get_wtime();
-    maze_outer.init();
-    maze_inner.init();
-    for(int i=0; i<13; i++){
+    for(int i=0; i<20; i++){
         paving.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
         cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
@@ -67,25 +70,12 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Zang Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
-
-//    VibesMaze v_maze_inner("graph_inner",&maze_inner, VibesMaze::VIBES_MAZE_INNER);
-//    v_maze_inner.setProperties(0, 0, 512, 512);
-//    v_maze_inner.show();
-
-//    IntervalVector position_info(2);
-//    position_info[0] = Interval(-0.4);
-//    position_info[1] = Interval(1.34);
-//    v_maze.get_room_info(&maze_inner, position_info);
-
-//    position_info[0] = Interval(-0.34);
-//    position_info[1] = Interval(1.34);
-//    v_maze.get_room_info(&maze_inner, position_info);
-
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
+
+    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/zang_basin.svg", "Zang Basin");
 
     vibes::endDrawing();
 

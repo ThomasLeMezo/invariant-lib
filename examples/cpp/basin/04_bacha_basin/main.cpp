@@ -80,10 +80,10 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 512, 512);
+    VibesMaze v_maze("Synchronous Generator Basin", &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
 
 //    VibesMaze v_maze_inner("graph_inner",&maze_inner, VibesMaze::VIBES_MAZE_INNER);
 //    v_maze_inner.setProperties(0, 0, 512, 512);
@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
 //    position_info[1] = Interval(2, 4);
 //    v_maze_info.setProperties(0, 0, 300, 300);
 //    v_maze_info.show_room_info(&maze_inner, position_info);
+
+    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/synchronous_generator_basin.svg", "Synchronous Generator Basin");
 
     vibes::endDrawing();
 

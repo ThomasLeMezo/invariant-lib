@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Rayleigh Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
 //    position_info[1] = Interval(2, 4);
 //    v_maze_info.setProperties(0, 0, 300, 300);
 //    v_maze_info.show_room_info(&maze_inner, position_info);
+
+    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/rayleigh_basin.svg", "Rayleigh Basin");
 
     vibes::endDrawing();
 

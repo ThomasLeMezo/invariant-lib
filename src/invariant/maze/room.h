@@ -136,6 +136,12 @@ public:
     bool is_full();
 
     /**
+     * @brief Return true if the Union of outer & inner for each doors is full
+     * @return
+     */
+    bool is_full_union() const;
+
+    /**
      * @brief Getter to the vector fields
      * @return
      */
