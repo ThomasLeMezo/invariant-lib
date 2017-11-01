@@ -10,7 +10,7 @@ smartSubPaving = SmartSubPaving(space)
 dom_outer = Domain(smartSubPaving, FULL_WALL)
 dom_outer.set_border_path_in(False)
 dom_outer.set_border_path_out(False)
-f_sep = Function("x[2]", "(x[0])^2+(x[1])^2-(0.4)^2")
+f_sep = Function("x[2]", "(x[0])^2+(x[1])^2-(0.42)^2")
 s_outer = SepFwdBwd(f_sep, LEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 dom_outer.set_sep_output(s_outer);
 

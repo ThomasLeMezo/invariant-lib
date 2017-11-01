@@ -56,13 +56,10 @@ int main(int argc, char *argv[])
                                      (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-3.0))));
     ibex::Function f_inner2(x1, x2, -Return(x2,
                                      (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(3.0))));
-//    ibex::Function f_inner3(x1, x2, -Return(x2,
-//                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+Interval(-2.0))));
 
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
-//    f_list_inner.push_back(&f_inner3);
     Dynamics_Function dyn_inner(f_list_inner, FWD);
 
     // ******* Mazes ********* //
@@ -73,7 +70,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
     maze_inner.contract();
-    for(int i=0; i<18; i++){
+    for(int i=0; i<10; i++){
         paving.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
@@ -83,12 +80,13 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     VibesMaze v_maze("graph_inner", /*&maze_outer,*/ &maze_inner);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.setProperties(0, 0, 512, 512);
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(12.6);
-    position_info[1] = Interval(-0.51);
+    position_info[0] = Interval(6.6);
+    position_info[1] = Interval(-2.4, -2.05);
+    v_maze.setProperties(600, 0, 512, 512);
     v_maze.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
