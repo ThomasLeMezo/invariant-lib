@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x, Return(x[1],
+    ibex::Function f(x, -Return(x[1],
                                     (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
     Dynamics_Function dyn(&f, BWD);
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Van Der Pol Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 //    v_maze.get_room_info(&maze_inner, position_info);
 
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
-
+    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol_basin.svg", "Van Der Pol Basin");
     vibes::endDrawing();
 
 }

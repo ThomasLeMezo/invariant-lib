@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(2D_invariant_positive_van_der_pol ${SRC})
+  add_executable(2D_invariant_van_der_pol_positive ${SRC})
 
-  target_link_libraries(2D_invariant_positive_van_der_pol
+  target_link_libraries(2D_invariant_van_der_pol_positive
 	 ${LIBS}
 	 invariant-core
          invariant-tools

@@ -12,9 +12,9 @@
 
   )
 
-  add_executable(2D_invariant_balancing_invariant ${SRC})
+  add_executable(2D_invariant_balancing ${SRC})
 
-  target_link_libraries(2D_invariant_balancing_invariant
+  target_link_libraries(2D_invariant_balancing
     ${LIBS}
     invariant-core
     invariant-tools
