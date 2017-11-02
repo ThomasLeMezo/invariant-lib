@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     maze_outer.init();
     maze_inner.init();
-    for(int i=0; i<18; i++){
+    for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
         cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("Van Der Pol Basin", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Van Der Pol 2 Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 //    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
     v_maze.drawBox(x1_c-r, x1_c+r,x2_c-r, x2_c+r, "black[red]");
     v_maze.drawBox(x1_c2-r2, x1_c2+r2,x2_c2-r2, x2_c2+r2, "black[red]");
-    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol_basin.svg", "Van Der Pol Basin");
+    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol2_basin.svg", "Van Der Pol 2 Basin");
     vibes::endDrawing();
 
 }
