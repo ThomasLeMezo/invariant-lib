@@ -747,7 +747,8 @@ bool Room::is_full(){
 
 bool Room::is_full_union() const{
     for(Face *f:m_pave->get_faces_vector()){
-        if(!f->get_doors()[m_maze]->is_full_union()){
+        Door *d = f->get_doors()[m_maze];
+        if(!d->is_full_union()){
             return false;
         }
     }
@@ -856,7 +857,7 @@ Room& operator|=(Room& r1, const Room& r2){
     return r1;
 }
 
-void Room::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep_output){
+void Room::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep, DOOR_SELECTOR doorSelector){
     IntervalVector in(m_pave->get_dim()), out(m_pave->get_dim());
     IntervalVector v_door(virtual_door_out & m_pave->get_position());
     DYNAMICS_SENS sens = m_maze->get_dynamics()->get_sens();
@@ -875,8 +876,10 @@ void Room::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep_o
                 if(sens != FWD_BWD){
                     contract_flow(in, out, ((sens==FWD)?1:-1)*vect);
                     out &= f->get_position();
-                    d_out->set_output_private(d_out->get_output_private() | out);
-                    d_out->set_input_private(d_out->get_input_private() | out);
+                    if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                        d_out->set_output_private(d_out->get_output_private() | out);
+                    if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                        d_out->set_input_private(d_out->get_input_private() | out);
                 }
                 else{
                     IntervalVector out2(out);
@@ -885,16 +888,20 @@ void Room::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep_o
                     contract_flow(in, out2, -vect);
                     out &= f->get_position();
                     out2 &= f->get_position();
-                    d_out->set_output_private(d_out->get_output_private() | out | out2);
-                    d_out->set_input_private(d_out->get_input_private() | out | out2);
+                    if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                        d_out->set_output_private(d_out->get_output_private() | out | out2);
+                    if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                        d_out->set_input_private(d_out->get_input_private() | out | out2);
                 }
             }
         }
         else{
             IntervalVector x_in(f->get_position()), x_out(f->get_position());
-            sep_output->separate(x_in, x_out);
-            d_out->set_output_private(x_out);
-            d_out->set_input_private(x_out);
+            sep->separate(x_in, x_out);
+            if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                d_out->set_output_private(x_out);
+            if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                d_out->set_input_private(x_out);
         }
     }
 }

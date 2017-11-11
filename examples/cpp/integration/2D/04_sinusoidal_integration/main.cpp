@@ -85,11 +85,10 @@ int main(int argc, char *argv[])
     v_maze.show();
     vibes::drawBox(Interval(0, 0.5), Interval(-2, 2), "red[]");
 
-//    v_maze.drawCircle(0.0, 0.0, 2, "balck[red]");
-    //    IntervalVector position_info(2);
-    //    position_info[0] = Interval(-2);
-    //    position_info[1] = Interval(-2);
-    //    v_maze_outer.get_room_info(&maze_outer, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = Interval(0.01);
+    position_info[1] = Interval(1.99);
+    v_maze.show_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 

@@ -10,6 +10,8 @@
 
 namespace invariant {
 
+enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
+
 class Pave; // declared only for friendship
 class Maze; // declared only for friendship
 class Dynamics; // declared only for friendship
@@ -238,7 +240,7 @@ public:
      * @param box
      * @param output
      */
-    void contract_box(ibex::IntervalVector& virtual_door, ibex::Sep *sep_output);
+    void contract_box(ibex::IntervalVector& virtual_door, ibex::Sep *sep, DOOR_SELECTOR doorSelector=DOOR_INPUT_OUTPUT);
 
 protected:
     /**

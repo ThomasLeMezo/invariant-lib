@@ -12,6 +12,7 @@
 #include <iomanip>
 
 namespace invariant {
+
 class Face; // declared only for friendship
 class Room; // declared only for friendship
 class Maze; // declared only for friendship
