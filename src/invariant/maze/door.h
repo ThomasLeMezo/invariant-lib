@@ -22,6 +22,7 @@ public:
     /**
      * @brief Constructor of a Door
      * @param face
+     * By default doors are set open
      */
     Door(Face * face, Room *room);
 

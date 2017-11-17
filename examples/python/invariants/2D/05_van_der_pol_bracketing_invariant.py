@@ -25,7 +25,7 @@ maze_outer = Maze(dom_outer, dyn_outer)
 maze_inner = Maze(dom_inner, dyn_inner)
 
 # Contract the system
-for i in range(15): # Number of bisections
+for i in range(12): # Number of bisections
 	print(i)
 	subPaving.bisect()
 	maze_outer.contract()

@@ -15,13 +15,6 @@ Door::Door(Face *face, Room *room):
     m_face = face;
     m_room = room;
     omp_init_lock(&m_lock_read);
-
-//    if(m_room->get_maze()->get_domain()->get_init() == FULL_WALL){
-//        m_input_private->set_empty();
-//        m_output_private->set_empty();
-//        m_input_public.set_empty();
-//        m_output_public.set_empty();
-//    }
 }
 
 Door::~Door(){

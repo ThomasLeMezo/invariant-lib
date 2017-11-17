@@ -210,6 +210,9 @@ private:
     bool                                        m_infinite_pave = false;
     size_t                                      m_serialization_id=0;
     bool                                        m_border = false;
+
+    std::map<Maze*, Door*>                      m_initial_condition_door;
+    std::map<Maze*, Door*>                      m_hybrid_door;
 };
 
     /**
