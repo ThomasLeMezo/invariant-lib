@@ -62,6 +62,7 @@ private:
 
     void draw_room_outer(invariant::Pave *p) const;
     void draw_room_inner(invariant::Pave *p) const;
+    void draw_room_inner_outer(invariant::Pave *p) const;
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:

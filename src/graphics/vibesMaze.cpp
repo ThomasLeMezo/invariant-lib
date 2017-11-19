@@ -146,6 +146,96 @@ void VibesMaze::draw_room_outer(Pave *p) const{
     show_theta(p, m_maze_outer);
 }
 
+void VibesMaze::draw_room_inner_outer(Pave *p) const{
+    // Draw backward
+//    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
+//        vibes::drawBox(p->get_position(), "black[]");
+
+    // Draw Polygon
+    vector<double> pt_x, pt_y;
+
+    for(const tuple<int, int, bool> &t:m_oriented_path){
+        Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
+        IntervalVector d_iv(d->get_input() | d->get_output());
+
+        if(!d_iv.is_empty()){
+            if(get<2>(t)){
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+            }
+            else{
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+            }
+        }
+    }
+    if(!pt_x.empty())
+        vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
+
+    pt_x.clear(); pt_y.clear();
+    for(const tuple<int, int, bool> &t:m_oriented_path){
+        Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
+        IntervalVector d_iv(d->get_input() | d->get_output());
+        IntervalVector* d_iv_list;
+        int nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
+
+        if(nb_vec == 1){
+            IntervalVector d_iv_c(d_iv_list[0]);
+            if(!d_iv_c.is_empty()){
+                if(get<2>(t)){
+                    pt_x.push_back(d_iv_c[0].lb());
+                    pt_y.push_back(d_iv_c[1].lb());
+                    pt_x.push_back(d_iv_c[0].ub());
+                    pt_y.push_back(d_iv_c[1].ub());
+                }
+                else{
+                    pt_x.push_back(d_iv_c[0].ub());
+                    pt_y.push_back(d_iv_c[1].ub());
+                    pt_x.push_back(d_iv_c[0].lb());
+                    pt_y.push_back(d_iv_c[1].lb());
+                }
+            }
+        }
+    }
+    if(!pt_x.empty())
+        vibes::drawPolygon(pt_x, pt_y, "black[#FF00FF]");
+
+    pt_x.clear(); pt_y.clear();
+    for(const tuple<int, int, bool> &t:m_oriented_path){
+        Door *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
+        IntervalVector d_iv(d->get_input() | d->get_output());
+        IntervalVector* d_iv_list;
+        int nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
+
+        if(nb_vec == 1){
+            IntervalVector d_iv_c(d_iv_list[0]);
+            if(!d_iv_c.is_empty()){
+                if(get<2>(t)){
+                    pt_x.push_back(d_iv_c[0].lb());
+                    pt_y.push_back(d_iv_c[1].lb());
+                    pt_x.push_back(d_iv_c[0].ub());
+                    pt_y.push_back(d_iv_c[1].ub());
+                }
+                else{
+                    pt_x.push_back(d_iv_c[0].ub());
+                    pt_y.push_back(d_iv_c[1].ub());
+                    pt_x.push_back(d_iv_c[0].lb());
+                    pt_y.push_back(d_iv_c[1].lb());
+                }
+            }
+        }
+    }
+    if(!pt_x.empty())
+        vibes::drawPolygon(pt_x, pt_y, "black[blue]");
+
+    // Draw Cone
+    show_theta(p, m_maze_inner);
+}
+
 void VibesMaze::show_maze_outer() const{
     for(Pave *p:m_subpaving->get_paves()){
         draw_room_outer(p);
@@ -181,10 +271,16 @@ void VibesMaze::show_maze_inner() const{
 void VibesMaze::show_maze_outer_inner() const{
     for(Pave *p:m_subpaving->get_paves()){
         Room *r_inner = p->get_rooms()[m_maze_inner];
-        if(!r_inner->is_full_union())
-            draw_room_inner(p);
-        else
+        Room *r_outer = p->get_rooms()[m_maze_outer];
+        if(!r_inner->is_full_union()){
+            if(r_outer->is_full_union())
+                draw_room_inner(p);
+            else
+                draw_room_inner_outer(p);
+        }
+        else{
             draw_room_outer(p);
+        }
     }
 
     for(Pave *p:m_subpaving->get_paves_not_bisectable()){
@@ -324,16 +420,16 @@ void VibesMaze::show_room_info(invariant::Maze *maze, const IntervalVector& posi
         vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height));
 
         // Draw Pave
-        if(m_type == VIBES_MAZE_INNER){
+        if(maze->get_domain()->get_init() == FULL_WALL){
             draw_room_inner(p);
         }
-        else if(m_type == VIBES_MAZE_OUTER){
+        else if(maze->get_domain()->get_init() == FULL_DOOR){
             draw_room_outer(p);
         }
-        else{
-            draw_room_outer(p);
-            draw_room_inner(p);
-        }
+//        else{
+//            draw_room_outer(p);
+//            draw_room_inner(p);
+//        }
 
 
         // Draw Doors
