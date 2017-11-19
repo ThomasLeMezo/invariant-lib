@@ -115,6 +115,8 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
                 if(first_read){
                     u_var.getAtt("scale_factor").getValues(&m_scale_factor);
                     u_var.getAtt("_FillValue").getValues(&m_fill_value);
+                    u_var.getAtt("valid_min").getValues(&m_min_valid);
+                    u_var.getAtt("valid_max").getValues(&m_max_valid);
                     i_max_save = i_max;
                     j_max_save = j_max;
                     first_read = false;
@@ -175,10 +177,10 @@ PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<
     cout << "**** FILL THE TREE ****" << endl;
     time_start_init = omp_get_wtime();
     short int val_min[2],val_max[2];
-    val_min[0] = std::numeric_limits<short int>::min();
-    val_min[1] = std::numeric_limits<short int>::min();
-    val_max[1] = std::numeric_limits<short int>::max();
-    val_max[1] = std::numeric_limits<short int>::max();
+    val_min[0] = m_max_valid; // Invert min/max bounds to fill the tree
+    val_min[1] = m_max_valid;
+    val_max[0] = m_min_valid;
+    val_max[1] = m_min_valid;
     m_node_current->fill_tree(m_node_root_position, val_min, val_max);
 
     cout << "-> TIME fill the tree = " << omp_get_wtime() - time_start_init << endl;
@@ -197,26 +199,26 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
     std::vector<std::array<int, 2>> target;
 
     array<int, 2> t = {floor(position[0].lb()/m_grid_conversion[0]), ceil(position[0].ub()/m_grid_conversion[0])};
-    array<int, 2> i = {floor(position[1].lb()/m_grid_conversion[1]), ceil(position[1].ub()/m_grid_conversion[1])};
-    array<int, 2> j = {floor(position[2].lb()/m_grid_conversion[2]), ceil(position[2].ub()/m_grid_conversion[2])};
+    array<int, 2> i = {floor(position[1].lb()/m_grid_conversion[1]-m_offset_i), ceil(position[1].ub()/m_grid_conversion[1]-m_offset_i)};
+    array<int, 2> j = {floor(position[2].lb()/m_grid_conversion[2]-m_offset_j), ceil(position[2].ub()/m_grid_conversion[2]-m_offset_j)};
     target.push_back(t);
     target.push_back(i);
     target.push_back(j);
 
-    short int val_min[2],val_max[2];
-    val_min[0] = std::numeric_limits<short int>::min();
-    val_min[1] = std::numeric_limits<short int>::min();
-    val_max[1] = std::numeric_limits<short int>::max();
-    val_max[1] = std::numeric_limits<short int>::max();
+    signed short int val_min[2],val_max[2];
+    val_min[0] = m_max_valid;
+    val_min[1] = m_max_valid;
+    val_max[0] = m_min_valid;
+    val_max[1] = m_min_valid;
     m_node_current->eval(target, m_node_root_position, val_min, val_max);
 
     IntervalVector vec(3);
-    if((val_min[0] == std::numeric_limits<short int>::max() && val_max[0] == std::numeric_limits<short int>::min())
-            || (val_min[1] == std::numeric_limits<short int>::max() && val_max[1] == std::numeric_limits<short int>::min())){
+    if((val_min[0] >= m_max_valid && val_max[0] <= m_min_valid)
+            || (val_min[1] >= m_max_valid && val_max[1] <= m_min_valid)){
         vec = IntervalVector(3, Interval::EMPTY_SET);
     }
     else{
-        vec[0] = Interval(0.9, 1.0);
+        vec[0] = Interval(0.9999, 1.0);
         vec[1] = Interval(val_min[0] * m_scale_factor, val_max[0] * m_scale_factor) + Interval(-0.1, 0.1);
         vec[2] = Interval(val_min[1] * m_scale_factor, val_max[1] * m_scale_factor) + Interval(-0.1, 0.1);
     }
@@ -228,11 +230,14 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
 {
     int nb_node=m_leaf_list.size();
 
-    #pragma omp parallel for
+    #pragma omp parallel for num_threads(1)
     for(int id=0; id<nb_node; id++){
         RasterTree<short int, 2> *rt = m_leaf_list[id];
         // [x], [y], [t] => array value should be identical
         std::vector<std::array<int, 2>> position = m_leaf_position[id];
+
+        if(position[0][0] == 0 && position[1][0]==209 && position[2][0]==399)
+            cout << "debug" << endl;
 
         // => Set without any error
         short int val_min[2], val_max[2];
@@ -240,8 +245,13 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
         val_min[1] = raw_v_t[position[0][0]][position[1][0]][position[2][0]];
         val_max[0] = val_min[0];
         val_max[1] = val_min[1];
+        bool valid_data = true;
 
-        rt->set_node_val(val_min, val_max);
+        if(val_min[0] < m_min_valid || val_min[1] < m_min_valid
+           || val_max[0] > m_max_valid || val_max[1] > m_max_valid)
+            valid_data = false;
+
+        rt->set_node_val(val_min, val_max, valid_data);
     }
 }
 

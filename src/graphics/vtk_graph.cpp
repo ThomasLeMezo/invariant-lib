@@ -190,7 +190,8 @@ void Vtk_Graph::show_graph(){
 void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
-    vtkSmartPointer<vtkAppendPolyData> polyData_field = vtkSmartPointer<vtkAppendPolyData>::New();
+    vtkSmartPointer<vtkPoints> vec_field_points = vtkSmartPointer< vtkPoints >::New();
+    vtkSmartPointer<vtkFloatArray> field = vtkSmartPointer<vtkFloatArray>::New();
 
     //    vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
     int dim_paves_list = m_subpaving->get_paves().size();
@@ -296,10 +297,6 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 // ********** Append results **************
 
                 // Vector field work
-                vtkSmartPointer<vtkPoints> points = vtkSmartPointer< vtkPoints >::New();
-                vtkSmartPointer<vtkFloatArray> field = vtkSmartPointer<vtkFloatArray>::New();
-                vtkSmartPointer< vtkPolyData> dataObject = vtkSmartPointer<vtkPolyData>::New();
-                vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
 
                 field->SetNumberOfComponents(3);
                 field->SetName("Glyph");
@@ -316,25 +313,21 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                     for(int x=0; x<2; x++){
                         for(int y=0; y<2; y++){
                             for(int z=0; z<2; z++){
-                                points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
-                                field->InsertNextTuple3(vec_field_point[0][x],
-                                        vec_field_point[1][y],
-                                        vec_field_point[2][z]);
+#pragma omp critical(add_field)
+                                {
+                                    vec_field_points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
+                                    field->InsertNextTuple3(vec_field_point[0][x],
+                                            vec_field_point[1][y],
+                                            vec_field_point[2][z]);
+                                }
                             }
                         }
                     }
-
-                    dataObject->SetPoints(points);
-                    dataObject->GetPointData()->SetVectors(field);
-                    vertexFilter->AddInputData(dataObject); // Transform points (array) in vertex objects
-                    vertexFilter->Update();
                 }
 
 #pragma omp critical(add_polygon)
                 {
                     polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-                    polyData_field->AddInputData(vertexFilter->GetOutput());
-
                     if(step%1000==0)
                         cout << "step = " << step << " /" << dim_paves_list << endl;
                 }
@@ -345,6 +338,16 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
         }
     }
 
+    vtkSmartPointer<vtkAppendPolyData> polyData_field = vtkSmartPointer<vtkAppendPolyData>::New();
+    vtkSmartPointer< vtkPolyData> dataObject = vtkSmartPointer<vtkPolyData>::New();
+    dataObject->SetPoints(vec_field_points);
+    dataObject->GetPointData()->SetVectors(field);
+    polyData_field->AddInputData(dataObject);
+    polyData_field->Update();
+    vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+    vertexFilter->AddInputData(polyData_field->GetOutput()); // Transform points (array) in vertex objects
+    vertexFilter->Update();
+
     polyData_polygon->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
@@ -353,9 +356,9 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
 
-//    polyData_field->Update();
-//    file = m_file_name + "_vecField" + comment + ".vtp";
-//    outputWriter->SetFileName(file.c_str());
-//    outputWriter->SetInputData(polyData_field->GetOutput());
-//    outputWriter->Write();
+    polyData_field->Update();
+    file = m_file_name + "_vecField" + comment + ".vtp";
+    outputWriter->SetFileName(file.c_str());
+    outputWriter->SetInputData(vertexFilter->GetOutput());
+    outputWriter->Write();
 }

@@ -103,6 +103,7 @@ private:
 private:
     float m_scale_factor = 0;
     short m_fill_value = 0;
+    short m_min_valid, m_max_valid;
     ibex::IntervalVector m_search_space;
 
     const vector<double> m_grid_conversion = {15.0*60.0, 250.0, 250.0};

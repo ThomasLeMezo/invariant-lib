@@ -36,7 +36,7 @@ public:
      * @param val_min
      * @param val_max
      */
-    void fill_tree(const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max);
+    bool fill_tree(const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max);
 
     /**
      * @brief Eval the vector filed at this position
@@ -50,7 +50,7 @@ public:
      * @param val_min
      * @param val_max
      */
-    void set_node_val(_Tp *val_min, _Tp *val_max);
+    void set_node_val(_Tp *val_min, _Tp *val_max, bool valid_data=true);
 
 private:
 
@@ -90,6 +90,7 @@ private:
     _Tp m_val_min[_n]; // signed short
     _Tp m_val_max[_n];
     signed char m_bisection_axis = -1; // -1 if leaf
+    bool m_valid_data = true;
 
     RasterTree<_Tp, _n> * m_children_first;
     RasterTree<_Tp, _n> * m_children_second;
@@ -102,9 +103,10 @@ bool RasterTree<_Tp, _n>::is_leaf() const{
 }
 
 template<typename _Tp, size_t _n>
-void RasterTree<_Tp, _n>::set_node_val(_Tp *val_min, _Tp *val_max){
-    std::copy_n(m_val_min, _n, val_min);
-    std::copy_n(m_val_max, _n, val_max);
+void RasterTree<_Tp, _n>::set_node_val(_Tp *val_min, _Tp *val_max, bool valid_data){
+    std::copy_n(val_min, _n, m_val_min);
+    std::copy_n(val_max, _n, m_val_max);
+    m_valid_data = valid_data;
 }
 
 }

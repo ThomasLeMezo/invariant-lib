@@ -88,35 +88,40 @@ size_t RasterTree<_Tp, _n>::bisector(const std::vector<std::array<int, 2>> &posi
 }
 
 template<typename _Tp, size_t _n>
-void RasterTree<_Tp, _n>::fill_tree(const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max){
+bool RasterTree<_Tp, _n>::fill_tree(const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max){
     if(is_leaf()){
-        union_vector(val_min, val_max);
+        if(m_valid_data){
+            union_vector(val_min, val_max);
+            return true;
+        }
+        else
+            return false;
     }
     else{
         std::vector<std::array<int, 2>> p1, p2;
         bisector(position, p1, p2);
-
-        m_children_first->fill_tree(p1, val_min, val_max);
-        m_children_second->fill_tree(p2, val_min, val_max);
+        bool valid_data = false;
+        valid_data |= m_children_first->fill_tree(p1, val_min, val_max);
+        valid_data |= m_children_second->fill_tree(p2, val_min, val_max);
         std::copy_n(val_min, _n, m_val_min);
         std::copy_n(val_max, _n, m_val_max);
+        m_valid_data = valid_data;
+        return valid_data;
     }
 }
 
 template<typename _Tp, size_t _n>
 void RasterTree<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max) const{
-    if(is_leaf()){
-        union_vector(val_min, val_max);
+    if(is_inter_empty(target, position)){
+        return;
+    }
+    else if(is_leaf() || is_subset(position, target)){
+        if(m_valid_data)
+            union_vector(val_min, val_max);
     }
     else{
-        if(is_inter_empty(target, position)){
-            return;
-        }
-        else if(is_subset(position, target)){
-            union_vector(val_min, val_max);
-        }
-        else{
-            // Bisect
+        // Bisect
+        if(m_valid_data){
             std::vector<std::array<int, 2>> p1, p2;
             bisector(position, p1, p2);
             m_children_first->eval(target, p1, val_min, val_max);
