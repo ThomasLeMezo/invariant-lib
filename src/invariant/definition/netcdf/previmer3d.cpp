@@ -218,7 +218,7 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec = IntervalVector(3, Interval::EMPTY_SET);
     }
     else{
-        vec[0] = Interval(0.9999, 1.0);
+        vec[0] = Interval(0.9999, 1.0001);
         vec[1] = Interval(val_min[0] * m_scale_factor, val_max[0] * m_scale_factor) + Interval(-0.01, 0.01);
         vec[2] = Interval(val_min[1] * m_scale_factor, val_max[1] * m_scale_factor) + Interval(-0.01, 0.01);
     }

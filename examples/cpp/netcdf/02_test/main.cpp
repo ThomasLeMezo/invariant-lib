@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     double t_c, x_c, y_c, r;
     t_c = 0 * pm3d.get_grid_conversion()[0];
-    x_c = 174 * pm3d.get_grid_conversion()[1];
+    x_c = 130 * pm3d.get_grid_conversion()[1];
     y_c = 460 * pm3d.get_grid_conversion()[2];
     r = 0.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<25; i++){
+    for(int i=0; i<20; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();

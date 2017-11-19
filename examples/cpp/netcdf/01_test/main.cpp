@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     vibes::newFigure("test");
-    for(size_t i=0; i<pm.get_i_max(); i+=3){
-        for(size_t j=0; j<pm.get_j_max(); j+=3){
+    for(size_t i=0; i<pm.get_i_max(); i+=2){
+        for(size_t j=0; j<pm.get_j_max(); j+=2){
             if(pm.get_raw_u()[i][j]!=fill_value){
                 vibes::drawBox(i, i+1, j, j+1, "b[b]");
             }
