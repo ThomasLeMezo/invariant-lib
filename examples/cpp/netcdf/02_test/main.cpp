@@ -13,39 +13,35 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    int iterations_max = 10;
-
-    string dir = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/");
-
-    vector<double> grid_size = {15*60.0, 250.0, 250.0}; // {15*60 s, 250 m, 250 m}
-    vector<double> limit_bisection = {15.0*60.0, 250.0, 250.0}; // Or divide by 2
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     IntervalVector search_space(3);
-    search_space[0] = Interval(0, 3); // T = 0..96 (in 15*min)
-    search_space[1] = Interval(100, 250); // X = 0..300
-    search_space[2] = Interval(500, 600); // Y = 200..500
 
-    for(int i=0; i<3; i++)
-        search_space[i] *= grid_size[i]; // Y = 200..500
+    array<array<size_t, 2>, 2> grid_limits; // X, Y, T limits
+    grid_limits[0][0] = 80; grid_limits[0][1] = 280;
+    grid_limits[1][0] = 380; grid_limits[1][1] = 580;
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(dir, search_space, grid_size, limit_bisection, iterations_max);
-    cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl;
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    search_space = pm3d.get_search_space();
+    cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
 
-    // ****** Domain *******
+//    // ****** Domain *******
+    cout << "Search_space = " << search_space << endl;
     SmartSubPaving paving(search_space);
     invariant::Domain dom(&paving, FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
+    const std::vector<double> limit_bisection = {15*60, 250, 250};
     paving.set_limit_bisection(limit_bisection);
 
     double t_c, x_c, y_c, r;
-    t_c = 0 * grid_size[0];
-    x_c = 160 * grid_size[1];
-    y_c = 536 * grid_size[2];
+    t_c = 0 * pm3d.get_grid_conversion()[0];
+    x_c = 160 * pm3d.get_grid_conversion()[1];
+    y_c = 536 * pm3d.get_grid_conversion()[2];
     r = 0.0;
     Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
@@ -56,13 +52,11 @@ int main(int argc, char *argv[])
     Maze maze(&dom, &pm3d);
 
     cout << "Domain = " << search_space << endl;
-//    double max_diam = search_space.max_diam();
-//    int iterations_max = 4*(ceil(log(max_diam)/log(2)));
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
-    for(int i=0; i<iterations_max; i++){
-        cout << i << "/" << iterations_max << endl;
+    for(int i=0; i<15; i++){
+        cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();
         cout << " => bisection : " << omp_get_wtime() - time_start_bisection << "s - " << paving.size() << endl;
@@ -75,16 +69,12 @@ int main(int argc, char *argv[])
     Vtk_Graph vtk_graph("Previmer", &paving, false);
 //    vtk_graph.show_graph();
     vtk_graph.show_maze(&maze);
-//    vector<Pave *> pave_list;
-    IntervalVector position(3);
-    position[0] = Interval(t_c, 2400); // 450, 900
-    position[1] = Interval(x_c); // 37304, 37980
-    position[2] = Interval(y_c); // 119766, 120469
-//    paving.get_room_info(&maze, position, pave_list);
-//    cout << pave_list.size() << endl;
-    vtk_graph.show_room_info(&maze, position);
 
-
+//    IntervalVector position(3);
+//    position[0] = Interval(t_c, 2400); // 450, 900
+//    position[1] = Interval(x_c); // 37304, 37980
+//    position[2] = Interval(y_c); // 119766, 120469
+//    vtk_graph.show_room_info(&maze, position);
 
     return 0;
 }

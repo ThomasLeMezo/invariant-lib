@@ -3,9 +3,10 @@
 
 #include <string>
 #include <ibex/ibex_IntervalVector.h>
-#include "nodecurrent3d.h"
+#include "rasterTree/rastertree.h"
 #include "dynamics.h"
 #include <utility>
+#include <array>
 
 namespace invariant {
 
@@ -17,7 +18,7 @@ public:
      * @brief PreviMer constructor
      * @param file_name
      */
-    PreviMer3D(const std::string &file_directory, const ibex::IntervalVector &search_space, std::vector<double> grid_size, const std::vector<double> &limit_bisection, int stop_level);
+    PreviMer3D(const std::string &file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits);
 
     /**
      * @brief PreviMer destructor
@@ -35,29 +36,50 @@ public:
      * @brief Get the search space associated with the current vector field
      * @return
      */
-    const ibex::IntervalVector& get_search_space();
+    const ibex::IntervalVector& get_search_space() const;
 
+    /**
+     * @brief get_raw_u
+     * @return
+     */
     const std::vector<std::vector<std::vector<short>> >& get_raw_u();
 
+    /**
+     * @brief get_raw_v
+     * @return
+     */
     const std::vector<std::vector<std::vector<short> > > &get_raw_v();
 
+    /**
+     * @brief get_fill_value
+     * @return
+     */
     short get_fill_value();
 
-    const std::vector<size_t>& get_size();
-
-    std::vector<double> get_grid_size();
-
-    signed char bisect_largest_first(const ibex::IntervalVector &position, ibex::IntervalVector &p1, ibex::IntervalVector &p2);
-
-private:
     /**
-     * @brief Get all the file names in a directory
-     * @param dir
-     * @param files
+     * @brief get_grid_conversion
+     * @param dim
+     * @return
      */
-    int get_file_list(std::string dir, std::vector<std::string> &files);
+    const double &get_grid_conversion(size_t dim) const;
+
+    /**
+     * @brief get_grid_conversion
+     * @return
+     */
+    std::vector<double> get_grid_conversion();
 
 private:
+
+    /**
+     * @brief load_data
+     * @param file_directory
+     * @param raw_u_t
+     * @param raw_v_t
+     */
+    void load_data(const std::string &file_xml, std::vector<std::vector<std::vector<short int>>> &raw_u_t,
+                   std::vector<std::vector<std::vector<short int>>> &raw_v_t,
+                   const std::array<std::array<size_t, 2>, 2> &grid_limits);
 
     /**
      * @brief Get the value of the vector field at a point from raw data
@@ -67,40 +89,46 @@ private:
     const ibex::IntervalVector& get_vector_field_at_point(std::vector<double> position);
 
     /**
+     * @brief Conversion function (real position to raster)
+     * @param position
+     * @return
+     */
+    const std::vector<std::array<int, 2>> & conversion_function(ibex::IntervalVector position);
+
+    /**
      * @brief Fill the leafs of the node tree
      */
-    void fill_leafs(const std::vector<std::vector<std::vector<short>>> &raw_u_t, const std::vector<std::vector<std::vector<short>>> &raw_v_t);
+    void fill_leafs(const std::vector<std::vector<std::vector<short> > > &raw_u_t, const std::vector<std::vector<std::vector<short> > > &raw_v_t);
 
 private:
     float m_scale_factor = 0;
     short m_fill_value = 0;
-    int m_dim = 0;
-    std::vector<size_t> m_size;
     ibex::IntervalVector m_search_space;
 
-    NodeCurrent3D *m_node_current;
-    std::vector<NodeCurrent3D *> m_leaf_list;
-    std::vector<ibex::IntervalVector> m_leaf_position;
+    const vector<double> m_grid_conversion = {15.0*60.0, 250.0, 250.0};
 
-    std::vector<double> m_grid_size;
+    size_t m_offset_i = 0;
+    size_t m_offset_j = 0;
 
-    std::vector<double> m_limit_bisection;
-    std::vector<double> m_ratio_dimension;
+    RasterTree<signed short, 2> *m_node_current;
+    std::vector<RasterTree<signed short, 2> *> m_leaf_list;
+    std::vector<std::vector<std::array<int, 2>>> m_leaf_position;
+    std::vector<std::array<int, 2>> m_node_root_position;
 };
 
 inline short PreviMer3D::get_fill_value(){
     return m_fill_value;
 }
 
-inline const std::vector<size_t>& PreviMer3D::get_size(){
-    return m_size;
+inline std::vector<double> PreviMer3D::get_grid_conversion(){
+    return m_grid_conversion;
 }
 
-inline std::vector<double> PreviMer3D::get_grid_size(){
-    return m_grid_size;
+inline const double& PreviMer3D::get_grid_conversion(size_t dim) const{
+    return m_grid_conversion[dim];
 }
 
-inline const ibex::IntervalVector& PreviMer3D::get_search_space(){
+inline const ibex::IntervalVector& PreviMer3D::get_search_space()const{
     return m_search_space;
 }
 

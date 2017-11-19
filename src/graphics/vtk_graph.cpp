@@ -74,15 +74,15 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
                                         {vec_field[1].lb(), vec_field[1].ub()},
                                         {vec_field[2].lb(), vec_field[2].ub()}};
         field->InsertNextTuple3(vec_field[0].mid(),
-                                vec_field[1].mid(),
-                                vec_field[2].mid());
+                vec_field[1].mid(),
+                vec_field[2].mid());
         for(int x=0; x<2; x++){
             for(int y=0; y<2; y++){
                 for(int z=0; z<2; z++){
                     points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
                     field->InsertNextTuple3(vec_field_point[0][x],
-                                            vec_field_point[1][y],
-                                            vec_field_point[2][z]);
+                            vec_field_point[1][y],
+                            vec_field_point[2][z]);
                 }
             }
         }
@@ -112,16 +112,16 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
                 IntervalVector input(d->get_input());
                 IntervalVector output(d->get_output());
 
-//                input[face] += /*1.0*Interval((sens==1)?(offset[face]):(-offset[face])) +*/ Interval(/*-offset[face]/4.0*/0.0, offset[face]/4.0);
+                //                input[face] += /*1.0*Interval((sens==1)?(offset[face]):(-offset[face])) +*/ Interval(/*-offset[face]/4.0*/0.0, offset[face]/4.0);
                 input[face] += (sens==1)?(Interval(0, offset[face]/4.0)):(Interval(-offset[face]/4.0, 0));
-//                output[face] += /*2.0*Interval((sens==1)?(offset[face]):(-offset[face])) +*/ Interval(/*-offset[face]/4.0*/0.0, offset[face]/4.0);
+                //                output[face] += /*2.0*Interval((sens==1)?(offset[face]):(-offset[face])) +*/ Interval(/*-offset[face]/4.0*/0.0, offset[face]/4.0);
                 output[face] += (sens==1)?(Interval(0, offset[face]/4.0)):(Interval(-offset[face]/4.0, 0));
 
                 if(!input.is_empty()){
                     vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
                     cubedata->SetBounds(input[0].lb(), input[0].ub(),
-                                        input[1].lb(), input[1].ub(),
-                                        input[2].lb(), input[2].ub());
+                            input[1].lb(), input[1].ub(),
+                            input[2].lb(), input[2].ub());
                     cubedata->Update();
                     polyData_doors_input->AddInputData(cubedata->GetOutput());
                 }
@@ -129,8 +129,8 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
                 if(!output.is_empty()){
                     vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
                     cubedata->SetBounds(output[0].lb(), output[0].ub(),
-                                        output[1].lb(), output[1].ub(),
-                                        output[2].lb(), output[2].ub());
+                            output[1].lb(), output[1].ub(),
+                            output[2].lb(), output[2].ub());
                     cubedata->Update();
                     polyData_doors_output->AddInputData(cubedata->GetOutput());
                 }
@@ -190,7 +190,9 @@ void Vtk_Graph::show_graph(){
 void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
-//    vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
+    vtkSmartPointer<vtkAppendPolyData> polyData_field = vtkSmartPointer<vtkAppendPolyData>::New();
+
+    //    vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
     int dim_paves_list = m_subpaving->get_paves().size();
     int step = 0;
 
@@ -202,17 +204,17 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
         step ++;
 
         if(r->is_full()){
-//            IntervalVector position(p->get_position());
-//            cubedata->SetBounds(position[0].lb(), position[0].ub(),
-//                    position[1].lb(), position[1].ub(),
-//                    position[2].lb(), position[2].ub());
-//            cubedata->Update();
-//#pragma omp critical(add_polygon)
-//            {
-//                polyData_polygon->AddInputData(cubedata->GetOutput());
-//                if(step%1000==0)
-//                    cout << "step = " << step << " /" << dim_paves_list << endl;
-//            }
+            //            IntervalVector position(p->get_position());
+            //            cubedata->SetBounds(position[0].lb(), position[0].ub(),
+            //                    position[1].lb(), position[1].ub(),
+            //                    position[2].lb(), position[2].ub());
+            //            cubedata->Update();
+            //#pragma omp critical(add_polygon)
+            //            {
+            //                polyData_polygon->AddInputData(cubedata->GetOutput());
+            //                if(step%1000==0)
+            //                    cout << "step = " << step << " /" << dim_paves_list << endl;
+            //            }
         }
         else if(!r->is_empty()){
             int nb_faces = 0;
@@ -292,9 +294,47 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
                 //            reverse->Update();
 
                 // ********** Append results **************
+
+                // Vector field work
+                vtkSmartPointer<vtkPoints> points = vtkSmartPointer< vtkPoints >::New();
+                vtkSmartPointer<vtkFloatArray> field = vtkSmartPointer<vtkFloatArray>::New();
+                vtkSmartPointer< vtkPolyData> dataObject = vtkSmartPointer<vtkPolyData>::New();
+                vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+
+                field->SetNumberOfComponents(3);
+                field->SetName("Glyph");
+
+                IntervalVector position(p->get_position());
+                IntervalVector vec_field = r->get_vector_fields()[0];
+                if(!vec_field.is_empty()){
+                    double vec_field_point[3][2] = {{vec_field[0].lb(), vec_field[0].ub()},
+                                                    {vec_field[1].lb(), vec_field[1].ub()},
+                                                    {vec_field[2].lb(), vec_field[2].ub()}};
+                    field->InsertNextTuple3(vec_field[0].mid(),
+                            vec_field[1].mid(),
+                            vec_field[2].mid());
+                    for(int x=0; x<2; x++){
+                        for(int y=0; y<2; y++){
+                            for(int z=0; z<2; z++){
+                                points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
+                                field->InsertNextTuple3(vec_field_point[0][x],
+                                        vec_field_point[1][y],
+                                        vec_field_point[2][z]);
+                            }
+                        }
+                    }
+
+                    dataObject->SetPoints(points);
+                    dataObject->GetPointData()->SetVectors(field);
+                    vertexFilter->AddInputData(dataObject); // Transform points (array) in vertex objects
+                    vertexFilter->Update();
+                }
+
 #pragma omp critical(add_polygon)
                 {
                     polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                    polyData_field->AddInputData(vertexFilter->GetOutput());
+
                     if(step%1000==0)
                         cout << "step = " << step << " /" << dim_paves_list << endl;
                 }
@@ -312,4 +352,10 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     outputWriter->SetFileName(file.c_str());
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
+
+//    polyData_field->Update();
+//    file = m_file_name + "_vecField" + comment + ".vtp";
+//    outputWriter->SetFileName(file.c_str());
+//    outputWriter->SetInputData(polyData_field->GetOutput());
+//    outputWriter->Write();
 }
