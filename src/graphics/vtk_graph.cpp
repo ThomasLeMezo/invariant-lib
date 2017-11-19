@@ -298,32 +298,32 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
 
                 // Vector field work
 
-                field->SetNumberOfComponents(3);
-                field->SetName("Glyph");
+//                field->SetNumberOfComponents(3);
+//                field->SetName("Glyph");
 
-                IntervalVector position(p->get_position());
-                IntervalVector vec_field = r->get_vector_fields()[0];
-                if(!vec_field.is_empty()){
-                    double vec_field_point[3][2] = {{vec_field[0].lb(), vec_field[0].ub()},
-                                                    {vec_field[1].lb(), vec_field[1].ub()},
-                                                    {vec_field[2].lb(), vec_field[2].ub()}};
-                    field->InsertNextTuple3(vec_field[0].mid(),
-                            vec_field[1].mid(),
-                            vec_field[2].mid());
-                    for(int x=0; x<2; x++){
-                        for(int y=0; y<2; y++){
-                            for(int z=0; z<2; z++){
-#pragma omp critical(add_field)
-                                {
-                                    vec_field_points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
-                                    field->InsertNextTuple3(vec_field_point[0][x],
-                                            vec_field_point[1][y],
-                                            vec_field_point[2][z]);
-                                }
-                            }
-                        }
-                    }
-                }
+//                IntervalVector position(p->get_position());
+//                IntervalVector vec_field = r->get_vector_fields()[0];
+//                if(!vec_field.is_empty()){
+//                    double vec_field_point[3][2] = {{vec_field[0].lb(), vec_field[0].ub()},
+//                                                    {vec_field[1].lb(), vec_field[1].ub()},
+//                                                    {vec_field[2].lb(), vec_field[2].ub()}};
+//                    field->InsertNextTuple3(vec_field[0].mid(),
+//                            vec_field[1].mid(),
+//                            vec_field[2].mid());
+//                    for(int x=0; x<2; x++){
+//                        for(int y=0; y<2; y++){
+//                            for(int z=0; z<2; z++){
+//#pragma omp critical(add_field)
+//                                {
+//                                    vec_field_points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
+//                                    field->InsertNextTuple3(vec_field_point[0][x],
+//                                            vec_field_point[1][y],
+//                                            vec_field_point[2][z]);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
 #pragma omp critical(add_polygon)
                 {
@@ -338,15 +338,15 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
         }
     }
 
-    vtkSmartPointer<vtkAppendPolyData> polyData_field = vtkSmartPointer<vtkAppendPolyData>::New();
-    vtkSmartPointer< vtkPolyData> dataObject = vtkSmartPointer<vtkPolyData>::New();
-    dataObject->SetPoints(vec_field_points);
-    dataObject->GetPointData()->SetVectors(field);
-    polyData_field->AddInputData(dataObject);
-    polyData_field->Update();
-    vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
-    vertexFilter->AddInputData(polyData_field->GetOutput()); // Transform points (array) in vertex objects
-    vertexFilter->Update();
+//    vtkSmartPointer<vtkAppendPolyData> polyData_field = vtkSmartPointer<vtkAppendPolyData>::New();
+//    vtkSmartPointer< vtkPolyData> dataObject = vtkSmartPointer<vtkPolyData>::New();
+//    dataObject->SetPoints(vec_field_points);
+//    dataObject->GetPointData()->SetVectors(field);
+//    polyData_field->AddInputData(dataObject);
+//    polyData_field->Update();
+//    vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+//    vertexFilter->AddInputData(polyData_field->GetOutput()); // Transform points (array) in vertex objects
+//    vertexFilter->Update();
 
     polyData_polygon->Update();
 
@@ -356,9 +356,9 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
 
-    polyData_field->Update();
-    file = m_file_name + "_vecField" + comment + ".vtp";
-    outputWriter->SetFileName(file.c_str());
-    outputWriter->SetInputData(vertexFilter->GetOutput());
-    outputWriter->Write();
+//    polyData_field->Update();
+//    file = m_file_name + "_vecField" + comment + ".vtp";
+//    outputWriter->SetFileName(file.c_str());
+//    outputWriter->SetInputData(vertexFilter->GetOutput());
+//    outputWriter->Write();
 }

@@ -198,9 +198,9 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
     // Apply function of conversion raster <--> Reality
     std::vector<std::array<int, 2>> target;
 
-    array<int, 2> t = {floor(position[0].lb()/m_grid_conversion[0]), ceil(position[0].ub()/m_grid_conversion[0])};
-    array<int, 2> i = {floor(position[1].lb()/m_grid_conversion[1]-m_offset_i), ceil(position[1].ub()/m_grid_conversion[1]-m_offset_i)};
-    array<int, 2> j = {floor(position[2].lb()/m_grid_conversion[2]-m_offset_j), ceil(position[2].ub()/m_grid_conversion[2]-m_offset_j)};
+    array<int, 2> t = {floor(position[0].lb()/m_grid_conversion[0]), floor(position[0].ub()/m_grid_conversion[0])};
+    array<int, 2> i = {floor(position[1].lb()/m_grid_conversion[1]-m_offset_i), floor(position[1].ub()/m_grid_conversion[1]-m_offset_i)};
+    array<int, 2> j = {floor(position[2].lb()/m_grid_conversion[2]-m_offset_j), floor(position[2].ub()/m_grid_conversion[2]-m_offset_j)};
     target.push_back(t);
     target.push_back(i);
     target.push_back(j);
@@ -219,8 +219,8 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
     }
     else{
         vec[0] = Interval(0.9999, 1.0);
-        vec[1] = Interval(val_min[0] * m_scale_factor, val_max[0] * m_scale_factor) + Interval(-0.1, 0.1);
-        vec[2] = Interval(val_min[1] * m_scale_factor, val_max[1] * m_scale_factor) + Interval(-0.1, 0.1);
+        vec[1] = Interval(val_min[0] * m_scale_factor, val_max[0] * m_scale_factor) + Interval(-0.01, 0.01);
+        vec[2] = Interval(val_min[1] * m_scale_factor, val_max[1] * m_scale_factor) + Interval(-0.01, 0.01);
     }
     vector_fields.push_back(vec);
     return vector_fields;
@@ -230,14 +230,11 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
 {
     int nb_node=m_leaf_list.size();
 
-    #pragma omp parallel for num_threads(1)
+    #pragma omp parallel for
     for(int id=0; id<nb_node; id++){
         RasterTree<short int, 2> *rt = m_leaf_list[id];
         // [x], [y], [t] => array value should be identical
         std::vector<std::array<int, 2>> position = m_leaf_position[id];
-
-        if(position[0][0] == 0 && position[1][0]==209 && position[2][0]==399)
-            cout << "debug" << endl;
 
         // => Set without any error
         short int val_min[2], val_max[2];

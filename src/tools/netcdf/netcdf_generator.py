@@ -30,9 +30,9 @@ v.scale_factor = scale_factor
 
 
 X, Y = np.mgrid[0:nj, 0:ni]
-# U, V = -Y, X # 1m/s
-U = np.ones((nj, ni))*1.0
-V = X/(ni/2)
+U, V = -Y, X # 1m/s
+# U = np.ones((nj, ni))*1.0
+# V = X/(ni/2)
 # plt.quiver(X, Y, U, V) #edgecolor='k', facecolor='None', linewidth=.5
 # plt.show()
 # U = np.ones((ni, nj))

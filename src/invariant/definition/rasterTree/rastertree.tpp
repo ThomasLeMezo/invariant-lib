@@ -101,8 +101,19 @@ bool RasterTree<_Tp, _n>::fill_tree(const std::vector<std::array<int, 2>> &posit
         std::vector<std::array<int, 2>> p1, p2;
         bisector(position, p1, p2);
         bool valid_data = false;
+
+        _Tp val_min_cpy[_n], val_max_cpy[_n];
+        std::copy_n(val_min, _n, val_min_cpy);
+        std::copy_n(val_max, _n, val_max_cpy);
+
         valid_data |= m_children_first->fill_tree(p1, val_min, val_max);
-        valid_data |= m_children_second->fill_tree(p2, val_min, val_max);
+        valid_data |= m_children_second->fill_tree(p2, val_min_cpy, val_max_cpy);
+
+        for(size_t dim=0; dim<_n; dim++){
+            val_min[dim] = min(val_min[dim], val_min_cpy[dim]);
+            val_max[dim] = max(val_max[dim], val_max_cpy[dim]);
+        }
+
         std::copy_n(val_min, _n, m_val_min);
         std::copy_n(val_max, _n, m_val_max);
         m_valid_data = valid_data;
