@@ -32,7 +32,6 @@ include_directories(../tools/serialization)
       definition/netcdf/nodecurrent.cpp
       definition/netcdf/previmer.cpp
       definition/netcdf/previmer3d.cpp
-      definition/netcdf/nodecurrent3d.cpp
     )
   endif()
 
@@ -57,7 +56,9 @@ include_directories(../tools/serialization)
       definition/netcdf/nodecurrent.h
       definition/netcdf/previmer.h
       definition/netcdf/previmer3d.h
-      definition/netcdf/nodecurrent3d.h
+
+      definition/rasterTree/rastertree.h
+      definition/rasterTree/rastertree.tpp
     )
   endif()
 
