@@ -112,8 +112,7 @@ private:
     size_t m_offset_j = 0;
 
     RasterTree<signed short, 2> *m_node_current;
-    std::vector<RasterTree<signed short, 2> *> m_leaf_list;
-    std::vector<std::vector<std::array<int, 2>>> m_leaf_position;
+    vector<pair<RasterTree<signed short int, 2>*, vector<array<int, 2>>>> m_leaf_list;
     std::vector<std::array<int, 2>> m_node_root_position;
 };
 

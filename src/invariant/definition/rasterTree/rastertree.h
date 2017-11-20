@@ -13,22 +13,26 @@ public:
     /**
      * @brief RasterTree constructor
      * @param position
-     * @param limit_bisection
-     * @param previmer
      * @param leaf_list
      */
-    RasterTree(const std::vector<std::array<int, 2>> &position, std::vector<RasterTree *> &leaf_list, std::vector<std::vector<std::array<int, 2>>> & leaf_position);
+    RasterTree(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<RasterTree *, std::vector<std::array<int, 2>>>> &leaf_list);
 
     /**
-     * @brief NodeCurrent destructor
+     * @brief RasterTree destructor
      */
     ~RasterTree();
 
     /**
-     * @brief Return if this NodeCurrent is a leaf
+     * @brief Return true if the node is a leaf
      * @return
      */
     bool is_leaf() const;
+
+    /**
+     * @brief Return true if the data is valid
+     * @return
+     */
+    bool is_valid_data() const;
 
     /**
      * @brief Fill the tree
@@ -36,30 +40,39 @@ public:
      * @param val_min
      * @param val_max
      */
-    bool fill_tree(const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max);
+    bool fill_tree();
 
     /**
      * @brief Eval the vector filed at this position
      * @param position
      * @return
      */
-    void eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max) const;
+    void eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, std::array<std::array<_Tp, 2>, _n>& data) const;
 
     /**
      * @brief Set the node val
      * @param val_min
      * @param val_max
      */
-    void set_node_val(_Tp *val_min, _Tp *val_max, bool valid_data=true);
+    void set_node_val(const std::array<std::array<_Tp, 2>, _n> &data, bool valid_data=true);
+
+    /**
+     * @brief get_data
+     * @return
+     */
+    const std::array<std::array<_Tp, 2>, _n> &get_data() const;
 
 private:
 
     /**
-     * @brief Compute the union of min/max
-     * @param val_min
-     * @param val_max
+     * @brief Compute the union of min/max and modify this
      */
-    void union_vector(_Tp *val_min, _Tp *val_max) const;
+    void union_this(const std::array<std::array<_Tp, 2>, _n>& data);
+
+    /**
+     * @brief Compute the union of min/max and modify data
+     */
+    void union_data(std::array<std::array<_Tp, 2>, _n>& data) const;
 
     /**
      * @brief Bisector
@@ -87,8 +100,7 @@ private:
 
 private:
 
-    _Tp m_val_min[_n]; // signed short
-    _Tp m_val_max[_n];
+    std::array<std::array<_Tp, 2>, _n> m_data;
     signed char m_bisection_axis = -1; // -1 if leaf
     bool m_valid_data = true;
 
@@ -103,12 +115,21 @@ bool RasterTree<_Tp, _n>::is_leaf() const{
 }
 
 template<typename _Tp, size_t _n>
-void RasterTree<_Tp, _n>::set_node_val(_Tp *val_min, _Tp *val_max, bool valid_data){
-    std::copy_n(val_min, _n, m_val_min);
-    std::copy_n(val_max, _n, m_val_max);
+bool RasterTree<_Tp, _n>::is_valid_data() const{
+    return m_valid_data;
+}
+
+template<typename _Tp, size_t _n>
+void RasterTree<_Tp, _n>::set_node_val(const std::array<std::array<_Tp, 2>, _n> &data, bool valid_data){
+    m_data = data;
     m_valid_data = valid_data;
 }
 
+template<typename _Tp, size_t _n>
+const std::array<std::array<_Tp, 2>, _n>& RasterTree<_Tp, _n>::get_data() const{
+    return m_data;
 }
+}
+
 #include "rastertree.tpp"
 #endif // RASTERTREE_H

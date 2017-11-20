@@ -65,7 +65,7 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
     int file_id = 0;
     bool first_read = true;
 
-    size_t i_max_save, j_max_save;
+    size_t i_max_save =0, j_max_save=0;
 
     BOOST_FOREACH(pt::ptree::value_type &v, tree.get_child("PREVIMER")){
         if(v.first == "file"){
@@ -158,7 +158,7 @@ PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<
 
     /// **************** BUILD THE TREE **************** //
     cout << "**** BUILD THE TREE ****" << endl;
-    m_node_current = new RasterTree<short int, 2>(m_node_root_position, m_leaf_list, m_leaf_position);
+    m_node_current = new RasterTree<short int, 2>(m_node_root_position, m_leaf_list);
 
     cout << "-> Nb leafs = " << m_leaf_list.size() << endl;
     cout << "-> TIME build the tree " << omp_get_wtime() - time_start_init << endl;
@@ -176,12 +176,7 @@ PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<
     /// **************** FILL THE TREE **************** //
     cout << "**** FILL THE TREE ****" << endl;
     time_start_init = omp_get_wtime();
-    short int val_min[2],val_max[2];
-    val_min[0] = m_max_valid; // Invert min/max bounds to fill the tree
-    val_min[1] = m_max_valid;
-    val_max[0] = m_min_valid;
-    val_max[1] = m_min_valid;
-    m_node_current->fill_tree(m_node_root_position, val_min, val_max);
+    m_node_current->fill_tree();
 
     cout << "-> TIME fill the tree = " << omp_get_wtime() - time_start_init << endl;
     cout << "-> MEMORY 4 = " << getRAM()/1000 - ram_init << " Mo" << endl;
@@ -205,22 +200,22 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
     target.push_back(i);
     target.push_back(j);
 
-    signed short int val_min[2],val_max[2];
-    val_min[0] = m_max_valid;
-    val_min[1] = m_max_valid;
-    val_max[0] = m_min_valid;
-    val_max[1] = m_min_valid;
-    m_node_current->eval(target, m_node_root_position, val_min, val_max);
+    std::array<std::array<signed short int, 2>, 2> data;
+    data[0][0] = m_max_valid;
+    data[0][1] = m_min_valid;
+    data[1][0] = m_max_valid;
+    data[1][1] = m_min_valid;
+    m_node_current->eval(target, m_node_root_position, data);
 
     IntervalVector vec(3);
-    if((val_min[0] >= m_max_valid && val_max[0] <= m_min_valid)
-            || (val_min[1] >= m_max_valid && val_max[1] <= m_min_valid)){
+    if((data[0][0] >= m_max_valid && data[0][1] <= m_min_valid)
+            || (data[1][0] >= m_max_valid && data[1][1] <= m_min_valid)){
         vec = IntervalVector(3, Interval::EMPTY_SET);
     }
     else{
         vec[0] = Interval(0.9999, 1.0001);
-        vec[1] = Interval(val_min[0] * m_scale_factor, val_max[0] * m_scale_factor) + Interval(-0.01, 0.01);
-        vec[2] = Interval(val_min[1] * m_scale_factor, val_max[1] * m_scale_factor) + Interval(-0.01, 0.01);
+        vec[1] = Interval(data[0][0] * m_scale_factor, data[0][1] * m_scale_factor) + Interval(-0.01, 0.01);
+        vec[2] = Interval(data[1][0] * m_scale_factor, data[1][1] * m_scale_factor) + Interval(-0.01, 0.01);
     }
     vector_fields.push_back(vec);
     return vector_fields;
@@ -232,23 +227,23 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
 
     #pragma omp parallel for
     for(int id=0; id<nb_node; id++){
-        RasterTree<short int, 2> *rt = m_leaf_list[id];
+        RasterTree<short int, 2> *rt = m_leaf_list[id].first;
         // [x], [y], [t] => array value should be identical
-        std::vector<std::array<int, 2>> position = m_leaf_position[id];
+        std::vector<std::array<int, 2>> position = m_leaf_list[id].second;
 
         // => Set without any error
-        short int val_min[2], val_max[2];
-        val_min[0] = raw_u_t[position[0][0]][position[1][0]][position[2][0]];
-        val_min[1] = raw_v_t[position[0][0]][position[1][0]][position[2][0]];
-        val_max[0] = val_min[0];
-        val_max[1] = val_min[1];
+        std::array<std::array<signed short int, 2>, 2> data;
+        data[0][0] = raw_u_t[position[0][0]][position[1][0]][position[2][0]];
+        data[1][0] = raw_v_t[position[0][0]][position[1][0]][position[2][0]];
+        data[0][1] = data[0][0];
+        data[1][1] = data[1][0];
         bool valid_data = true;
 
-        if(val_min[0] < m_min_valid || val_min[1] < m_min_valid
-           || val_max[0] > m_max_valid || val_max[1] > m_max_valid)
+        if(data[0][0] < m_min_valid || data[1][0] < m_min_valid
+           || data[0][1] > m_max_valid || data[1][1] > m_max_valid)
             valid_data = false;
 
-        rt->set_node_val(val_min, val_max, valid_data);
+        rt->set_node_val(data, valid_data);
     }
 }
 

@@ -12,11 +12,11 @@ using namespace std;
 namespace invariant {
 
 template<typename _Tp, size_t _n>
-RasterTree<_Tp, _n>::RasterTree(const std::vector<std::array<int, 2>> &position, std::vector<RasterTree *> &leaf_list, std::vector<std::vector<std::array<int, 2>>> &leaf_position)
+RasterTree<_Tp, _n>::RasterTree(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<RasterTree *, std::vector<std::array<int, 2>>>> &leaf_list)
 {
     for(size_t dim=0; dim<_n; dim++){
-        m_val_min[dim] = std::numeric_limits<_Tp>::min();
-        m_val_max[dim] = std::numeric_limits<_Tp>::max();
+        m_data[dim][0] = std::numeric_limits<_Tp>::min();
+        m_data[dim][1] = std::numeric_limits<_Tp>::min();
     }
 
     bool limit_reach = true;
@@ -30,16 +30,16 @@ RasterTree<_Tp, _n>::RasterTree(const std::vector<std::array<int, 2>> &position,
     if(limit_reach){
         // One pixel size
         m_bisection_axis = -1;
-        leaf_list.push_back(this);
-        leaf_position.push_back(position);
+        std::pair<RasterTree *, std::vector<std::array<int, 2>>> pair(this, position);
+        leaf_list.push_back(pair);
     }
     else{
         // Bisect
         std::vector<std::array<int, 2>> p1, p2;
         m_bisection_axis = (signed char) bisector(position, p1, p2);
 
-        RasterTree<_Tp, _n> *rt1 = new RasterTree<_Tp, _n>(p1, leaf_list, leaf_position);
-        RasterTree<_Tp, _n> *rt2 = new RasterTree<_Tp, _n>(p2, leaf_list, leaf_position);
+        RasterTree<_Tp, _n> *rt1 = new RasterTree<_Tp, _n>(p1, leaf_list);
+        RasterTree<_Tp, _n> *rt2 = new RasterTree<_Tp, _n>(p2, leaf_list);
         m_children_first = rt1;
         m_children_second = rt2;
     }
@@ -88,64 +88,68 @@ size_t RasterTree<_Tp, _n>::bisector(const std::vector<std::array<int, 2>> &posi
 }
 
 template<typename _Tp, size_t _n>
-bool RasterTree<_Tp, _n>::fill_tree(const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max){
-    if(is_leaf()){
-        if(m_valid_data){
-            union_vector(val_min, val_max);
-            return true;
-        }
-        else
-            return false;
-    }
+bool RasterTree<_Tp, _n>::fill_tree(){
+    if(is_leaf())
+        return m_valid_data;
     else{
-        std::vector<std::array<int, 2>> p1, p2;
-        bisector(position, p1, p2);
         bool valid_data = false;
+        valid_data |= m_children_first->fill_tree();
+        valid_data |= m_children_second->fill_tree();
 
-        _Tp val_min_cpy[_n], val_max_cpy[_n];
-        std::copy_n(val_min, _n, val_min_cpy);
-        std::copy_n(val_max, _n, val_max_cpy);
-
-        valid_data |= m_children_first->fill_tree(p1, val_min, val_max);
-        valid_data |= m_children_second->fill_tree(p2, val_min_cpy, val_max_cpy);
-
-        for(size_t dim=0; dim<_n; dim++){
-            val_min[dim] = min(val_min[dim], val_min_cpy[dim]);
-            val_max[dim] = max(val_max[dim], val_max_cpy[dim]);
+        if(m_children_first->is_valid_data()){
+            union_this(m_children_first->get_data());
+        }
+        if(m_children_second->is_valid_data()){
+            union_this(m_children_second->get_data());
         }
 
-        std::copy_n(val_min, _n, m_val_min);
-        std::copy_n(val_max, _n, m_val_max);
         m_valid_data = valid_data;
         return valid_data;
     }
 }
 
 template<typename _Tp, size_t _n>
-void RasterTree<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, _Tp *val_min, _Tp *val_max) const{
+void RasterTree<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, std::array<std::array<_Tp, 2>, _n>& data) const{
     if(is_inter_empty(target, position)){
         return;
     }
     else if(is_leaf() || is_subset(position, target)){
         if(m_valid_data)
-            union_vector(val_min, val_max);
+            union_data(data);
     }
     else{
         // Bisect
         if(m_valid_data){
+            // Test Data inclusion
+            bool inclusion = true;
+            for(size_t dim=0; dim<_n; dim++){
+                if(data[dim][0] > m_data[dim][0] && data[dim][1] < m_data[dim][1])
+                    inclusion = false;
+            }
+            if(inclusion)
+                return;
+
             std::vector<std::array<int, 2>> p1, p2;
             bisector(position, p1, p2);
-            m_children_first->eval(target, p1, val_min, val_max);
-            m_children_second->eval(target, p2, val_min, val_max);
+            m_children_first->eval(target, p1, data);
+            m_children_second->eval(target, p2, data);
         }
     }
 }
 
 template<typename _Tp, size_t _n>
-void RasterTree<_Tp, _n>::union_vector(_Tp *val_min, _Tp *val_max) const{
+void RasterTree<_Tp, _n>::union_this(const std::array<std::array<_Tp, 2>, _n>& data){
     for(size_t dim=0; dim<_n; dim++){
-        val_min[dim] = min(val_min[dim], m_val_min[dim]);
-        val_max[dim] = max(val_max[dim], m_val_max[dim]);
+        m_data[dim][0] = min(m_data[dim][0], data[dim][0]);
+        m_data[dim][1] = max(m_data[dim][1], data[dim][1]);
+    }
+}
+
+template<typename _Tp, size_t _n>
+void RasterTree<_Tp, _n>::union_data(std::array<std::array<_Tp, 2>, _n>& data) const{
+    for(size_t dim=0; dim<_n; dim++){
+        data[dim][0] = min(m_data[dim][0], data[dim][0]);
+        data[dim][1] = max(m_data[dim][1], data[dim][1]);
     }
 }
 

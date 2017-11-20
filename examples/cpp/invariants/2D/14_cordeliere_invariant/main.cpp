@@ -31,18 +31,18 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
-    invariant::Domain dom_inner(&paving, FULL_WALL);
-    dom_inner.set_border_path_in(true);
-    dom_inner.set_border_path_out(true);
+//    invariant::Domain dom_inner(&paving, FULL_WALL);
+//    dom_inner.set_border_path_in(true);
+//    dom_inner.set_border_path_out(true);
 
-//    Function f_sep(x1, x2, sqr(x1-1.78129)+sqr(x2-1.78129)-0.5);
-//    Function f_sep2(x1, x2, sqr(x1+1.78129)+sqr(x2+1.78129)-0.5);
-//    Function f_sep3(x1, x2, sqr(x1)+sqr(x2)-0.5);
-//    SepFwdBwd sep(f_sep, GEQ);
-//    SepFwdBwd sep2(f_sep2, GEQ);
-//    SepFwdBwd sep3(f_sep3, GEQ);
-//    SepInter sep_i(sep, sep2, sep3);
-//    dom.set_sep(&sep_i);
+    Function f_sep(x1, x2, sqr(x1-1.78129)+sqr(x2-1.78129)-0.5);
+    Function f_sep2(x1, x2, sqr(x1+1.78129)+sqr(x2+1.78129)-0.5);
+    Function f_sep3(x1, x2, sqr(x1)+sqr(x2)-0.5);
+    SepFwdBwd sep(f_sep, GEQ);
+    SepFwdBwd sep2(f_sep2, GEQ);
+    SepFwdBwd sep3(f_sep3, GEQ);
+    SepInter sep_i(sep, sep2, sep3);
+    dom_outer.set_sep(&sep_i);
 
     // ****** Dynamics ******* //
     double h0 = -9;
@@ -53,27 +53,27 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
                                     (hdiff(x1, x2)[1]*cos(psi(x1, x2))+hdiff(x1, x2)[0]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0]))));
 
-    Dynamics_Function dyn(&f, FWD_BWD);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Maze ********* //
     Maze maze_outer(&dom_outer, &dyn);
-    Maze maze_inner(&dom_inner, &dyn);
+//    Maze maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
         cout << maze_outer.contract() << endl;
-        cout << maze_inner.contract() << endl;
+//        cout << maze_inner.contract() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMaze v_maze("SmartSubPaving", &maze_outer/*, &maze_inner*/);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 //    v_maze.drawCircle(0, 0, 0.5, "black[red]");
