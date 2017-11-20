@@ -13,8 +13,8 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
-    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
+//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     IntervalVector search_space(3);
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<25; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();

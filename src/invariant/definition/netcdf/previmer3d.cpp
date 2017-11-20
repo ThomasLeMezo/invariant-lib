@@ -225,7 +225,7 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
 {
     int nb_node=m_leaf_list.size();
 
-    #pragma omp parallel for
+    #pragma omp parallel for //num_threads(1)
     for(int id=0; id<nb_node; id++){
         RasterTree<short int, 2> *rt = m_leaf_list[id].first;
         // [x], [y], [t] => array value should be identical
@@ -234,8 +234,8 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
         // => Set without any error
         std::array<std::array<signed short int, 2>, 2> data;
         data[0][0] = raw_u_t[position[0][0]][position[1][0]][position[2][0]];
-        data[1][0] = raw_v_t[position[0][0]][position[1][0]][position[2][0]];
         data[0][1] = data[0][0];
+        data[1][0] = raw_v_t[position[0][0]][position[1][0]][position[2][0]];
         data[1][1] = data[1][0];
         bool valid_data = true;
 

@@ -15,7 +15,7 @@ template<typename _Tp, size_t _n>
 RasterTree<_Tp, _n>::RasterTree(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<RasterTree *, std::vector<std::array<int, 2>>>> &leaf_list)
 {
     for(size_t dim=0; dim<_n; dim++){
-        m_data[dim][0] = std::numeric_limits<_Tp>::min();
+        m_data[dim][0] = std::numeric_limits<_Tp>::max();
         m_data[dim][1] = std::numeric_limits<_Tp>::min();
     }
 
@@ -123,7 +123,7 @@ void RasterTree<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, co
             // Test Data inclusion
             bool inclusion = true;
             for(size_t dim=0; dim<_n; dim++){
-                if(data[dim][0] > m_data[dim][0] && data[dim][1] < m_data[dim][1])
+                if(data[dim][0] > m_data[dim][0] && data[dim][1] < m_data[dim][1]) // complementary
                     inclusion = false;
             }
             if(inclusion)
