@@ -13,8 +13,8 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
-//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     IntervalVector search_space(3);
 
@@ -30,14 +30,14 @@ int main(int argc, char *argv[])
     search_space = pm3d.get_search_space();
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
 
-//    IntervalVector test_position(3);
-//    test_position[0] = Interval(0, 14.0625);
-//    test_position[1] = Interval(52468.8, 52611.3);
-//    test_position[2] = Interval(99588.4, 99772.5);
-//    vector<ibex::IntervalVector> result = pm3d.eval(test_position);
-//    cout << "Result = " << endl;
-//    for(IntervalVector &iv:result)
-//        cout << iv << endl;
+    IntervalVector test_position(3);
+    test_position[0] = Interval(0, 14.0625);
+    test_position[1] = Interval(52468.8, 52611.3);
+    test_position[2] = Interval(99588.4, 99772.5);
+    vector<ibex::IntervalVector> result = pm3d.eval(test_position);
+    cout << "Result = " << endl;
+    for(IntervalVector &iv:result)
+        cout << iv << endl;
 
 #if 1
     // ****** Domain *******
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<25; i++){
+    for(int i=0; i<20; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();

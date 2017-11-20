@@ -98,8 +98,8 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
                 for(size_t i=m_offset_i; i<i_max+m_offset_i; i++){
                     vector<short int> line_u, line_v;
                     for(size_t j=m_offset_j; j<j_max+m_offset_j; j++){
-                        line_u.push_back(raw_u[i_max_file*j+i]);
-                        line_v.push_back(raw_v[j_max_file*j+i]);
+                        line_u.push_back(raw_u[j*i_max_file+i]); // y, x tab
+                        line_v.push_back(raw_v[j*i_max_file+i]); // y, x tab
                     }
                     tab_u.push_back(line_u);
                     tab_v.push_back(line_v);
@@ -233,9 +233,9 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
 
         // => Set without any error
         std::array<std::array<signed short int, 2>, 2> data;
-        data[0][0] = raw_u_t[position[0][0]][position[1][0]][position[2][0]];
+        data[0][0] = raw_u_t[position[0][0]][position[1][0]][position[2][0]]; // t, y, x tab ?
         data[0][1] = data[0][0];
-        data[1][0] = raw_v_t[position[0][0]][position[1][0]][position[2][0]];
+        data[1][0] = raw_v_t[position[0][0]][position[1][0]][position[2][0]]; // t, y, x tab ?
         data[1][1] = data[1][0];
         bool valid_data = true;
 
