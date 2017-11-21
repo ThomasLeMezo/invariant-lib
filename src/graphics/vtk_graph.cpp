@@ -1,8 +1,10 @@
 #include "vtk_graph.h"
+
 #include <string>
+#include "ibex/ibex_IntervalVector.h"
+#include "smartSubPaving.h"
 
 #include <vtkSmartPointer.h>
-#include <vtkXMLPolyDataWriter.h>
 #include <vtkAppendPolyData.h>
 
 #include <vtkPoints.h>
@@ -362,3 +364,37 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
 //    outputWriter->SetInputData(vertexFilter->GetOutput());
 //    outputWriter->Write();
 }
+
+//void Vtk_Graph::monteCarlos(invariant::PreviMer3D &pm3d, int t0, int x0, int y0){
+//    // MonteCarlos integration
+//    ibex::IntervalVector search_space(pm3d.get_search_space());
+
+//    ibex::IntervalVector x(3);
+//    x[0] = ibex::Interval(t0*pm3d.get_grid_conversion(0));
+//    x[1] = ibex::Interval(x0*pm3d.get_grid_conversion(1));
+//    x[2] = ibex::Interval(y0*pm3d.get_grid_conversion(2));
+//    vector<ibex::IntervalVector> x_list;
+//    x_list.push_back(x);
+
+//    vtkSmartPointer<vtkAppendPolyData> polyData = vtkSmartPointer<vtkAppendPolyData>::New();
+//    for(int t=0; t<search_space[0].ub(); t++){
+//        vector<ibex::IntervalVector> result = pm3d.eval(x);
+//        x[0]=ibex::Interval(t);
+//        x[1] += 1.0*result[0][1].mid();
+//        x[2] += 1.0*result[0][2].mid();
+//        x_list.push_back(x);
+//        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
+//        cubedata->SetBounds(t,t+1.0,
+//                x[1].lb()-10.0,x[1].ub()+10.0,
+//                x[2].lb()-10.0,x[2].ub()+10.0);
+//        cubedata->Update();
+//        polyData->AddInputData(cubedata->GetOutput());
+//    }
+//    polyData->Update();
+//    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+//    stringstream file_name;
+//    file_name << "monte_carlos_" << x0 << "_" << y0 << ".vtp";
+//    outputWriter->SetFileName(file_name.str().c_str());
+//    outputWriter->SetInputData(polyData->GetOutput());
+//    outputWriter->Write();
+//}

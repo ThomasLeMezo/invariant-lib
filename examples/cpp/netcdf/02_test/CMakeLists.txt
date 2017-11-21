@@ -6,8 +6,6 @@
 
 if(WITH_NETCDF AND WITH_3D)
 
-  include(${VTK_USE_FILE})
-
   set(SRC
     main.cpp
   )
@@ -21,7 +19,6 @@ if(WITH_NETCDF AND WITH_3D)
   target_link_libraries(3D_netcdf_test
     ${LIBS}
     ${LIBS_NETCDF}
-    ${LIBS_VTK}
     invariant-core
     invariant-tools
     invariant-graphics-3D

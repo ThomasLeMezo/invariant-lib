@@ -7,11 +7,6 @@
 
 #include "vtk_graph.h"
 
-#include <vtkSmartPointer.h>
-#include <vtkAppendPolyData.h>
-#include <vtkCubeSource.h>
-#include <vtkXMLPolyDataWriter.h>
-
 using namespace std;
 using namespace invariant;
 using namespace ibex;
@@ -46,36 +41,13 @@ int main(int argc, char *argv[])
         cout << iv << endl;
 
 /// **************** TEST 2 **************** ///
-    // MonteCarlos integration
-    IntervalVector x(3);
-    x[0] = Interval(0*pm3d.get_grid_conversion(0));
-    x[1] = Interval(130*pm3d.get_grid_conversion(1));
-    x[2] = Interval(460*pm3d.get_grid_conversion(2));
-    vector<ibex::IntervalVector> x_list;
-    x_list.push_back(x);
 
-    vtkSmartPointer<vtkAppendPolyData> polyData = vtkSmartPointer<vtkAppendPolyData>::New();
-    for(int t=0; t<search_space[0].ub(); t++){
-        vector<ibex::IntervalVector> result = pm3d.eval(x);
-        x[0]=Interval(t);
-        x[1] += 1.0*result[0][1].mid();
-        x[2] += 1.0*result[0][2].mid();
-        x_list.push_back(x);
-        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
-        cubedata->SetBounds(t,t+1.0,
-                x[1].lb()-10.0,x[1].ub()+10.0,
-                x[2].lb()-10.0,x[2].ub()+10.0);
-        cubedata->Update();
-        polyData->AddInputData(cubedata->GetOutput());
-    }
-    polyData->Update();
-    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-    outputWriter->SetFileName("monte_carlos.vtp");
-    outputWriter->SetInputData(polyData->GetOutput());
-    outputWriter->Write();
+//    Vtk_Graph monteCarlos("", NULL);
+//    monteCarlos.monteCarlos(pm3d, 0, 130, 460);
+//    monteCarlos(pm3d, 0, 131, 460);
+//    monteCarlos(pm3d, 0, 131, 461);
 
-
-#if 1
+#if 0
     // ****** Domain *******
     cout << "Search_space = " << search_space << endl;
     SmartSubPaving paving(search_space);

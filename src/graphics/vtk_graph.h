@@ -2,6 +2,12 @@
 #define VTK_GRAPH_H
 
 #include "smartSubPaving.h"
+#include "previmer3d.h"
+
+//#include <vtkAppendPolyData.h>
+//#include <vtkCubeSource.h>
+//#include <vtkXMLPolyDataWriter.h>
+//#include <vtkSmartPointer.h>
 
 class Vtk_Graph
 {
@@ -33,6 +39,15 @@ public:
      * @param position_info
      */
     void show_room_info(invariant::Maze *maze, ibex::IntervalVector position);
+
+    /**
+     * @brief monteCarlos
+     * @param pm3d
+     * @param t0
+     * @param x0
+     * @param y0
+    **/
+//    void monteCarlos(invariant::PreviMer3D &pm3d, int t0, int x0, int y0);
 
 private:
     invariant::SmartSubPaving*   m_subpaving = NULL;
