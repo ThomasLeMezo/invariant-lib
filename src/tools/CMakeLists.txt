@@ -14,7 +14,10 @@
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-tools ${SRC} ${HEADERS})
+  add_library(invariant-tools
+      ${SRC}
+      ${HEADERS}
+  )
   target_link_libraries(invariant-tools
       ${LIBS}
   )

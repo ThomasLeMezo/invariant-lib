@@ -40,15 +40,6 @@ public:
      */
     void show_room_info(invariant::Maze *maze, ibex::IntervalVector position);
 
-    /**
-     * @brief monteCarlos
-     * @param pm3d
-     * @param t0
-     * @param x0
-     * @param y0
-    **/
-//    void monteCarlos(invariant::PreviMer3D &pm3d, int t0, int x0, int y0);
-
 private:
     invariant::SmartSubPaving*   m_subpaving = NULL;
 
@@ -58,5 +49,14 @@ private:
     std::string         m_file_name = "";
     bool                m_memory_optimization = false;
 };
+
+/**
+ * @brief monteCarlos
+ * @param pm3d
+ * @param t0
+ * @param x0
+ * @param y0
+**/
+void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0);
 
 #endif // VTK_GRAPH_H

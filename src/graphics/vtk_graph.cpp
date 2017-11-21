@@ -25,6 +25,12 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkPointData.h>
 
+#include <vtkLine.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+
+#include "previmer3d.h"
+
 using namespace invariant;
 using namespace std;
 using namespace ibex;
@@ -365,36 +371,57 @@ void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
 //    outputWriter->Write();
 }
 
-//void Vtk_Graph::monteCarlos(invariant::PreviMer3D &pm3d, int t0, int x0, int y0){
-//    // MonteCarlos integration
-//    ibex::IntervalVector search_space(pm3d.get_search_space());
+void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0){
+    // MonteCarlos integration
+    ibex::IntervalVector search_space(pm3d.get_search_space());
 
-//    ibex::IntervalVector x(3);
-//    x[0] = ibex::Interval(t0*pm3d.get_grid_conversion(0));
-//    x[1] = ibex::Interval(x0*pm3d.get_grid_conversion(1));
-//    x[2] = ibex::Interval(y0*pm3d.get_grid_conversion(2));
-//    vector<ibex::IntervalVector> x_list;
-//    x_list.push_back(x);
+    double lambda = 1.1;
+    double a1 = (1.0-1.0/(2.0*lambda));
+    double a2 = 1.0/(2.0*lambda);
+    double dt = 1.0;
 
-//    vtkSmartPointer<vtkAppendPolyData> polyData = vtkSmartPointer<vtkAppendPolyData>::New();
-//    for(int t=0; t<search_space[0].ub(); t++){
-//        vector<ibex::IntervalVector> result = pm3d.eval(x);
-//        x[0]=ibex::Interval(t);
-//        x[1] += 1.0*result[0][1].mid();
-//        x[2] += 1.0*result[0][2].mid();
-//        x_list.push_back(x);
-//        vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
-//        cubedata->SetBounds(t,t+1.0,
-//                x[1].lb()-10.0,x[1].ub()+10.0,
-//                x[2].lb()-10.0,x[2].ub()+10.0);
-//        cubedata->Update();
-//        polyData->AddInputData(cubedata->GetOutput());
-//    }
-//    polyData->Update();
-//    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-//    stringstream file_name;
-//    file_name << "monte_carlos_" << x0 << "_" << y0 << ".vtp";
-//    outputWriter->SetFileName(file_name.str().c_str());
-//    outputWriter->SetInputData(polyData->GetOutput());
-//    outputWriter->Write();
-//}
+    ibex::IntervalVector x(3);
+    x[0] = ibex::Interval(t0*pm3d.get_grid_conversion(0));
+    x[1] = ibex::Interval(x0*pm3d.get_grid_conversion(1));
+    x[2] = ibex::Interval(y0*pm3d.get_grid_conversion(2));
+    cout << "Integration MonteCarlos : " << x << endl;
+
+    vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    for(int t=0; t<search_space[0].ub(); t+=dt){
+        vector<ibex::IntervalVector> f1 = pm3d.eval(x);
+        x[0] += dt;
+        x[1] += dt*f1[0][1];
+        x[2] += dt*f1[0][2];
+
+        IntervalVector x2(x);
+        x2[0] += lambda*dt;
+        x2[1] += lambda*dt*(f1[0][1].mid());
+        x2[2] += lambda*dt*(f1[0][2].mid());
+        vector<ibex::IntervalVector> f2 = pm3d.eval(x2);
+        x[0] += dt;
+        x[1] += dt*(a1*(f1[0][1]).mid()+a2*lambda*(f2[0][1]).mid());
+        x[2] += dt*(a1*f1[0][2].mid()+a2*lambda*f2[0][2].mid());
+
+        if(f1[0].is_empty() || f2[0].is_empty())
+            return;
+        points->InsertNextPoint(x[0].lb(), x[1].lb(), x[2].lb());
+    }
+    linesPolyData->SetPoints(points);
+
+    vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+    for(unsigned int i = 0; i < points->GetNumberOfPoints()-1; i++){
+        vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+        line->GetPointIds()->SetId(0,i);
+        line->GetPointIds()->SetId(1,i+1);
+        lines->InsertNextCell(line);
+    }
+    linesPolyData->SetLines(lines);
+
+    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+    stringstream file_name;
+    file_name << "monte_carlos_" << x0 << "_" << y0 << ".vtp";
+    outputWriter->SetFileName(file_name.str().c_str());
+    outputWriter->SetInputData(linesPolyData);
+    outputWriter->Write();
+}

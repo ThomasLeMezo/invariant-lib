@@ -64,7 +64,10 @@ include_directories(../tools/serialization)
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-core ${SRC} ${HEADERS})
+  add_library(invariant-core
+      ${SRC}
+      ${HEADERS}
+  )
   target_link_libraries(invariant-core
       ${LIBS}
       ${LIBS_NETCDF}

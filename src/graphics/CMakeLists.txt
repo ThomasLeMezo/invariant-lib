@@ -20,10 +20,14 @@ if(WITH_3D)
         vtk_graph.h
     )
 
-    add_library(invariant-graphics-3D ${SRC_3D} ${HEADERS_3D})
+    add_library(invariant-graphics-3D
+        ${SRC_3D}
+        ${HEADERS_3D}
+    )
     target_link_libraries(invariant-graphics-3D
         ${LIBS}
         ${LIBS_VTK}
+        invariant-core
     )
 
     install(FILES ${HEADERS_3D} DESTINATION "include/invariant-lib")
@@ -39,7 +43,10 @@ if(WITH_GRAPHIZ)
         graphiz_graph.h
     )
 
-    add_library(invariant-graphics-graphiz ${SRC_graphiz} ${HEADERS_graphiz})
+    add_library(invariant-graphics-graphiz
+        ${SRC_graphiz}
+        ${HEADERS_graphiz}
+    )
     target_link_libraries(invariant-graphics-graphiz
         ${LIBS}
         ${LIBS_GRAPHIZ}
@@ -65,7 +72,10 @@ endif()
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-graphics ${SRC} ${HEADERS})
+  add_library(invariant-graphics
+      ${SRC}
+      ${HEADERS}
+  )
   target_link_libraries(invariant-graphics
       ${LIBS}
   )

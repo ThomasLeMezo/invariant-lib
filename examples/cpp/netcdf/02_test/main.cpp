@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
     search_space = pm3d.get_search_space();
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
+    cout << "Search_space = " << search_space << endl;
 
 /// **************** TEST 1 **************** ///
     IntervalVector test_position(3);
@@ -42,14 +43,15 @@ int main(int argc, char *argv[])
 
 /// **************** TEST 2 **************** ///
 
-//    Vtk_Graph monteCarlos("", NULL);
-//    monteCarlos.monteCarlos(pm3d, 0, 130, 460);
-//    monteCarlos(pm3d, 0, 131, 460);
-//    monteCarlos(pm3d, 0, 131, 461);
+    monteCarlos(pm3d, 0, 130.4, 460.4);
+    monteCarlos(pm3d, 0, 130, 460);
+    monteCarlos(pm3d, 0, 131, 460);
+    monteCarlos(pm3d, 0, 131, 461);
+    monteCarlos(pm3d, 0, 130, 460);
+    monteCarlos(pm3d, 0, 130, 470);
 
 #if 0
     // ****** Domain *******
-    cout << "Search_space = " << search_space << endl;
     SmartSubPaving paving(search_space);
     invariant::Domain dom(&paving, FULL_WALL);
 
