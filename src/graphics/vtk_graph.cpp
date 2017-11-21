@@ -375,10 +375,10 @@ void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0){
     // MonteCarlos integration
     ibex::IntervalVector search_space(pm3d.get_search_space());
 
-    double lambda = 1.1;
+    double lambda = 1.5;
     double a1 = (1.0-1.0/(2.0*lambda));
     double a2 = 1.0/(2.0*lambda);
-    double dt = 1.0;
+    double dt = 60.0;
 
     ibex::IntervalVector x(3);
     x[0] = ibex::Interval(t0*pm3d.get_grid_conversion(0));
@@ -388,7 +388,7 @@ void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0){
 
     vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    for(int t=0; t<search_space[0].ub(); t+=dt){
+    for(int t=0; t<search_space[0].ub()-15*60; t+=dt){
         vector<ibex::IntervalVector> f1 = pm3d.eval(x);
         x[0] += dt;
         x[1] += dt*f1[0][1];
@@ -400,11 +400,20 @@ void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0){
         x2[2] += lambda*dt*(f1[0][2].mid());
         vector<ibex::IntervalVector> f2 = pm3d.eval(x2);
         x[0] += dt;
-        x[1] += dt*(a1*(f1[0][1]).mid()+a2*lambda*(f2[0][1]).mid());
-        x[2] += dt*(a1*f1[0][2].mid()+a2*lambda*f2[0][2].mid());
+        x[1] += dt*(a1*(f1[0][1]).mid()+a2*(f2[0][1]).mid());
+        x[2] += dt*(a1*f1[0][2].mid()+a2*f2[0][2].mid());
 
-        if(f1[0].is_empty() || f2[0].is_empty())
-            return;
+        bool Break = false;
+        if(f1[0].is_empty()){
+            cout << "ERROR Trajectory f1 " << t << endl;
+            Break = true;
+        }
+        if(f2[0].is_empty()){
+            cout << "ERROR Trajectory f2 " << t << endl;
+            Break = true;
+        }
+        if(Break)
+            break;
         points->InsertNextPoint(x[0].lb(), x[1].lb(), x[2].lb());
     }
     linesPolyData->SetPoints(points);
