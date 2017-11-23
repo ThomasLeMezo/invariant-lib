@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    Vtk_Graph vtk_graph("wrapping", &paving, false);
-    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("wrapping", false);
+    vtk_graph.show_graph(&paving);
     vtk_graph.show_maze(&maze, "outer");
 
     IntervalVector position(3);

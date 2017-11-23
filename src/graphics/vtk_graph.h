@@ -19,12 +19,12 @@ public:
      * @param memory_optimization : will delete paves after computing rooms view
      * (use this option only if you need a unique show_maze)
      */
-    Vtk_Graph(const std::string& file_name, invariant::SmartSubPaving *g, bool memory_optimization=false);
+    Vtk_Graph(const std::string& file_name, bool memory_optimization=false);
 
     /**
      * @brief Export to a file the representation of a paving
      */
-    void show_graph();
+    void show_graph(invariant::SmartSubPaving *subpaving);
 
     /**
      * @brief Export to a file the representation of a maze
@@ -40,9 +40,13 @@ public:
      */
     void show_room_info(invariant::Maze *maze, ibex::IntervalVector position);
 
-private:
-    invariant::SmartSubPaving*   m_subpaving = NULL;
+    /**
+     * @brief serialize_maze
+     * @param file_name
+     */
+    void serialize_maze(const string &file_name, invariant::Maze *maze);
 
+private:
     invariant::Maze*    m_maze_outer = NULL;
     invariant::Maze*    m_maze_inner = NULL;
 

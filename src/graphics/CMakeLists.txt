@@ -8,6 +8,7 @@ include_directories(../invariant/smartSubPaving)
 include_directories(../invariant/maze)
 include_directories(../invariant/definition)
 include_directories(../invariant/definition/netcdf)
+include_directories(../invariant/serialization)
 include_directories(vibes)
 
 if(WITH_3D)

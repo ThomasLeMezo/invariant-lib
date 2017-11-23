@@ -21,6 +21,12 @@ public:
     PreviMer3D(const std::string &file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits);
 
     /**
+     * @brief PreviMer3D deserialization
+     * @param file_name
+     */
+    PreviMer3D(const std::string& file_name);
+
+    /**
      * @brief PreviMer destructor
      */
     ~PreviMer3D();
@@ -100,13 +106,19 @@ private:
      */
     void fill_leafs(const std::vector<std::vector<std::vector<short> > > &raw_u_t, const std::vector<std::vector<std::vector<short> > > &raw_v_t);
 
+    /**
+     * @brief serialize
+     * @param filename
+     */
+    void serialize(const string &file_name);
+
 private:
     float m_scale_factor = 0;
     short m_fill_value = 0;
     short m_min_valid, m_max_valid;
     ibex::IntervalVector m_search_space;
 
-    const vector<double> m_grid_conversion = {15.0*60.0, 250.0, 250.0};
+    vector<double> m_grid_conversion = {15.0*60.0, 250.0, 250.0};
 
     size_t m_offset_i = 0;
     size_t m_offset_j = 0;

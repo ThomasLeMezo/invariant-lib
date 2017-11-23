@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
     search_space = pm3d.get_search_space();
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
     cout << "Search_space = " << search_space << endl;
@@ -43,14 +44,14 @@ int main(int argc, char *argv[])
 
 /// **************** TEST 2 **************** ///
 
-    monteCarlos(pm3d, 0, 130.4, 460.4);
-    monteCarlos(pm3d, 0, 130, 460);
-    monteCarlos(pm3d, 0, 131, 460);
-    monteCarlos(pm3d, 0, 131, 461);
-    monteCarlos(pm3d, 0, 130, 460);
-    monteCarlos(pm3d, 0, 130, 470);
+//    monteCarlos(pm3d, 0, 130.4, 460.4);
+//    monteCarlos(pm3d, 0, 130, 460);
+//    monteCarlos(pm3d, 0, 131, 460);
+//    monteCarlos(pm3d, 0, 131, 461);
+//    monteCarlos(pm3d, 0, 130, 460);
+//    monteCarlos(pm3d, 0, 130, 470);
 
-#if 0
+#if 1
     // ****** Domain *******
     SmartSubPaving paving(search_space);
     invariant::Domain dom(&paving, FULL_WALL);
@@ -89,9 +90,10 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("Previmer", &paving, true);
-//    vtk_graph.show_graph();
-    vtk_graph.show_maze(&maze);
+    Vtk_Graph vtk_graph("Previmer", true);
+//     vtk_graph.show_graph(&paving);
+//    vtk_graph.show_maze(&maze);
+    vtk_graph.serialize_maze("current.maze", &maze);
 
     IntervalVector position(3);
     position[0] = Interval(t_c); // 450, 900

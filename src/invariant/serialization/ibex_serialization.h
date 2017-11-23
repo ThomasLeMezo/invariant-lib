@@ -16,6 +16,7 @@
 #include <fstream>
 #include "ibex_Interval.h"
 #include "ibex_IntervalVector.h"
+#include <fstream>
 
   /**
    * \brief Write an Interval object into a binary file.
@@ -61,5 +62,45 @@
    * \return intv IntervalVector object to be deserialized
    */
   const ibex::IntervalVector deserializeIntervalVector(std::ifstream& binFile);
+
+  /**
+   * @brief serialize Vector
+   * @param v
+   * @param binFile
+   */
+  template<typename _Tp=short int>
+  void serializeVector(const std::vector<_Tp> &v, std::ofstream &binFile);
+
+  /**
+   * @brief deserialize Vector
+   * @param binFile
+   * \return vector
+   */
+  template<typename _Tp=short int>
+  std::vector<_Tp> deserializeVector(std::ifstream &binFile);
+
+// Inline functions
+
+  template<typename _Tp=short int>
+  inline void serializeVector(const std::vector<_Tp> &v, std::ofstream &binFile){
+      size_t size = v.size();
+      binFile.write((const char*)&size, sizeof(size_t));
+      for(size_t i=0; i<size; i++){
+          binFile.write((const char*)&v[i], sizeof(_Tp));
+      }
+  }
+
+  template<typename _Tp=short int>
+  inline std::vector<_Tp> deserializeVector(std::ifstream &binFile){
+      std::vector<_Tp> result;
+      size_t size;
+      binFile.read((char*)&size, sizeof(size_t));
+      for(size_t i=0; i<size; i++){
+          _Tp tmp;
+          binFile.read((char*)&tmp, sizeof(_Tp));
+          result.push_back(tmp);
+      }
+      return result;
+  }
 
 #endif

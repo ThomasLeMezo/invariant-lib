@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("rabinovich-fabrikant", &paving, true);
-    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("rabinovich-fabrikant", true);
+    vtk_graph.show_graph(&paving);
     vtk_graph.show_maze(&maze);
 
     //    IntervalVector position_info(2);

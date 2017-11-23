@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("vdp_3D", &paving);
-    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("vdp_3D");
+    vtk_graph.show_graph(&paving);
     vtk_graph.show_maze(&maze);
 
 }

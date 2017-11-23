@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("thomas", &paving, true);
-    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("thomas",  true);
+    vtk_graph.show_graph(&paving);
     vtk_graph.show_maze(&maze);
 
     //    IntervalVector position_info(2);

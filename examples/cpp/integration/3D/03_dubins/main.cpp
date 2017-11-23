@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("dubins", &paving, true);
-    vtk_graph.show_graph();
+    Vtk_Graph vtk_graph("dubins",  true);
+    vtk_graph.show_graph(&paving);
     vtk_graph.show_maze(&maze_outer, "outer");
 //    vtk_graph.show_maze(&maze_inner, "inner");
 

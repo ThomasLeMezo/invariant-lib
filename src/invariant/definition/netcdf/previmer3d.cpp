@@ -17,6 +17,8 @@
 
 #include <fstream>
 
+#include "ibex_serialization.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
@@ -185,14 +187,60 @@ PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<
     cout << "-> TIME fill the tree = " << omp_get_wtime() - time_start_init << endl;
     cout << "-> MEMORY 4 = " << getRAM()/1000 - ram_init << " Mo" << endl;
 
-    std::ofstream ofs ("test.txt", std::ofstream::out);
-    m_node_current->serialize(ofs);
-    ofs.close();
+    serialize("PreviMer3D.data");
 }
 
 PreviMer3D::~PreviMer3D()
 {
     delete(m_node_current);
+}
+
+void PreviMer3D::serialize(const string &file_name){
+    std::ofstream binFile(file_name.c_str(), std::ofstream::out);
+
+    /// ******** Previmer3D variable ******** ///
+
+    serializeIntervalVector(binFile, m_search_space);
+    binFile.write((const char*)&m_scale_factor, sizeof(float));
+    binFile.write((const char*)&m_fill_value, sizeof(short));
+    binFile.write((const char*)&m_min_valid, sizeof(short));
+    binFile.write((const char*)&m_max_valid, sizeof(short));
+
+    serializeVector<double>(m_grid_conversion, binFile);
+
+    binFile.write((const char*)&m_offset_i, sizeof(size_t));
+    binFile.write((const char*)&m_offset_j, sizeof(size_t));
+
+    serializeVector<std::array<int, 2>>(m_node_root_position, binFile);
+
+    m_node_current->serialize(binFile);
+    binFile.close();
+}
+
+PreviMer3D::PreviMer3D(const std::string& file_name):
+    Dynamics(FWD), m_search_space(3)
+{
+    int ram_init = getRAM()/1000;
+    std::ifstream binFile(file_name.c_str(), std::ifstream::in);
+
+    /// ******** Previmer3D variable ******** ///
+
+    m_search_space = deserializeIntervalVector(binFile);
+    binFile.read((char*)&m_scale_factor, sizeof(float));
+    binFile.read((char*)&m_fill_value, sizeof(short));
+    binFile.read((char*)&m_min_valid, sizeof(short));
+    binFile.read((char*)&m_max_valid, sizeof(short));
+
+    m_grid_conversion = deserializeVector<double>(binFile);
+
+    binFile.read((char*)&m_offset_i, sizeof(size_t));
+    binFile.read((char*)&m_offset_j, sizeof(size_t));
+
+    m_node_root_position = deserializeVector<std::array<int, 2>>(binFile);
+
+    m_node_current = new DataSetNode<short int, 2>(binFile);
+    binFile.close();
+    cout << "-> MEMORY = " << getRAM()/1000 - ram_init << " Mo" << endl;
 }
 
 const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& position){
