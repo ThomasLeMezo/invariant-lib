@@ -17,8 +17,7 @@
   target_link_libraries(2D_invariant_van_der_pol_positive
 	 ${LIBS}
 	 invariant-core
-         invariant-tools
-         invariant-graphics
+     invariant-graphics
   )
 
 

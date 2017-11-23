@@ -18,8 +18,7 @@ if(WITH_3D)
   target_link_libraries(3D_integration_van_der_pol
 	 ${LIBS}
 	 invariant-core
-         invariant-tools
-         invariant-graphics-3D
+     invariant-graphics-3D
   )
 endif()
 

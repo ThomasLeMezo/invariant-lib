@@ -17,7 +17,7 @@
   target_link_libraries(2D_invariant_buckling_column
     ${LIBS}
     invariant-core
-    invariant-tools
+    
     invariant-graphics
   )
 

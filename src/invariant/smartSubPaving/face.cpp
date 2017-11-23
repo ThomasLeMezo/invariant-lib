@@ -1,5 +1,5 @@
 #include "face.h"
-#include <serialization.h>
+#include <ibex_serialization.h>
 #include <iostream>
 
 using namespace std;
@@ -30,13 +30,13 @@ Face::Face(Pave *p):
 
 void Face::serialize(std::ofstream& binFile) const{
     // Face serialization
-    ibex_tools::serializeIntervalVector(binFile, m_position);
-    ibex_tools::serializeIntervalVector(binFile, m_orientation);
+    serializeIntervalVector(binFile, m_position);
+    serializeIntervalVector(binFile, m_orientation);
 }
 
 void Face::deserialize(std::ifstream& binFile){
-    m_position = ibex_tools::deserializeIntervalVector(binFile);
-    m_orientation = ibex_tools::deserializeIntervalVector(binFile);
+    m_position = deserializeIntervalVector(binFile);
+    m_orientation = deserializeIntervalVector(binFile);
 }
 
 void Face::add_neighbor(Face *f){

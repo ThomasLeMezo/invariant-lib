@@ -24,7 +24,7 @@ if(WITH_NETCDF AND WITH_3D)
     ${LIBS_NETCDF}
     ${LIBS_VTK}
     invariant-core
-    invariant-tools
+    
     invariant-graphics-3D
   )
 endif()

@@ -17,7 +17,7 @@
   target_link_libraries(2D_basin_van_der_pol2
     ${LIBS}
     invariant-core
-    invariant-tools
+    
     invariant-graphics
   )
 

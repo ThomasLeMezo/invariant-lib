@@ -17,7 +17,7 @@
   target_link_libraries(2D_invariant_rayleigh
     ${LIBS}
     invariant-core
-    invariant-tools
+    
     invariant-graphics
   )
 

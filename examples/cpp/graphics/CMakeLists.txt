@@ -19,7 +19,6 @@ if(WITH_GRAPHIZ)
          ${LIBS}
          ${LIBS_GRAPHIZ}
 	 invariant-core
-         invariant-tools
          invariant-graphics-graphiz
          invariant-graphics
   )

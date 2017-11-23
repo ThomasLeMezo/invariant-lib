@@ -5,18 +5,15 @@
  *  License   : This program is distributed under the terms of
  *              the GNU General Public License (GPL). See the file LICENSE.
  *
- *  Author(s) : Simon Rohou
+ *  Author(s) : Simon Rohou, Thomas Le Mézo
  *  Bug fixes : -
  *  Created   : 2016
  * ---------------------------------------------------------------------------- */
 
-#include "serialization.h"
+#include "ibex_serialization.h"
 
 using namespace std;
 using namespace ibex;
-
-namespace ibex_tools
-{
 
 enum IntervalType { BOUNDED, EMPTY_SET, ALL_REALS, POS_REALS, NEG_REALS };
 
@@ -102,5 +99,4 @@ const IntervalVector deserializeIntervalVector(std::ifstream& binFile)
     for(int i=0; i<dim_const; i++)
         deserializeInterval(binFile, itv[i]);
     return itv;
-}
 }

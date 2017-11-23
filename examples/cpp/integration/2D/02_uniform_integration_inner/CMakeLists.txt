@@ -17,7 +17,7 @@
   target_link_libraries(2D_integration_uniform_inner
     ${LIBS}
     invariant-core
-    invariant-tools
+    
     invariant-graphics
   )
 

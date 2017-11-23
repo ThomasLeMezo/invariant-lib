@@ -1,5 +1,6 @@
 #include "previmer3d.h"
-#include "rasterTree/rastertree.h"
+#include "dataSet/datasetnode.h"
+#include "dataSet/datasetfunction.h"
 
 #include <netcdf>
 #include <omp.h>
@@ -13,6 +14,8 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
+
+#include <fstream>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -157,8 +160,9 @@ PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<
     cout << "-> MEMORY 1 = " << getRAM()/1000 - ram_init << " Mo" << endl;  // 29 Mo
 
     /// **************** BUILD THE TREE **************** //
+
     cout << "**** BUILD THE TREE ****" << endl;
-    m_node_current = new RasterTree<short int, 2>(m_node_root_position, m_leaf_list);
+    m_node_current = new DataSetNode<short int, 2>(m_node_root_position, m_leaf_list);
 
     cout << "-> Nb leafs = " << m_leaf_list.size() << endl;
     cout << "-> TIME build the tree " << omp_get_wtime() - time_start_init << endl;
@@ -180,6 +184,10 @@ PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<
 
     cout << "-> TIME fill the tree = " << omp_get_wtime() - time_start_init << endl;
     cout << "-> MEMORY 4 = " << getRAM()/1000 - ram_init << " Mo" << endl;
+
+    std::ofstream ofs ("test.txt", std::ofstream::out);
+    m_node_current->serialize(ofs);
+    ofs.close();
 }
 
 PreviMer3D::~PreviMer3D()
@@ -227,7 +235,7 @@ void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int>
 
     #pragma omp parallel for //num_threads(1)
     for(int id=0; id<nb_node; id++){
-        RasterTree<short int, 2> *rt = m_leaf_list[id].first;
+        DataSetNode<short int, 2> *rt = (DataSetNode<short int, 2>*)(m_leaf_list[id].first);
         // [x], [y], [t] => array value should be identical
         std::vector<std::array<int, 2>> position = m_leaf_list[id].second;
 

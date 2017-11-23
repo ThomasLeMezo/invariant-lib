@@ -3,7 +3,7 @@
 
 #include <string>
 #include <ibex/ibex_IntervalVector.h>
-#include "rasterTree/rastertree.h"
+#include "dataSet/datasetnode.h"
 #include "dynamics.h"
 #include <utility>
 #include <array>
@@ -111,8 +111,8 @@ private:
     size_t m_offset_i = 0;
     size_t m_offset_j = 0;
 
-    RasterTree<signed short, 2> *m_node_current;
-    vector<pair<RasterTree<signed short int, 2>*, vector<array<int, 2>>>> m_leaf_list;
+    DataSetNode<signed short, 2> *m_node_current;
+    vector<pair<DataSetVirtualNode*, vector<array<int, 2>>>> m_leaf_list;
     std::vector<std::array<int, 2>> m_node_root_position;
 };
 

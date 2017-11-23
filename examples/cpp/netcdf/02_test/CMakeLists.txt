@@ -20,7 +20,7 @@ if(WITH_NETCDF AND WITH_3D)
     ${LIBS}
     ${LIBS_NETCDF}
     invariant-core
-    invariant-tools
+    
     invariant-graphics-3D
   )
 endif()

@@ -10,15 +10,13 @@
  *  Created   : 2017
  * ---------------------------------------------------------------------------- */
 
-#ifndef SERIALIZATION_HEADER
-#define SERIALIZATION_HEADER
+#ifndef IBEX_SERIALIZATION_HEADER
+#define IBEX_SERIALIZATION_HEADER
 
 #include <fstream>
 #include "ibex_Interval.h"
 #include "ibex_IntervalVector.h"
 
-namespace ibex_tools
-{
   /**
    * \brief Write an Interval object into a binary file.
    * 
@@ -63,5 +61,5 @@ namespace ibex_tools
    * \return intv IntervalVector object to be deserialized
    */
   const ibex::IntervalVector deserializeIntervalVector(std::ifstream& binFile);
-}
+
 #endif

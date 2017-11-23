@@ -17,7 +17,7 @@
   target_link_libraries(2D_integration_car_on_the_hill_with_inner
 	${LIBS}
 	invariant-core
-	invariant-tools
+	
 	invariant-graphics
   )
 

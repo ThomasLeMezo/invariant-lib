@@ -17,7 +17,7 @@
   target_link_libraries(2D_integration_full_cones
 	${LIBS}
 	invariant-core
-	invariant-tools
+	
 	invariant-graphics
   )
 

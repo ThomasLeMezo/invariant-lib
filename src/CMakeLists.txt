@@ -11,5 +11,4 @@
 # Sources
 
   add_subdirectory(invariant)
-  add_subdirectory(tools)
   add_subdirectory(graphics)

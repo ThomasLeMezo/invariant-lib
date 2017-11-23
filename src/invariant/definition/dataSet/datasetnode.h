@@ -1,26 +1,33 @@
-#ifndef RASTERTREE_H
-#define RASTERTREE_H
+#ifndef DATASETNODE_H
+#define DATASETNODE_H
 
 #include <array>
 #include <vector>
+#include <fstream>
+#include "datasetvirtualnode.h"
 
 namespace invariant {
 
 template<typename _Tp=short int, size_t _n=1>
-class RasterTree
+class DataSetNode : public DataSetVirtualNode
 {
 public:
     /**
-     * @brief RasterTree constructor
+     * @brief DataSetNode constructor
      * @param position
      * @param leaf_list
      */
-    RasterTree(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<RasterTree *, std::vector<std::array<int, 2>>>> &leaf_list);
+    DataSetNode(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2>>>> &leaf_list);
 
     /**
-     * @brief RasterTree destructor
+     * @brief DataSetNode constructor for deserialization
+     * @param binFile
      */
-    ~RasterTree();
+    DataSetNode(std::ifstream& binFile);
+    /**
+     * @brief DataSetNode destructor
+     */
+    ~DataSetNode();
 
     /**
      * @brief Return true if the node is a leaf
@@ -36,23 +43,21 @@ public:
 
     /**
      * @brief Fill the tree
-     * @param position
-     * @param val_min
-     * @param val_max
      */
     bool fill_tree();
 
     /**
      * @brief Eval the vector filed at this position
+     * @param target
      * @param position
-     * @return
+     * @param data
      */
     void eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, std::array<std::array<_Tp, 2>, _n>& data) const;
 
     /**
      * @brief Set the node val
-     * @param val_min
-     * @param val_max
+     * @param data
+     * @param valid_data
      */
     void set_node_val(const std::array<std::array<_Tp, 2>, _n> &data, bool valid_data=true);
 
@@ -61,6 +66,12 @@ public:
      * @return
      */
     const std::array<std::array<_Tp, 2>, _n> &get_data() const;
+
+    /**
+     * @brief Serialize Raster
+     * @param binFile
+     */
+    void serialize(std::ofstream& binFile) const;
 
 private:
 
@@ -104,32 +115,32 @@ private:
     signed char m_bisection_axis = -1; // -1 if leaf
     bool m_valid_data = true;
 
-    RasterTree<_Tp, _n> * m_children_first;
-    RasterTree<_Tp, _n> * m_children_second;
+    DataSetNode<_Tp, _n> * m_children_first;
+    DataSetNode<_Tp, _n> * m_children_second;
 
 };
 
 template<typename _Tp, size_t _n>
-bool RasterTree<_Tp, _n>::is_leaf() const{
+bool DataSetNode<_Tp, _n>::is_leaf() const{
     return (m_bisection_axis == -1)?true:false;
 }
 
 template<typename _Tp, size_t _n>
-bool RasterTree<_Tp, _n>::is_valid_data() const{
+bool DataSetNode<_Tp, _n>::is_valid_data() const{
     return m_valid_data;
 }
 
 template<typename _Tp, size_t _n>
-void RasterTree<_Tp, _n>::set_node_val(const std::array<std::array<_Tp, 2>, _n> &data, bool valid_data){
+void DataSetNode<_Tp, _n>::set_node_val(const std::array<std::array<_Tp, 2>, _n> &data, bool valid_data){
     m_data = data;
     m_valid_data = valid_data;
 }
 
 template<typename _Tp, size_t _n>
-const std::array<std::array<_Tp, 2>, _n>& RasterTree<_Tp, _n>::get_data() const{
+const std::array<std::array<_Tp, 2>, _n>& DataSetNode<_Tp, _n>::get_data() const{
     return m_data;
 }
 }
 
-#include "rastertree.tpp"
-#endif // RASTERTREE_H
+#include "datasetnode.tpp"
+#endif // DATASETNODE_H

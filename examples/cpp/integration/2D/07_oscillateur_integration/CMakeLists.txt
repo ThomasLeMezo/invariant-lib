@@ -17,8 +17,7 @@
   target_link_libraries(2D_integration_oscillateur
 	 ${LIBS}
 	 invariant-core
-         invariant-tools
-         invariant-graphics
+     invariant-graphics
   )
 
 

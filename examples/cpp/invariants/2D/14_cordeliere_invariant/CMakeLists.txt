@@ -17,7 +17,7 @@
   target_link_libraries(2D_invariant_cordeliere
     ${LIBS}
     invariant-core
-    invariant-tools
+    
     invariant-graphics
   )
 

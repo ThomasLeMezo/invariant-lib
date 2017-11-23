@@ -18,7 +18,7 @@ if(WITH_3D)
   target_link_libraries(3D_invariant_rabinovich_fabrikant
     ${LIBS}
     invariant-core
-    invariant-tools
+    
     invariant-graphics-3D
   )
 endif()

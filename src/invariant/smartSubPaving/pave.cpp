@@ -1,5 +1,5 @@
 #include "pave.h"
-#include <serialization.h>
+#include <ibex_serialization.h>
 #include <utility>
 
 using namespace std;
@@ -69,7 +69,7 @@ void Pave::serialize(std::ofstream& binFile) const{
     /// ToDo : add pave node tree to the serialization process + update others variables
 
     binFile.write((const char*) &m_serialization_id, sizeof(size_t)); // Serialization id
-    ibex_tools::serializeIntervalVector(binFile, m_position);
+    serializeIntervalVector(binFile, m_position);
 
     // Faces serialization
     for(size_t i=0; i<m_dim; i++){
@@ -81,7 +81,7 @@ void Pave::serialize(std::ofstream& binFile) const{
 
 void Pave::deserialize(std::ifstream& binFile){
     binFile.read((char*)&m_serialization_id, sizeof(size_t));
-    m_position = ibex_tools::deserializeIntervalVector(binFile);
+    m_position = deserializeIntervalVector(binFile);
 
     /// ToDo : add pave node tree to the deserialization process + update others variables
 

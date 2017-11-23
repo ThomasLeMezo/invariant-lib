@@ -6,10 +6,10 @@
 # Sources
 include_directories(definition)
 include_directories(definition/netcdf)
+include_directories(definition/dataSet)
+include_directories(serialization)
 include_directories(smartSubPaving)
 include_directories(maze)
-include_directories(../tools/serialization)
-
 
   set(SRC
     smartSubPaving/smartSubPaving.cpp
@@ -25,6 +25,8 @@ include_directories(../tools/serialization)
     definition/domain.cpp
     definition/dynamics.cpp
     definition/dynamics_function.cpp
+
+    serialization/ibex_serialization.cpp
   )
 
   if(WITH_NETCDF)
@@ -32,6 +34,8 @@ include_directories(../tools/serialization)
       definition/netcdf/nodecurrent.cpp
       definition/netcdf/previmer.cpp
       definition/netcdf/previmer3d.cpp
+
+      definition/dataSet/datasetfunction.cpp
     )
   endif()
 
@@ -49,6 +53,8 @@ include_directories(../tools/serialization)
     definition/domain.h
     definition/dynamics.h
     definition/dynamics_function.h
+
+    serialization/ibex_serialization.h
   )
 
   if(WITH_NETCDF)
@@ -57,8 +63,11 @@ include_directories(../tools/serialization)
       definition/netcdf/previmer.h
       definition/netcdf/previmer3d.h
 
-      definition/rasterTree/rastertree.h
-      definition/rasterTree/rastertree.tpp
+      definition/dataSet/datasetnode.h
+      definition/dataSet/datasetnode.tpp
+
+      definition/dataSet/datasetfunction.h
+      definition/dataSet/datasetvirtualnode.h
     )
   endif()
 
@@ -71,7 +80,6 @@ include_directories(../tools/serialization)
   target_link_libraries(invariant-core
       ${LIBS}
       ${LIBS_NETCDF}
-      invariant-tools
   )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")

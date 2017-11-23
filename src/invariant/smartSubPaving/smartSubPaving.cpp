@@ -1,5 +1,5 @@
 #include "smartSubPaving.h"
-#include "serialization.h"
+#include "ibex_serialization.h"
 #include <stdexcept>
 #include <fstream>
 
@@ -66,7 +66,7 @@ void SmartSubPaving::serialize(std::ofstream& binFile) const{
     binFile.write((const char*)&m_dim, sizeof(unsigned char)); // dimension
     size_t size = m_paves.size();
     binFile.write((const char*)&size, sizeof(size_t)); // Number of paves
-    ibex_tools::serializeIntervalVector(binFile, m_position);
+    serializeIntervalVector(binFile, m_position);
 
     size_t cpt = 0;
     for(Pave *p:m_paves){
@@ -84,7 +84,7 @@ void SmartSubPaving::deserialize(std::ifstream& binFile){
     binFile.read((char*)&m_dim, sizeof(unsigned char));
     size_t number_pave;
     binFile.read((char*)&number_pave, sizeof(size_t));
-    m_position = ibex_tools::deserializeIntervalVector(binFile);
+    m_position = deserializeIntervalVector(binFile);
 
     const size_t number_pave_const = number_pave;
     for(size_t i=0; i<number_pave_const; i++){

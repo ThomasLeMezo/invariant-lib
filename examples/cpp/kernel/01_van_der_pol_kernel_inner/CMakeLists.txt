@@ -17,7 +17,7 @@
   target_link_libraries(2D_kernel_van_der_pol_inner
 	${LIBS}
 	invariant-core
-	invariant-tools
+	
 	invariant-graphics
   )
 

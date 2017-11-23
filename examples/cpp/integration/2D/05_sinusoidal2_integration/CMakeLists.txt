@@ -17,7 +17,7 @@
   target_link_libraries(2D_integration_sinusoidal2
 	${LIBS}
 	invariant-core
-	invariant-tools
+	
 	invariant-graphics
   )
 
