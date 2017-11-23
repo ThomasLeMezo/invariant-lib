@@ -12,7 +12,7 @@ using namespace std;
         m_root = new DataSetNode<Type, nb>(m_root_position, m_leaf_list);\
         break;
 #define DATASETFUNCTION_SWITCH_INIT(Type) \
-    switch(type){\
+    switch(cell_dim){\
         DATASETFUNCTION_CASE_INIT(Type, 1)\
         DATASETFUNCTION_CASE_INIT(Type, 2)\
         DATASETFUNCTION_CASE_INIT(Type, 3)\

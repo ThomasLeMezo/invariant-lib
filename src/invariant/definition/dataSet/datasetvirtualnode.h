@@ -29,23 +29,25 @@ public:
 
     DataSetVirtualNode(){}
 
+    virtual ~DataSetVirtualNode() =0;
+
     /**
      * @brief Return true if the node is a leaf
      * @return
      */
-    virtual bool is_leaf() const;
+    virtual bool is_leaf() const {return false;}
 
     /**
      * @brief Return true if the data is valid
      * @return
      */
-    virtual bool is_valid_data() const;
+    virtual bool is_valid_data() const  {return false;}
 
     /**
      * @brief Fill the tree
      * @return
      */
-    virtual bool fill_tree();
+    virtual bool fill_tree()  {return false;}
 
     /**
      * @brief Eval the vector filed at this position
@@ -72,8 +74,10 @@ public:
      * @brief serialize
      * @param binFile
      */
-    virtual void serialize(std::ofstream& binFile) const;
+    virtual void serialize(std::ofstream& binFile) const  {}
 
 };
+
+inline DataSetVirtualNode::~DataSetVirtualNode(){}
 
 #endif // DATASETVIRTUALNODE_H
