@@ -339,8 +339,8 @@ protected:
     bool    m_in_deque = false;
     bool    m_removed = false;
 
+    // To Be Removed
     int     m_nb_contract = 0;
-
     bool m_debug_room = false;
     int m_time_debug = 0;
 };

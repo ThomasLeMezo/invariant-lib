@@ -34,6 +34,12 @@ public:
     void show_maze(invariant::Maze *maze, std::string comment="");
 
     /**
+     * @brief show_maze
+     * @param file_name
+     */
+    void show_maze(const string &file_name);
+
+    /**
      * @brief Export to a file the representation of selected paves
      * @param maze
      * @param position_info

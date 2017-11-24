@@ -31,6 +31,7 @@
 
 #include <fstream>
 #include "ibex_serialization.h"
+#include <iostream>
 
 #include "previmer3d.h"
 
@@ -224,6 +225,87 @@ void Vtk_Graph::show_graph(invariant::SmartSubPaving* subpaving){
     string file = m_file_name + "_paves.vtp";
     outputWriter->SetFileName(file.c_str());
     outputWriter->SetInputData(polyData_paves->GetOutput());
+    outputWriter->Write();
+}
+
+void Vtk_Graph::show_maze(const string &file_name){
+    std::ifstream binFile(file_name.c_str(), std::ifstream::in);
+
+    vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
+    size_t step=0;
+    while(!binFile.eof()){
+        int nb_points = 0;
+        vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+
+        size_t nb_doors;
+        binFile.read((char*)&nb_doors, sizeof(size_t));
+        for(size_t d=0; d<nb_doors; d++){
+
+            IntervalVector iv = deserializeIntervalVector(binFile);
+            IntervalVector orientation = deserializeIntervalVector(binFile);
+            int val_max[3] = {2, 2, 2};
+            for(int i=0; i<3; i++){
+                if(orientation[i] != Interval(0, 1)){
+                    val_max[i] = 1;
+                    break;
+                }
+            }
+
+            double val[3][2] = {{iv[0].lb(), iv[0].ub()}, // x
+                                {iv[1].lb(), iv[1].ub()},  // y
+                                {iv[2].lb(), iv[2].ub()}}; // z
+
+            for(int x=0; x<val_max[0]; x++){
+                for(int y=0; y<val_max[1]; y++){
+                    for(int z=0; z<val_max[2]; z++){
+                        points->InsertNextPoint(val[0][x], val[1][y], val[2][z]);
+                        nb_points++;
+                    }
+                }
+            }
+        }
+
+        vtkIdType pointIds[nb_points];
+        for(int i=0; i<nb_points; i++){
+            pointIds[i] = i;
+        }
+        vtkSmartPointer<vtkCellArray> faces = vtkSmartPointer<vtkCellArray>::New();
+
+        for(size_t i=0; i<nb_doors; i++){
+            vtkIdType face[4];
+            for(size_t j=0; j<4; j++)
+                face[j] = 4*i+j;
+            faces->InsertNextCell(4, face);
+        }
+
+        vtkSmartPointer<vtkUnstructuredGrid> ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        ugrid->SetPoints(points);
+        ugrid->InsertNextCell(VTK_POLYHEDRON, nb_points, pointIds, nb_doors, faces->GetPointer());
+
+        // ********** Surface **************
+        // Create the convex hull of the pointcloud (delaunay + outer surface)
+        vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+        delaunay->SetInputData(ugrid);
+        delaunay->SetTolerance(0.0);
+        delaunay->Update();
+
+        vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+        surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+        surfaceFilter->Update();
+
+        polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+        if(step%1000==0)
+            cout << "step = " << step << endl;
+        step++;
+    }
+
+
+    polyData_polygon->Update();
+
+    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+    string file = m_file_name + "_polygon" + ".vtp";
+    outputWriter->SetFileName(file.c_str());
+    outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
 }
 
