@@ -305,7 +305,7 @@ void VtkMaze3D::show_maze(const string &file_name){
 
         polyData_polygon->AddInputData(surfaceFilter->GetOutput());
         if(step%1000==0)
-            cout << "step = " << step << " / " << nb_pave << endl;
+            cout << "step = " << step << " / " << nb_pave << " " << round((step/nb_pave)*100) << "%"<< endl;
         step++;
     }
 

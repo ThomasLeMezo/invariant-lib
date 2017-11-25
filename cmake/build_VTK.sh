@@ -27,4 +27,5 @@ if [ ! -e "$HOME/vtk/bin/vtkH5detect" ]; then
   					  -DCMAKE_BUILD_TYPE=Release \ 
   					  -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP
   make -j4
+  make install
 fi

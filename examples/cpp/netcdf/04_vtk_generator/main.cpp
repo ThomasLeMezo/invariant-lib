@@ -7,7 +7,7 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    VtkMaze3D vtkMaze3D("Previmer");
-    vtkMaze3D.show_maze("current.maze");
+    VtkMaze3D vtkMaze3D("Previmer2");
+    vtkMaze3D.show_maze("current2.maze");
     return 0;
 }
