@@ -10,7 +10,7 @@
 #include <cstring>
 #include <omp.h>
 
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 using namespace std;
 using namespace ibex;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     Maze maze_outer(&dom_outer, &dyn_outer);
     Maze maze_inner(&dom_inner, &dyn_inner);
 
-    Vtk_Graph vtk_graph("vdp_3D");
+    VtkMaze3D vtkMaze3D("vdp_3D");
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-     vtk_graph.show_graph(&paving);
-    vtk_graph.show_maze(&maze_outer, "outer");
-//    vtk_graph.show_maze(&maze_inner, "inner");
+     vtkMaze3D.show_graph(&paving);
+    vtkMaze3D.show_maze(&maze_outer, "outer");
+//    vtkMaze3D.show_maze(&maze_inner, "inner");
 
 }

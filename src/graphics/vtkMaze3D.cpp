@@ -1,4 +1,4 @@
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 #include <string>
 #include "ibex/ibex_IntervalVector.h"
@@ -39,12 +39,12 @@ using namespace invariant;
 using namespace std;
 using namespace ibex;
 
-Vtk_Graph::Vtk_Graph(const std::string &file_name, bool memory_optimization){
+VtkMaze3D::VtkMaze3D(const std::string &file_name, bool memory_optimization){
     m_file_name = file_name;
     m_memory_optimization = memory_optimization;
 }
 
-void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector position){
+void VtkMaze3D::show_room_info(invariant::Maze *maze, ibex::IntervalVector position){
     std::vector<invariant::Pave*> pave_list;
     maze->get_subpaving()->get_room_info(maze, position, pave_list);
     vector<string> name_files;
@@ -160,8 +160,10 @@ void Vtk_Graph::show_room_info(invariant::Maze *maze, ibex::IntervalVector posit
     }
 }
 
-void Vtk_Graph::serialize_maze(const string &file_name, Maze* maze){
+void VtkMaze3D::serialize_maze(const string &file_name, Maze* maze){
     std::ofstream binFile(file_name.c_str(), std::ofstream::out);
+    size_t nb_pave = 0;
+    binFile.write((const char*)&nb_pave, sizeof(size_t));
 
     for(size_t pave_id=0; pave_id<maze->get_subpaving()->get_paves().size(); pave_id++){
         Pave *p = maze->get_subpaving()->get_paves()[pave_id];
@@ -185,12 +187,16 @@ void Vtk_Graph::serialize_maze(const string &file_name, Maze* maze){
                 serializeIntervalVector(binFile, list_doors[i].first);
                 serializeIntervalVector(binFile, list_doors[i].second);
             }
+            nb_pave++;
         }
     }
+    binFile.seekp(0);
+    binFile.write((const char*)&nb_pave, sizeof(size_t));
+
     binFile.close();
 }
 
-void Vtk_Graph::show_graph(invariant::SmartSubPaving* subpaving){
+void VtkMaze3D::show_graph(invariant::SmartSubPaving* subpaving){
     cout << "vtk paving" << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_paves = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -228,12 +234,16 @@ void Vtk_Graph::show_graph(invariant::SmartSubPaving* subpaving){
     outputWriter->Write();
 }
 
-void Vtk_Graph::show_maze(const string &file_name){
+void VtkMaze3D::show_maze(const string &file_name){
     std::ifstream binFile(file_name.c_str(), std::ifstream::in);
+
+    size_t nb_pave = 0;
+    binFile.read((char*)&nb_pave, sizeof(size_t));
+    cout << "nb of pave to read = " << nb_pave << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
     size_t step=0;
-    while(!binFile.eof()){
+    for(size_t n = 0; n<nb_pave; n++){
         int nb_points = 0;
         vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
@@ -295,7 +305,7 @@ void Vtk_Graph::show_maze(const string &file_name){
 
         polyData_polygon->AddInputData(surfaceFilter->GetOutput());
         if(step%1000==0)
-            cout << "step = " << step << endl;
+            cout << "step = " << step << " / " << nb_pave << endl;
         step++;
     }
 
@@ -309,7 +319,7 @@ void Vtk_Graph::show_maze(const string &file_name){
     outputWriter->Write();
 }
 
-void Vtk_Graph::show_maze(invariant::Maze *maze, std::string comment){
+void VtkMaze3D::show_maze(invariant::Maze *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
     //    vtkSmartPointer<vtkPoints> vec_field_points = vtkSmartPointer< vtkPoints >::New();

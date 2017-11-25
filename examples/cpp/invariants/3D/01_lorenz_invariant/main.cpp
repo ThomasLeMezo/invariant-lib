@@ -9,7 +9,7 @@
 #include "vibes/vibes.h"
 #include "graphiz_graph.h"
 #include <omp.h>
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 #include "ibex/ibex_SepFwdBwd.h"
 #include "ibex/ibex_SepInter.h"
@@ -79,20 +79,20 @@ int main(int argc, char *argv[])
         cout << "-----" << i << "-----" << endl;
         paving.bisect();
         cout << "nb contractions = " << maze.contract() << " - " << "paving size = " << paving.size() << endl;
-        //        vtk_graph.show_maze(&maze, std::to_string(i));
+        //        vtkMaze3D.show_maze(&maze, std::to_string(i));
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("lorenz", true);
-//     vtk_graph.show_graph(&paving);
-    vtk_graph.show_maze(&maze);
+    VtkMaze3D vtkMaze3D("lorenz", true);
+//     vtkMaze3D.show_graph(&paving);
+    vtkMaze3D.show_maze(&maze);
 
 //    IntervalVector position_info(3);
 //    position_info[0] = Interval(0.5);
 //    position_info[1] = Interval(0.5);
 //    position_info[2] = Interval(0.5);
-//    vtk_graph.show_room_info(&maze, position_info);
+//    vtkMaze3D.show_room_info(&maze, position_info);
     //        vector<Pave*> pave_list;
     //        paving.get_room_info(&maze, position_info, pave_list);
 

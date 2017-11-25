@@ -10,7 +10,7 @@
 #include <cstring>
 #include "graphiz_graph.h"
 #include <omp.h>
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 using namespace std;
 using namespace ibex;
@@ -57,14 +57,14 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("torus", false);
-     vtk_graph.show_graph(&paving);
-    vtk_graph.show_maze(&maze);
+    VtkMaze3D vtkMaze3D("torus", false);
+    vtkMaze3D.show_graph(&paving);
+    vtkMaze3D.show_maze(&maze);
 
 //    IntervalVector position_info(3);
 //    position_info[0] = Interval(0.5);
 //    position_info[1] = Interval(0.5);
 //    position_info[2] = Interval(0.2);
-//    vtk_graph.show_room_info(&maze, position_info);
+//    vtkMaze3D.show_room_info(&maze, position_info);
 
 }

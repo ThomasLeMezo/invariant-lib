@@ -9,7 +9,7 @@
 //#include <vtkXMLPolyDataWriter.h>
 //#include <vtkSmartPointer.h>
 
-class Vtk_Graph
+class VtkMaze3D
 {
 public:
     /**
@@ -19,7 +19,7 @@ public:
      * @param memory_optimization : will delete paves after computing rooms view
      * (use this option only if you need a unique show_maze)
      */
-    Vtk_Graph(const std::string& file_name, bool memory_optimization=false);
+    VtkMaze3D(const std::string& file_name, bool memory_optimization=false);
 
     /**
      * @brief Export to a file the representation of a paving

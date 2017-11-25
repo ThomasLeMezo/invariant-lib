@@ -6,7 +6,7 @@
 #include <cstring>
 #include <omp.h>
 
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 #include "ibex/ibex_SepFwdBwd.h"
 
@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("vdp_3D");
-    vtk_graph.show_graph(&paving);
-    vtk_graph.show_maze(&maze);
+    VtkMaze3D vtkMaze3D("vdp_3D");
+    vtkMaze3D.show_graph(&paving);
+    vtkMaze3D.show_maze(&maze);
 
 }

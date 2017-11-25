@@ -5,7 +5,7 @@
 #include <ibex.h>
 #include <math.h>
 
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 using namespace std;
 using namespace invariant;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<30; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();
@@ -90,16 +90,16 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    Vtk_Graph vtk_graph("Previmer", true);
-//     vtk_graph.show_graph(&paving);
-//    vtk_graph.show_maze(&maze);
-    vtk_graph.serialize_maze("current.maze", &maze);
+    VtkMaze3D vtkMaze3D("Previmer", true);
+//     vtkMaze3D.show_graph(&paving);
+//    vtkMaze3D.show_maze(&maze);
+    vtkMaze3D.serialize_maze("current.maze", &maze);
 
     IntervalVector position(3);
     position[0] = Interval(t_c); // 450, 900
     position[1] = Interval(x_c); // 37304, 37980
     position[2] = Interval(y_c); // 119766, 120469
-    vtk_graph.show_room_info(&maze, position);
+    vtkMaze3D.show_room_info(&maze, position);
 #endif
 
     return 0;

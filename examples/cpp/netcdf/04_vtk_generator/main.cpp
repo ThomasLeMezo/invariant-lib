@@ -1,5 +1,5 @@
 #include <iostream>
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 using namespace std;
 using namespace invariant;
@@ -7,7 +7,7 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    Vtk_Graph vtk_graph("Previmer");
-    vtk_graph.show_maze("current.maze");
+    VtkMaze3D vtkMaze3D("Previmer");
+    vtkMaze3D.show_maze("current.maze");
     return 0;
 }

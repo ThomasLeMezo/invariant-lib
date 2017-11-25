@@ -10,7 +10,7 @@
 #include <cstring>
 #include <omp.h>
 
-#include "vtk_graph.h"
+#include "vtkMaze3D.h"
 
 using namespace std;
 using namespace ibex;
@@ -52,14 +52,14 @@ int main(int argc, char *argv[])
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    Vtk_Graph vtk_graph("wrapping", false);
-    vtk_graph.show_graph(&paving);
-    vtk_graph.show_maze(&maze, "outer");
+    VtkMaze3D vtkMaze3D("wrapping", false);
+    vtkMaze3D.show_graph(&paving);
+    vtkMaze3D.show_maze(&maze, "outer");
 
     IntervalVector position(3);
     position[0] = Interval(0);
     position[1] = Interval(-0.1);
     position[2] = Interval(-0.1);
-    vtk_graph.show_room_info(&maze, position);
+    vtkMaze3D.show_room_info(&maze, position);
 
 }

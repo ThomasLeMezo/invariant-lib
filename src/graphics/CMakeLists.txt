@@ -15,10 +15,10 @@ if(WITH_3D)
     include(${VTK_USE_FILE})
 
     set(SRC_3D
-        vtk_graph.cpp
+        vtkMaze3D.cpp
     )
     set(HEADERS_3D
-        vtk_graph.h
+        vtkMaze3D.h
     )
 
     add_library(invariant-graphics-3D
