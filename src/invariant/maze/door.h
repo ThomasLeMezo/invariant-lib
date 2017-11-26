@@ -5,21 +5,26 @@
 
 #include <ppl.hh>
 
-#include "face.h"
-#include "room.h"
-#include "maze.h"
 #include <omp.h>
 #include <iostream>
 #include <sstream>      // std::ostringstream
 #include <iomanip>
 
+#include "../definition/domain.h"
+#include "../smartSubPaving/face.h"
+#include "room.h"
+#include "maze.h"
+#include "../smartSubPaving/pave.h"
+
 namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
 
-class Face; // declared only for friendship
-class Room; // declared only for friendship
-class Maze; // declared only for friendship
+template <typename _Tp> class Face;
+template <typename _Tp> class Room;
+template <typename _Tp> class Maze;
+template <typename _Tp> class Pave;
+template <typename _Tp> class Domain;
 
 template <typename _Tp=ibex::IntervalVector>
 class Door
@@ -30,12 +35,12 @@ public:
      * @param face
      * By default doors are set open
      */
-    Door(Face * face, Room *room){}
+    Door(invariant::Face<_Tp>* face, invariant::Room<_Tp> *room);
 
     /**
      * @brief Destructor of a Door
      */
-    ~Door(){}
+    ~Door();
 
     /**
      * @brief Get the public read input door
@@ -82,49 +87,49 @@ public:
      * @brief Getter to the associated Face
      * @return
      */
-    Face * get_face() const;
+    Face<_Tp> * get_face() const;
 
     /**
      * @brief Getter to the associated Room
      * @return
      */
-    Room *get_room() const;
+    Room<_Tp> *get_room() const;
 
     /**
      * @brief Set the private output doors to empty
      */
-    void set_empty_private_output(){}
+    void set_empty_private_output();
 
     /**
      * @brief Set the private output doors to full
      */
-    void set_full_private_output(){}
+    void set_full_private_output();
 
     /**
      * @brief Set the input private door to empty
      */
-    void set_empty_private_input(){}
+    void set_empty_private_input();
 
     /**
      * @brief Set the input private door to full
      */
-    void set_full_private_input(){}
+    void set_full_private_input();
 
     /**
      * @brief Set all input and output private doors to empty
      */
-    void set_empty_private(){}
+    void set_empty_private();
 
     /**
      * @brief Set all input and output private doors to full
      */
-    void set_full_private(){}
+    void set_full_private();
 
     /**
      * @brief Set full all input & output private doors according to
      * vector field possibility
      */
-    void set_full_possible_private(){}
+    void set_full_possible_private();
 
     /**
      * @brief Contract its private door according to neighbors
@@ -136,7 +141,7 @@ public:
      * add the neighbor room to the list
      * @param list_rooms
      */
-    bool analyze_change(std::vector<Room *>&list_rooms);
+    bool analyze_change(std::vector<Room<_Tp> *>&list_rooms);
 
     /**
      * @brief Return true if input & output doors are empty
@@ -222,7 +227,11 @@ public:
      * @param d2
      * @return
      */
-    friend Door& operator&=(Door& d1, const Door& d2);
+    friend Door& operator&=(Door& d1, const Door& d2){
+        d1.set_input_private(d1.get_input_private() & d2.get_input());
+        d1.set_output_private(d1.get_output_private() & d2.get_output());
+        return d1;
+    }
 
     /**
      * @brief operator |=
@@ -230,15 +239,19 @@ public:
      * @param d2
      * @return
      */
-    friend Door& operator|=(Door& d1, const Door& d2);
+    friend Door& operator|=(Door& d1, const Door& d2){
+        d1.set_input_private(d1.get_input_private() | d2.get_input());
+        d1.set_output_private(d1.get_output_private() | d2.get_output());
+        return d1;
+    }
 
 protected:
     _Tp m_input_public;
     _Tp m_output_public; //input and output doors public
     _Tp *m_input_private;
     _Tp *m_output_private; //input and output doors private (for contraction)
-    Face *               m_face = NULL; // pointer to the associated face
-    Room *               m_room = NULL; // pointer to the associated face
+    Face<_Tp> *               m_face = NULL; // pointer to the associated face
+    Room<_Tp> *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
 
     std::vector<bool>    m_possible_out;
@@ -249,6 +262,11 @@ protected:
 }
 
 namespace invariant{
+
+template <typename _Tp>
+inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp>& d){
+    return stream;
+}
 
 template <typename _Tp>
 inline const _Tp Door<_Tp>::get_input() const{
@@ -287,12 +305,12 @@ inline void Door<_Tp>::set_output_private(const _Tp& iv_output){
 }
 
 template <typename _Tp>
-inline Face * Door<_Tp>::get_face() const{
+inline Face<_Tp> * Door<_Tp>::get_face() const{
     return m_face;
 }
 
 template <typename _Tp>
-inline Room * Door<_Tp>::get_room() const{
+inline Room<_Tp> * Door<_Tp>::get_room() const{
     return m_room;
 }
 
@@ -350,37 +368,11 @@ inline void Door<_Tp>::set_empty_private(){
     set_empty_private_output();
 }
 
-/// ******************  Sepcialized ****************** ///
-
-// ibex::IntervalVector
-
-template <typename _Tp>
-inline void Door<ibex::IntervalVector>::set_empty_private_output(){
-    m_output_private->set_empty();
-}
-
-template <typename _Tp>
-inline void Door<ibex::IntervalVector>::set_empty_private_input(){
-    m_input_private->set_empty();
-}
-
-// C_Polyhedron
-
-template <typename _Tp>
-inline void Door<ppl::C_Polyhedron>::set_empty_private_output(){
-    m_output_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
-}
-
-template <typename _Tp>
-inline void Door<ppl::C_Polyhedron>::set_empty_private_input(){
-    m_input_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
-}
-
 }
 
 /// ******************  Other functions ****************** ///
 // out of invariant namespace
-inline std::ostream& operator<< (std::ostream& stream, const invariant::Door<ibex::IntervalVector>& d){
+inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<ibex::IntervalVector>& d){
     std::ostringstream input, output;
     input << d.get_input();
     output << d.get_output();
@@ -388,6 +380,9 @@ inline std::ostream& operator<< (std::ostream& stream, const invariant::Door<ibe
     return stream;
 }
 
+ppl::C_Polyhedron& operator&=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
+
+ppl::C_Polyhedron& operator|=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
 
 #include "door.tpp"
 

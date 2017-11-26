@@ -8,13 +8,20 @@
 #include "../definition/dynamics.h"
 #include "../definition/domain.h"
 #include "room.h"
+#include "../smartSubPaving/smartSubPaving.h"
+#include "pave.h"
 
 namespace invariant {
 
-class SmartSubPaving; // declared only for friendship
-class Domain; // declared only for friendship
 class Dynamics; // declared only for friendship
-class Room; // declared only for friendship
+template <typename _Tp> class Room;
+template <typename _Tp> class Domain;
+template <typename _Tp> class SmartSubPaving;
+template <typename _Tp> class Pave;
+template <typename _Tp> class Face;
+template <typename _Tp> class Door;
+
+template <typename _Tp=ibex::IntervalVector>
 class Maze
 {
 public:
@@ -24,7 +31,7 @@ public:
      * @param f_vect
      * @param type of operation (forward, backward or both)
      */
-    Maze(invariant::Domain *domain, Dynamics *dynamics);
+    Maze(invariant::Domain<_Tp> *domain, Dynamics *dynamics);
 
     /**
      * @brief Maze destructor
@@ -35,13 +42,13 @@ public:
      * @brief Getter to the Domain
      * @return
      */
-    Domain * get_domain() const;
+    Domain<_Tp> * get_domain() const;
 
     /**
      * @brief Getter to the SmartSubPaving
      * @return
      */
-    SmartSubPaving * get_subpaving() const;
+    SmartSubPaving<_Tp> * get_subpaving() const;
 
     /**
      * @brief Getter to the dynamics
@@ -70,13 +77,13 @@ public:
      * (to short locking the deque)
      * @param r
      */
-    void add_to_deque(Room *r);
+    void add_to_deque(Room<_Tp> *r);
 
     /**
      * @brief Add a list of rooms to the deque (check if already in)
      * @param list_rooms
      */
-    void add_rooms(const std::vector<Room *> &list_rooms);
+    void add_rooms(const std::vector<Room<_Tp> *> &list_rooms);
 
     /**
      * @brief Return true if some trajectory can escape from the search space
@@ -91,11 +98,11 @@ public:
     bool is_empty();
 
 private:
-    invariant::Domain *    m_domain = NULL;
-    SmartSubPaving  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
+    invariant::Domain<_Tp> *    m_domain = NULL;
+    SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
     Dynamics *  m_dynamics = NULL;
 
-    std::deque<Room *> m_deque_rooms;
+    std::deque<Room<_Tp> *> m_deque_rooms;
 
     omp_lock_t  m_deque_access;
 
@@ -110,23 +117,30 @@ private:
 
 namespace invariant{
 
-inline Domain * Maze::get_domain() const{
+template <typename _Tp>
+inline Domain<_Tp> * Maze<_Tp>::get_domain() const{
     return m_domain;
 }
 
-inline Dynamics * Maze::get_dynamics() const{
+template <typename _Tp>
+inline Dynamics * Maze<_Tp>::get_dynamics() const{
     return m_dynamics;
 }
 
-inline SmartSubPaving * Maze::get_subpaving() const{
+template <typename _Tp>
+inline SmartSubPaving<_Tp> * Maze<_Tp>::get_subpaving() const{
     return m_subpaving;
 }
 
-inline void Maze::add_to_deque(Room *r){
+template <typename _Tp>
+inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
     omp_set_lock(&m_deque_access);
     m_deque_rooms.push_back(r);
     omp_unset_lock(&m_deque_access);
 }
 
 }
+
+#include "maze.tpp"
+
 #endif // MAZE_H

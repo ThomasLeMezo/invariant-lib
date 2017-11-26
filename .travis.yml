@@ -46,6 +46,7 @@ matrix:
 cache:
   directories:
   - "$HOME/ibex"
+  - "$HOME/ppl"
   # - "$HOME/patchelf"
 notifications:
   email: false
@@ -83,6 +84,7 @@ before_install:
 
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
+- sh ./cmake/build_ppl.sh
 # - sh ./travis_script/build_patchelf.sh
 script:
 - export PATH=$PATH:~/patchelf/bin

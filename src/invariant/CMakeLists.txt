@@ -4,28 +4,24 @@
 
 
 # Sources
+include_directories(serialization)
 include_directories(definition)
 include_directories(definition/netcdf)
 include_directories(definition/dataSet)
-include_directories(serialization)
 include_directories(smartSubPaving)
 include_directories(maze)
 
   set(SRC
-    smartSubPaving/smartSubPaving.cpp
-    smartSubPaving/pave.cpp
-    smartSubPaving/face.cpp
-    smartSubPaving/pave_node.cpp
-
-    maze/maze.cpp
-    maze/room.cpp
-    maze/sepmaze.cpp
-
-    definition/domain.cpp
     definition/dynamics.cpp
     definition/dynamics_function.cpp
 
     serialization/ibex_serialization.cpp
+
+    maze/room.cpp
+    maze/door.cpp
+    smartSubPaving/face.cpp
+
+    smartSubPaving/pave.cpp
   )
 
   if(WITH_NETCDF)
@@ -39,22 +35,33 @@ include_directories(maze)
   endif()
 
   set(HEADERS
+    serialization/ibex_serialization.h
+
+    maze/maze.h
+    maze/room.h
+    maze/door.h
+    maze/sepmaze.h
+
     smartSubPaving/smartSubPaving.h
     smartSubPaving/pave.h
     smartSubPaving/face.h
     smartSubPaving/pave_node.h
 
-    maze/maze.h
-    maze/room.h
-    maze/door.h
-    maze/door.tpp
-    maze/sepmaze.h
-
     definition/domain.h
     definition/dynamics.h
     definition/dynamics_function.h
 
-    serialization/ibex_serialization.h
+    smartSubPaving/smartSubPaving.tpp
+    smartSubPaving/pave.tpp
+    smartSubPaving/face.tpp
+    smartSubPaving/pave_node.tpp
+
+    maze/maze.tpp
+    maze/room.tpp
+    maze/door.tpp
+    maze/sepmaze.tpp
+
+    definition/domain.tpp
   )
 
   if(WITH_NETCDF)
@@ -80,6 +87,8 @@ include_directories(maze)
   target_link_libraries(invariant-core
       ${LIBS}
       ${LIBS_NETCDF}
+      ${LIBS_PPL}
+      ${LIBS_GMP}
   )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")

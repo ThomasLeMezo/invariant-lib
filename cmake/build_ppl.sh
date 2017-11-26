@@ -19,7 +19,7 @@ if [ ! -e "$HOME/ppl/lib/libppl.a" ]; then
   cd ${FILE_NAME}
 
   ./configure --prefix=$HOME/ppl --enable-interfaces=cxx --enable-optimization=sspeed --enable-fpmath=default \
-    --disable-ppl_lpsol --disable-ppl_lcdd --enable-cxx
+    --disable-ppl_lpsol --disable-ppl_lcdd --enable-cxx --enable-shared
   make -j4
   make install
   cd ..

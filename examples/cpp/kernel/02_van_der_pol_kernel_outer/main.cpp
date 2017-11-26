@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = ibex::Interval(-6,6);
+    space[1] = ibex::Interval(-6,6);
 
     // ****** Domain ******* //
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_DOOR);
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
 
     Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
     SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(-x2,
-                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.5, 0.5)));
-    Dynamics_Function dyn(&f, BWD);
+                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.5, 0.5)));
+    Dynamics_Function dyn(&f, Dynamics::BWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     vibes::endDrawing();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-5.98);
-//    position_info[1] = Interval(0.14);
+//    position_info[0] = ibex::Interval(-5.98);
+//    position_info[1] = ibex::Interval(0.14);
 //    v_maze.get_room_info(&maze, position_info);
 
 }

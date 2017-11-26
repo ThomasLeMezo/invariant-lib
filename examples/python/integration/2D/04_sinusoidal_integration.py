@@ -27,7 +27,7 @@ dom_inner.set_sep_output(s_inner_union);
 
 # Create the Dynamics
 f = Function("x[2]", "(1,-sin(x[1]))")
-dyn = DynamicsFunction(f, FWD)
+dyn = DynamicsFunction(f, Dynamics::FWD)
 
 # Create the two Maze associated with the Domain and the dynamics
 maze_inner = Maze(dom_inner, dyn)

@@ -24,14 +24,14 @@ public:
     /**
      * @brief Export to a file the representation of a paving
      */
-    void show_graph(invariant::SmartSubPaving *subpaving);
+    void show_graph(invariant::SmartSubPaving<ibex::IntervalVector> *subpaving);
 
     /**
      * @brief Export to a file the representation of a maze
      * @param maze
      * @param comment
      */
-    void show_maze(invariant::Maze *maze, std::string comment="");
+    void show_maze(invariant::Maze<ibex::IntervalVector> *maze, std::string comment="");
 
     /**
      * @brief show_maze
@@ -44,17 +44,17 @@ public:
      * @param maze
      * @param position_info
      */
-    void show_room_info(invariant::Maze *maze, ibex::IntervalVector position);
+    void show_room_info(invariant::Maze<ibex::IntervalVector> *maze, ibex::IntervalVector position);
 
     /**
      * @brief serialize_maze
      * @param file_name
      */
-    void serialize_maze(const string &file_name, invariant::Maze *maze);
+    void serialize_maze(const string &file_name, invariant::Maze<ibex::IntervalVector> *maze);
 
 private:
-    invariant::Maze*    m_maze_outer = NULL;
-    invariant::Maze*    m_maze_inner = NULL;
+    invariant::Maze<ibex::IntervalVector>*    m_maze_outer = NULL;
+    invariant::Maze<ibex::IntervalVector>*    m_maze_inner = NULL;
 
     std::string         m_file_name = "";
     bool                m_memory_optimization = false;

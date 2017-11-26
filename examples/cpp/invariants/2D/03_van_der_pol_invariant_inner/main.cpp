@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-3,3);
-    space[1] = Interval(-3,3);
+    space[0] = ibex::Interval(-3,3);
+    space[1] = ibex::Interval(-3,3);
 
     // ****** Domain ******* //
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_WALL);
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_WALL);
 
     dom.set_border_path_in(true);
     dom.set_border_path_out(true);
@@ -33,10 +33,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, FWD);
+    Dynamics_Function dyn(&f, Dynamics::FWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     vibes::endDrawing();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(1);
-//    position_info[1] = Interval(1);
+//    position_info[0] = ibex::Interval(1);
+//    position_info[1] = ibex::Interval(1);
 //    v_maze.get_room_info(&maze, position_info);
 }

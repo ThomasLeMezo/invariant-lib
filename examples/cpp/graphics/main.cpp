@@ -14,8 +14,8 @@ using namespace invariant;
 int main(int argc, char *argv[])
 {
     IntervalVector space(2);
-    space[0] = Interval(0,1);
-    space[1] = Interval(0,1);
+    space[0] = ibex::Interval(0,1);
+    space[1] = ibex::Interval(0,1);
 
     Graph g(space);
     double t_start = omp_get_wtime();

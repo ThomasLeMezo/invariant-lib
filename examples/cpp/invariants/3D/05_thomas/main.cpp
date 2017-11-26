@@ -22,13 +22,13 @@ int main(int argc, char *argv[])
     ibex::Variable x, y, z;
 
     IntervalVector space(3);
-    space[0] = Interval(-10, 10);
-    space[1] = Interval(-10, 10);
-    space[2] = Interval(-10, 10);
+    space[0] = ibex::Interval(-10, 10);
+    space[1] = ibex::Interval(-10, 10);
+    space[2] = ibex::Interval(-10, 10);
 
     // ****** Domain ******* //
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_DOOR);
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -51,17 +51,17 @@ int main(int argc, char *argv[])
     dom.set_sep(&sep_total);
 
     // ****** Dynamics ******* //
-//    Interval b = Interval(0.32899);
-//    Interval b = Interval(0.208186);
-    Interval b = Interval(0.1998);
+//    Interval b = ibex::Interval(0.32899);
+//    Interval b = ibex::Interval(0.208186);
+    ibex::Interval b = ibex::Interval(0.1998);
 
     ibex::Function f(x, y, z, Return(sin(y)-b*x,
                                      sin(z)-b*y,
                                      sin(x)-b*z));
-    Dynamics_Function dyn(&f, FWD_BWD);
+    Dynamics_Function dyn(&f, Dynamics::FWD_BWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -80,8 +80,8 @@ int main(int argc, char *argv[])
     vtkMaze3D.show_maze(&maze);
 
     //    IntervalVector position_info(2);
-    //    position_info[0] = Interval(-1.7);
-    //    position_info[1] = Interval(1);
+    //    position_info[0] = ibex::Interval(-1.7);
+    //    position_info[1] = ibex::Interval(1);
     //    v_maze.get_room_info(&maze, position_info);
 
 }

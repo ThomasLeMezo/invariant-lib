@@ -20,18 +20,18 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-4,4);
-    space[1] = Interval(-4,4);
-    SmartSubPaving paving(space);
+    space[0] = ibex::Interval(-4,4);
+    space[1] = ibex::Interval(-4,4);
+    invariant::SmartSubPaving<> paving(space);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     vector<Function *> f_list;
     f_list.push_back(&f);
-    Dynamics_Function dyn(f_list, FWD);
+    Dynamics_Function dyn(f_list, Dynamics::FWD);
 
     // ****** Domain & Maze *******
-    invariant::Domain dom_A(&paving, FULL_WALL);
+    invariant::Domain<> dom_A(&paving, invariant::Domain<>::FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
@@ -42,19 +42,19 @@ int main(int argc, char *argv[])
     SepFwdBwd s_A(f_sep_A, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A.set_sep(&s_A);
 
-    Maze maze_A(&dom_A, &dyn);
+    invariant::Maze<> maze_A(&dom_A, &dyn);
 
-    invariant::Domain dom_B(&paving, FULL_WALL);
+    invariant::Domain<> dom_B(&paving, invariant::Domain<>::FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     IntervalVector box_B(2);
-    box_B[0] = Interval(-0.5, 0.5);
-    box_B[1] = Interval(-2.5, -1.5);
+    box_B[0] = ibex::Interval(-0.5, 0.5);
+    box_B[1] = ibex::Interval(-2.5, -1.5);
     Function f_sep_B(x1, x2, Return(x1, x2));
     SepFwdBwd s_B(f_sep_B, box_B);
     dom_B.set_sep(&s_B);
 
-    Maze maze_B(&dom_B, &dyn);
+    invariant::Maze<> maze_B(&dom_B, &dyn);
 
     dom_B.add_maze_inter(&maze_A);
 //    dom_A.add_maze_inter(&maze_B);
@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
     v_mazeB.drawBox(box_B, "r[]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(4);
+//    position_info[0] = ibex::Interval(-2);
+//    position_info[1] = ibex::Interval(4);
 //    v_maze.get_room_info(&maze, position_info);
 
     vibes::endDrawing();

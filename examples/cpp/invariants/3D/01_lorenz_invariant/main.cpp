@@ -25,19 +25,19 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = Interval(-30,30);
-    space[1] = Interval(-20,20);
-    space[2] = Interval(0,50);
+    space[0] = ibex::Interval(-30,30);
+    space[1] = ibex::Interval(-20,20);
+    space[2] = ibex::Interval(0,50);
 
-    Interval rho = Interval(28.0);
-    Interval sigma = Interval(10.0);
-    Interval beta = Interval(8.0/3.0);
+    ibex::Interval rho = ibex::Interval(28.0);
+    ibex::Interval sigma = ibex::Interval(10.0);
+    ibex::Interval beta = ibex::Interval(8.0/3.0);
 
     // ****** Domain ******* //
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_DOOR);
-    Interval pt_xy = sqrt(beta*(rho-1.0));
-    Interval pt_z = rho-1.0;
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
+    ibex::Interval pt_xy = sqrt(beta*(rho-1.0));
+    ibex::Interval pt_z = rho-1.0;
     double r = 3.0;
 
     // Remove zeros
@@ -60,17 +60,17 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
 
-    //    Interval rho = Interval(13.0);
-    //    Interval sigma = Interval(10.0);
-    //    Interval beta = Interval(8.0/3.0);
+    //    Interval rho = ibex::Interval(13.0);
+    //    Interval sigma = ibex::Interval(10.0);
+    //    Interval beta = ibex::Interval(8.0/3.0);
 
     ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
                                         x1*(rho - x3) - x2,
                                         x1*x2 - beta * x3));
-    Dynamics_Function dyn(&f, FWD_BWD);
+    Dynamics_Function dyn(&f, Dynamics::FWD_BWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -89,9 +89,9 @@ int main(int argc, char *argv[])
     vtkMaze3D.show_maze(&maze);
 
 //    IntervalVector position_info(3);
-//    position_info[0] = Interval(0.5);
-//    position_info[1] = Interval(0.5);
-//    position_info[2] = Interval(0.5);
+//    position_info[0] = ibex::Interval(0.5);
+//    position_info[1] = ibex::Interval(0.5);
+//    position_info[2] = ibex::Interval(0.5);
 //    vtkMaze3D.show_room_info(&maze, position_info);
     //        vector<Pave*> pave_list;
     //        paving.get_room_info(&maze, position_info, pave_list);

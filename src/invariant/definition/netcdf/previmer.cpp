@@ -13,7 +13,7 @@ using namespace ibex;
 namespace invariant {
 
 PreviMer::PreviMer(const std::string& file_name):
-    Dynamics(FWD)
+    Dynamics(Dynamics::FWD)
 {
     NcFile dataFile(file_name, NcFile::read);
 

@@ -142,7 +142,7 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
 }
 
 PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits):
-    Dynamics(FWD), m_search_space(3)
+    Dynamics(Dynamics::FWD), m_search_space(3)
 {
     int ram_init = getRAM()/1000;
     cout << "Mem 0 = " << ram_init << " Mo" << endl;
@@ -218,7 +218,7 @@ void PreviMer3D::serialize(const string &file_name){
 }
 
 PreviMer3D::PreviMer3D(const std::string& file_name):
-    Dynamics(FWD), m_search_space(3)
+    Dynamics(Dynamics::FWD), m_search_space(3)
 {
     int ram_init = getRAM()/1000;
     std::ifstream binFile(file_name.c_str(), std::ifstream::in);

@@ -1,12 +1,12 @@
 #include "maze.h"
 
-#include "../../graphics/vibesMaze.h"
 
 using namespace std;
 using namespace ibex;
 namespace invariant {
 
-Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
+template<typename _Tp>
+Maze<_Tp>::Maze(invariant::Domain<_Tp> *domain, Dynamics *dynamics)
 {
     m_domain = domain;
     m_dynamics = dynamics;
@@ -14,9 +14,9 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
     m_subpaving = domain->get_subpaving();
     omp_init_lock(&m_deque_access);
 
-    SmartSubPaving *g = domain->get_subpaving();
-    for(Pave*p:g->get_paves()){
-        Room *r = new Room(p, this, dynamics);
+    SmartSubPaving<_Tp> *g = domain->get_subpaving();
+    for(Pave<_Tp>*p:g->get_paves()){
+        Room<_Tp> *r = new Room<_Tp>(p, this, dynamics);
         p->add_room(r);
     }
 
@@ -24,29 +24,32 @@ Maze::Maze(invariant::Domain *domain, Dynamics *dynamics)
     m_empty = false;
 }
 
-Maze::~Maze(){
+template<typename _Tp>
+Maze<_Tp>::~Maze(){
     omp_destroy_lock(&m_deque_access);
 }
 
-void Maze::init(){
-    vector<Room *> list_room_to_contract;
-    invariant::Domain *d = m_domain;
+template<typename _Tp>
+void Maze<_Tp>::init(){
+    vector<Room<_Tp> *> list_room_to_contract;
+    invariant::Domain<_Tp> *d = m_domain;
     d->contract_domain(this, list_room_to_contract);
 }
 
-int Maze::contract(){
+template<typename _Tp>
+int Maze<_Tp>::contract(){
     if(m_empty){
         cout << " ==> MAZE EMPTY" << endl;
         return 0;
     }
     // Domain contraction
-    vector<Room *> list_room_to_contract;
-    invariant::Domain *d = m_domain;
+    vector<Room<_Tp> *> list_room_to_contract;
+    invariant::Domain<_Tp> *d = m_domain;
     double t_start = omp_get_wtime();
     d->contract_domain(this, list_room_to_contract);
 
     // Add Room to the Deque
-    for(Room *r:list_room_to_contract){
+    for(Room<_Tp> *r:list_room_to_contract){
         if(!r->is_in_deque()){
             r->set_in_queue();
             add_to_deque(r);
@@ -87,7 +90,7 @@ int Maze::contract(){
                 {
                     // Take one Room
                     omp_set_lock(&m_deque_access);
-                    Room *r = NULL;
+                    Room<_Tp> *r = NULL;
                     if(!m_deque_rooms.empty()){
                         // To improve the efficiency, we start half of the thread on the back of the deque
                         // and the other on the front
@@ -111,13 +114,13 @@ int Maze::contract(){
 
                         if(change){
                             // Analyse changes
-                            vector<Room *> rooms_to_update;
+                            vector<Room<_Tp> *> rooms_to_update;
                             r->analyze_change(rooms_to_update);
 
                             // Synchronize
                             r->synchronize();
 
-                            if(m_domain->get_init() == FULL_DOOR && r->is_empty())
+                            if(m_domain->get_init() == Domain<_Tp>::FULL_DOOR && r->is_empty())
                                 r->set_removed();
 
                             // Add Rooms to the Deque
@@ -156,7 +159,8 @@ int Maze::contract(){
     return nb_operations;
 }
 
-//void Maze::contract_inter(Maze* maze_inter){
+//template<typename _Tp>
+//void Maze<_Tp>::contract_inter(Maze* maze_inter){
 //    // Intersect this maze with other mazes
 //    //    invariant::Domain *d = m_domain;
 //    //    d->inter_maze(this);
@@ -179,19 +183,20 @@ int Maze::contract(){
 //    }
 //}
 
-bool Maze::is_escape_trajectories(){
+template<typename _Tp>
+bool Maze<_Tp>::is_escape_trajectories(){
     if(m_espace_trajectories == false)
         return false;
     else{
-        std::vector<Pave*> pave_list_border;
+        std::vector<Pave<_Tp>*> pave_list_border;
         m_subpaving->get_tree()->get_border_paves(pave_list_border);
 
-        for(Pave *p:pave_list_border){
-            Room *r = p->get_rooms()[this];
+        for(Pave<_Tp> *p:pave_list_border){
+            Room<_Tp> *r = p->get_rooms()[this];
             if(!r->is_removed()){
-                for(Face *f:p->get_faces_vector()){
+                for(Face<_Tp> *f:p->get_faces_vector()){
                     if(f->is_border()){
-                        Door *d = f->get_doors()[this];
+                        Door<_Tp> *d = f->get_doors()[this];
                         if(!d->is_empty())
                             return true;
                     }
@@ -203,8 +208,9 @@ bool Maze::is_escape_trajectories(){
     }
 }
 
-void Maze::add_rooms(const vector<Room *>& list_rooms){
-    for(Room *r:list_rooms){
+template<typename _Tp>
+void Maze<_Tp>::add_rooms(const vector<Room<_Tp> *>& list_rooms){
+    for(Room<_Tp> *r:list_rooms){
         if(!r->is_in_deque()){
             r->set_in_queue();
             this->add_to_deque(r);

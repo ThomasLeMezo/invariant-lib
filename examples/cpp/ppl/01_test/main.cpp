@@ -157,9 +157,9 @@ int main(){
     pave[2] = ibex::Interval(-1, 1);
 
     IntervalVector vec(dimension);
-    theta[0] = ibex::Interval(-0.3, 0.3);
-    theta[0] = ibex::Interval(-0.3, 0.3);
-    theta[1] = ibex::Interval(1);
+    vec[0] = ibex::Interval(-0.3, 0.3);
+    vec[0] = ibex::Interval(-0.3, 0.3);
+    vec[1] = ibex::Interval(1);
 
     C_Polyhedron ph_in(dimension, PPL::EMPTY);
     PPL::Variable x(0), y(1), z(2);
@@ -180,18 +180,18 @@ int main(){
     //    face_in[2] = ibex::Interval(-1);
     //    C_Polyhedron ph_in(iv_2_box(face_in));
 
-    C_Polyhedron ph_projection = add_ray(theta, ph_in);
+    C_Polyhedron ph_projection = add_ray(vec, ph_in);
 
-    std::vector<Parma_Polyhedra_Library::C_Polyhedron> ph_out_list;
-    for(auto &ph_face:rb_list){
-        C_Polyhedron ph_tmp(ph_projection);
-        C_Polyhedron ph_face_tmp(ph_face);
-        ph_tmp.intersection_assign(ph_face_tmp);
-        if(!ph_tmp.is_empty()){
-            ph_out_list.push_back(ph_tmp);
-        }
-    }
-    write_VTK(ph_out_list, "pave_out");
+//    std::vector<Parma_Polyhedra_Library::C_Polyhedron> ph_out_list;
+//    for(auto &ph_face:rb_list){
+//        C_Polyhedron ph_tmp(ph_projection);
+//        C_Polyhedron ph_face_tmp(ph_face);
+//        ph_tmp.intersection_assign(ph_face_tmp);
+//        if(!ph_tmp.is_empty()){
+//            ph_out_list.push_back(ph_tmp);
+//        }
+//    }
+//    write_VTK(ph_out_list, "pave_out");
 
     cout << "matrix" << endl;
 

@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
     // ****** Domain *******
     IntervalVector search_space = pm.get_search_space();
 //    IntervalVector search_space(2);
-//    search_space[0] = Interval(0, 300);
-//    search_space[1] = Interval(200, 500);
-    SmartSubPaving paving(search_space);
-    invariant::Domain dom(&paving, FULL_WALL);
+//    search_space[0] = ibex::Interval(0, 300);
+//    search_space[1] = ibex::Interval(200, 500);
+    invariant::SmartSubPaving<> paving(search_space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -34,13 +34,13 @@ int main(int argc, char *argv[])
     x1_c = 210;
     x2_c = 400;
     r = 0.0;
-    Variable x1, x2;
+    ibex::Variable x1, x2;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom.set_sep(&s);
 
     // ******* Maze *********
-    Maze maze(&dom, &pm);
+    invariant::Maze<> maze(&dom, &pm);
 
     double max_diam = max(search_space[0].diam(), search_space[1].diam());
     int iterations_max = 2*(ceil(log(max_diam)/log(2)));
@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(x1_c);
-    position_info[1] = Interval(x2_c);
+    position_info[0] = ibex::Interval(x1_c);
+    position_info[1] = ibex::Interval(x2_c);
     v_maze.get_room_info(&maze, position_info);
 
 

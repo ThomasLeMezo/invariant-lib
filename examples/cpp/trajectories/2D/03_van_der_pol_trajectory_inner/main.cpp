@@ -20,19 +20,19 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-4,4);
-    space[1] = Interval(-4,4);
-    SmartSubPaving paving(space);
+    space[0] = ibex::Interval(-4,4);
+    space[1] = ibex::Interval(-4,4);
+    invariant::SmartSubPaving<> paving(space);
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, FWD);
+    Dynamics_Function dyn(&f, Dynamics::FWD);
 
     ibex::Function f_bwd(x1, x2, -Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn_bwd(&f_bwd, BWD);
+    Dynamics_Function dyn_bwd(&f_bwd, Dynamics::BWD);
 
     // ****** Maze A *******
-    invariant::Domain dom_A(&paving, FULL_WALL);
+    invariant::Domain<> dom_A(&paving, invariant::Domain<>::FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
@@ -41,29 +41,29 @@ int main(int argc, char *argv[])
     SepFwdBwd s_A(f_sep_A, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A.set_sep(&s_A);
 
-    Maze maze_A(&dom_A, &dyn);
+    invariant::Maze<> maze_A(&dom_A, &dyn);
 
     // ****** Maze A inner *******
-    invariant::Domain dom_A_inner(&paving, FULL_DOOR);
+    invariant::Domain<> dom_A_inner(&paving, invariant::Domain<>::FULL_DOOR);
     dom_A_inner.set_border_path_in(true);
     dom_A_inner.set_border_path_out(true);
     SepFwdBwd s_A_inner(f_sep_A, GEQ); // LT, LEQ, EQ, GEQ, GT)
     dom_A_inner.set_sep(&s_A_inner);
 
-    Maze maze_A_inner(&dom_A_inner, &dyn_bwd);
+    invariant::Maze<> maze_A_inner(&dom_A_inner, &dyn_bwd);
 
     // ****** Maze B *******
-    invariant::Domain dom_B(&paving, FULL_WALL);
+    invariant::Domain<> dom_B(&paving, invariant::Domain<>::FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     IntervalVector box_B(2);
-    box_B[0] = Interval(0.8, 1.6);
-    box_B[1] = Interval(-0.7, -0.5);
+    box_B[0] = ibex::Interval(0.8, 1.6);
+    box_B[1] = ibex::Interval(-0.7, -0.5);
     Function f_sep_B(x1, x2, Return(x1, x2));
     SepFwdBwd s_B(f_sep_B, box_B);
     dom_B.set_sep(&s_B);
 
-    Maze maze_B(&dom_B, &dyn);
+    invariant::Maze<> maze_B(&dom_B, &dyn);
 
     dom_B.add_maze_inter(&maze_A);
 //    dom_A.add_maze_inter(&maze_B);
@@ -92,8 +92,8 @@ int main(int argc, char *argv[])
     v_mazeB.drawBox(box_B, "r[]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-2);
-//    position_info[1] = Interval(4);
+//    position_info[0] = ibex::Interval(-2);
+//    position_info[1] = ibex::Interval(4);
 //    v_maze.get_room_info(&maze, position_info);
 
     vibes::endDrawing();

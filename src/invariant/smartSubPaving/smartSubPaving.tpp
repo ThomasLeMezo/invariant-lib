@@ -1,19 +1,17 @@
 #include "smartSubPaving.h"
-#include "ibex_serialization.h"
-#include <stdexcept>
-#include <fstream>
 
 using namespace std;
 using namespace ibex;
 
 namespace invariant {
-SmartSubPaving::SmartSubPaving(const ibex::IntervalVector &space):
+template<typename _Tp>
+SmartSubPaving<_Tp>::SmartSubPaving(const ibex::IntervalVector &space):
     m_position(space)
 {
     m_dim = (unsigned char) space.size();
 
     // Create search space Pave
-    Pave* p = new Pave(space, this);
+    invariant::Pave<_Tp>* p = new invariant::Pave<_Tp>(space, this);
     m_paves.push_back(p);
 
     // Create infinity Paves around search space
@@ -27,13 +25,13 @@ SmartSubPaving::SmartSubPaving(const ibex::IntervalVector &space):
 //    }
 
     // Analyze faces (border)
-    for(Pave *p:m_paves)
+    for(Pave<_Tp> *p:m_paves)
         p->analyze_border();
-    for(Pave *p:m_paves_not_bisectable)
+    for(Pave<_Tp> *p:m_paves_not_bisectable)
         p->analyze_border();
 
     // Root of the pave node tree
-    m_tree = new Pave_node(p);
+    m_tree = new Pave_node<_Tp>(p);
     p->set_pave_node(m_tree);
 
     // Compute ratio dimension
@@ -44,20 +42,23 @@ SmartSubPaving::SmartSubPaving(const ibex::IntervalVector &space):
     }
 }
 
-SmartSubPaving::~SmartSubPaving(){
-    for(Pave *p:m_paves){
+template<typename _Tp>
+SmartSubPaving<_Tp>::~SmartSubPaving(){
+    for(Pave<_Tp> *p:m_paves){
         if(p!=NULL)
             delete(p);
     }
     delete(m_tree);
 }
 
-void SmartSubPaving::delete_pave(int id){
+template<typename _Tp>
+void SmartSubPaving<_Tp>::delete_pave(int id){
     delete(m_paves[id]);
     m_paves[id] = NULL;
 }
 
-void SmartSubPaving::serialize(std::ofstream& binFile) const{
+template<typename _Tp>
+void SmartSubPaving<_Tp>::serialize(std::ofstream& binFile) const{
     // unsigned char    dimension
     // size_t           number of paves
     // IntervalVector   position
@@ -69,13 +70,14 @@ void SmartSubPaving::serialize(std::ofstream& binFile) const{
     serializeIntervalVector(binFile, m_position);
 
     size_t cpt = 0;
-    for(Pave *p:m_paves){
+    for(Pave<_Tp> *p:m_paves){
         p->set_serialization_id(cpt); cpt++;
         p->serialize(binFile);
     }
 }
 
-void SmartSubPaving::deserialize(std::ifstream& binFile){
+template<typename _Tp>
+void SmartSubPaving<_Tp>::deserialize(std::ifstream& binFile){
     if(m_paves.size()!=0){
         throw std::runtime_error("in [graph.cpp/deserialize] SmartSubPaving is not empty");
         return;
@@ -88,16 +90,17 @@ void SmartSubPaving::deserialize(std::ifstream& binFile){
 
     const size_t number_pave_const = number_pave;
     for(size_t i=0; i<number_pave_const; i++){
-        Pave *p = new Pave(this);
+        Pave<_Tp> *p = new Pave<_Tp>(this);
         m_paves.push_back(p);
     }
     for(size_t i=0; i<number_pave_const; i++){
-        Pave *p = m_paves[i];
+        Pave<_Tp> *p = m_paves[i];
         p->deserialize(binFile);
     }
 }
 
-const bool SmartSubPaving::is_equal(const SmartSubPaving& g) const{
+template<typename _Tp>
+const bool SmartSubPaving<_Tp>::is_equal(const SmartSubPaving<_Tp>& g) const{
     if(m_position != g.get_position())
         return false;
     if(m_dim != g.dim())
@@ -110,14 +113,15 @@ const bool SmartSubPaving::is_equal(const SmartSubPaving& g) const{
     return true;
 }
 
-void SmartSubPaving::bisect(){
-    vector<Pave*> m_bisectable_paves = m_paves;
-    vector<Pave*> m_bisected_paves;
+template<typename _Tp>
+void SmartSubPaving<_Tp>::bisect(){
+    vector<Pave<_Tp>*> m_bisectable_paves = m_paves;
+    vector<Pave<_Tp>*> m_bisected_paves;
     m_paves.clear();
 
     /// Bisect the graph ///
     while(m_bisectable_paves.size()>0){
-        Pave *p = m_bisectable_paves.back();
+        Pave<_Tp> *p = m_bisectable_paves.back();
         m_bisectable_paves.pop_back();
 
         if(p->request_bisection()){
@@ -140,20 +144,22 @@ void SmartSubPaving::bisect(){
     }
 
     /// Delete parent of bisected paves ///
-    for(Pave* p:m_bisected_paves)
+    for(Pave<_Tp>* p:m_bisected_paves)
         delete(p);
 }
 
-void SmartSubPaving::get_room_info(Maze *maze, const IntervalVector& position, vector<Pave*> &pave_list) const{
+template<typename _Tp>
+void SmartSubPaving<_Tp>::get_room_info(Maze<_Tp> *maze, const IntervalVector& position, vector<Pave<_Tp>*> &pave_list) const{
     m_tree->get_intersection_pave_outer(pave_list,position);
-    for(Pave *p:pave_list){
-        Room *r = p->get_rooms()[maze];
+    for(Pave<_Tp> *p:pave_list){
+        Room<_Tp> *r = p->get_rooms()[maze];
         cout << *r << endl;
     }
 }
 
 
-std::pair<IntervalVector, IntervalVector> SmartSubPaving::bisect_largest_first(const IntervalVector &position){
+template<typename _Tp>
+std::pair<IntervalVector, IntervalVector> SmartSubPaving<_Tp>::bisect_largest_first(const IntervalVector &position){
     // Select dimensions to bisect
     bool one_possible = false;
     vector<bool> possible_dim;
@@ -185,8 +191,8 @@ std::pair<IntervalVector, IntervalVector> SmartSubPaving::bisect_largest_first(c
     IntervalVector p1(position);
     IntervalVector p2(position);
 
-    p1[dim_max] = Interval(position[dim_max].lb(), position[dim_max].mid());
-    p2[dim_max] = Interval(position[dim_max].mid(), position[dim_max].ub());
+    p1[dim_max] = ibex::Interval(position[dim_max].lb(), position[dim_max].mid());
+    p2[dim_max] = ibex::Interval(position[dim_max].mid(), position[dim_max].ub());
 
     return std::make_pair(p1, p2);
 }

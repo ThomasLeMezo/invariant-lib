@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
 
 /// **************** TEST 1 **************** ///
     IntervalVector test_position(3);
-    test_position[0] = Interval(0, 14.0625);
-    test_position[1] = Interval(52468.8, 52611.3);
-    test_position[2] = Interval(99588.4, 99772.5);
+    test_position[0] = ibex::Interval(0, 14.0625);
+    test_position[1] = ibex::Interval(52468.8, 52611.3);
+    test_position[2] = ibex::Interval(99588.4, 99772.5);
     vector<ibex::IntervalVector> result = pm3d.eval(test_position);
     cout << "Result = " << endl;
     for(IntervalVector &iv:result)
@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
 
 #if 1
     // ****** Domain *******
-    SmartSubPaving paving(search_space);
-    invariant::Domain dom(&paving, FULL_WALL);
+    invariant::SmartSubPaving<> paving(search_space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -68,13 +68,13 @@ int main(int argc, char *argv[])
     y_c = 460 * pm3d.get_grid_conversion(2);
     r = 0.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
-    Variable t, x, y;
+    ibex::Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
     dom.set_sep(&s);
 
     // ******* Maze *********
-    Maze maze(&dom, &pm3d);
+    invariant::Maze<> maze(&dom, &pm3d);
 
     cout << "Domain = " << search_space << endl;
 
@@ -96,9 +96,9 @@ int main(int argc, char *argv[])
     vtkMaze3D.serialize_maze("current.maze", &maze);
 
     IntervalVector position(3);
-    position[0] = Interval(t_c); // 450, 900
-    position[1] = Interval(x_c); // 37304, 37980
-    position[2] = Interval(y_c); // 119766, 120469
+    position[0] = ibex::Interval(t_c); // 450, 900
+    position[1] = ibex::Interval(x_c); // 37304, 37980
+    position[2] = ibex::Interval(y_c); // 119766, 120469
     vtkMaze3D.show_room_info(&maze, position);
 #endif
 

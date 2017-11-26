@@ -17,7 +17,7 @@ public:
      * @param position
      * @param leaf_list
      */
-    DataSetNode(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2>>>> &leaf_list);
+    DataSetNode(const std::vector<std::array<int, 2> > &position, std::vector<std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2> > > > &leaf_list);
 
     /**
      * @brief DataSetNode constructor for deserialization

@@ -19,13 +19,13 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
-    space[2] = Interval(0,20);
+    space[0] = ibex::Interval(-6,6);
+    space[1] = ibex::Interval(-6,6);
+    space[2] = ibex::Interval(0,20);
 
     // ****** Domain *******
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_WALL);
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, x3, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1), pow(x2, 2)+ pow((1.0*(1.0-pow(x1, 2))*x2-x1), 2)));
     vector<Function *> f_list;
     f_list.push_back(&f);
-    Dynamics_Function dyn(f_list, FWD);
+    Dynamics_Function dyn(f_list, Dynamics::FWD);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in

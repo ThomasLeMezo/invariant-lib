@@ -13,7 +13,7 @@ using namespace std;
 namespace invariant {
 
 template<typename _Tp, size_t _n>
-DataSetNode<_Tp, _n>::DataSetNode(const std::vector<std::array<int, 2>> &position, std::vector<std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2>>>> &leaf_list)
+DataSetNode<_Tp, _n>::DataSetNode(const std::vector<std::array<int, 2> > &position, std::vector<std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2> > > > &leaf_list)
 {
     for(size_t dim=0; dim<_n; dim++){
         m_data[dim][0] = std::numeric_limits<_Tp>::max();
@@ -33,7 +33,7 @@ DataSetNode<_Tp, _n>::DataSetNode(const std::vector<std::array<int, 2>> &positio
         m_bisection_axis = -1;
         m_children_first = NULL;
         m_children_second = NULL;
-        std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2>>> pair(this, position);
+        std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2> > > pair(this, position);
         leaf_list.push_back(pair);
     }
     else{

@@ -21,14 +21,14 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = Interval(-3.5,3.5);
-    space[1] = Interval(-4.5,4.5);
-    space[2] = Interval(0,10);
+    space[0] = ibex::Interval(-3.5,3.5);
+    space[1] = ibex::Interval(-4.5,4.5);
+    space[2] = ibex::Interval(0,10);
 
-    SmartSubPaving paving(space);
+    invariant::SmartSubPaving<> paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&paving, FULL_WALL);
+    invariant::Domain<> dom_outer(&paving, invariant::Domain<>::FULL_WALL);
 
     double x1_c, x2_c, x3_c, r;
     x1_c = -0.27;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&paving, FULL_DOOR);
+    invariant::Domain<> dom_inner(&paving, invariant::Domain<>::FULL_DOOR);
 
     SepFwdBwd s_inner(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
     dom_inner.set_sep(&s_inner);
@@ -57,12 +57,12 @@ int main(int argc, char *argv[])
                                             2.0+0*x3));
 //    ibex::Function f(x1, x2, Return(x2,
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
-    Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn_outer(&f, Dynamics::FWD);
+    Dynamics_Function dyn_inner(&f, Dynamics::FWD);
 
     // ******* Mazes ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer);
-    Maze maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
 
     VtkMaze3D vtkMaze3D("vdp_3D");
 

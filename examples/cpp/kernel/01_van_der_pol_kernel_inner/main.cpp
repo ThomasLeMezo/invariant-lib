@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = ibex::Interval(-6,6);
+    space[1] = ibex::Interval(-6,6);
 
     // ****** Domain ******* //
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_WALL);
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_WALL);
 
     Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(1.0, 2));
     SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT
@@ -36,22 +36,22 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.3)));
     ibex::Function f2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(0.3)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(0.3)));
 
 //    ibex::Function f1(x1, x2, Return(Interval(1.0),
-//                                    Interval(0.5)));
+//                                    ibex::Interval(0.5)));
 //    ibex::Function f2(x1, x2, Return(Interval(1.0),
-//                                     Interval(-0.5)));
+//                                     ibex::Interval(-0.5)));
 
     vector<Function *> f_list;
     f_list.push_back(&f1);
     f_list.push_back(&f2);
-    Dynamics_Function dyn(f_list, FWD);
+    Dynamics_Function dyn(f_list, Dynamics::FWD);
 
     // ******* Maze ********* //
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     vibes::endDrawing();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(1);
-//    position_info[1] = Interval(1);
+//    position_info[0] = ibex::Interval(1);
+//    position_info[1] = ibex::Interval(1);
 //    v_maze.get_room_info(&maze, position_info);
 }

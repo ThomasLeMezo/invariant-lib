@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-6,6);
-    space[1] = Interval(-6,6);
+    space[0] = ibex::Interval(-6,6);
+    space[1] = ibex::Interval(-6,6);
 
     // ****** Domain *******
-    SmartSubPaving paving(space);
-    invariant::Domain dom(&paving, FULL_WALL);
+    invariant::SmartSubPaving<> paving(space);
+    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -42,10 +42,10 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     vector<Function *> f_list;
     f_list.push_back(&f);
-    Dynamics_Function dyn(f_list, FWD);
+    Dynamics_Function dyn(f_list, Dynamics::FWD);
 
     // ******* Maze *********
-    Maze maze(&dom, &dyn);
+    invariant::Maze<> maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
     maze.contract(); // To set first pave to be in
@@ -64,13 +64,13 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(3, 2, 0.3, "red[]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(2.7);
-//    position_info[1] = Interval(2.12);
+//    position_info[0] = ibex::Interval(2.7);
+//    position_info[1] = ibex::Interval(2.12);
 //    v_maze.show_room_info(&maze, position_info);
 
 //    IntervalVector pave_in(2);
-//    pave_in[0] = Interval(2.67188, 2.71875);
-//    pave_in[1] = Interval(2.0625, 2.15625);
+//    pave_in[0] = ibex::Interval(2.67188, 2.71875);
+//    pave_in[1] = ibex::Interval(2.0625, 2.15625);
 //    IntervalVector pave_out(pave_in);
 //    s.separate(pave_in, pave_out);
 //    cout << "pave_in = " << pave_in << " pave_out = " << pave_out << endl;

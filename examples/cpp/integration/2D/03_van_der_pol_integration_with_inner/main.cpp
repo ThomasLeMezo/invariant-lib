@@ -21,13 +21,13 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-4.75,4.75);
-    space[1] = Interval(-3.5,6);
+    space[0] = ibex::Interval(-4.75,4.75);
+    space[1] = ibex::Interval(-3.5,6);
 
-    SmartSubPaving paving(space);
+    invariant::SmartSubPaving<> paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&paving, FULL_WALL);
+    invariant::Domain<> dom_outer(&paving, invariant::Domain<>::FULL_WALL);
 
     double x1_c, x2_c, r;
 //    x1_c = 3.0;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&paving, FULL_DOOR);
+    invariant::Domain<> dom_inner(&paving, invariant::Domain<>::FULL_DOOR);
 
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -57,12 +57,12 @@ int main(int argc, char *argv[])
                                         (1.0*(1.0-pow(x1, 2))*x2-x1)));
 //    ibex::Function f(x1, x2, Return(x2,
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
-    Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn_outer(&f, Dynamics::FWD);
+    Dynamics_Function dyn_inner(&f, Dynamics::FWD);
 
     // ******* Mazes ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer);
-    Maze maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -83,14 +83,14 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(x1_c, x2_c, r, "red[]");
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-2.28);
-    position_info[1] = Interval(3.89);
+    position_info[0] = ibex::Interval(-2.28);
+    position_info[1] = ibex::Interval(3.89);
 //    v_maze.get_room_info(&maze_inner, position_info);
 //    v_maze.show_room_info(&maze_inner, position_info);
 
 //    IntervalVector pave_in(2);
-//    pave_in[0] = Interval(-2.375, -1.78125);
-//    pave_in[1] = Interval(3.625, 4.8125);
+//    pave_in[0] = ibex::Interval(-2.375, -1.78125);
+//    pave_in[1] = ibex::Interval(3.625, 4.8125);
 //    IntervalVector pave_out(pave_in);
 //    vibes::drawBox(pave_out, "black[]");
 //    s_inner.separate(pave_in, pave_out);

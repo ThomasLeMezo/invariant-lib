@@ -23,13 +23,13 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-4,4);
-    space[1] = Interval(-3.5,6);
+    space[0] = ibex::Interval(-4,4);
+    space[1] = ibex::Interval(-3.5,6);
 
-    SmartSubPaving paving(space);
+    invariant::SmartSubPaving<> paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain dom_outer(&paving, FULL_WALL);
+    invariant::Domain<> dom_outer(&paving, invariant::Domain<>::FULL_WALL);
 
     double x1_c, x2_c, r;
     x1_c = 0.0;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain dom_inner(&paving, FULL_DOOR);
+    invariant::Domain<> dom_inner(&paving, invariant::Domain<>::FULL_DOOR);
 
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -66,12 +66,12 @@ int main(int argc, char *argv[])
     // ****** Dynamics Outer & Inner ******* //
     ibex::Function f(x1, x2, Return((2*x1-x1*x2),
                                     (2*pow(x1,2)-x2)));
-    Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn_outer(&f, Dynamics::FWD);
+    Dynamics_Function dyn_inner(&f, Dynamics::FWD);
 
     // ******* Mazes ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer);
-    Maze maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -94,19 +94,19 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(0.0, 1.0, 9.0/100.0, "black[green]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(-0.015);
-//    position_info[1] = Interval(-3);
+//    position_info[0] = ibex::Interval(-0.015);
+//    position_info[1] = ibex::Interval(-3);
 //    v_maze.show_room_info(&maze_outer, position_info);
 
 //    IntervalVector x_out(2);
-//    x_out[0] = Interval(0);
-//    x_out[1] = Interval(-3.0546875, -2.98046875);
+//    x_out[0] = ibex::Interval(0);
+//    x_out[1] = ibex::Interval(-3.0546875, -2.98046875);
 //    IntervalVector x_in(x_out);
 //    sep_u.separate(x_out, x_in);
 //    cout << "x_out = " << x_out << " x_in = " << x_in << endl;
 
-//    x_out[0] = Interval(-0.03125);
-//    x_out[1] = Interval(-3.0546875, -2.98046875);
+//    x_out[0] = ibex::Interval(-0.03125);
+//    x_out[1] = ibex::Interval(-3.0546875, -2.98046875);
 //    x_in = x_out;
 //    sep_u.separate(x_out, x_in);
 //    cout << "x_out = " << x_out << " x_in = " << x_in << endl;

@@ -61,7 +61,7 @@ public:
      * @brief root_position
      * @return
      */
-    const std::vector<std::array<int, 2>>& get_root_position() const;
+    const std::vector<std::array<int, 2> >& get_root_position() const;
 
     /**
      * @brief Append Data
@@ -70,13 +70,13 @@ public:
 
 private:
     ibex::IntervalVector* m_root_real_position;
-    std::vector<std::array<int, 2>> m_root_position;
+    std::vector<std::array<int, 2> > m_root_position;
     DataSetVirtualNode *m_root;
 
     DataSetFunction_TYPE m_type;
     size_t  m_cell_dim;
 
-    vector<pair<DataSetVirtualNode*, vector<array<int, 2>>>> m_leaf_list;
+    vector<pair<DataSetVirtualNode*, vector<array<int, 2> > > > m_leaf_list;
 };
 
 }

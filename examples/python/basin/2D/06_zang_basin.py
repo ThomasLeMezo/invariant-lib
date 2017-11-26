@@ -28,7 +28,7 @@ dom_inner.set_sep_input(s_inner);
 
 # Create the Dynamics
 f = Function("x[2]", "(x[1],8.0/25.0*x[0]^5-4.0/3.0*x[0]^3+4.0/5.0*x[0])")
-dyn = DynamicsFunction(f, BWD)
+dyn = DynamicsFunction(f, Dynamics::BWD)
 
 # Create the two Maze associated with the Domain and the dynamics
 maze_inner = Maze(dom_inner, dyn)

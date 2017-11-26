@@ -20,29 +20,29 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = Interval(-3,3);
-    space[1] = Interval(-3,3);
+    space[0] = ibex::Interval(-3,3);
+    space[1] = ibex::Interval(-3,3);
 
     // ****** Domain ******* //
-    SmartSubPaving subpaving(space);
+    invariant::SmartSubPaving<> subpaving(space);
 
-    invariant::Domain dom_outer(&subpaving, FULL_DOOR);
+    invariant::Domain<> dom_outer(&subpaving, invariant::Domain<>::FULL_DOOR);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
-    invariant::Domain dom_inner(&subpaving, FULL_WALL);
+    invariant::Domain<> dom_inner(&subpaving, invariant::Domain<>::FULL_WALL);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn_outer(&f, FWD_BWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn_outer(&f, Dynamics::FWD_BWD);
+    Dynamics_Function dyn_inner(&f, Dynamics::FWD);
 
     // ******* Maze ********* //
-    Maze maze_outer(&dom_outer, &dyn_outer);
-    Maze maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -63,18 +63,18 @@ int main(int argc, char *argv[])
     v_maze.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = Interval(0);
-//    position_info[1] = Interval(1);
+//    position_info[0] = ibex::Interval(0);
+//    position_info[1] = ibex::Interval(1);
 //    v_maze.get_room_info(&maze, position_info);
 
     IntervalVector position_info(2);
-    position_info[0] = Interval(-2.5);
-    position_info[1] = Interval(2.9);
+    position_info[0] = ibex::Interval(-2.5);
+    position_info[1] = ibex::Interval(2.9);
 //    v_maze.get_room_info(&maze, position_info);
 //    v_maze.show_room_info(&maze, position_info);
 
-//    position_info[0] = Interval(0);
-//    position_info[1] = Interval(-1);
+//    position_info[0] = ibex::Interval(0);
+//    position_info[1] = ibex::Interval(-1);
 //    v_maze.get_room_info(&maze, position_info);
     vibes::endDrawing();
 
