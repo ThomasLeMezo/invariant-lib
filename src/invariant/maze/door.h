@@ -3,6 +3,8 @@
 
 #include <ibex/ibex_IntervalVector.h>
 
+#include <ppl.hh>
+
 #include "face.h"
 #include "room.h"
 #include "maze.h"
@@ -11,11 +13,15 @@
 #include <sstream>      // std::ostringstream
 #include <iomanip>
 
+namespace ppl=Parma_Polyhedra_Library;
+
 namespace invariant {
 
 class Face; // declared only for friendship
 class Room; // declared only for friendship
 class Maze; // declared only for friendship
+
+template <typename _Tp=ibex::IntervalVector>
 class Door
 {
 public:
@@ -24,48 +30,48 @@ public:
      * @param face
      * By default doors are set open
      */
-    Door(Face * face, Room *room);
+    Door(Face * face, Room *room){}
 
     /**
      * @brief Destructor of a Door
      */
-    ~Door();
+    ~Door(){}
 
     /**
      * @brief Get the public read input door
      * @return iv
      */
-    const ibex::IntervalVector get_input() const;
+    const _Tp get_input() const;
 
     /**
      * @brief Get the public read output door
      * @return iv
      */
-    const ibex::IntervalVector get_output() const;
+    const _Tp get_output() const;
 
     /**
      * @brief Set the input door
      * @param iv_input
      */
-    void set_input_private(const ibex::IntervalVector& iv_input);
+    void set_input_private(const _Tp& iv_input);
 
     /**
      * @brief Set the output door
      * @param iv_output
      */
-    void set_output_private(const ibex::IntervalVector& iv_output);
+    void set_output_private(const _Tp& iv_output);
 
     /**
      * @brief Get the input door
      * @return iv
      */
-    const ibex::IntervalVector& get_input_private() const;
+    const _Tp& get_input_private() const;
 
     /**
      * @brief Get the output door
      * @return iv
      */
-    const ibex::IntervalVector& get_output_private() const;
+    const _Tp& get_output_private() const;
 
     /**
      * @brief Synchronize public and private
@@ -87,38 +93,38 @@ public:
     /**
      * @brief Set the private output doors to empty
      */
-    void set_empty_private_output();
+    void set_empty_private_output(){}
 
     /**
      * @brief Set the private output doors to full
      */
-    void set_full_private_output();
+    void set_full_private_output(){}
 
     /**
      * @brief Set the input private door to empty
      */
-    void set_empty_private_input();
+    void set_empty_private_input(){}
 
     /**
      * @brief Set the input private door to full
      */
-    void set_full_private_input();
+    void set_full_private_input(){}
 
     /**
      * @brief Set all input and output private doors to empty
      */
-    void set_empty_private();
+    void set_empty_private(){}
 
     /**
      * @brief Set all input and output private doors to full
      */
-    void set_full_private();
+    void set_full_private(){}
 
     /**
      * @brief Set full all input & output private doors according to
      * vector field possibility
      */
-    void set_full_possible_private();
+    void set_full_possible_private(){}
 
     /**
      * @brief Contract its private door according to neighbors
@@ -178,7 +184,7 @@ public:
      * @brief Get if this door is a possible in for propagation
      * @return
      */
-    const std::vector<bool> &is_possible_in() const;
+    const std::vector<bool>& is_possible_in() const;
 
     /**
      * @brief Get if the vector field is collinear to the door
@@ -208,7 +214,7 @@ public:
      * @brief Get the hull of the door
      * @return
      */
-    const ibex::IntervalVector get_hull() const;
+    const _Tp get_hull() const;
 
     /**
      * @brief operator &=
@@ -227,10 +233,10 @@ public:
     friend Door& operator|=(Door& d1, const Door& d2);
 
 protected:
-    ibex::IntervalVector m_input_public;
-    ibex::IntervalVector m_output_public; //input and output doors public
-    ibex::IntervalVector *m_input_private;
-    ibex::IntervalVector *m_output_private; //input and output doors private (for contraction)
+    _Tp m_input_public;
+    _Tp m_output_public; //input and output doors public
+    _Tp *m_input_private;
+    _Tp *m_output_private; //input and output doors private (for contraction)
     Face *               m_face = NULL; // pointer to the associated face
     Room *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
@@ -244,65 +250,137 @@ protected:
 
 namespace invariant{
 
-inline const ibex::IntervalVector Door::get_input() const{
+template <typename _Tp>
+inline const _Tp Door<_Tp>::get_input() const{
     omp_set_lock(&m_lock_read);
-    ibex::IntervalVector tmp(m_input_public);
+    _Tp tmp(m_input_public);
     omp_unset_lock(&m_lock_read);
     return tmp;
 }
 
-inline const ibex::IntervalVector Door::get_output() const{
+template <typename _Tp>
+inline const _Tp Door<_Tp>::get_output() const{
     omp_set_lock(&m_lock_read);
-    ibex::IntervalVector tmp(m_output_public);
+    _Tp tmp(m_output_public);
     omp_unset_lock(&m_lock_read);
     return tmp;
 }
 
-inline const ibex::IntervalVector& Door::get_input_private() const{
+template <typename _Tp>
+inline const _Tp& Door<_Tp>::get_input_private() const{
     return *m_input_private;
 }
 
-inline const ibex::IntervalVector& Door::get_output_private() const{
+template <typename _Tp>
+inline const _Tp& Door<_Tp>::get_output_private() const{
     return *m_output_private;
 }
 
-inline void Door::set_input_private(const ibex::IntervalVector& iv_input){
+template <typename _Tp>
+inline void Door<_Tp>::set_input_private(const _Tp& iv_input){
     *m_input_private = iv_input;
 }
 
-inline void Door::set_output_private(const ibex::IntervalVector& iv_output){
+template <typename _Tp>
+inline void Door<_Tp>::set_output_private(const _Tp& iv_output){
     *m_output_private = iv_output;
 }
 
-inline Face * Door::get_face() const{
+template <typename _Tp>
+inline Face * Door<_Tp>::get_face() const{
     return m_face;
 }
 
-inline Room * Door::get_room() const{
+template <typename _Tp>
+inline Room * Door<_Tp>::get_room() const{
     return m_room;
 }
 
-inline void Door::set_empty_private_output(){
-    m_output_private->set_empty();
+template <typename _Tp>
+inline void Door<_Tp>::push_back_possible_in(bool val){
+    m_possible_in.push_back(val);
 }
 
-inline void Door::set_empty_private_input(){
-    m_input_private->set_empty();
+template <typename _Tp>
+inline void Door<_Tp>::push_back_possible_out(bool val){
+    m_possible_out.push_back(val);
 }
 
-inline void Door::set_empty_private(){
-    m_output_private->set_empty();
-    m_input_private->set_empty();
+template <typename _Tp>
+inline void Door<_Tp>::push_back_collinear_vector_field(bool val){
+    m_collinear_vector_field.push_back(val);
 }
 
-inline bool Door::is_empty() const{
+template <typename _Tp>
+inline void Door<_Tp>::push_back_zeros_in_vector_field(std::vector<bool> zeros){
+    m_zeros_in_vector_fields.push_back(zeros);
+}
+
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::get_where_zeros(size_t vector_field_id) const{
+    return m_zeros_in_vector_fields[vector_field_id];
+}
+
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::is_collinear() const{
+    return m_collinear_vector_field;
+}
+
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::is_possible_out() const{
+    return m_possible_out;
+}
+
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::is_possible_in() const{
+    return m_possible_in;
+}
+
+template <typename _Tp>
+inline bool Door<_Tp>::is_empty() const{
     if(m_input_public.is_empty() && m_output_public.is_empty())
         return true;
     else
         return false;
 }
 
-inline std::ostream& operator<< (std::ostream& stream, const Door& d){
+template <typename _Tp>
+inline void Door<_Tp>::set_empty_private(){
+    set_empty_private_input();
+    set_empty_private_output();
+}
+
+/// ******************  Sepcialized ****************** ///
+
+// ibex::IntervalVector
+
+template <typename _Tp>
+inline void Door<ibex::IntervalVector>::set_empty_private_output(){
+    m_output_private->set_empty();
+}
+
+template <typename _Tp>
+inline void Door<ibex::IntervalVector>::set_empty_private_input(){
+    m_input_private->set_empty();
+}
+
+// C_Polyhedron
+
+template <typename _Tp>
+inline void Door<ppl::C_Polyhedron>::set_empty_private_output(){
+    m_output_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
+}
+
+template <typename _Tp>
+inline void Door<ppl::C_Polyhedron>::set_empty_private_input(){
+    m_input_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
+}
+
+}
+
+/// ******************  Other functions ****************** ///
+// out of invariant namespace
+inline std::ostream& operator<< (std::ostream& stream, const invariant::Door<ibex::IntervalVector>& d){
     std::ostringstream input, output;
     input << d.get_input();
     output << d.get_output();
@@ -310,36 +388,7 @@ inline std::ostream& operator<< (std::ostream& stream, const Door& d){
     return stream;
 }
 
-inline void Door::push_back_possible_in(bool val){
-    m_possible_in.push_back(val);
-}
 
-inline void Door::push_back_possible_out(bool val){
-    m_possible_out.push_back(val);
-}
+#include "door.tpp"
 
-inline void Door::push_back_collinear_vector_field(bool val){
-    m_collinear_vector_field.push_back(val);
-}
-
-inline void Door::push_back_zeros_in_vector_field(std::vector<bool> zeros){
-    m_zeros_in_vector_fields.push_back(zeros);
-}
-
-inline const std::vector<bool>& Door::get_where_zeros(size_t vector_field_id) const{
-    return m_zeros_in_vector_fields[vector_field_id];
-}
-
-inline const std::vector<bool>& Door::is_collinear() const{
-    return m_collinear_vector_field;
-}
-
-inline const std::vector<bool>& Door::is_possible_out() const{
-    return m_possible_out;
-}
-
-inline const std::vector<bool>& Door::is_possible_in() const{
-    return m_possible_in;
-}
-}
 #endif // DOOR_H

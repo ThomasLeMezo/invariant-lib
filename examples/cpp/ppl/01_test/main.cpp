@@ -148,51 +148,18 @@ void write_VTK(PPL::C_Polyhedron &ph, string filename){
     write_VTK(ph_list, filename);
 }
 
-std::vector<IntervalVector> get_faces(ibex::IntervalVector pave){
-    std::vector<IntervalVector> face_list;
-    for(int face=0; face<pave.size(); face++){
-        for(int side = 0; side<2; side++){
-            IntervalVector tmp_face(pave.size());
-            for(int i=0; i<pave.size(); i++){
-                if(i==face){
-                    if(side==0){
-                        tmp_face[i] = ibex::Interval(pave[i].lb());
-                    }
-                    else{
-                        tmp_face[i] = ibex::Interval(pave[i].ub());
-                    }
-                }
-                else{
-                    tmp_face[i] = pave[i];
-                }
-            }
-            face_list.push_back(tmp_face);
-        }
-    }
-    return face_list;
-}
-
 int main(){
-    int dimension = 2;
+    int dimension = 3;
 
     IntervalVector pave(dimension);
     pave[0] = ibex::Interval(-1, 1);
     pave[1] = ibex::Interval(-1, 1);
-    //    pave[2] = ibex::Interval(-1, 1);
-    //    pave[3] = ibex::Interval(0, 1);
-    //    pave[4] = ibex::Interval(0, 1);
+    pave[2] = ibex::Interval(-1, 1);
 
-    IntervalVector theta(dimension);
-//    theta[0] = ibex::Interval(-0.3, 0.3);
-    theta[0] = ibex::Interval::ALL_REALS;
+    IntervalVector vec(dimension);
+    theta[0] = ibex::Interval(-0.3, 0.3);
+    theta[0] = ibex::Interval(-0.3, 0.3);
     theta[1] = ibex::Interval(1);
-
-    //    theta[2] = ibex::Interval(1);
-    //    theta[3] = ibex::Interval(1);
-    //    theta[4] = ibex::Interval(1);
-
-    std::vector<IntervalVector> face_list = get_faces(pave);
-    std::vector<Rational_Box> rb_list = iv_2_box(face_list);
 
     C_Polyhedron ph_in(dimension, PPL::EMPTY);
     PPL::Variable x(0), y(1), z(2);
@@ -225,6 +192,13 @@ int main(){
         }
     }
     write_VTK(ph_out_list, "pave_out");
+
+    cout << "matrix" << endl;
+
+    ibex::IntervalMatrix test(3, 4);
+    test[1][2] = ibex::Interval(1, 10);
+    cout << test << endl;
+    cout << test[0] << endl;
 
     return 0;
 }

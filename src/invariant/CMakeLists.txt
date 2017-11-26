@@ -19,7 +19,6 @@ include_directories(maze)
 
     maze/maze.cpp
     maze/room.cpp
-    maze/door.cpp
     maze/sepmaze.cpp
 
     definition/domain.cpp
@@ -48,6 +47,7 @@ include_directories(maze)
     maze/maze.h
     maze/room.h
     maze/door.h
+    maze/door.tpp
     maze/sepmaze.h
 
     definition/domain.h
