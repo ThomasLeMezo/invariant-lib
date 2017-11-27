@@ -9,7 +9,6 @@
 #include "pave_node.h"
 #include "../maze/maze.h"
 
-#include "smartSubPaving.h"
 #include "../serialization/ibex_serialization.h"
 #include <stdexcept>
 #include <fstream>

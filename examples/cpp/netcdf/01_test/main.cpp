@@ -1,7 +1,11 @@
 #include "ibex/ibex_SepFwdBwd.h"
 #include <iostream>
-#include "previmer.h"
+
+#include "smartSubPaving.h"
+#include "domain.h"
 #include "maze.h"
+#include "previmer.h"
+
 #include <ibex.h>
 #include <math.h>
 

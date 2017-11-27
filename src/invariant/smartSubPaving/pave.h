@@ -7,19 +7,18 @@
 #include <fstream>
 #include <utility>
 
+#include "smartSubPaving.h"
+#include "face.h"
+#include "pave_node.h"
+
 #include "../maze/room.h"
 #include "../maze/maze.h"
 
-#include "pave.h"
-#include "face.h"
-#include "smartSubPaving.h"
-#include "pave_node.h"
-
 #include "../serialization/ibex_serialization.h"
 
+template <typename _Tp> class SmartSubPaving;
 template <typename _Tp> class Room;
 template <typename _Tp> class Face;
-template <typename _Tp> class SmartSubPaving;
 template <typename _Tp> class Maze;
 template <typename _Tp> class Pave_node;
 
@@ -206,17 +205,17 @@ public:
 private:
 
     /** Class Variable **/
-    mutable ibex::IntervalVector                    m_position; // Pave position
-    mutable std::vector< std::array<Face<_Tp>*, 2>> m_faces; // Faces of the Pave
-    mutable std::vector<Face<_Tp> *>                m_faces_vector; // Faces of the Pave
-    mutable SmartSubPaving<_Tp>*                    m_subpaving = NULL;
-    mutable Pave_node<_Tp>*                         m_tree = NULL;
-    mutable size_t                                  m_dim = 0;
-    std::array<Pave<_Tp>*, 2>                       m_result_bisected;
-    std::map<Maze<_Tp>*, Room<_Tp>*>                m_rooms;
-    bool                                            m_infinite_pave = false;
-    size_t                                          m_serialization_id=0;
-    bool                                            m_border = false;
+    mutable ibex::IntervalVector                            m_position; // Pave position
+    mutable std::vector< std::array<Face<_Tp>*, 2>>         m_faces; // Faces of the Pave
+    mutable std::vector<invariant::Face<_Tp> *>             m_faces_vector; // Faces of the Pave
+    mutable invariant::SmartSubPaving<_Tp>*                 m_subpaving = NULL;
+    mutable invariant::Pave_node<_Tp>*                      m_tree = NULL;
+    mutable size_t                                          m_dim = 0;
+    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
+    std::map<invariant::Maze<_Tp>*, invariant::Room<_Tp>*>  m_rooms;
+    bool                                                    m_infinite_pave = false;
+    size_t                                                  m_serialization_id=0;
+    bool                                                    m_border = false;
 
     //    std::map<Maze*, Door*>                      m_initial_condition_door;
     //    std::map<Maze*, Door*>                      m_hybrid_door;
