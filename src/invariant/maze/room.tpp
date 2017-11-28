@@ -621,25 +621,6 @@ bool Room<_Tp>::contract_continuity(){
 }
 
 template<typename _Tp>
-void Room<_Tp>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect){
-    // assert 0 not in v.
-    ibex::IntervalVector c(out-in);
-    ibex::IntervalVector v(vect);
-    ibex::Interval alpha(ibex::Interval::POS_REALS);
-
-    for(int i=0; i<v.size(); i++){
-        if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
-            alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
-    }
-    if(alpha==ibex::Interval::ZERO)
-        alpha.set_empty();
-
-    c &= alpha*v;
-    out &= c+in;
-    in &= out-c;
-}
-
-template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
 

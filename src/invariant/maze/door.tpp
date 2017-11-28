@@ -108,6 +108,45 @@ bool Door<_Tp>::is_full_union() const{
         return false;
 }
 
+template <typename _Tp>
+bool Door<_Tp>::contract_continuity_private(){
+    Dynamics::DYNAMICS_SENS dynamics_sens = m_room->get_maze()->get_dynamics()->get_sens();
+    typename Domain<_Tp>::DOMAIN_INITIALIZATION domain_init = m_room->get_maze()->get_domain()->get_init();
+
+    bool change = false;
+
+    if(dynamics_sens == Dynamics::FWD || dynamics_sens == Dynamics::FWD_BWD){
+        ibex::IntervalVector door_input = _Tp(m_input_private->size(), ibex::Interval::EMPTY_SET);
+        for(Face<_Tp>* f:m_face->get_neighbors()){
+            Door<_Tp> *d = f->get_doors()[m_room->get_maze()];
+            door_input |= (d->get_output() & m_face->get_position());
+        }
+        if(door_input != *m_input_private){
+            change = true;
+            if(domain_init == Domain<_Tp>::FULL_DOOR)
+                (*m_input_private) &= door_input;
+            else if(domain_init == Domain<_Tp>::FULL_WALL)
+                (*m_input_private) |= door_input;
+        }
+    }
+
+    if(dynamics_sens == Dynamics::BWD || dynamics_sens == Dynamics::FWD_BWD){
+        ibex::IntervalVector door_output = _Tp(m_output_private->size(), ibex::Interval::EMPTY_SET);
+        for(Face<_Tp>* f:m_face->get_neighbors()){
+            Door<_Tp> *d = f->get_doors()[m_room->get_maze()];
+            door_output |= (d->get_input() & m_face->get_position());
+        }
+        if(door_output != (*m_output_private)){
+            change = true;
+            if(domain_init == Domain<_Tp>::FULL_DOOR)
+                (*m_output_private) &= door_output;
+            else if(domain_init == Domain<_Tp>::FULL_WALL)
+                (*m_output_private) |= door_output;
+        }
+    }
+    return change;
+}
+
 /// ******************  Sepcialized ****************** ///
 
 

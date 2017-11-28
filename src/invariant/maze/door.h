@@ -265,6 +265,8 @@ protected:
 
 namespace invariant{
 
+ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv);
+
 template <typename _Tp>
 inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp>& d){
     return stream;
@@ -385,8 +387,6 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<ibex
 ppl::C_Polyhedron& operator&=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
 
 ppl::C_Polyhedron& operator|=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
-
-ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv);
 
 #include "door.tpp"
 
