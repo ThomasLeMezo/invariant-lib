@@ -15,19 +15,19 @@ Pave<_Tp>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp> *g):
 
     if(position.is_unbounded())
         m_infinite_pave = true;
-    IntervalVector normal(m_dim, ibex::Interval(0));
+    ibex::IntervalVector normal(m_dim, ibex::Interval(0));
 
     // Build the faces
     for(size_t i=0; i<m_dim; i++){
-        IntervalVector normal_lb(normal);
-        IntervalVector normal_ub(normal);
+        ibex::IntervalVector normal_lb(normal);
+        ibex::IntervalVector normal_ub(normal);
         normal_lb[i] = ibex::Interval(1);
         normal_ub[i] = ibex::Interval(-1);
 
-        IntervalVector iv_lb(m_position);
-        IntervalVector iv_ub(m_position);
-        IntervalVector orient_lb(m_dim, ibex::Interval(0, 1));
-        IntervalVector orient_ub(m_dim, ibex::Interval(0, 1));
+        ibex::IntervalVector iv_lb(m_position);
+        ibex::IntervalVector iv_ub(m_position);
+        ibex::IntervalVector orient_lb(m_dim, ibex::Interval(0, 1));
+        ibex::IntervalVector orient_ub(m_dim, ibex::Interval(0, 1));
 
         iv_lb[i]=ibex::Interval(m_position[i].lb());
         iv_ub[i]=ibex::Interval(m_position[i].ub());
@@ -37,7 +37,7 @@ Pave<_Tp>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp> *g):
         Face<_Tp>* face_lb = new Face<_Tp>(iv_lb, orient_lb, normal_lb, this);
         Face<_Tp>* face_ub = new Face<_Tp>(iv_ub, orient_ub, normal_ub, this);
 
-        array<Face<_Tp>*, 2> face_array = {face_lb, face_ub};
+        std::array<Face<_Tp>*, 2> face_array = {face_lb, face_ub};
         m_faces.push_back(face_array);
         m_faces_vector.push_back(face_lb);
         m_faces_vector.push_back(face_ub);
@@ -65,7 +65,7 @@ template<typename _Tp>
 void Pave<_Tp>::serialize(std::ofstream& binFile) const{
     // *** Pave serialization ***
     // size_t           Serialization id
-    // IntervalVector   m_position
+    // ibex::IntervalVector   m_position
     // [...] Faces
 
     /// ToDo : add pave node tree to the serialization process + update others variables
@@ -93,7 +93,7 @@ void Pave<_Tp>::deserialize(std::ifstream& binFile){
     for(unsigned char i=0; i<dim; i++){
         Face<_Tp>* face_lb = new Face<_Tp>(this);
         Face<_Tp>* face_ub = new Face<_Tp>(this);
-        array<Face<_Tp>*, 2> face_array = {face_lb, face_ub};
+        std::array<Face<_Tp>*, 2> face_array = {face_lb, face_ub};
         m_faces.push_back(face_array);
     }
 
@@ -107,7 +107,7 @@ void Pave<_Tp>::deserialize(std::ifstream& binFile){
 template<typename _Tp>
 std::ostream& operator<< (std::ostream& stream, const std::vector<Pave<_Tp>*> &l){
     for(Pave<_Tp> *p:l){
-        stream << *p << endl;
+        stream << *p << std::endl;
     }
     return stream;
 }
@@ -128,9 +128,9 @@ const bool Pave<_Tp>::is_equal(const Pave<_Tp>& p) const{
 template<typename _Tp>
 void Pave<_Tp>::bisect(){
     //    ibex::LargestFirst bisector(0, 0.5);
-    //    std::pair<IntervalVector, IntervalVector> result_boxes = bisector.bisect(m_position);
+    //    std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = bisector.bisect(m_position);
 
-    std::pair<IntervalVector, IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
+    std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
     const size_t dim = m_dim;
     // Find the axe of bissection
     size_t bisect_axis = 0;

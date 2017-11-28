@@ -15,7 +15,7 @@ f_sep2 = Function("x[2]", "x[1]^2-(2)^2")
 s_outer1 = SepFwdBwd(f_sep1, LT) # possible options : LT, LEQ, EQ, GEQ, GT
 s_outer2 = SepFwdBwd(f_sep2, LT) # possible options : LT, LEQ, EQ, GEQ, GT
 s_outer_inter = SepInter([s_outer1, s_outer2])
-dom_outer.set_sep_output(s_outer_inter);
+dom_outer.set_sep_input(s_outer_inter);
 
 dom_inner = Domain(smartSubPaving, FULL_DOOR)
 dom_inner.set_border_path_in(True)
@@ -27,7 +27,7 @@ dom_inner.set_sep_output(s_inner_union);
 
 # Create the Dynamics
 f = Function("x[2]", "(1,-sin(x[1]))")
-dyn = DynamicsFunction(f, Dynamics::FWD)
+dyn = DynamicsFunction(f, FWD)
 
 # Create the two Maze associated with the Domain and the dynamics
 maze_inner = Maze(dom_inner, dyn)

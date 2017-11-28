@@ -6,7 +6,7 @@ from vibes import *
 space = IntervalVector([[-5.0, 5.0],[-3.5,10.0]])
 
 # Create the grpah structure
-graph = Graph(space)
+graph = SmartSubPaving(space)
 
 # Create the Dynamics
 f = Function("x[2]", "(2*x[0]-x[0]*x[1],2*x[0]^2-x[1])")

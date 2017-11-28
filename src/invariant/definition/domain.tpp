@@ -1,7 +1,5 @@
 #include "domain.h"
 
-using namespace ibex;
-using namespace std;
 namespace invariant {
 
 template<typename _Tp>
@@ -101,8 +99,8 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
     }
         break;
     case SEP_UNKNOWN:{
-        IntervalVector x_in(pave_node->get_position());
-        IntervalVector x_out(x_in);
+        ibex::IntervalVector x_in(pave_node->get_position());
+        ibex::IntervalVector x_out(x_in);
         if(output)
             m_sep_output->separate(x_in, x_out);
         else
@@ -177,7 +175,7 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
     if(m_subpaving->size()==1 && m_domain_init == Domain<_Tp>::FULL_DOOR)
         return;
 
-    vector<Pave<_Tp>*> pave_border_list;
+    std::vector<Pave<_Tp>*> pave_border_list;
     m_subpaving->get_tree()->get_border_paves(pave_border_list);
 
 #pragma omp parallel for

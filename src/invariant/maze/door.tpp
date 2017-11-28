@@ -8,8 +8,6 @@
 #include "room.h"
 #include "maze.h"
 
-using namespace ibex;
-using namespace std;
 namespace invariant {
 
 template <typename _Tp>
@@ -52,10 +50,10 @@ void Door<_Tp>::synchronize(){
 }
 
 template <typename _Tp>
-bool Door<_Tp>::analyze_change(vector<Room<_Tp> *>&list_rooms){
+bool Door<_Tp>::analyze_change(std::vector<Room<_Tp> *>&list_rooms){
     if((*m_input_private) != get_input()
             || (*m_output_private) != get_output()){ // operator != is generic for iv & polyhedron
-        vector<Face<_Tp> *> l_face = m_face->get_neighbors();
+        std::vector<Face<_Tp> *> l_face = m_face->get_neighbors();
         for(Face<_Tp>* f:l_face)
             list_rooms.push_back(f->get_pave()->get_rooms()[m_room->get_maze()]);
         return true;

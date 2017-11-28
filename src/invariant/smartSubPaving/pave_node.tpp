@@ -1,5 +1,4 @@
-using namespace std;
-using namespace ibex;
+#include "pave_node.h" // only for ide
 
 namespace invariant{
 template<typename _Tp>
@@ -16,7 +15,7 @@ void Pave_node<_Tp>::add_child(Pave<_Tp> *p1, Pave<_Tp> *p2){
     m_pave = NULL;
     Pave_node<_Tp>* pn1 = new Pave_node<_Tp>(p1);
     Pave_node<_Tp>* pn2 = new Pave_node<_Tp>(p2);
-    m_children = make_pair(pn1, pn2);
+    m_children = std::make_pair(pn1, pn2);
 
     p1->set_pave_node(pn1);
     p2->set_pave_node(pn2);
@@ -58,7 +57,7 @@ void Pave_node<_Tp>::get_intersection_pave_inner(std::vector<Pave<_Tp>*> &l, con
 
 template<typename _Tp>
 void Pave_node<_Tp>::get_intersection_pave_outer(std::vector<Pave<_Tp>*> &l, ibex::Ctc &nc){
-    IntervalVector position(m_position);
+    ibex::IntervalVector position(m_position);
     nc.contract(position);
 
     if(!position.is_empty()){
@@ -74,7 +73,7 @@ void Pave_node<_Tp>::get_intersection_pave_outer(std::vector<Pave<_Tp>*> &l, ibe
 
 template<typename _Tp>
 void Pave_node<_Tp>::get_intersection_pave_inner(std::vector<Pave<_Tp>*> &l, ibex::Ctc &nc){
-    IntervalVector position(m_position);
+    ibex::IntervalVector position(m_position);
     nc.contract(position);
 
     if(!position.is_empty()){
@@ -124,13 +123,13 @@ void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, con
 
 template<typename _Tp>
 void Pave_node<_Tp>::get_intersection_face_outer(std::vector<Face<_Tp>*> &l, ibex::Ctc &nc){
-    IntervalVector position(m_position);
+    ibex::IntervalVector position(m_position);
     nc.contract(position);
 
     if(!position.is_empty()){
         if(m_leaf){
             for(Face<_Tp>*f:m_pave->get_faces_vector()){
-                IntervalVector f_position(f->get_position());
+                ibex::IntervalVector f_position(f->get_position());
                 nc.contract(f_position);
                 if(!f_position.is_empty())
                     l.push_back(f);
@@ -145,14 +144,14 @@ void Pave_node<_Tp>::get_intersection_face_outer(std::vector<Face<_Tp>*> &l, ibe
 
 template<typename _Tp>
 void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, ibex::Ctc &nc){
-    IntervalVector position(m_position);
+    ibex::IntervalVector position(m_position);
     nc.contract(position);
 
     if(!position.is_empty()){
         if(m_leaf){
             if(position == m_position){
                 for(Face<_Tp>*f:m_pave->get_faces_vector()){
-                    IntervalVector f_position(f->get_position());
+                    ibex::IntervalVector f_position(f->get_position());
                     nc.contract(f_position);
                     if(f_position == f->get_position())
                         l.push_back(f);

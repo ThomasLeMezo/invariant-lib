@@ -1,8 +1,5 @@
 #include "maze.h"
 
-
-using namespace std;
-using namespace ibex;
 namespace invariant {
 
 template<typename _Tp>
@@ -31,7 +28,7 @@ Maze<_Tp>::~Maze(){
 
 template<typename _Tp>
 void Maze<_Tp>::init(){
-    vector<Room<_Tp> *> list_room_to_contract;
+    std::vector<Room<_Tp> *> list_room_to_contract;
     invariant::Domain<_Tp> *d = m_domain;
     d->contract_domain(this, list_room_to_contract);
 }
@@ -39,11 +36,11 @@ void Maze<_Tp>::init(){
 template<typename _Tp>
 int Maze<_Tp>::contract(){
     if(m_empty){
-        cout << " ==> MAZE EMPTY" << endl;
+        std::cout << " ==> MAZE EMPTY" << std::endl;
         return 0;
     }
     // Domain contraction
-    vector<Room<_Tp> *> list_room_to_contract;
+    std::vector<Room<_Tp> *> list_room_to_contract;
     invariant::Domain<_Tp> *d = m_domain;
     double t_start = omp_get_wtime();
     d->contract_domain(this, list_room_to_contract);
@@ -65,10 +62,10 @@ int Maze<_Tp>::contract(){
     //        test[0] = Interval(-2);
     //        test[1] = Interval(2);
     //        v_maze.show_room_info(this, test);
-    //        cout << "debug graph_debug" << endl;
+    //        std::cout << "debug graph_debug" << std::endl;
     //    }
 
-    cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << endl;
+    std::cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << std::endl;
     t_start = omp_get_wtime();
     int nb_operations = 0;
 
@@ -76,7 +73,7 @@ int Maze<_Tp>::contract(){
     bool deque_empty = m_deque_rooms.empty();
 
     if(deque_empty){
-        cout << " => MAZE EMPTY" << endl;
+        std::cout << " => MAZE EMPTY" << std::endl;
         m_empty = true;
         return 0;
     }
@@ -114,7 +111,7 @@ int Maze<_Tp>::contract(){
 
                         if(change){
                             // Analyse changes
-                            vector<Room<_Tp> *> rooms_to_update;
+                            std::vector<Room<_Tp> *> rooms_to_update;
                             r->analyze_change(rooms_to_update);
 
                             // Synchronize
@@ -155,7 +152,7 @@ int Maze<_Tp>::contract(){
         }
     }
 
-    cout << " => contractions : " << omp_get_wtime() - t_start << endl;
+    std::cout << " => contractions : " << omp_get_wtime() - t_start << std::endl;
     return nb_operations;
 }
 
@@ -209,7 +206,7 @@ bool Maze<_Tp>::is_escape_trajectories(){
 }
 
 template<typename _Tp>
-void Maze<_Tp>::add_rooms(const vector<Room<_Tp> *>& list_rooms){
+void Maze<_Tp>::add_rooms(const std::vector<Room<_Tp> *>& list_rooms){
     for(Room<_Tp> *r:list_rooms){
         if(!r->is_in_deque()){
             r->set_in_queue();

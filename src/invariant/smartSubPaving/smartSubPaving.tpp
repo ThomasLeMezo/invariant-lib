@@ -1,8 +1,5 @@
 #include "smartSubPaving.h"
 
-using namespace std;
-using namespace ibex;
-
 namespace invariant {
 template<typename _Tp>
 SmartSubPaving<_Tp>::SmartSubPaving(const ibex::IntervalVector &space):
@@ -20,7 +17,7 @@ SmartSubPaving<_Tp>::SmartSubPaving(const ibex::IntervalVector &space):
 
 //    for (int i=0; i<n; i++) {
 //        Pave* p_infinity = new Pave(result[i], this);
-//        cout << result[i] << endl;
+//        std::cout << result[i] << std::endl;
 //        m_paves_not_bisectable.push_back(p_infinity);
 //    }
 
@@ -115,8 +112,8 @@ const bool SmartSubPaving<_Tp>::is_equal(const SmartSubPaving<_Tp>& g) const{
 
 template<typename _Tp>
 void SmartSubPaving<_Tp>::bisect(){
-    vector<Pave<_Tp>*> m_bisectable_paves = m_paves;
-    vector<Pave<_Tp>*> m_bisected_paves;
+    std::vector<Pave<_Tp>*> m_bisectable_paves = m_paves;
+    std::vector<Pave<_Tp>*> m_bisected_paves;
     m_paves.clear();
 
     /// Bisect the graph ///
@@ -149,20 +146,20 @@ void SmartSubPaving<_Tp>::bisect(){
 }
 
 template<typename _Tp>
-void SmartSubPaving<_Tp>::get_room_info(Maze<_Tp> *maze, const IntervalVector& position, vector<Pave<_Tp>*> &pave_list) const{
+void SmartSubPaving<_Tp>::get_room_info(Maze<_Tp> *maze, const ibex::IntervalVector& position, std::vector<Pave<_Tp>*> &pave_list) const{
     m_tree->get_intersection_pave_outer(pave_list,position);
     for(Pave<_Tp> *p:pave_list){
         Room<_Tp> *r = p->get_rooms()[maze];
-        cout << *r << endl;
+        std::cout << *r << std::endl;
     }
 }
 
 
 template<typename _Tp>
-std::pair<IntervalVector, IntervalVector> SmartSubPaving<_Tp>::bisect_largest_first(const IntervalVector &position){
+std::pair<ibex::IntervalVector, ibex::IntervalVector> SmartSubPaving<_Tp>::bisect_largest_first(const ibex::IntervalVector &position){
     // Select dimensions to bisect
     bool one_possible = false;
-    vector<bool> possible_dim;
+    std::vector<bool> possible_dim;
     for(int dim = 0; dim<m_dim; dim++){
         if(position[dim].diam() > m_limit_bisection[dim]){
             possible_dim.push_back(true);
@@ -178,7 +175,7 @@ std::pair<IntervalVector, IntervalVector> SmartSubPaving<_Tp>::bisect_largest_fi
     }
 
     // Find largest dimension
-    Vector diam = position.diam();
+    ibex::Vector diam = position.diam();
     int dim_max = 0;
     double max = 0;
     for(int i=0; i<m_dim; i++){
@@ -188,8 +185,8 @@ std::pair<IntervalVector, IntervalVector> SmartSubPaving<_Tp>::bisect_largest_fi
             dim_max = i;
         }
     }
-    IntervalVector p1(position);
-    IntervalVector p2(position);
+    ibex::IntervalVector p1(position);
+    ibex::IntervalVector p2(position);
 
     p1[dim_max] = ibex::Interval(position[dim_max].lb(), position[dim_max].mid());
     p2[dim_max] = ibex::Interval(position[dim_max].mid(), position[dim_max].ub());

@@ -1,7 +1,5 @@
 #include "face.h"
 
-using namespace std;
-
 namespace invariant {
 
 template <typename _Tp>
@@ -58,7 +56,7 @@ void Face<_Tp>::remove_neighbor(const Face<_Tp> *f){
 template <typename _Tp>
 std::ostream& operator<< (std::ostream& stream, const std::vector<Face<_Tp>*> &l){
     for(Face<_Tp> *f:l){
-        stream << *f << endl;
+        stream << *f << std::endl;
     }
     return stream;
 }

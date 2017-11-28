@@ -22,9 +22,6 @@ template <typename _Tp> class Maze;
 template <typename _Tp> class Room;
 template <typename _Tp> class Pave_node;
 
-//template <typename _Tp> class Door;
-//template <typename _Tp> class Pave;
-
 template<typename _Tp=ibex::IntervalVector>
 class Domain
 {

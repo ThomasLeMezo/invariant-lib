@@ -4,6 +4,7 @@
 #include <ibex/ibex_IntervalVector.h>
 #include <deque>
 #include <omp.h>
+#include <iostream>
 
 #include "../definition/dynamics.h"
 #include "../definition/domain.h"

@@ -8,8 +8,6 @@
 #include "door.h"
 #include "../smartSubPaving/face.h"
 
-using namespace ibex;
-using namespace std;
 namespace invariant {
 
 template<typename _Tp>
@@ -17,13 +15,13 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics)
 {
     m_pave = p;
     m_maze = m;
-    const IntervalVector position(p->get_position());
-    vector<IntervalVector> vector_field_list = dynamics->eval(position);
+    const ibex::IntervalVector position(p->get_position());
+    std::vector<ibex::IntervalVector> vector_field_list = dynamics->eval(position);
 
     // Eval Vector field
-    for(IntervalVector &vector_field:vector_field_list){
+    for(ibex::IntervalVector &vector_field:vector_field_list){
         // Test if 0 is inside the vector_field IV
-        IntervalVector zero(m_pave->get_dim(), ibex::Interval::ZERO);
+        ibex::IntervalVector zero(m_pave->get_dim(), ibex::Interval::ZERO);
         if((zero.is_subset(vector_field))){
             m_vector_field_zero.push_back(true);
             m_contain_zero = true;
@@ -125,22 +123,22 @@ void Room<_Tp>::contract_vector_field(){
     //    test[0] = Interval(-2.25, -1.5);
     //    test[1] = Interval(-3, -1.5);
     //    if(m_pave->get_position() == test)
-    //        cout << "TEST" << endl;
+    //        std::cout << "TEST" << std::endl;
 
     int dim = m_pave->get_dim();
     Dynamics::DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
-    IntervalVector zero(dim, ibex::Interval::ZERO);
+    ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
 
     for(Face<_Tp> *f:m_pave->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[m_maze];
-        vector<IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
-        //        vector<IntervalVector> vector_fields_face = this->get_vector_fields();
+        std::vector<ibex::IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
+        //        std::vector<IntervalVector> vector_fields_face = this->get_vector_fields();
 
-        for(const IntervalVector &v:vector_fields_face){
+        for(const ibex::IntervalVector &v:vector_fields_face){
             if(!zero.is_subset(v)){
                 // Construct the boolean interval vector of the vector_field
-                IntervalVector v_bool_in = IntervalVector(dim, ibex::Interval::EMPTY_SET);
-                IntervalVector v_bool_out = IntervalVector(dim, ibex::Interval::EMPTY_SET);
+                ibex::IntervalVector v_bool_in = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
+                ibex::IntervalVector v_bool_out = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
 
                 for(int i=0; i<dim; i++){
                     if(!(v[i] & ibex::Interval::POS_REALS).is_empty())
@@ -172,16 +170,16 @@ void Room<_Tp>::contract_vector_field(){
 template<typename _Tp>
 void Room<_Tp>::eval_vector_field_possibility(){
     int dim = m_pave->get_dim();
-    IntervalVector zero = IntervalVector(dim, ibex::Interval::ZERO);
+    ibex::IntervalVector zero = ibex::IntervalVector(dim, ibex::Interval::ZERO);
 
     for(Face<_Tp> *f:m_pave->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[m_maze];
-        vector<IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
+        std::vector<ibex::IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
 
-        for(IntervalVector &v:vector_fields_face){
+        for(ibex::IntervalVector &v:vector_fields_face){
             // Construct the boolean interval vector of the vector_field
-            IntervalVector v_bool_in = IntervalVector(dim, ibex::Interval::EMPTY_SET);
-            IntervalVector v_bool_out = IntervalVector(dim, ibex::Interval::EMPTY_SET);
+            ibex::IntervalVector v_bool_in = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
+            ibex::IntervalVector v_bool_out = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
 
             for(int i=0; i<dim; i++){
                 if(!(v[i] & ibex::Interval::POS_REALS).is_empty())
@@ -207,9 +205,9 @@ void Room<_Tp>::eval_vector_field_possibility(){
             // Note : synchronization will be proceed at the end of all contractors
             // to avoid unecessary lock
 
-            for(const IntervalVector&v:get_vector_fields()){
-                IntervalVector product = hadamard_product(v, f->get_normal());
-                vector<bool> where_zeros;
+            for(const ibex::IntervalVector&v:get_vector_fields()){
+                ibex::IntervalVector product = hadamard_product(v, f->get_normal());
+                std::vector<bool> where_zeros;
 
                 if(zero.is_subset(product)){
                     d->push_back_collinear_vector_field(true);
@@ -229,7 +227,7 @@ void Room<_Tp>::eval_vector_field_possibility(){
 }
 
 template<typename _Tp>
-void Room<_Tp>::compute_sliding_mode(const int n_vf, vector<vector< array<IntervalVector, 2> > > &out_results, vector<vector<array<IntervalVector, 2> > > &in_results){
+void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<ibex::IntervalVector, 2> > > &out_results, std::vector<std::vector<std::array<ibex::IntervalVector, 2> > > &in_results){
     const int dim = m_pave->get_dim();
     typename Dynamics::DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     typename Domain<_Tp>::DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
@@ -241,8 +239,8 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, vector<vector< array<Interv
                 Door<_Tp>* door_in = f_in->get_doors()[m_maze];
 
                 /// INPUT
-                IntervalVector out_return(dim, ibex::Interval::EMPTY_SET);
-                IntervalVector in_return(dim, ibex::Interval::EMPTY_SET);
+                ibex::IntervalVector out_return(dim, ibex::Interval::EMPTY_SET);
+                ibex::IntervalVector in_return(dim, ibex::Interval::EMPTY_SET);
                 contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_return);
 
                 if(dynamics_sens == Dynamics::BWD || dynamics_sens == Dynamics::FWD_BWD){
@@ -261,8 +259,8 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, vector<vector< array<Interv
                                 if(!(face_out == face_in && sens_in == sens_out)){
                                     Face<_Tp>* f_out = m_pave->get_faces()[face_out][sens_out];
                                     Door<_Tp>* door_out = f_out->get_doors()[m_maze];
-                                    IntervalVector out_tmp(door_out->get_output_private());
-                                    IntervalVector in_tmp(in_return);
+                                    ibex::IntervalVector out_tmp(door_out->get_output_private());
+                                    ibex::IntervalVector in_tmp(in_return);
                                     if(!out_tmp.is_empty()){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields(n_vf));
                                         out_results[n_vf][face_out][sens_out] |= out_tmp;
@@ -278,7 +276,7 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, vector<vector< array<Interv
 }
 
 template<typename _Tp>
-void Room<_Tp>::compute_standard_mode(const int n_vf, vector<vector<array<IntervalVector, 2> > > &out_results, vector<vector<array<IntervalVector, 2> > > &in_results){
+void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<std::array<ibex::IntervalVector, 2> > > &out_results, std::vector<std::vector<std::array<ibex::IntervalVector, 2> > > &in_results){
     const int dim = m_pave->get_dim();
     Dynamics::DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     typename Domain<_Tp>::DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
@@ -288,7 +286,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, vector<vector<array<Interv
             if(!(domain_init == Domain<_Tp>::FULL_DOOR && m_door_collinearity[face_in][sens_in][n_vf])){ // avoid sliding mode on face in
                 Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
                 Door<_Tp>* door_in = f_in->get_doors()[m_maze];
-                const IntervalVector in(door_in->get_input_private());
+                const ibex::IntervalVector in(door_in->get_input_private());
 
                 for(int face_out=0; face_out<dim; face_out++){
                     for(int sens_out = 0; sens_out < 2; sens_out++){
@@ -296,11 +294,11 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, vector<vector<array<Interv
                             if(!(domain_init == Domain<_Tp>::FULL_DOOR && m_door_collinearity[face_out][sens_out][n_vf])){ // avoid sliding mode on face out
                                 Face<_Tp>* f_out = m_pave->get_faces()[face_out][sens_out];
                                 Door<_Tp>* door_out = f_out->get_doors()[m_maze];
-                                const IntervalVector out(door_out->get_output_private());
+                                const ibex::IntervalVector out(door_out->get_output_private());
 
                                 /// ************ IN -> OUT ************
                                 if(dynamics_sens == Dynamics::FWD || dynamics_sens == Dynamics::FWD_BWD){
-                                    IntervalVector in_tmp(in), out_tmp(out);
+                                    ibex::IntervalVector in_tmp(in), out_tmp(out);
                                     if(domain_init == Domain<_Tp>::FULL_WALL)
                                         out_tmp = f_out->get_position();
 
@@ -311,7 +309,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, vector<vector<array<Interv
                                 }
                                 /// ************ OUT -> IN ************
                                 if(dynamics_sens == Dynamics::BWD || dynamics_sens == Dynamics::FWD_BWD){
-                                    IntervalVector in_tmp(in), out_tmp(out);
+                                    ibex::IntervalVector in_tmp(in), out_tmp(out);
                                     if(domain_init == Domain<_Tp>::FULL_WALL)
                                         in_tmp = f_in->get_position();
 
@@ -334,8 +332,8 @@ void Room<_Tp>::contract_consistency(){
     const int dim = m_pave->get_dim();
 
     /// Deal with netcdf empty data (set to empty vec_field)
-    IntervalVector empty = IntervalVector(dim, ibex::Interval::EMPTY_SET);
-    for(IntervalVector &vec_field:get_vector_fields()){
+    ibex::IntervalVector empty = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
+    for(ibex::IntervalVector &vec_field:get_vector_fields()){
         if(vec_field == empty)
             return;
     }
@@ -346,12 +344,12 @@ void Room<_Tp>::contract_consistency(){
     typename Domain<_Tp>::DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
 
     /// ************ Create empty results vector ************ //
-    vector<vector< array<IntervalVector, 2> > > out_results, in_results; // One per vec_field, dim, sens
+    std::vector<std::vector< std::array<ibex::IntervalVector, 2> > > out_results, in_results; // One per vec_field, dim, sens
     const int nb_vec = m_vector_fields.size();
     for(int vf=0; vf<nb_vec; vf++){
-        std::vector< std::array<IntervalVector, 2>> out_result;
+        std::vector< std::array<ibex::IntervalVector, 2>> out_result;
         for(int i=0; i<dim; i++){
-            std::array<IntervalVector, 2> output = {IntervalVector::empty(dim), IntervalVector::empty(dim)};
+            std::array<ibex::IntervalVector, 2> output = {ibex::IntervalVector::empty(dim), ibex::IntervalVector::empty(dim)};
             out_result.push_back(output);
         }
         out_results.push_back(out_result);
@@ -380,7 +378,7 @@ void Room<_Tp>::contract_consistency(){
                 Door<_Tp>* door = f->get_doors()[m_maze];
 
                 if(dynamics_sens == Dynamics::FWD || dynamics_sens == Dynamics::FWD_BWD){
-                    IntervalVector door_out_iv(door->get_face()->get_position());
+                    ibex::IntervalVector door_out_iv(door->get_face()->get_position());
                     bool one_possible = false;
                     for(int n_vf=0; n_vf<nb_vec; n_vf++){
                         if(domain_init == Domain<_Tp>::FULL_DOOR || (domain_init == Domain<_Tp>::FULL_WALL && door->is_possible_out()[n_vf])){
@@ -397,7 +395,7 @@ void Room<_Tp>::contract_consistency(){
                         door->set_output_private(door->get_output_private() | door_out_iv);
                 }
                 if(dynamics_sens == Dynamics::BWD || dynamics_sens == Dynamics::FWD_BWD){
-                    IntervalVector door_in_iv(door->get_face()->get_position());
+                    ibex::IntervalVector door_in_iv(door->get_face()->get_position());
                     bool one_possible = false;
                     for(int n_vf=0; n_vf<nb_vec; n_vf++){
                         if(domain_init == Domain<_Tp>::FULL_DOOR || (domain_init == Domain<_Tp>::FULL_WALL && door->is_possible_in()[n_vf])){
@@ -419,19 +417,19 @@ void Room<_Tp>::contract_consistency(){
 }
 
 template<typename _Tp>
-void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, IntervalVector &out_return, IntervalVector &in_return){
+void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return){
     if(m_debug_room)
-        cout << "debug" << endl;
+        std::cout << "debug" << std::endl;
 
     Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
     Door<_Tp>* door_in = f_in->get_doors()[m_maze];
     int dim = m_pave->get_dim();
-    in_return = IntervalVector(dim, ibex::Interval::EMPTY_SET);
-    out_return = IntervalVector(dim, ibex::Interval::EMPTY_SET);
+    in_return = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
+    out_return = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
 
     /// Compute IN_OUT door
-    IntervalVector output_global_door(door_in->get_output_private());
-    IntervalVector input_global_door(door_in->get_input_private());
+    ibex::IntervalVector output_global_door(door_in->get_output_private());
+    ibex::IntervalVector input_global_door(door_in->get_input_private());
     for(Face<_Tp> *f_n:f_in->get_neighbors()){
         Door<_Tp>* d_n = f_n->get_doors()[m_maze];
         output_global_door |= (d_n->get_output() & f_in->get_position());
@@ -441,16 +439,16 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
     /// ************* Find adjacent paves *************
     /// --> In the direction of the zeros
 
-    vector<Pave<_Tp> *> adjacent_paves;
+    std::vector<Pave<_Tp> *> adjacent_paves;
     m_maze->get_subpaving()->get_tree()->get_intersection_pave_outer(adjacent_paves, f_in->get_position());
 
     // Remove pave not in the zero(s) direction
-    IntervalVector vec_field_global(dim, ibex::Interval::EMPTY_SET);
-    IntervalVector vec_field_neighbors(dim, ibex::Interval::EMPTY_SET);
+    ibex::IntervalVector vec_field_global(dim, ibex::Interval::EMPTY_SET);
+    ibex::IntervalVector vec_field_neighbors(dim, ibex::Interval::EMPTY_SET);
 
-    vector<Pave<_Tp> *> adjacent_paves_valid;
-    IntervalVector pave_extrude(f_in->get_position());
-    vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
+    std::vector<Pave<_Tp> *> adjacent_paves_valid;
+    ibex::IntervalVector pave_extrude(f_in->get_position());
+    std::vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
 
     for(int id_zero=0; id_zero<dim; id_zero++){
         if(where_zeros[id_zero])
@@ -459,7 +457,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
 
     for(Pave<_Tp> *pave_adj:adjacent_paves){
         // Find adjacent paves that extrude this pave in the directions of zeros
-        IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
+        ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
 
         if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
             adjacent_paves_valid.push_back(pave_adj);
@@ -471,7 +469,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
         }
     }
 
-    IntervalVector zero(dim, ibex::Interval::ZERO);
+    ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
     if(zero.is_subset(vec_field_global)){ // Case no contraction (if there is a possible cycle)
         in_return = door_in->get_input_private();
         out_return = door_in->get_output_private();
@@ -485,7 +483,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
         bool local_pave = false;
         if(pave_adj->get_position() == m_pave->get_position())
             local_pave = true;
-        IntervalVector vec_field_local(pave_adj->get_rooms()[m_maze]->get_one_vector_fields(n_vf));
+        ibex::IntervalVector vec_field_local(pave_adj->get_rooms()[m_maze]->get_one_vector_fields(n_vf));
 
         for(int face_out_adj=0; face_out_adj<dim; face_out_adj++){
             for(int sens_out_adj = 0; sens_out_adj < 2; sens_out_adj ++){
@@ -500,7 +498,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
                     /// But in the case the face intersect an other face of the adjacents faces
                     /// it means that the intersected part is not on the hull
 
-                    IntervalVector own_surface(f_out_adj->get_position());
+                    ibex::IntervalVector own_surface(f_out_adj->get_position());
                     for(Face<_Tp> *face_out_n:f_out_adj->get_neighbors()){
                         Pave<_Tp> *pave_out_n = face_out_n->get_pave();
 
@@ -521,9 +519,9 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
                         if(is_same_face)
                             own_surface.set_empty();
                         else if(is_in_adj_pave_list){
-                            IntervalVector *diff_list;
+                            ibex::IntervalVector *diff_list;
                             int nb_boxes = f_out_adj->get_position().diff(face_out_n->get_position() & f_out_adj->get_position(), diff_list);
-                            IntervalVector union_of_diff(dim, ibex::Interval::EMPTY_SET);
+                            ibex::IntervalVector union_of_diff(dim, ibex::Interval::EMPTY_SET);
                             for(int i=0; i<nb_boxes; i++)
                                 union_of_diff |= diff_list[i];
                             own_surface &= union_of_diff;
@@ -540,9 +538,9 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
                         if(!input_global_door.is_empty()){
                             /// WARNING : do no set in_tmp_IN only to private door
                             /// because only half part is taken into account => take the union with the IN of the neighbour
-                            IntervalVector in_tmp_IN(input_global_door);
+                            ibex::IntervalVector in_tmp_IN(input_global_door);
 
-                            IntervalVector out_tmp_IN(own_surface);
+                            ibex::IntervalVector out_tmp_IN(own_surface);
                             if(local_pave)
                                 out_tmp_IN &= d_out_adj->get_output_private();
                             else
@@ -564,8 +562,8 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, Interv
 
                         // IN -> OUT
                         if(!output_global_door.is_empty()){
-                            IntervalVector out_tmp_OUT(output_global_door);
-                            IntervalVector in_tmp_OUT(own_surface);
+                            ibex::IntervalVector out_tmp_OUT(output_global_door);
+                            ibex::IntervalVector in_tmp_OUT(own_surface);
                             if(local_pave)
                                 in_tmp_OUT &= d_out_adj->get_input_private();
                             else
@@ -625,8 +623,8 @@ bool Room<_Tp>::contract_continuity(){
 template<typename _Tp>
 void Room<_Tp>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect){
     // assert 0 not in v.
-    IntervalVector c(out-in);
-    IntervalVector v(vect);
+    ibex::IntervalVector c(out-in);
+    ibex::IntervalVector v(vect);
     ibex::Interval alpha(ibex::Interval::POS_REALS);
 
     for(int i=0; i<v.size(); i++){
@@ -674,36 +672,36 @@ bool Room<_Tp>::contract(){
 }
 
 template<typename _Tp>
-bool Room<_Tp>::get_private_doors_info(string message, bool cout_message){
+bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if(m_maze->get_domain()->get_init() != Domain<_Tp>::FULL_DOOR)
         return false;
-    IntervalVector position(2);
+    ibex::IntervalVector position(2);
     //
     position[0] = ibex::Interval(-0.0625, 0.03125);
     position[1] = ibex::Interval(0.125, 0.1875);
-    //    IntervalVector position2(2);
+    //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
-    IntervalVector position2(position);
+    ibex::IntervalVector position2(position);
 
     if((m_pave->get_position() == position || m_pave->get_position() == position2)){
         if(cout_message){
-            cout << message << endl;
+            std::cout << message << std::endl;
             if(m_pave->get_position() == position)
-                cout << "position 1" << endl;
+                std::cout << "position 1" << std::endl;
             else
-                cout << "position 2" << endl;
+                std::cout << "position 2" << std::endl;
 
-            cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << endl;
+            std::cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << std::endl;
             for(Face<_Tp> *f:m_pave->get_faces_vector()){
                 Door<_Tp> *d = f->get_doors()[m_maze];
-                cout << " Face : ";
+                std::cout << " Face : ";
                 std::ostringstream input, output;
                 input << d->get_input_private();
                 output << d->get_output_private();
-                cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << endl;
+                std::cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << std::endl;
             }
-            cout << "----" << endl;
+            std::cout << "----" << std::endl;
         }
         return true;
     }
@@ -795,25 +793,25 @@ template<typename _Tp>
 std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r) {
     stream << "Room = " << r.get_pave()->get_position() << " - " << r.get_pave()->get_faces_vector().size() << " faces";
     stream << ", vector field = ";
-    for(IntervalVector &v:r.get_vector_fields()){
+    for(ibex::IntervalVector &v:r.get_vector_fields()){
         stream << v << " ";
     }
-    stream << endl;
+    stream << std::endl;
     stream << " nb_contractions = " << r.get_nb_contractions();
     stream << ", removed = " << (r.is_removed()?"true":"false");
-    stream << endl;
+    stream << std::endl;
     for(Face<_Tp> *f:r.get_pave()->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[r.get_maze()];
-        stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << endl;
+        stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << std::endl;
     }
-    stream << " contain_zero = " << r.get_contain_zero_coordinate() << endl;
+    stream << " contain_zero = " << r.get_contain_zero_coordinate() << std::endl;
     return stream;
 }
 
 
 
 //template<typename _Tp>
-//bool Room<_Tp>::is_degenerated(const IntervalVector& iv){
+//bool Room<_Tp>::is_degenerated(const ibex::IntervalVector& iv){
 //    int compt = 0;
 //    int dim = m_maze->get_subpaving()->dim();
 //    for(int i=0; i<dim; i++){
@@ -843,8 +841,8 @@ void Room<_Tp>::set_removed(){
 }
 
 template<typename _Tp>
-const IntervalVector Room<_Tp>::get_hull() const{
-    IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
+const ibex::IntervalVector Room<_Tp>::get_hull() const{
+    ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
     for(Face<_Tp> *f:get_pave()->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[m_maze];
         result |= d->get_hull();
@@ -853,14 +851,14 @@ const IntervalVector Room<_Tp>::get_hull() const{
 }
 
 template<typename _Tp>
-const IntervalVector Room<_Tp>::get_hull_complementary(){
+const ibex::IntervalVector Room<_Tp>::get_hull_complementary(){
     if(is_empty())
         return m_pave->get_position();
-    IntervalVector hull = get_hull();
-    IntervalVector *result;
+    ibex::IntervalVector hull = get_hull();
+    ibex::IntervalVector *result;
     int nb_box = m_pave->get_position().diff(hull,result);
 
-    IntervalVector complementary(hull.size(), ibex::Interval::EMPTY_SET);
+    ibex::IntervalVector complementary(hull.size(), ibex::Interval::EMPTY_SET);
     for(int i=0; i<nb_box; i++){
         complementary |= result[i];
     }
@@ -869,8 +867,8 @@ const IntervalVector Room<_Tp>::get_hull_complementary(){
 
 template<typename _Tp>
 void Room<_Tp>::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* sep, DOOR_SELECTOR doorSelector){
-    IntervalVector in(m_pave->get_dim()), out(m_pave->get_dim());
-    IntervalVector v_door(virtual_door_out & m_pave->get_position());
+    ibex::IntervalVector in(m_pave->get_dim()), out(m_pave->get_dim());
+    ibex::IntervalVector v_door(virtual_door_out & m_pave->get_position());
     typename Dynamics::DYNAMICS_SENS sens = m_maze->get_dynamics()->get_sens();
     typename Domain<_Tp>::DOMAIN_INITIALIZATION init = m_maze->get_domain()->get_init();
 
@@ -879,9 +877,9 @@ void Room<_Tp>::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* 
 
         // IN -> OUTPUT
         if(init!=Domain<_Tp>::FULL_DOOR){
-            d_out->set_output_private(IntervalVector::empty(m_pave->get_dim()));
-            d_out->set_input_private(IntervalVector::empty(m_pave->get_dim()));
-            for(IntervalVector vect:m_vector_fields){
+            d_out->set_output_private(ibex::IntervalVector::empty(m_pave->get_dim()));
+            d_out->set_input_private(ibex::IntervalVector::empty(m_pave->get_dim()));
+            for(ibex::IntervalVector vect:m_vector_fields){
                 in = v_door;
                 out = f->get_position();
                 if(sens != Dynamics::FWD_BWD){
@@ -893,7 +891,7 @@ void Room<_Tp>::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* 
                         d_out->set_input_private(d_out->get_input_private() | out);
                 }
                 else{
-                    IntervalVector out2(out);
+                    ibex::IntervalVector out2(out);
                     contract_flow(in, out, vect);
                     in = v_door;
                     contract_flow(in, out2, -vect);
@@ -907,7 +905,7 @@ void Room<_Tp>::contract_box(ibex::IntervalVector& virtual_door_out, ibex::Sep* 
             }
         }
         else{
-            IntervalVector x_in(f->get_position()), x_out(f->get_position());
+            ibex::IntervalVector x_in(f->get_position()), x_out(f->get_position());
             sep->separate(x_in, x_out);
             if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
                 d_out->set_output_private(x_out);
