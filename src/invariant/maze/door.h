@@ -16,6 +16,8 @@
 #include "maze.h"
 #include "../smartSubPaving/pave.h"
 
+#define IBEX_PPL_PRECISION 1e6
+
 namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
@@ -383,6 +385,8 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<ibex
 ppl::C_Polyhedron& operator&=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
 
 ppl::C_Polyhedron& operator|=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
+
+ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv);
 
 #include "door.tpp"
 
