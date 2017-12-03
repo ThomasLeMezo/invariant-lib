@@ -43,12 +43,12 @@ void Door<ibex::IntervalVector>::set_output_private(const ibex::IntervalVector& 
 
 template <>
 void Door<Parma_Polyhedra_Library::C_Polyhedron>::set_empty_private_output(){
-    *m_output_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
+    *m_output_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim(), ppl::EMPTY);
 }
 
 template <>
 void Door<Parma_Polyhedra_Library::C_Polyhedron>::set_empty_private_input(){
-    *m_input_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
+    *m_input_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim(), ppl::EMPTY);
 }
 
 template <> Door<Parma_Polyhedra_Library::C_Polyhedron>::Door(invariant::Face<Parma_Polyhedra_Library::C_Polyhedron> *face, invariant::Room<Parma_Polyhedra_Library::C_Polyhedron> *room)

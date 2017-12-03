@@ -16,7 +16,7 @@
 #include "maze.h"
 #include "../smartSubPaving/pave.h"
 
-#define IBEX_PPL_PRECISION 1e6
+#define IBEX_PPL_PRECISION 1e8
 
 namespace ppl=Parma_Polyhedra_Library;
 
