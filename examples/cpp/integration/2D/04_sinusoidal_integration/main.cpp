@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     invariant::SmartSubPaving<> paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain<> dom_outer(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_outer(&paving, FULL_WALL);
 
     double x1_max, x2_norm;
     x1_max = 0.5;
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain<> dom_inner(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom_inner(&paving, FULL_DOOR);
 
     SepFwdBwd s_inner_x1(f_sep_outer_x1, GEQ); // LT, LEQ, EQ, GEQ, GT
     SepFwdBwd s_inner_x2(f_sep_outer_x2, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     // ****** Dynamics Outer & Inner ******* //
     ibex::Function f(x1, x2, Return(ibex::Interval(1.0),
                                     -sin(x2)));
-    Dynamics_Function dyn_outer(&f, Dynamics::FWD);
-    Dynamics_Function dyn_inner(&f, Dynamics::FWD);
+    Dynamics_Function dyn_outer(&f, FWD);
+    Dynamics_Function dyn_inner(&f, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);

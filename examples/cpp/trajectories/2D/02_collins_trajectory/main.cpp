@@ -26,10 +26,10 @@ int main(int argc, char *argv[])
     // ****** MAZE A ******
     // Dynamics
     ibex::Function f_A(x1, x2, Return(2*x1-x1*x2,2*pow(x1,2)-x2));
-    Dynamics_Function dynA(&f_A, Dynamics::FWD);
+    Dynamics_Function dynA(&f_A, FWD);
 
     // Domain
-    invariant::Domain<> dom_A(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_A(&paving, FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     Function f_sep_A(x1, x2, pow(x1, 2)+pow(x2+2, 2)-1);
@@ -42,10 +42,10 @@ int main(int argc, char *argv[])
     // ****** MAZE B ******
     // Dynamics
     ibex::Function f_B(x1, x2, -Return(2*x1-x1*x2,2*pow(x1,2)-x2));
-    Dynamics_Function dynB(&f_B, Dynamics::FWD);
+    Dynamics_Function dynB(&f_B, FWD);
 
     // Domain
-    invariant::Domain<> dom_B(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_B(&paving, FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     Function f_sep_B(x1, x2, pow(x1, 2)+pow(x2-1, 2)-pow(9.0/100.0,2));

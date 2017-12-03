@@ -213,7 +213,7 @@ void Pave<_Tp>::bisect(){
         if(r->is_full()){
             m_tree->add_fullness((it->first), true);
             // Child cannot be set to full because of overapproximation
-            // in the case of Domain<_Tp>::FULL_WALL & Domain<_Tp>::FULL_DOOR is already full
+            // in the case of FULL_WALL & FULL_DOOR is already full
         }
         else
             m_tree->add_fullness((it->first), false);
@@ -243,7 +243,7 @@ const bool Pave<_Tp>::request_bisection(){
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp> *r = it->second;
         Maze<_Tp> *maze = it->first;
-        if(maze->get_domain()->get_init()==Domain<_Tp>::FULL_WALL){
+        if(maze->get_domain()->get_init()==FULL_WALL){
             request_wall |= r->request_bisection();
             one_wall = true;
         }
@@ -261,7 +261,7 @@ void Pave<_Tp>::set_removed_rooms(){
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp>* r = it->second;
         //        if(r->is_empty()) //?
-        if(r->is_empty() || r->get_maze()->get_domain()->get_init()!=Domain<_Tp>::FULL_WALL){
+        if(r->is_empty() || r->get_maze()->get_domain()->get_init()!=FULL_WALL){
             r->set_removed();
             m_tree->set_removed(it->first);
         }

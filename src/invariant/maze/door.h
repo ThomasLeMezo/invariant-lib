@@ -299,16 +299,6 @@ inline const _Tp& Door<_Tp>::get_output_private() const{
 }
 
 template <typename _Tp>
-inline void Door<_Tp>::set_input_private(const _Tp& iv_input){
-    *m_input_private = iv_input;
-}
-
-template <typename _Tp>
-inline void Door<_Tp>::set_output_private(const _Tp& iv_output){
-    *m_output_private = iv_output;
-}
-
-template <typename _Tp>
 inline Face<_Tp> * Door<_Tp>::get_face() const{
     return m_face;
 }
@@ -383,10 +373,6 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<ibex
     stream << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str();
     return stream;
 }
-
-ppl::C_Polyhedron& operator&=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
-
-ppl::C_Polyhedron& operator|=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2);
 
 #include "door.tpp"
 

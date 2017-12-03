@@ -15,6 +15,8 @@
 
 namespace invariant {
 
+using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron>;
+
 template <typename _Tp> class Pave;
 template <typename _Tp> class Pave_node;
 template <typename _Tp> class Maze;

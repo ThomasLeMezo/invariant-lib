@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x, Return(ibex::Interval(1),
                                      x[2],
                                      -x[1]-0.1*x[2]));
-    Dynamics_Function dyn(&f, Dynamics::FWD_BWD);
+    Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

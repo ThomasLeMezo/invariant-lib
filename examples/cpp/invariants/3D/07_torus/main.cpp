@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom(&paving, FULL_DOOR);
 
     Function f_sep(x, y, z, pow(x, 2)+pow(y, 2)+pow(z, 2)-pow(0.5, 2));
     SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x, y, z, Return(x-(x+y)*(pow(x,2)+pow(y,2)),
                                     y+(x-y)*(pow(x,2)+pow(y,2)),
                                      -z*(1+pow(x,2)+pow(y,2))));
-    Dynamics_Function dyn(&f, Dynamics::FWD_BWD);
+    Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

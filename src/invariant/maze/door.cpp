@@ -29,19 +29,29 @@ template <> Door<ibex::IntervalVector>::Door(invariant::Face<ibex::IntervalVecto
     omp_init_lock(&m_lock_read);
 }
 
+template <>
+void Door<ibex::IntervalVector>::set_input_private(const ibex::IntervalVector& iv_input){
+    *m_input_private = iv_input;
+}
+
+template <>
+void Door<ibex::IntervalVector>::set_output_private(const ibex::IntervalVector& iv_output){
+    *m_output_private = iv_output;
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
-void Door<ppl::C_Polyhedron>::set_empty_private_output(){
+void Door<Parma_Polyhedra_Library::C_Polyhedron>::set_empty_private_output(){
     *m_output_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
 }
 
 template <>
-void Door<ppl::C_Polyhedron>::set_empty_private_input(){
+void Door<Parma_Polyhedra_Library::C_Polyhedron>::set_empty_private_input(){
     *m_input_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim()-1, ppl::EMPTY);
 }
 
-template <> Door<ppl::C_Polyhedron>::Door(invariant::Face<ppl::C_Polyhedron> *face, invariant::Room<ppl::C_Polyhedron> *room)
+template <> Door<Parma_Polyhedra_Library::C_Polyhedron>::Door(invariant::Face<Parma_Polyhedra_Library::C_Polyhedron> *face, invariant::Room<Parma_Polyhedra_Library::C_Polyhedron> *room)
 {
     m_input_public = iv_2_polyhedron(face->get_position());
     m_output_public = m_input_public;
@@ -53,19 +63,21 @@ template <> Door<ppl::C_Polyhedron>::Door(invariant::Face<ppl::C_Polyhedron> *fa
     omp_init_lock(&m_lock_read);
 }
 
+template <>
+void Door<Parma_Polyhedra_Library::C_Polyhedron>::set_input_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_input){
+    *m_input_private = iv_input;
+    m_input_private->simplify_using_context_assign(m_face->get_position_typed());
+}
+
+template <>
+void Door<Parma_Polyhedra_Library::C_Polyhedron>::set_output_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_output){
+    *m_output_private = iv_output;
+    m_input_private->simplify_using_context_assign(m_face->get_position_typed());
+}
+
 /// ******************  Other functions ****************** ///
 
 // Define operator | and & for C_Polyhedron
-
-ppl::C_Polyhedron& operator&=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2){
-    p1.intersection_assign(p2);
-    return p1;
-}
-
-ppl::C_Polyhedron& operator|=(ppl::C_Polyhedron& p1, const ppl::C_Polyhedron& p2){
-    p1.poly_difference_assign(p2);
-    return p1;
-}
 
 ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv){
         Rational_Box box(iv.size());
@@ -80,3 +92,4 @@ ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv){
 }
 
 }
+

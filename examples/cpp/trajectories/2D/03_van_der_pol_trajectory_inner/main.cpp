@@ -26,13 +26,13 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, Dynamics::FWD);
+    Dynamics_Function dyn(&f, FWD);
 
     ibex::Function f_bwd(x1, x2, -Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn_bwd(&f_bwd, Dynamics::BWD);
+    Dynamics_Function dyn_bwd(&f_bwd, BWD);
 
     // ****** Maze A *******
-    invariant::Domain<> dom_A(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_A(&paving, FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_A(&dom_A, &dyn);
 
     // ****** Maze A inner *******
-    invariant::Domain<> dom_A_inner(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom_A_inner(&paving, FULL_DOOR);
     dom_A_inner.set_border_path_in(true);
     dom_A_inner.set_border_path_out(true);
     SepFwdBwd s_A_inner(f_sep_A, GEQ); // LT, LEQ, EQ, GEQ, GT)
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_A_inner(&dom_A_inner, &dyn_bwd);
 
     // ****** Maze B *******
-    invariant::Domain<> dom_B(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_B(&paving, FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     IntervalVector box_B(2);

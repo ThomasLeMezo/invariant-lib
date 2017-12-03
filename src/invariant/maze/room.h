@@ -1,3 +1,12 @@
+#ifndef FUNCTION_TOOLS
+#define FUNCTION_TOOLS
+namespace invariant {
+template <typename _Tp>
+_Tp get_empty_door_container(int dim);
+}
+#endif
+
+
 #ifndef ROOM_H
 #define ROOM_H
 
@@ -9,7 +18,11 @@
 #include "../definition/domain.h"
 #include "pave.h"
 #include "maze.h"
+#include "door.h"
 #include "../smartSubPaving/face.h"
+#include "ppl.hh"
+
+namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
 
@@ -290,6 +303,7 @@ protected:
      * @param vect
      */
     void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
+    void contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect);
 
     /**
      * @brief Temp
@@ -306,21 +320,21 @@ protected:
      * @param out_return
      * @param in_return
      */
-    void contract_sliding_mode(int n_vf, int face_in, int sens_in, ibex::IntervalVector &out_return, ibex::IntervalVector &in_return);
+    void contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &out_return, _Tp &in_return);
 
     /**
      * @brief compute_sliding_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<ibex::IntervalVector, 2> > > &out_results, std::vector<std::vector< std::array<ibex::IntervalVector, 2> > > &in_results);
+    void compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector< std::array<_Tp, 2> > > &in_results);
 
     /**
      * @brief compute_standard_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_standard_mode(const int n_vf, std::vector<std::vector< std::array<ibex::IntervalVector, 2> > > &out_results, std::vector<std::vector< std::array<ibex::IntervalVector, 2> > > &in_results);
+    void compute_standard_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector< std::array<_Tp, 2> > > &in_results);
 
 public:
     /**
@@ -363,12 +377,52 @@ protected:
     int     m_nb_contract = 0;
     bool m_debug_room = false;
     int m_time_debug = 0;
+
+    // For PPL
+//    std::vector<std::vector<ppl::Generator>> *m_ray_vector_field;
+//    std::vector<std::vector<ppl::Generator>> *m_ray_vector_field_backward;
 };
 }
 
 namespace invariant {
 
-int get_nb_dim_flat(const ibex::IntervalVector &iv);
+inline Parma_Polyhedra_Library::C_Polyhedron& operator&=(Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
+    p1.intersection_assign(p2);
+    return p1;
+}
+
+inline Parma_Polyhedra_Library::C_Polyhedron& operator|=(Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
+    p1.poly_difference_assign(p2);
+    return p1;
+}
+
+inline Parma_Polyhedra_Library::C_Polyhedron operator&(const Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
+    Parma_Polyhedra_Library::C_Polyhedron p_return(p1);
+    p_return.intersection_assign(p2);
+    return p_return;
+}
+
+inline Parma_Polyhedra_Library::C_Polyhedron operator|(const Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
+    Parma_Polyhedra_Library::C_Polyhedron p_return(p1);
+    p_return.poly_difference_assign(p2);
+    return p_return;
+}
+
+
+///
+/// \brief Get the difference Hull a\b
+/// \param a
+/// \param b
+/// \return
+///
+template <typename _Tp>
+_Tp get_diff_hull(const _Tp &a, const _Tp &b);
+
+template <typename _Tp>
+void set_empty(_Tp &T);
+
+template <typename _Tp>
+int get_nb_dim_flat(const _Tp &iv);
 
 template<typename _Tp>
 std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r);
@@ -452,7 +506,6 @@ inline const ibex::IntervalVector Room<_Tp>::get_one_vector_fields(int n_vf){
 }
 
 }
-
 #include "room.tpp"
 
 #endif // ROOM_H

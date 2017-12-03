@@ -117,7 +117,7 @@ int Maze<_Tp>::contract(){
                             // Synchronize
                             r->synchronize();
 
-                            if(m_domain->get_init() == Domain<_Tp>::FULL_DOOR && r->is_empty())
+                            if(m_domain->get_init() == invariant::FULL_DOOR && r->is_empty())
                                 r->set_removed();
 
                             // Add Rooms to the Deque

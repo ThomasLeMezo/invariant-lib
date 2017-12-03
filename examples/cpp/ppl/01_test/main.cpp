@@ -22,7 +22,7 @@ using namespace ibex;
 
 PPL::Rational_Box iv_2_box(const ibex::IntervalVector &iv){
     Rational_Box box(iv.size());
-    for(int i=0; i<box.space_dimension(); i++){
+    for(int i=0; i<(int)box.space_dimension(); i++){
         PPL::Variable x(i);
 
         if(!iv[i].is_empty()){
@@ -108,7 +108,7 @@ void write_VTK(const std::vector<Parma_Polyhedra_Library::C_Polyhedron> &ph_list
                 else{
                     for(int i=0; i<3; i++){
                         PPL::Variable x(i);
-                        if(g.space_dimension()>i){
+                        if((int)g.space_dimension()>i){
                             coord.push_back(g.coefficient(x).get_d()/(g.divisor().get_d()*IBEX_PPL_PRECISION));
                         }
                         else{
@@ -151,54 +151,35 @@ void write_VTK(PPL::C_Polyhedron &ph, string filename){
 int main(){
     int dimension = 3;
 
-    IntervalVector pave(dimension);
-    pave[0] = ibex::Interval(-1, 1);
-    pave[1] = ibex::Interval(-1, 1);
-    pave[2] = ibex::Interval(-1, 1);
-
     IntervalVector vec(dimension);
     vec[0] = ibex::Interval(-0.3, 0.3);
-    vec[0] = ibex::Interval(-0.3, 0.3);
-    vec[1] = ibex::Interval(1);
+    vec[1] = ibex::Interval(-0.3, 0.3);
+    vec[2] = ibex::Interval(1);
 
-    C_Polyhedron ph_in(dimension, PPL::EMPTY);
-    PPL::Variable x(0), y(1), z(2);
-    //    ph_in.add_generator(PPL::point(0.5*IBEX_PPL_PRECISION*x+0*y-IBEX_PPL_PRECISION*z));
-    //    ph_in.add_generator(PPL::point(0*x+0.5*IBEX_PPL_PRECISION*y-IBEX_PPL_PRECISION*z));
-    //    ph_in.add_generator(PPL::point(-0.5*IBEX_PPL_PRECISION*x+0*y-IBEX_PPL_PRECISION*z));
-    //    ph_in.add_generator(PPL::point(0*x-0.5*IBEX_PPL_PRECISION*y-IBEX_PPL_PRECISION*z));
-    //    ph_in.add_generator(PPL::point(0.7*IBEX_PPL_PRECISION*x+0.7*IBEX_PPL_PRECISION*y-IBEX_PPL_PRECISION*z));
-
-    ph_in.add_generator(PPL::point(-0.1*IBEX_PPL_PRECISION*x -1.0*IBEX_PPL_PRECISION*y));
-    ph_in.add_generator(PPL::point(0.1*IBEX_PPL_PRECISION*x -1.0*IBEX_PPL_PRECISION*y));
-
-    //    cout << "ph_in = " << ph_in.generators() << endl;
-
-    //    IntervalVector face_in(3);
-    //    face_in[0] = ibex::Interval(-0.5, 0.5);
-    //    face_in[1] = ibex::Interval(-0.5, 0.5);
-    //    face_in[2] = ibex::Interval(-1);
-    //    C_Polyhedron ph_in(iv_2_box(face_in));
+    IntervalVector face_in(3);
+    face_in[0] = ibex::Interval(-1, 1);
+    face_in[1] = ibex::Interval(-1, 1);
+    face_in[2] = ibex::Interval(-1);
+    C_Polyhedron ph_in(iv_2_box(face_in));
 
     C_Polyhedron ph_projection = add_ray(vec, ph_in);
 
-//    std::vector<Parma_Polyhedra_Library::C_Polyhedron> ph_out_list;
-//    for(auto &ph_face:rb_list){
-//        C_Polyhedron ph_tmp(ph_projection);
-//        C_Polyhedron ph_face_tmp(ph_face);
-//        ph_tmp.intersection_assign(ph_face_tmp);
-//        if(!ph_tmp.is_empty()){
-//            ph_out_list.push_back(ph_tmp);
-//        }
-//    }
-//    write_VTK(ph_out_list, "pave_out");
+    IntervalVector face_out(3);
+    face_out[0] = ibex::Interval(-1, 1);
+    face_out[1] = ibex::Interval(-1, 1);
+    face_out[2] = ibex::Interval(1);
+    C_Polyhedron ph_out(iv_2_box(face_out));
+    ph_out.intersection_assign(ph_projection);
 
-    cout << "matrix" << endl;
+    cout << ph_out.space_dimension() << endl;
+    cout << ph_out.affine_dimension() << endl;
+    cout << ph_out.is_discrete() << endl;
+    cout << ph_out.is_empty() << endl;
+    cout << ph_out.is_topologically_closed() << endl;
 
-    ibex::IntervalMatrix test(3, 4);
-    test[1][2] = ibex::Interval(1, 10);
-    cout << test << endl;
-    cout << test[0] << endl;
+    write_VTK(ph_in, "ph_in");
+    write_VTK(ph_out, "ph_out");
+    write_VTK(ph_projection, "ph_projection");
 
     return 0;
 }

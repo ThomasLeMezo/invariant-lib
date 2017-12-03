@@ -1,3 +1,10 @@
+#ifndef DOMAIN_ENUM
+#define DOMAIN_ENUM
+namespace invariant{
+    enum DOMAIN_INITIALIZATION{FULL_DOOR, FULL_WALL};
+}
+#endif
+
 #ifndef DOMAIN_H
 #define DOMAIN_H
 
@@ -8,14 +15,13 @@
 #include "../smartSubPaving/smartSubPaving.h"
 #include "../maze/maze.h"
 #include "../maze/room.h"
-//#include "../maze/door.h"
 #include "../smartSubPaving/pave_node.h"
-//#include "../smartSubPaving/pave.h"
 
 namespace invariant{
 
+using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron>;
+
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
-//enum DOMAIN_INITIALIZATION{Domain<_Tp>::FULL_DOOR, Domain<_Tp>::FULL_WALL};
 
 template <typename _Tp> class SmartSubPaving;
 template <typename _Tp> class Maze;
@@ -26,8 +32,6 @@ template<typename _Tp=ibex::IntervalVector>
 class Domain
 {
 public:
-    enum DOMAIN_INITIALIZATION{FULL_DOOR, FULL_WALL};
-
     /**
      * @brief Constructor of a domain
      * @param paving
@@ -160,7 +164,7 @@ public:
      * @brief Get the initialization condition on Room (Full door or Full wall)
      * @return
      */
-    typename Domain<_Tp>::DOMAIN_INITIALIZATION get_init() const;
+    DOMAIN_INITIALIZATION get_init() const;
 
 private:
     /**
@@ -199,7 +203,7 @@ private:
     bool m_border_path_in = true;
     bool m_border_path_out = true;
 
-    DOMAIN_INITIALIZATION m_domain_init = Domain<_Tp>::FULL_DOOR;
+    DOMAIN_INITIALIZATION m_domain_init = FULL_DOOR;
 
     std::vector<Maze<_Tp> *> m_maze_list_inter;
     std::vector<Maze<_Tp> *> m_maze_list_union;
@@ -209,7 +213,7 @@ private:
 namespace invariant{
 
 template<typename _Tp>
-inline typename Domain<_Tp>::DOMAIN_INITIALIZATION Domain<_Tp>::get_init() const{
+inline DOMAIN_INITIALIZATION Domain<_Tp>::get_init() const{
     return m_domain_init;
 }
 

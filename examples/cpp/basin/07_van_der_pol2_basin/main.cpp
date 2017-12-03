@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     Function f2_sep1(x, sqr(x[0]-x1_c2)-sqr(r2));
     Function f2_sep2(x, sqr(x[1]-x2_c2)-sqr(r2));
 
-    invariant::Domain<> dom_outer(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     SepUnion s_outer(s1_outer, s2_outer);
     dom_outer.set_sep_output(&s_outer);
 
-    invariant::Domain<> dom_inner(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
     SepFwdBwd s1_inner1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT)
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x, -Return(x[1],
                                     (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
-    Dynamics_Function dyn(&f, Dynamics::BWD);
+    Dynamics_Function dyn(&f, BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);

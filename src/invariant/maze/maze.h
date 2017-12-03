@@ -14,6 +14,9 @@
 
 namespace invariant {
 
+template <typename _Tp> class Maze;
+using MazePPL = Maze<Parma_Polyhedra_Library::C_Polyhedron>;
+
 class Dynamics; // declared only for friendship
 template <typename _Tp> class Room;
 template <typename _Tp> class Domain;

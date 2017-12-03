@@ -28,10 +28,10 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     vector<Function *> f_list;
     f_list.push_back(&f);
-    Dynamics_Function dyn(f_list, Dynamics::FWD);
+    Dynamics_Function dyn(f_list, FWD);
 
     // ****** Domain & Maze *******
-    invariant::Domain<> dom_A(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_A(&paving, FULL_WALL);
     dom_A.set_border_path_in(false);
     dom_A.set_border_path_out(false);
     double xc_1, yc_1, r_1;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     invariant::Maze<> maze_A(&dom_A, &dyn);
 
-    invariant::Domain<> dom_B(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_B(&paving, FULL_WALL);
     dom_B.set_border_path_in(false);
     dom_B.set_border_path_out(false);
     IntervalVector box_B(2);

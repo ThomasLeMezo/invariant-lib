@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom(&paving, FULL_DOOR);
     ibex::Interval pt_xy = sqrt(beta*(rho-1.0));
     ibex::Interval pt_z = rho-1.0;
     double r = 3.0;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
                                         x1*(rho - x3) - x2,
                                         x1*x2 - beta * x3));
-    Dynamics_Function dyn(&f, Dynamics::FWD_BWD);
+    Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

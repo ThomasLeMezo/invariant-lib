@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     double r = 0.5;
 
     // ****** Domain Outer ******* //
-    invariant::Domain<> dom_outer(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom_outer(&paving, FULL_DOOR);
 
     Function f_sep_outer(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain<> dom_inner(&paving, invariant::Domain<>::FULL_WALL);
+    invariant::Domain<> dom_inner(&paving, FULL_WALL);
 
     Function f_sep_inner(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(r, 2));
     SepFwdBwd s_inner(f_sep_inner, LEQ); // LT, LEQ, EQ, GEQ, GT
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // ****** Dynamics Outer ******* //
     ibex::Function f_outer(x1, x2, -Return(x2,
                                     -1.0*(x1+pow(x2,3)-x2)+ibex::Interval(-0.2, 0.2)));
-    Dynamics_Function dyn_outer(&f_outer, Dynamics::BWD);
+    Dynamics_Function dyn_outer(&f_outer, BWD);
 
     // ****** Dynamics Inner ******* //
     ibex::Function f_inner1(x1, x2, Return(x2,
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
-    Dynamics_Function dyn_inner(f_list_inner, Dynamics::FWD);
+    Dynamics_Function dyn_inner(f_list_inner, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);

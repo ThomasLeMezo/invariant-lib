@@ -16,9 +16,9 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
         Pave<_Tp> *p = m_subpaving->get_paves()[i];
         Room<_Tp> *r = p->get_rooms()[maze];
         if(!r->is_removed()){
-            if(m_domain_init == Domain<_Tp>::FULL_DOOR)
+            if(m_domain_init == FULL_DOOR)
                 r->set_full_private();
-            else if(m_domain_init == Domain<_Tp>::FULL_WALL)
+            else if(m_domain_init == FULL_WALL)
                 r->set_empty_private();
             r->synchronize();
         }
@@ -39,10 +39,10 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
     contract_union_maze(maze);
 
     // ********** Add additional rooms to deque ********** //
-    if(m_domain_init == Domain<_Tp>::FULL_DOOR){
+    if(m_domain_init == FULL_DOOR){
         m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
     }
-    if(m_domain_init == Domain<_Tp>::FULL_WALL && m_subpaving->get_paves().size()>1){ // When initial condition is not link with active paves
+    if(m_domain_init == FULL_WALL && m_subpaving->get_paves().size()>1){ // When initial condition is not link with active paves
 //                m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
 //        m_subpaving->get_tree()->get_all_child_rooms_inside_outside(list_room_deque, maze);
         // (OK ?) Wrong function -> need to add neighbours of full paves instead of not_empty
@@ -57,7 +57,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
         return;
     switch (accelerator) {
     case SEP_INSIDE:{
-        if(!pave_node->get_fullness()[maze] || m_domain_init==Domain<_Tp>::FULL_WALL){
+        if(!pave_node->get_fullness()[maze] || m_domain_init==FULL_WALL){
             if(pave_node->is_leaf()){
                 Pave<_Tp>* p = pave_node->get_pave();
                 Room<_Tp> *r = p->get_rooms()[maze];
@@ -66,7 +66,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                         r->set_full_private_output();
                     else
                         r->set_full_private_input();
-                    if(m_domain_init == Domain<_Tp>::FULL_WALL)
+                    if(m_domain_init == FULL_WALL)
                         p->get_neighbors_room(maze, list_room_deque);
                     r->synchronize();
                 }
@@ -79,7 +79,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
     }
         break;
     case SEP_OUTSIDE:{
-        if(!pave_node->get_emptyness()[maze] || m_domain_init==Domain<_Tp>::FULL_DOOR){
+        if(!pave_node->get_emptyness()[maze] || m_domain_init==FULL_DOOR){
             if(pave_node->is_leaf()){
                 Pave<_Tp>* p = pave_node->get_pave();
                 Room<_Tp> *r = p->get_rooms()[maze];
@@ -115,7 +115,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                         r->set_full_private_output();
                     else
                         r->set_full_private_input();
-                    if(m_domain_init == Domain<_Tp>::FULL_WALL){
+                    if(m_domain_init == FULL_WALL){
                         p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
                     }
@@ -137,7 +137,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
 //                    else
 //                        r->contract_box(x_out, m_sep_input, DOOR_OUTPUT);
 
-                    if(m_domain_init == Domain<_Tp>::FULL_WALL){
+                    if(m_domain_init == FULL_WALL){
                         p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
                     }
@@ -172,7 +172,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
 
 template<typename _Tp>
 void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque){
-    if(m_subpaving->size()==1 && m_domain_init == Domain<_Tp>::FULL_DOOR)
+    if(m_subpaving->size()==1 && m_domain_init == FULL_DOOR)
         return;
 
     std::vector<Pave<_Tp>*> pave_border_list;
@@ -189,21 +189,21 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                     if(m_border_path_in)
                         d->set_full_private_input();
                     else{
-                        if(m_domain_init != Domain<_Tp>::FULL_WALL)
+                        if(m_domain_init != FULL_WALL)
                             d->set_empty_private_input();
                     }
 
                     if(m_border_path_out)
                         d->set_full_private_output();
                     else{
-                        if(m_domain_init != Domain<_Tp>::FULL_WALL)
+                        if(m_domain_init != FULL_WALL)
                             d->set_empty_private_output();
                     }
                     d->synchronize();
                 }
             }
 
-            if(m_domain_init == Domain<_Tp>::FULL_WALL && (m_border_path_in || m_border_path_out)){
+            if(m_domain_init == FULL_WALL && (m_border_path_in || m_border_path_out)){
                 if(!p->get_rooms()[maze]->is_full()){
 #pragma omp critical(dqueue)
                     {
@@ -211,7 +211,7 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                     }
                 }
             }
-            if(m_domain_init == Domain<_Tp>::FULL_DOOR && (!m_border_path_in || !m_border_path_out)){
+            if(m_domain_init == FULL_DOOR && (!m_border_path_in || !m_border_path_out)){
                 if(!p->get_rooms()[maze]->is_empty()){
 #pragma omp critical(dqueue)
                     {

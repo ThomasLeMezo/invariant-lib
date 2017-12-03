@@ -13,6 +13,7 @@
 
 #include "../maze/room.h"
 #include "../maze/maze.h"
+#include "../definition/domain.h"
 
 #include "../serialization/ibex_serialization.h"
 
@@ -56,6 +57,9 @@ public:
      */
     const ibex::IntervalVector &get_position() const;
     const ibex::IntervalVector get_position_copy() const;
+
+    const _Tp &get_position_typed() const;
+    const _Tp get_position_copy_typed() const;
 
     /**
      * @brief Return the array of an array of Faces of the Pave

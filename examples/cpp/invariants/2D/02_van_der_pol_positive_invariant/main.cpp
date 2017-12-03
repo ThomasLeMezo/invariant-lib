@@ -25,14 +25,14 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, invariant::Domain<>::FULL_DOOR);
+    invariant::Domain<> dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(true);
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, Dynamics::Dynamics::BWD);
+    Dynamics_Function dyn(&f, BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

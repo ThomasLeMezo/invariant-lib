@@ -54,6 +54,12 @@ public:
     const ibex::IntervalVector &get_position() const;
 
     /**
+     * @brief Return the position of the Face (templated)
+     * @return
+     */
+    const _Tp get_position_typed() const;
+
+    /**
      * @brief Face serialization
      * @param binFile
      */

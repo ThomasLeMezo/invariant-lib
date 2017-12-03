@@ -34,7 +34,7 @@ maze_inner = Maze(dom_inner, dyn)
 maze_outer = Maze(dom_outer, dyn)
 
 # Contract the system
-for i in range(14):
+for i in range(15):
 	print(i)
 	smartSubPaving.bisect()
 	maze_outer.contract()
@@ -42,7 +42,7 @@ for i in range(14):
 
 # Visualization
 visu = VibesMaze("Safety Prrof Integration", maze_outer, maze_inner)
-visu.setProperties(0,0,512,512)
+visu.setProperties(0,0,1024,1024)
 visu.show()
 visu.drawCircle(0, -2, 1, "black[red]");
 visu.drawCircle(1, -3, 0.1, "black[red]");
