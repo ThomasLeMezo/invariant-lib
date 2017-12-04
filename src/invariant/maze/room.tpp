@@ -451,7 +451,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
     std::vector<bool> where_zeros = door_in->get_where_zeros(n_vf);
 
     for(int id_zero=0; id_zero<dim; id_zero++){
-        if(where_zeros[id_zero])
+        if(where_zeros[(size_t)id_zero])
             pave_extrude[id_zero] = ibex::Interval::ALL_REALS;
     }
 

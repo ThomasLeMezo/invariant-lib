@@ -42,7 +42,7 @@ ibex::IntervalVector get_diff_hull(const ibex::IntervalVector &a, const ibex::In
     ibex::IntervalVector union_of_diff(a.size(), ibex::Interval::EMPTY_SET);
     for(int i=0; i<nb_boxes; i++)
         union_of_diff |= diff_list[i];
-    delete(diff_list);
+    delete[] diff_list;
     return union_of_diff;
 }
 
