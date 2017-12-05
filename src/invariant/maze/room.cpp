@@ -95,7 +95,7 @@ void Room<ppl::C_Polyhedron>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhe
         return;
     }
 
-    ppl::C_Polyhedron out_tmp(out);
+//    ppl::C_Polyhedron out_tmp(out);
     ppl::C_Polyhedron in_tmp(in);
 
     Linear_Expression e_in = Linear_Expression(0);
@@ -105,15 +105,15 @@ void Room<ppl::C_Polyhedron>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhe
         in_tmp.add_generator(ray(l));
     }
 
-    Linear_Expression e_out = Linear_Expression(0);
-    std::vector<Linear_Expression> linear_expression_list_out;
-    recursive_linear_expression_from_iv(-vect, vect.size(), linear_expression_list_out,e_out);
-    for(auto &l:linear_expression_list_out){
-        out_tmp.add_generator(ray(l));
-    }
+//    Linear_Expression e_out = Linear_Expression(0);
+//    std::vector<Linear_Expression> linear_expression_list_out;
+//    recursive_linear_expression_from_iv(-vect, vect.size(), linear_expression_list_out,e_out);
+//    for(auto &l:linear_expression_list_out){
+//        out_tmp.add_generator(ray(l));
+//    }
 
     out &= in_tmp;
-    in &= out_tmp;
+//    in &= out_tmp;
 }
 
 template <>
@@ -128,8 +128,12 @@ void set_empty<Parma_Polyhedra_Library::C_Polyhedron>(Parma_Polyhedra_Library::C
 
 template <>
 Parma_Polyhedra_Library::C_Polyhedron get_diff_hull(const Parma_Polyhedra_Library::C_Polyhedron &a, const Parma_Polyhedra_Library::C_Polyhedron &b){
-    Parma_Polyhedra_Library::C_Polyhedron tmp(a);
-    tmp.poly_difference_assign(b);
+    Parma_Polyhedra_Library::C_Polyhedron tmp(b);
+    tmp.poly_difference_assign(a);
+
+//    Parma_Polyhedra_Library::C_Polyhedron tmp(a);
+//    tmp.poly_difference_assign(b);
+
     return tmp;
 }
 

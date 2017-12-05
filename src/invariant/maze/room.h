@@ -28,6 +28,9 @@ namespace invariant {
 
 enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
 
+template <typename _Tp> class Room;
+using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron>;
+
 class Dynamics; // declared only for friendship
 template <typename _Tp> class Pave; // declared only for friendship
 template <typename _Tp> class Maze;
@@ -388,23 +391,27 @@ namespace invariant {
 
 inline Parma_Polyhedra_Library::C_Polyhedron& operator&=(Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     p1.intersection_assign(p2);
+    p1.simplify_using_context_assign(ppl::C_Polyhedron(p1.space_dimension(), ppl::UNIVERSE));
     return p1;
 }
 
 inline Parma_Polyhedra_Library::C_Polyhedron& operator|=(Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
-    p1.poly_difference_assign(p2);
+    p1.poly_hull_assign(p2);
+    p1.simplify_using_context_assign(ppl::C_Polyhedron(p1.space_dimension(), ppl::UNIVERSE));
     return p1;
 }
 
 inline Parma_Polyhedra_Library::C_Polyhedron operator&(const Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     Parma_Polyhedra_Library::C_Polyhedron p_return(p1);
     p_return.intersection_assign(p2);
+    p_return.simplify_using_context_assign(ppl::C_Polyhedron(p_return.space_dimension(), ppl::UNIVERSE));
     return p_return;
 }
 
 inline Parma_Polyhedra_Library::C_Polyhedron operator|(const Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     Parma_Polyhedra_Library::C_Polyhedron p_return(p1);
-    p_return.poly_difference_assign(p2);
+    p_return.poly_hull_assign(p2);
+    p_return.simplify_using_context_assign(ppl::C_Polyhedron(p_return.space_dimension(), ppl::UNIVERSE));
     return p_return;
 }
 

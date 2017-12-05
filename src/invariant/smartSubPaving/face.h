@@ -17,6 +17,8 @@
 
 namespace invariant {
 
+using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron>;
+
 template <typename _Tp> class Pave;
 template <typename _Tp> class Door;
 template <typename _Tp> class Room;
@@ -57,7 +59,7 @@ public:
      * @brief Return the position of the Face (templated)
      * @return
      */
-    const _Tp get_position_typed() const;
+    const _Tp &get_position_typed() const;
 
     /**
      * @brief Face serialization
@@ -146,6 +148,7 @@ public:
 private:
     /** Class Variable **/
     mutable ibex::IntervalVector      m_position; // Face position
+    _Tp                               m_position_typed; // Face position
     mutable ibex::IntervalVector      m_orientation; // Orientation of the Face : [1], [0] or [0,1]
     mutable ibex::IntervalVector      m_normal; // Normal vector of the face
     // for each dimension according to the position of the Face in the Pave
@@ -153,7 +156,7 @@ private:
     std::vector<Face<_Tp> *>          m_neighbors;
     bool                              m_border = false;
 
-    std::map<Maze<_Tp>*, Door<_Tp>*>            m_doors;
+    std::map<Maze<_Tp>*, Door<_Tp>*>  m_doors;
 
 };
 
@@ -182,6 +185,11 @@ namespace invariant{
 template <typename _Tp> 
 const ibex::IntervalVector& Face<_Tp>::get_position() const{
     return m_position;
+}
+
+template <typename _Tp>
+const _Tp& Face<_Tp>::get_position_typed() const{
+    return m_position_typed;
 }
 
 template <typename _Tp> 

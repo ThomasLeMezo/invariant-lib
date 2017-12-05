@@ -6,10 +6,10 @@
 #include "vibesMaze.h"
 
 #include <iostream>
-#include "vibes/vibes.h"
 #include <cstring>
-#include "graphiz_graph.h"
 #include <omp.h>
+
+#include "vtkmazeppl.h"
 
 #include "ppl.hh"
 
@@ -19,11 +19,16 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    ibex::Variable x1, x2;
+    ibex::Variable x1, x2, x3;
 
-    IntervalVector space(2);
-    space[0] = ibex::Interval(-3,3);
-    space[1] = ibex::Interval(-3,3);
+    IntervalVector space(3);
+    space[0] = ibex::Interval(-30,30);
+    space[1] = ibex::Interval(-20,20);
+    space[2] = ibex::Interval(0,50);
+
+    ibex::Interval rho = ibex::Interval(28.0);
+    ibex::Interval sigma = ibex::Interval(10.0);
+    ibex::Interval beta = ibex::Interval(8.0/3.0);
 
     // ****** Domain ******* //
     SmartSubPavingPPL paving(space);
@@ -33,8 +38,9 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
+    ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
+                                        x1*(rho - x3) - x2,
+                                        x1*x2 - beta * x3));
     Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
@@ -43,7 +49,8 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<2; i++){
+    omp_set_num_threads(1);
+    for(int i=0; i<10; i++){
         paving.bisect();
         cout << i << " - " << maze.contract() << " - ";
         cout << paving.size() << endl;
@@ -52,11 +59,6 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-//    vibes::beginDrawing();
-//    VibesMaze v_maze("SmartSubPaving", &maze);
-//    v_maze.setProperties(0, 0, 1024, 1024);
-//    v_maze.show();
-
-//    vibes::endDrawing();
-
+    VtkMazePPL vtkMazePPL("LorenzPPL");
+    vtkMazePPL.show_maze(&maze);
 }

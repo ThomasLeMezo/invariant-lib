@@ -1,16 +1,17 @@
+#include "ibex/ibex_SepFwdBwd.h"
 #include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
 #include "maze.h"
-
-#include "ibex/ibex_SepFwdBwd.h"
+#include "vibesMaze.h"
 
 #include <iostream>
-#include "vibes/vibes.h"
 #include <cstring>
 #include <omp.h>
 
-#include "vtkMaze3D.h"
+#include "vtkmazeppl.h"
+
+#include "ppl.hh"
 
 using namespace std;
 using namespace ibex;
@@ -28,10 +29,10 @@ int main(int argc, char *argv[])
     ibex::Interval v = ibex::Interval(0.1);
     ibex::Interval u = ibex::Interval(0.3);
 
-    invariant::SmartSubPaving<> paving(space);
+    SmartSubPavingPPL paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain<> dom_outer(&paving, FULL_WALL);
+    DomainPPL dom_outer(&paving, FULL_WALL);
 
     double x_c, y_c, theta_c, r;
     x_c = 0.0;
@@ -45,43 +46,26 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
-    // ****** Domain Inner ******* //
-//    invariant::Domain<> dom_inner(&paving, FULL_DOOR);
-
-//    SepFwdBwd s_inner(f_sep_outer, GEQ); // LT, LEQ, EQ, GEQ, GT
-//    dom_inner.set_sep(&s_inner);
-
-//    dom_inner.set_border_path_in(true);
-//    dom_inner.set_border_path_out(true);
-
     // ****** Dynamics Outer & Inner ******* //
-        ibex::Function f(x, y, theta, Return(v*cos(theta),
+    ibex::Function f(x, y, theta, Return(v*cos(theta),
                                             v*sin(theta),
                                             u));
-//    ibex::Function f(x1, x2, Return(x2,
-//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
     Dynamics_Function dyn_outer(&f, FWD);
-//    Dynamics_Function dyn_inner(&f, FWD);
 
     // ******* Mazes ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-//    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    MazePPL maze_outer(&dom_outer, &dyn_outer);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_outer.contract();
-    for(int i=0; i<20; i++){
+    omp_set_num_threads(1);
+    for(int i=0; i<10; i++){
         paving.bisect();
-//        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    VtkMaze3D vtkMaze3D("dubins",  true);
-    vtkMaze3D.show_graph(&paving);
-    vtkMaze3D.show_maze(&maze_outer, "outer");
-//    vtkMaze3D.show_maze(&maze_inner, "inner");
-
+    VtkMazePPL vtkMazePPL("DubinsPPL");
+    vtkMazePPL.show_maze(&maze_outer);
 }

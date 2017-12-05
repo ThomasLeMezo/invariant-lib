@@ -16,6 +16,9 @@
 
 namespace invariant{
 
+template <typename _Tp> class Pave_node;
+using Pave_nodePPL = Pave_node<Parma_Polyhedra_Library::C_Polyhedron>;
+
 template <typename _Tp> class Pave;
 template <typename _Tp> class Maze;
 template <typename _Tp> class Face;

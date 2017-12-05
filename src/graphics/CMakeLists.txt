@@ -16,9 +16,11 @@ if(WITH_3D)
 
     set(SRC_3D
         vtkMaze3D.cpp
+        vtkmazeppl.cpp
     )
     set(HEADERS_3D
         vtkMaze3D.h
+        vtkmazeppl.h
     )
 
     add_library(invariant-graphics-3D

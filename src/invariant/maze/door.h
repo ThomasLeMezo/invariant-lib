@@ -16,11 +16,14 @@
 #include "maze.h"
 #include "../smartSubPaving/pave.h"
 
-#define IBEX_PPL_PRECISION 1e8
+#define IBEX_PPL_PRECISION 1e3
 
 namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
+
+template <typename _Tp> class Door;
+using DoorPPL = Door<Parma_Polyhedra_Library::C_Polyhedron>;
 
 template <typename _Tp> class Face;
 template <typename _Tp> class Room;

@@ -31,7 +31,7 @@ dom_inner = Domain(subpaving, FULL_DOOR)
 dom_inner.set_border_path_in(True)
 dom_inner.set_border_path_out(True)
 
-## Build domain separator for outer
+## Build domain separator for input
 s1_inner1 = SepFwdBwd(f_sep1, GEQ)
 s1_inner2 = SepFwdBwd(f_sep2, GEQ)
 s1_inner = SepUnion([s1_inner1, s1_inner2])

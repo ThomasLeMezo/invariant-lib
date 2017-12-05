@@ -12,13 +12,12 @@
 
   )
 
-  add_executable(ppl_2D_invariant_van_der_pol ${SRC})
+  add_executable(ppl_3D_dubins ${SRC})
 
-  target_link_libraries(ppl_2D_invariant_van_der_pol
+  target_link_libraries(ppl_3D_dubins
     ${LIBS}
     invariant-core
-    
-    invariant-graphics
+    invariant-graphics-3D
   )
 
 

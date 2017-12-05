@@ -15,14 +15,14 @@ int Pave<ibex::IntervalVector>::get_dim_inter_boundary(const ibex::IntervalVecto
 }
 
 template <>
-const ibex::IntervalVector Face<ibex::IntervalVector>::get_position_typed() const{
+const ibex::IntervalVector Pave<ibex::IntervalVector>::get_position_typed() const{
     return m_position;
 }
 
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
-const ppl::C_Polyhedron Face<ppl::C_Polyhedron>::get_position_typed() const{
+const ppl::C_Polyhedron Pave<ppl::C_Polyhedron>::get_position_typed() const{
     return iv_2_polyhedron(this->m_position);
 }
 

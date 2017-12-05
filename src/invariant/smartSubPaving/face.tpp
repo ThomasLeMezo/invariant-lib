@@ -2,29 +2,20 @@
 
 namespace invariant {
 
-template <typename _Tp>
-Face<_Tp>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<_Tp> *p):
-    m_position(position),
-    m_orientation(orientation),
-    m_normal(normal)
-{
-    m_pave = p;
-}
+//template <typename _Tp>
+//Face<_Tp>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<_Tp> *p):
+//    m_position(position),
+//    m_orientation(orientation),
+//    m_normal(normal)
+//{
+//    m_pave = p;
+//}
 
 template <typename _Tp>
 Face<_Tp>::~Face(){
     for(typename std::map<Maze<_Tp>*,Door<_Tp>*>::iterator it=m_doors.begin(); it!=m_doors.end(); ++it){
         delete(it->second);
     }
-}
-
-template <typename _Tp>
-Face<_Tp>::Face(Pave<_Tp> *p):
-    m_position(0),
-    m_orientation(0),
-    m_normal(0)
-{
-    m_pave = p;
 }
 
 template <typename _Tp>

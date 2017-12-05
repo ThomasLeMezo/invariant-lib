@@ -53,9 +53,6 @@ public:
     void serialize_maze(const string &file_name, invariant::Maze<ibex::IntervalVector> *maze);
 
 private:
-    invariant::Maze<ibex::IntervalVector>*    m_maze_outer = NULL;
-    invariant::Maze<ibex::IntervalVector>*    m_maze_inner = NULL;
-
     std::string         m_file_name = "";
     bool                m_memory_optimization = false;
 };

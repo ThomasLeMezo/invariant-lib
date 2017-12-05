@@ -19,6 +19,9 @@
 
 namespace invariant {
 
+template <typename _Tp> class Pave;
+using PavePPL = Pave<Parma_Polyhedra_Library::C_Polyhedron>;
+
 template <typename _Tp> class SmartSubPaving;
 template <typename _Tp> class Room;
 template <typename _Tp> class Face;
@@ -58,7 +61,7 @@ public:
     const ibex::IntervalVector &get_position() const;
     const ibex::IntervalVector get_position_copy() const;
 
-    const _Tp &get_position_typed() const;
+    const _Tp get_position_typed() const;
     const _Tp get_position_copy_typed() const;
 
     /**

@@ -18,17 +18,45 @@ void Face<ibex::IntervalVector>::deserialize(std::ifstream& binFile){
     m_orientation = deserializeIntervalVector(binFile);
 }
 
+template <>
+Face<ibex::IntervalVector>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<ibex::IntervalVector> *p):
+    m_position(position),
+    m_orientation(orientation),
+    m_normal(normal),
+    m_position_typed(position)
+{
+    m_pave = p;
+}
 
 template <>
-const ibex::IntervalVector Face<ibex::IntervalVector>::get_position_typed() const{
-    return m_position;
+Face<ibex::IntervalVector>::Face(Pave<ibex::IntervalVector> *p):
+    m_position(0),
+    m_orientation(0),
+    m_normal(0),
+    m_position_typed(0)
+{
+    m_pave = p;
 }
 
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
-const ppl::C_Polyhedron Face<ppl::C_Polyhedron>::get_position_typed() const{
-    return iv_2_polyhedron(this->m_position);
+Face<ppl::C_Polyhedron>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<ppl::C_Polyhedron> *p):
+    m_position(position),
+    m_orientation(orientation),
+    m_normal(normal)
+{
+    m_pave = p;
+    m_position_typed = iv_2_polyhedron(position);
+}
+
+template <>
+Face<ppl::C_Polyhedron>::Face(Pave<ppl::C_Polyhedron> *p):
+    m_position(0),
+    m_orientation(0),
+    m_normal(0)
+{
+    m_pave = p;
 }
 
 }
