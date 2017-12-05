@@ -635,6 +635,10 @@ bool Room<_Tp>::contract(){
             eval_vector_field_possibility();
             m_first_contract = false;
         }
+
+        if(!m_first_contract && ((is_full() && domain_init==FULL_WALL) || (is_empty() && domain_init == FULL_DOOR)))
+            return false;
+
         //        get_private_doors_info("before");
         change |= contract_continuity();
         //        get_private_doors_info("continuity");
