@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     t_c = 0 * pm3d.get_grid_conversion(0);
     x_c = 130 * pm3d.get_grid_conversion(1);
     y_c = 460 * pm3d.get_grid_conversion(2);
-    r = 0.0;
+    r = 50.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
     ibex::Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<10; i++){
+    for(int i=0; i<20; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();

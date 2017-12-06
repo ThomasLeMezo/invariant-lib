@@ -85,6 +85,8 @@ int Maze<_Tp, _V>::contract(){
             while(!deque_empty){
 #pragma omp task
                 {
+#pragma omp atomic
+                            nb_operations++;
                     // Take one Room
                     omp_set_lock(&m_deque_access);
                     Room<_Tp, _V> *r = NULL;
@@ -124,8 +126,8 @@ int Maze<_Tp, _V>::contract(){
                             add_rooms(rooms_to_update);
 
                             // Increment operations
-#pragma omp atomic
-                            nb_operations++;
+//#pragma omp atomic
+//                            nb_operations++;
                         }
 
                         /// DEBUG
@@ -152,7 +154,7 @@ int Maze<_Tp, _V>::contract(){
         }
     }
 
-    std::cout << " => contractions : " << omp_get_wtime() - t_start << std::endl;
+    std::cout << " => contractions (" << nb_operations << ") : " << omp_get_wtime() - t_start << " s";
     return nb_operations;
 }
 
@@ -208,7 +210,7 @@ bool Maze<_Tp, _V>::is_escape_trajectories(){
 template<typename _Tp, typename _V>
 void Maze<_Tp, _V>::add_rooms(const std::vector<Room<_Tp, _V> *>& list_rooms){
     for(Room<_Tp, _V> *r:list_rooms){
-        if(!r->is_in_deque()){
+        if(!r->is_in_deque() && !r->is_removed()){
             r->set_in_queue();
             this->add_to_deque(r);
         }

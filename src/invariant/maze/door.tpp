@@ -52,8 +52,9 @@ void Door<_Tp, _V>::synchronize(){
 
 template <typename _Tp, typename _V>
 bool Door<_Tp, _V>::analyze_change(std::vector<Room<_Tp, _V> *>&list_rooms){
-    if((*m_input_private) != get_input()
-            || (*m_output_private) != get_output()){ // operator != is generic for iv & polyhedron
+    DYNAMICS_SENS sens = m_room->get_maze()->get_dynamics()->get_sens();
+    if(((*m_input_private) != get_input() && (sens == BWD || sens==FWD_BWD))
+            || ((*m_output_private) != get_output() && (sens==FWD|| sens==FWD_BWD))){ // operator != is generic for iv & polyhedron
         std::vector<Face<_Tp, _V> *> l_face = m_face->get_neighbors();
         for(Face<_Tp, _V>* f:l_face)
             list_rooms.push_back(f->get_pave()->get_rooms()[m_room->get_maze()]);

@@ -19,9 +19,22 @@ if [ ! -e "$HOME/ppl/lib/libppl.a" ]; then
   cd ${FILE_NAME}
 
   ./configure --prefix=$HOME/ppl --enable-interfaces=cxx --enable-optimization=sspeed --enable-fpmath=default \
-    --disable-ppl_lpsol --disable-ppl_lcdd --enable-cxx --enable-shared
+    --disable-ppl_lpsol --disable-ppl_lcdd --enable-cxx --enable-thread-safe --enable-shared
   make -j4
   make install
   cd ..
   rm -R ${FILE_NAME}
 fi
+
+
+
+###
+
+# git clone git://git.cs.unipr.it/ppl/ppl.git
+# cd ppl
+# git checkout devel
+# autoreconf
+# ./configure --prefix=$HOME/ppl --enable-interfaces=cxx --enable-optimization=sspeed --enable-fpmath=default \
+#     --disable-ppl_lpsol --disable-ppl_lcdd --enable-cxx --enable-shared --enable-thread-safe
+# make -j4
+# make install

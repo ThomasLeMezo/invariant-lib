@@ -62,9 +62,7 @@ int get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(const ibex::Inte
 template <>
 void Room<ibex::IntervalVector, ibex::IntervalVector>::compute_vector_field_typed(){
     m_vector_fields_typed_fwd = m_vector_fields;
-    for(ibex::IntervalVector &iv:m_vector_fields)
-        m_vector_fields_typed_bwd.push_back(-iv);
-
+    m_vector_fields_typed_bwd = m_vector_fields;// No negative bc of the way the contractor is coded
 }
 
 /// ******************  ppl::C_Polyhedron ****************** ///
@@ -127,20 +125,18 @@ void Room<ppl::C_Polyhedron, ppl::Generator_System>::contract_flow(ppl::C_Polyhe
             out = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
         }
         else{
-            ppl::C_Polyhedron in_tmp(in);
-            in_tmp.add_generators(gs);
-            out &= in_tmp;
+            in.add_generators(gs);
+            out &= in;
         }
     }
 
-    if(sens == FWD){
+    if(sens == BWD){
         if(gs.empty() || out.is_empty()){
             in = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
         }
         else{
-            ppl::C_Polyhedron out_tmp(out);
-            out_tmp.add_generators(gs);
-            in &= out_tmp;
+            out.add_generators(gs);
+            in &= out;
         }
     }
 }
@@ -159,10 +155,6 @@ template <>
 Parma_Polyhedra_Library::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, ppl::Generator_System>(const ppl::C_Polyhedron &a, const ppl::C_Polyhedron &b){
     Parma_Polyhedra_Library::C_Polyhedron tmp(b);
     tmp.poly_difference_assign(a);
-
-    //    Parma_Polyhedra_Library::C_Polyhedron tmp(a);
-    //    tmp.poly_difference_assign(b);
-
     return tmp;
 }
 

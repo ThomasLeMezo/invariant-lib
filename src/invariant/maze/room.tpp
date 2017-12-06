@@ -263,7 +263,7 @@ void Room<_Tp, _V>::compute_sliding_mode(const int n_vf, std::vector<std::vector
                                     Door<_Tp, _V>* door_out = f_out->get_doors()[m_maze];
                                     _Tp out_tmp(door_out->get_output_private());
                                     _Tp in_tmp(in_return);
-                                    if(!out_tmp.is_empty()){
+                                    if(!out_tmp.is_empty() && door_out->is_possible_out()[n_vf]){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_fwd(n_vf), FWD);
                                         out_results[n_vf][face_out][sens_out] |= out_tmp;
                                     }
@@ -299,7 +299,7 @@ void Room<_Tp, _V>::compute_standard_mode(const int n_vf, std::vector<std::vecto
                                 const _Tp out(door_out->get_output_private());
 
                                 /// ************ IN -> OUT ************
-                                if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
+                                if((dynamics_sens == FWD || dynamics_sens == FWD_BWD) && door_out->is_possible_out()[n_vf]){
                                     _Tp in_tmp(in), out_tmp(out);
                                     if(domain_init == FULL_WALL)
                                         out_tmp = f_out->get_position_typed();
@@ -310,7 +310,7 @@ void Room<_Tp, _V>::compute_standard_mode(const int n_vf, std::vector<std::vecto
                                     }
                                 }
                                 /// ************ OUT -> IN ************
-                                if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
+                                if((dynamics_sens == BWD || dynamics_sens == FWD_BWD) && door_in->is_possible_in()[n_vf]){
                                     _Tp in_tmp(in), out_tmp(out);
                                     if(domain_init == FULL_WALL)
                                         in_tmp = f_in->get_position_typed();

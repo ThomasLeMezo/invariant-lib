@@ -44,8 +44,10 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
             }
 
             if(ph_union.space_dimension()==3){
+                int nb_points = 0;
                 for(auto &g:ph_union.generators()){
                     if(g.is_point()){
+                        nb_points++;
                         std::vector<double> coord;
                         for(size_t i=0; i<3; i++){
                             ppl::Variable x(i);
@@ -59,6 +61,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                         points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
+                cout << nb_points << endl;
             }
 
             if(points->GetNumberOfPoints()>0){
