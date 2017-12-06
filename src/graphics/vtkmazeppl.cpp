@@ -61,7 +61,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                         points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
-                cout << nb_points << endl;
+//                cout << nb_points << endl;
             }
 
             if(points->GetNumberOfPoints()>0){

@@ -536,7 +536,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
                     /// ************* Compute the propagation *************
                     if(!own_surface.is_empty()){
                         // OUT -> IN
-                        if(!input_global_door.is_empty()){
+                        if(!input_global_door.is_empty() && door_in->is_possible_in()[n_vf]){
                             /// WARNING : do no set in_tmp_IN only to private door
                             /// because only half part is taken into account => take the union with the IN of the neighbour
                             _Tp in_tmp_IN(input_global_door);
@@ -562,7 +562,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
                         }
 
                         // IN -> OUT
-                        if(!output_global_door.is_empty()){
+                        if(!output_global_door.is_empty() && door_in->is_possible_out()[n_vf]){
                             _Tp out_tmp_OUT(output_global_door);
                             _Tp in_tmp_OUT(own_surface);
                             if(local_pave)
