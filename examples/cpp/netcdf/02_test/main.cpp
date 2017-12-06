@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "vtkMaze3D.h"
+#include "vtkmazeppl.h"
 
 using namespace std;
 using namespace invariant;
@@ -26,8 +27,8 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
     search_space = pm3d.get_search_space();
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
     cout << "Search_space = " << search_space << endl;
@@ -53,8 +54,8 @@ int main(int argc, char *argv[])
 
 #if 1
     // ****** Domain *******
-    invariant::SmartSubPaving<> paving(search_space);
-    invariant::Domain<> dom(&paving, FULL_WALL);
+    invariant::SmartSubPavingPPL paving(search_space);
+    invariant::DomainPPL dom(&paving, FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -74,12 +75,13 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ******* Maze *********
-    invariant::Maze<> maze(&dom, &pm3d);
+    invariant::MazePPL maze(&dom, &pm3d);
 
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<30; i++){
+    omp_set_num_threads(1);
+    for(int i=0; i<10; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();
@@ -90,16 +92,19 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VtkMaze3D vtkMaze3D("Previmer", true);
-//     vtkMaze3D.show_graph(&paving);
-//    vtkMaze3D.show_maze(&maze);
-    vtkMaze3D.serialize_maze("current.maze", &maze);
+//    VtkMaze3D vtkMaze3D("Previmer", true);
+////     vtkMaze3D.show_graph(&paving);
+////    vtkMaze3D.show_maze(&maze);
+//    vtkMaze3D.serialize_maze("current.maze", &maze);
 
-    IntervalVector position(3);
-    position[0] = ibex::Interval(t_c); // 450, 900
-    position[1] = ibex::Interval(x_c); // 37304, 37980
-    position[2] = ibex::Interval(y_c); // 119766, 120469
-    vtkMaze3D.show_room_info(&maze, position);
+//    IntervalVector position(3);
+//    position[0] = ibex::Interval(t_c); // 450, 900
+//    position[1] = ibex::Interval(x_c); // 37304, 37980
+//    position[2] = ibex::Interval(y_c); // 119766, 120469
+//    vtkMaze3D.show_room_info(&maze, position);
+
+    VtkMazePPL vtkMazePPL("Previmer");
+    vtkMazePPL.show_maze(&maze);
 #endif
 
     return 0;

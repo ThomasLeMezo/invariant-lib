@@ -66,13 +66,13 @@ template <> Door<ppl::C_Polyhedron, ppl::Generator_System>::Door(invariant::Face
 template <>
 void Door<ppl::C_Polyhedron, ppl::Generator_System>::set_input_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_input){
     *m_input_private = iv_input;
-//    m_input_private->simplify_using_context_assign(m_face->get_position_typed()); // ToDo : improve
+//    m_input_private->simplify_using_context_assign(ppl::C_Polyhedron(m_input_private->space_dimension(), ppl::UNIVERSE));
 }
 
 template <>
 void Door<ppl::C_Polyhedron, ppl::Generator_System>::set_output_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_output){
     *m_output_private = iv_output;
-//    m_input_private->simplify_using_context_assign(m_face->get_position_typed()); // ToDo : improve
+//    m_output_private->simplify_using_context_assign(ppl::C_Polyhedron(m_output_private->space_dimension(), ppl::UNIVERSE));
 }
 
 /// ******************  Other functions ****************** ///
