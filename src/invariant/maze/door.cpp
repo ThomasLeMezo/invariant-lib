@@ -8,16 +8,16 @@ namespace invariant{
 /// ******************  ibex::IntervalVector ****************** ///
 
 template <>
-void Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::set_empty_private_output(){
+void Door<ibex::IntervalVector, ibex::IntervalVector>::set_empty_private_output(){
     m_output_private->set_empty();
 }
 
 template <>
-void Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::set_empty_private_input(){
+void Door<ibex::IntervalVector, ibex::IntervalVector>::set_empty_private_input(){
     m_input_private->set_empty();
 }
 
-template <> Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::Door(invariant::Face<ibex::IntervalVector, std::vector<ibex::IntervalVector>> *face, invariant::Room<ibex::IntervalVector, std::vector<ibex::IntervalVector>> *room):
+template <> Door<ibex::IntervalVector, ibex::IntervalVector>::Door(invariant::Face<ibex::IntervalVector, ibex::IntervalVector> *face, invariant::Room<ibex::IntervalVector, ibex::IntervalVector> *room):
     m_input_public(face->get_position()),
     m_output_public(face->get_position())
 {
@@ -30,28 +30,28 @@ template <> Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::Door(
 }
 
 template <>
-void Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::set_input_private(const ibex::IntervalVector& iv_input){
+void Door<ibex::IntervalVector, ibex::IntervalVector>::set_input_private(const ibex::IntervalVector& iv_input){
     *m_input_private = iv_input;
 }
 
 template <>
-void Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::set_output_private(const ibex::IntervalVector& iv_output){
+void Door<ibex::IntervalVector, ibex::IntervalVector>::set_output_private(const ibex::IntervalVector& iv_output){
     *m_output_private = iv_output;
 }
 
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
-void Door<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::set_empty_private_output(){
+void Door<ppl::C_Polyhedron, ppl::Generator_System>::set_empty_private_output(){
     *m_output_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim(), ppl::EMPTY);
 }
 
 template <>
-void Door<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::set_empty_private_input(){
+void Door<ppl::C_Polyhedron, ppl::Generator_System>::set_empty_private_input(){
     *m_input_private = ppl::C_Polyhedron(m_face->get_pave()->get_dim(), ppl::EMPTY);
 }
 
-template <> Door<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::Door(invariant::Face<ppl::C_Polyhedron, std::vector<ppl::Generator_System>> *face, invariant::Room<ppl::C_Polyhedron, std::vector<ppl::Generator_System>> *room)
+template <> Door<ppl::C_Polyhedron, ppl::Generator_System>::Door(invariant::Face<ppl::C_Polyhedron, ppl::Generator_System> *face, invariant::Room<ppl::C_Polyhedron, ppl::Generator_System> *room)
 {
     m_input_public = iv_2_polyhedron(face->get_position());
     m_output_public = m_input_public;
@@ -64,13 +64,13 @@ template <> Door<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::Door(in
 }
 
 template <>
-void Door<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::set_input_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_input){
+void Door<ppl::C_Polyhedron, ppl::Generator_System>::set_input_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_input){
     *m_input_private = iv_input;
 //    m_input_private->simplify_using_context_assign(m_face->get_position_typed()); // ToDo : improve
 }
 
 template <>
-void Door<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::set_output_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_output){
+void Door<ppl::C_Polyhedron, ppl::Generator_System>::set_output_private(const Parma_Polyhedra_Library::C_Polyhedron& iv_output){
     *m_output_private = iv_output;
 //    m_input_private->simplify_using_context_assign(m_face->get_position_typed()); // ToDo : improve
 }

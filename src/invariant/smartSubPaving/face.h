@@ -17,8 +17,8 @@
 
 namespace invariant {
 
-using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using FaceIBEX = Face<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using FaceIBEX = Face<ibex::IntervalVector, ibex::IntervalVector>;
 
 template <typename _Tp, typename _V> class Pave;
 template <typename _Tp, typename _V> class Door;

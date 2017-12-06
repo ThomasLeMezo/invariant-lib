@@ -23,8 +23,8 @@ namespace ppl=Parma_Polyhedra_Library;
 namespace invariant {
 
 template <typename _Tp, typename _V> class Door;
-using DoorPPL = Door<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using DoorIBEX = Door<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using DoorPPL = Door<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using DoorIBEX = Door<ibex::IntervalVector, ibex::IntervalVector>;
 
 template <typename _Tp, typename _V> class Face;
 template <typename _Tp, typename _V> class Room;
@@ -32,7 +32,7 @@ template <typename _Tp, typename _V> class Maze;
 template <typename _Tp, typename _V> class Pave;
 template <typename _Tp, typename _V> class Domain;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class Door
 {
 public:

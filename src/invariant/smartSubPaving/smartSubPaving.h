@@ -15,14 +15,14 @@
 
 namespace invariant {
 
-using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using SmartSubPavingIBEX = SmartSubPaving<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using SmartSubPavingIBEX = SmartSubPaving<ibex::IntervalVector, ibex::IntervalVector>;
 
 template <typename _Tp, typename _V> class Pave;
 template <typename _Tp, typename _V> class Pave_node;
 template <typename _Tp, typename _V> class Maze;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class SmartSubPaving
 {
 public:

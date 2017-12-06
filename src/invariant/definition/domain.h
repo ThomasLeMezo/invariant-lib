@@ -19,8 +19,8 @@ namespace invariant{
 
 namespace invariant{
 
-using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using DomainIBEX = Domain<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using DomainIBEX = Domain<ibex::IntervalVector, ibex::IntervalVector>;
 
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
 
@@ -29,7 +29,7 @@ template <typename _Tp, typename _V> class Maze;
 template <typename _Tp, typename _V> class Room;
 template <typename _Tp, typename _V> class Pave_node;
 
-template<typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template<typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class Domain
 {
 public:

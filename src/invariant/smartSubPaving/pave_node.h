@@ -17,15 +17,15 @@
 namespace invariant{
 
 template <typename _Tp, typename _V> class Pave_node;
-using Pave_nodePPL = Pave_node<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using Pave_nodeIBEX = Pave_node<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using Pave_nodePPL = Pave_node<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using Pave_nodeIBEX = Pave_node<ibex::IntervalVector, ibex::IntervalVector>;
 
 template <typename _Tp, typename _V> class Pave;
 template <typename _Tp, typename _V> class Maze;
 template <typename _Tp, typename _V> class Face;
 template <typename _Tp, typename _V> class Room;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class Pave_node
 {
 public:

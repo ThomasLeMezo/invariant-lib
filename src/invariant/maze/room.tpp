@@ -65,6 +65,8 @@ Room<_Tp, _V>::Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics)
         }
         m_door_collinearity.push_back(vect_temp);
     }
+
+    compute_vector_field_typed();
 }
 
 template<typename _Tp, typename _V>
@@ -262,7 +264,7 @@ void Room<_Tp, _V>::compute_sliding_mode(const int n_vf, std::vector<std::vector
                                     _Tp out_tmp(door_out->get_output_private());
                                     _Tp in_tmp(in_return);
                                     if(!out_tmp.is_empty()){
-                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields(n_vf), FWD);
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_fwd(n_vf), FWD);
                                         out_results[n_vf][face_out][sens_out] |= out_tmp;
                                     }
                                 }
@@ -303,7 +305,7 @@ void Room<_Tp, _V>::compute_standard_mode(const int n_vf, std::vector<std::vecto
                                         out_tmp = f_out->get_position_typed();
 
                                     if(!out_tmp.is_empty() && !in_tmp.is_empty()){
-                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields(n_vf), FWD);
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_fwd(n_vf), FWD);
                                         out_results[n_vf][face_out][sens_out] |= out_tmp;
                                     }
                                 }
@@ -314,7 +316,7 @@ void Room<_Tp, _V>::compute_standard_mode(const int n_vf, std::vector<std::vecto
                                         in_tmp = f_in->get_position_typed();
 
                                     if(!out_tmp.is_empty() && !in_tmp.is_empty()){
-                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields(n_vf), BWD);
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_bwd(n_vf), BWD);
                                         in_results[n_vf][face_in][sens_in] |= in_tmp;
                                     }
                                 }
@@ -459,7 +461,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
         // Find adjacent paves that extrude this pave in the directions of zeros
         ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
 
-        if(get_nb_dim_flat<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(inter_extrude)==get_nb_dim_flat<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
+        if(get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(inter_extrude)==get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
             adjacent_paves_valid.push_back(pave_adj);
             Room<_Tp, _V> *room_n= pave_adj->get_rooms()[m_maze];
             vec_field_global |= room_n->get_one_vector_fields(n_vf);
@@ -479,11 +481,15 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
     /// ************* Compute Consistency *************
     /// For each Pave, propagate OUT -> IN
 
+    _V vec_field_typed_neighbors_fwd = convert_vec_field<_V>(vec_field_neighbors);
+    _V vec_field_typed_neighbors_bwd = convert_vec_field<_V>(-vec_field_neighbors);
+
     for(Pave<_Tp, _V> *pave_adj:adjacent_paves_valid){
         bool local_pave = false;
         if(pave_adj->get_position() == m_pave->get_position())
             local_pave = true;
-        ibex::IntervalVector vec_field_local(pave_adj->get_rooms()[m_maze]->get_one_vector_fields(n_vf));
+        _V vec_field_typed_local_fwd(pave_adj->get_rooms()[m_maze]->get_one_vector_fields_fwd(n_vf));
+        _V vec_field_typed_local_bwd(pave_adj->get_rooms()[m_maze]->get_one_vector_fields_bwd(n_vf));
 
         for(int face_out_adj=0; face_out_adj<dim; face_out_adj++){
             for(int sens_out_adj = 0; sens_out_adj < 2; sens_out_adj ++){
@@ -547,9 +553,9 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
 
                             if(!out_tmp_IN.is_empty()){
                                 if(local_pave)
-                                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_local, BWD);
+                                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_local_bwd, BWD);
                                 else
-                                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_neighbors, BWD);
+                                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_bwd, BWD);
 
                                 in_return |= in_tmp_IN ;
                             }
@@ -569,9 +575,9 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
 
                             if(!in_tmp_OUT.is_empty()){
                                 if(local_pave)
-                                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_local, FWD);
+                                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_local_fwd, FWD);
                                 else
-                                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_neighbors, FWD);
+                                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
                                 out_return |= out_tmp_OUT;
                             }
                         }
@@ -863,7 +869,7 @@ void Room<_Tp, _V>::contract_box(ibex::IntervalVector& virtual_door_out, ibex::S
                 in = v_door;
                 out = f->get_position();
                 if(sens != FWD_BWD){
-                    contract_flow(in, out, ((sens==FWD)?1:-1)*vect);
+                    contract_flow(in, out, ((sens==FWD)?1:-1)*vect, FWD);
                     out &= f->get_position();
                     if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
                         d_out->set_output_private(d_out->get_output_private() | out);
@@ -872,9 +878,9 @@ void Room<_Tp, _V>::contract_box(ibex::IntervalVector& virtual_door_out, ibex::S
                 }
                 else{
                     ibex::IntervalVector out2(out);
-                    contract_flow(in, out, vect);
+                    contract_flow(in, out, vect, FWD);
                     in = v_door;
-                    contract_flow(in, out2, -vect);
+                    contract_flow(in, out2, -vect, FWD);
                     out &= f->get_position();
                     out2 &= f->get_position();
                     if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)

@@ -6,7 +6,7 @@ namespace invariant{
 /// ******************  ibex::IntervalVector ****************** ///
 
 template<>
-void Room<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
+void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     // assert 0 not in v.
     ibex::IntervalVector c(out-in);
     ibex::IntervalVector v(vect);
@@ -27,17 +27,17 @@ void Room<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::contract_flo
 }
 
 template <>
-ibex::IntervalVector get_empty_door_container<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(int dim){
+ibex::IntervalVector get_empty_door_container<ibex::IntervalVector, ibex::IntervalVector>(int dim){
     return IntervalVector(dim, ibex::Interval::EMPTY_SET);
 }
 
 template <>
-void set_empty<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(ibex::IntervalVector &T){
+void set_empty<ibex::IntervalVector, ibex::IntervalVector>(ibex::IntervalVector &T){
     T.set_empty();
 }
 
 template <>
-ibex::IntervalVector get_diff_hull<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(const ibex::IntervalVector &a, const ibex::IntervalVector &b){
+ibex::IntervalVector get_diff_hull<ibex::IntervalVector, ibex::IntervalVector>(const ibex::IntervalVector &a, const ibex::IntervalVector &b){
     ibex::IntervalVector *diff_list;
     int nb_boxes = a.diff(b, diff_list);
 
@@ -49,7 +49,7 @@ ibex::IntervalVector get_diff_hull<ibex::IntervalVector, std::vector<ibex::Inter
 }
 
 template<>
-int get_nb_dim_flat<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(const ibex::IntervalVector &iv){
+int get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(const ibex::IntervalVector &iv){
     int dim = iv.size();
     int flat=0;
     for(int i=0; i<dim; i++){
@@ -59,11 +59,19 @@ int get_nb_dim_flat<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(con
     return flat;
 }
 
+template <>
+void Room<ibex::IntervalVector, ibex::IntervalVector>::compute_vector_field_typed(){
+    m_vector_fields_typed_fwd = m_vector_fields;
+    for(ibex::IntervalVector &iv:m_vector_fields)
+        m_vector_fields_typed_bwd.push_back(-iv);
+
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 void recursive_linear_expression_from_iv(const ibex::IntervalVector &vect_field,
                                          int dim,
-                                         std::vector<Linear_Expression> &linear_expression_list,
+                                         ppl::Generator_System &gs,
                                          Linear_Expression &local_linear_expression){
     if(dim > 0){
         ppl::Variable x(dim-1);
@@ -72,66 +80,83 @@ void recursive_linear_expression_from_iv(const ibex::IntervalVector &vect_field,
 
         // ToDo: case theta[dim] -> lb=+oo | ub=-oo
         if(std::isinf(vect_field[dim-1].ub()))
-            linear_expression_list.push_back(Linear_Expression(x));
+            gs.insert(ppl::ray(Linear_Expression(x)));
         else
             linear_expression_ub += x*ceil(vect_field[dim-1].ub()*IBEX_PPL_PRECISION);
 
         if(std::isinf(vect_field[dim-1].lb()))
-            linear_expression_list.push_back(Linear_Expression(-x));
+            gs.insert(ppl::ray(Linear_Expression(-x)));
         else
             linear_expression_lb += x*floor(vect_field[dim-1].lb()*IBEX_PPL_PRECISION);
 
-        recursive_linear_expression_from_iv(vect_field, dim-1, linear_expression_list, linear_expression_ub);
-        recursive_linear_expression_from_iv(vect_field, dim-1, linear_expression_list, linear_expression_lb);
+        recursive_linear_expression_from_iv(vect_field, dim-1, gs, linear_expression_ub);
+        recursive_linear_expression_from_iv(vect_field, dim-1, gs, linear_expression_lb);
     }
     else{
-        linear_expression_list.push_back(local_linear_expression);
-    }
-}
-
-template<>
-void Room<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
-    if(vect.is_empty()){
-        out = ppl::C_Polyhedron(in.space_dimension(), ppl::EMPTY);
-        in = ppl::C_Polyhedron(in.space_dimension(), ppl::EMPTY);
-        return;
-    }
-
-    if(sens == FWD || sens == FWD_BWD){
-        ppl::C_Polyhedron in_tmp(in);
-        Linear_Expression e_in = Linear_Expression(0);
-        std::vector<Linear_Expression> linear_expression_list_in;
-        recursive_linear_expression_from_iv(vect, vect.size(), linear_expression_list_in,e_in);
-        for(auto &l:linear_expression_list_in){
-            in_tmp.add_generator(ray(l));
-        }
-        out &= in_tmp;
-    }
-
-    if(sens == FWD || sens == FWD_BWD){
-        ppl::C_Polyhedron out_tmp(out);
-        Linear_Expression e_out = Linear_Expression(0);
-        std::vector<Linear_Expression> linear_expression_list_out;
-        recursive_linear_expression_from_iv(-vect, vect.size(), linear_expression_list_out,e_out);
-        for(auto &l:linear_expression_list_out){
-            out_tmp.add_generator(ray(l));
-        }
-        in &= out_tmp;
+        gs.insert(ppl::ray(local_linear_expression));
     }
 }
 
 template <>
-Parma_Polyhedra_Library::C_Polyhedron get_empty_door_container<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(int dim){
+void Room<ppl::C_Polyhedron, ppl::Generator_System>::compute_vector_field_typed(){
+    std::vector<ppl::Generator_System> gs_list_fwd;
+    for(ibex::IntervalVector &vect:m_vector_fields){
+        Linear_Expression l = Linear_Expression(0);
+        ppl::Generator_System gs;
+        if(!vect.is_empty())
+            recursive_linear_expression_from_iv(vect, vect.size(), gs,l);
+        gs_list_fwd.push_back(gs);
+    }
+    m_vector_fields_typed_fwd = gs_list_fwd;
+
+    std::vector<ppl::Generator_System> gs_list_bwd;
+    for(ibex::IntervalVector &vect:m_vector_fields){
+        Linear_Expression l = Linear_Expression(0);
+        ppl::Generator_System gs;
+        if(!vect.is_empty())
+            recursive_linear_expression_from_iv(-vect, vect.size(), gs,l);
+        gs_list_bwd.push_back(gs);
+    }
+    m_vector_fields_typed_bwd = gs_list_bwd;
+}
+
+template<>
+void Room<ppl::C_Polyhedron, ppl::Generator_System>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ppl::Generator_System &gs, const DYNAMICS_SENS &sens){
+    if(sens == FWD){
+        if(gs.empty() || in.is_empty()){
+            out = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
+        }
+        else{
+            ppl::C_Polyhedron in_tmp(in);
+            in_tmp.add_generators(gs);
+            out &= in_tmp;
+        }
+    }
+
+    if(sens == FWD){
+        if(gs.empty() || out.is_empty()){
+            in = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
+        }
+        else{
+            ppl::C_Polyhedron out_tmp(out);
+            out_tmp.add_generators(gs);
+            in &= out_tmp;
+        }
+    }
+}
+
+template <>
+Parma_Polyhedra_Library::C_Polyhedron get_empty_door_container<ppl::C_Polyhedron, ppl::Generator_System>(int dim){
     return Parma_Polyhedra_Library::C_Polyhedron(dim, Parma_Polyhedra_Library::EMPTY);
 }
 
 template <>
-void set_empty<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(ppl::C_Polyhedron &T){
-    T = get_empty_door_container<Parma_Polyhedra_Library::C_Polyhedron,std::vector<Parma_Polyhedra_Library::Generator_System>>(T.space_dimension());
+void set_empty<ppl::C_Polyhedron, ppl::Generator_System>(ppl::C_Polyhedron &T){
+    T = get_empty_door_container<Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::Generator_System>(T.space_dimension());
 }
 
 template <>
-Parma_Polyhedra_Library::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(const ppl::C_Polyhedron &a, const ppl::C_Polyhedron &b){
+Parma_Polyhedra_Library::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, ppl::Generator_System>(const ppl::C_Polyhedron &a, const ppl::C_Polyhedron &b){
     Parma_Polyhedra_Library::C_Polyhedron tmp(b);
     tmp.poly_difference_assign(a);
 
@@ -142,11 +167,24 @@ Parma_Polyhedra_Library::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, std::vect
 }
 
 template<>
-int get_nb_dim_flat<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(const Parma_Polyhedra_Library::C_Polyhedron &p){
+int get_nb_dim_flat<ppl::C_Polyhedron, ppl::Generator_System>(const Parma_Polyhedra_Library::C_Polyhedron &p){
     return p.space_dimension() - p.affine_dimension();
 }
 
 /// ******************  Other functions ****************** ///
 
+template<>
+ibex::IntervalVector convert_vec_field<ibex::IntervalVector>(const ibex::IntervalVector &vect){
+    return vect;
+}
+
+template<>
+ppl::Generator_System convert_vec_field<ppl::Generator_System>(const ibex::IntervalVector &vect){
+    Linear_Expression l = Linear_Expression(0);
+    ppl::Generator_System gs;
+    recursive_linear_expression_from_iv(vect, vect.size(), gs,l);
+    return gs;
+}
 
 }
+

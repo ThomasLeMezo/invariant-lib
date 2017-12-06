@@ -15,8 +15,8 @@
 namespace invariant {
 
 template <typename _Tp, typename _V> class Maze;
-using MazePPL = Maze<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using MazeIBEX = Maze<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using MazePPL = Maze<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using MazeIBEX = Maze<ibex::IntervalVector, ibex::IntervalVector>;
 
 class Dynamics; // declared only for friendship
 template <typename _Tp, typename _V> class Room;
@@ -26,7 +26,7 @@ template <typename _Tp, typename _V> class Pave;
 template <typename _Tp, typename _V> class Face;
 template <typename _Tp, typename _V> class Door;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class Maze
 {
 public:

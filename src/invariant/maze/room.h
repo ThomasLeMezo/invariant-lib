@@ -29,8 +29,8 @@ namespace invariant {
 enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
 
 template <typename _Tp, typename _V> class Room;
-using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
-using RoomIBEX = Room<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
+using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using RoomIBEX = Room<ibex::IntervalVector, ibex::IntervalVector>;
 
 class Dynamics; // declared only for friendship
 template <typename _Tp, typename _V> class Pave; // declared only for friendship
@@ -39,7 +39,7 @@ template <typename _Tp, typename _V> class Face;
 template <typename _Tp, typename _V> class Door;
 template <typename _Tp, typename _V> class Domain;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class Room
 {
 public:
@@ -177,7 +177,9 @@ public:
      * @brief Getter to one of the the vector fields
      * @return
      */
-    const ibex::IntervalVector get_one_vector_fields(int n_vf);
+    ibex::IntervalVector get_one_vector_fields(int n_vf) const;
+    const _V& get_one_vector_fields_fwd(int n_vf) const;
+    const _V& get_one_vector_fields_bwd(int n_vf) const;
 
     /**
      * @brief Getter to one of the the vector fields zero evaluation
@@ -241,6 +243,11 @@ public:
      * @return
      */
     bool get_contain_zero() const;
+
+    /**
+     * @brief compute the vector field typed (in the constructor of Room)
+     */
+    void compute_vector_field_typed();
 
 
     /**
@@ -306,7 +313,7 @@ protected:
      * @param out
      * @param vect
      */
-    void contract_flow(_Tp &in, _Tp &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens);
+    void contract_flow(_Tp &in, _Tp &out, const _V &vect, const DYNAMICS_SENS &sens);
 //    void contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect);
 
     /**
@@ -353,12 +360,25 @@ public:
      */
     int get_nb_contractions() const;
 
+    /**
+     * @brief get vector fields typed fwd
+     * @return
+     */
+    const std::vector<_V>& get_vector_fields_typed_fwd() const;
+
+    /**
+     * @brief get vector fields typed bwd
+     * @return
+     */
+    const std::vector<_V>& get_vector_fields_typed_bwd() const;
+
 protected:
     Pave<_Tp, _V>*   m_pave = NULL; // pointer to the associated face
     Maze<_Tp, _V>*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
 
-    _V m_vector_fields_typed; // Typed Vector field of the Room
+    std::vector<_V> m_vector_fields_typed_fwd; // Typed Vector field of the Room
+    std::vector<_V> m_vector_fields_typed_bwd; // Typed Vector field of the Room
 
     std::vector<bool>    m_vector_field_zero;
     bool            m_contain_zero_coordinate = false;
@@ -438,6 +458,9 @@ int get_nb_dim_flat(const _Tp &iv);
 template<typename _Tp, typename _V>
 std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r);
 
+template<typename _V>
+_V convert_vec_field(const ibex::IntervalVector &vect);
+
 template <typename _Tp, typename _V>
 inline Pave<_Tp, _V>* Room<_Tp, _V>::get_pave() const{
     return m_pave;
@@ -446,6 +469,16 @@ inline Pave<_Tp, _V>* Room<_Tp, _V>::get_pave() const{
 template <typename _Tp, typename _V>
 inline Maze<_Tp, _V>* Room<_Tp, _V>::get_maze() const{
     return m_maze;
+}
+
+template <typename _Tp, typename _V>
+const std::vector<_V>& Room<_Tp, _V>::get_vector_fields_typed_fwd() const{
+    return m_vector_fields_typed_fwd;
+}
+
+template <typename _Tp, typename _V>
+const std::vector<_V>& Room<_Tp, _V>::get_vector_fields_typed_bwd() const{
+    return m_vector_fields_typed_bwd;
 }
 
 template <typename _Tp, typename _V>
@@ -512,7 +545,17 @@ inline bool Room<_Tp, _V>::get_contain_zero() const{
 }
 
 template <typename _Tp, typename _V>
-inline const ibex::IntervalVector Room<_Tp, _V>::get_one_vector_fields(int n_vf){
+inline const _V& Room<_Tp, _V>::get_one_vector_fields_fwd(int n_vf) const{
+    return m_vector_fields_typed_fwd[n_vf];
+}
+
+template <typename _Tp, typename _V>
+inline const _V& Room<_Tp, _V>::get_one_vector_fields_bwd(int n_vf) const{
+    return m_vector_fields_typed_bwd[n_vf];
+}
+
+template <typename _Tp, typename _V>
+inline ibex::IntervalVector Room<_Tp, _V>::get_one_vector_fields(int n_vf) const{
     return m_vector_fields[n_vf];
 }
 

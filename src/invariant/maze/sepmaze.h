@@ -10,7 +10,7 @@ namespace invariant {
 
 template <typename _Tp, typename _V> class Maze;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
+template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class SepMaze : public ibex::Sep
 {
 public:
