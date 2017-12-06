@@ -18,7 +18,7 @@ public:
      * @param maze
      * @param comment
      */
-    void show_maze(invariant::Maze<ppl::C_Polyhedron> *maze, std::string comment="");
+    void show_maze(invariant::MazePPL *maze, std::string comment="");
 
 private:
 

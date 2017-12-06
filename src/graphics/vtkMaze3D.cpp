@@ -117,8 +117,8 @@ void VtkMaze3D::show_room_info(invariant::Maze<ibex::IntervalVector> *maze, ibex
         vtkSmartPointer<vtkAppendPolyData> polyData_doors_output = vtkSmartPointer<vtkAppendPolyData>::New();
         for(size_t face=0; face<3; face++){
             for(size_t sens=0; sens<2; sens++){
-                invariant::Face<ibex::IntervalVector> *f = p->get_faces()[face][sens];
-                invariant::Door<ibex::IntervalVector> *d = f->get_doors()[maze];
+                invariant::FaceIBEX *f = p->get_faces()[face][sens];
+                invariant::DoorIBEX *d = f->get_doors()[maze];
 
                 IntervalVector input(d->get_input());
                 IntervalVector output(d->get_output());
@@ -160,19 +160,19 @@ void VtkMaze3D::show_room_info(invariant::Maze<ibex::IntervalVector> *maze, ibex
     }
 }
 
-void VtkMaze3D::serialize_maze(const string &file_name, invariant::Maze<ibex::IntervalVector>* maze){
+void VtkMaze3D::serialize_maze(const string &file_name, invariant::MazeIBEX* maze){
     std::ofstream binFile(file_name.c_str(), std::ofstream::out);
     size_t nb_pave = 0;
     binFile.write((const char*)&nb_pave, sizeof(size_t));
 
     for(size_t pave_id=0; pave_id<maze->get_subpaving()->get_paves().size(); pave_id++){
-        Pave<ibex::IntervalVector> *p = maze->get_subpaving()->get_paves()[pave_id];
+        PaveIBEX *p = maze->get_subpaving()->get_paves()[pave_id];
         vector<pair<IntervalVector, IntervalVector>> list_doors;
 
         for(size_t direction=0; direction<3; direction++){
             for(size_t sens = 0; sens <2; sens++){
-                invariant::Face<ibex::IntervalVector> *f = p->get_faces()[direction][sens];
-                invariant::Door<ibex::IntervalVector> *d = f->get_doors()[maze];
+                invariant::FaceIBEX *f = p->get_faces()[direction][sens];
+                invariant::DoorIBEX *d = f->get_doors()[maze];
                 if(!d->is_empty()){
                     IntervalVector iv = d->get_input() | d->get_output();
                     IntervalVector orientation = f->get_orientation();
@@ -196,7 +196,7 @@ void VtkMaze3D::serialize_maze(const string &file_name, invariant::Maze<ibex::In
     binFile.close();
 }
 
-void VtkMaze3D::show_graph(invariant::SmartSubPaving<ibex::IntervalVector>* subpaving){
+void VtkMaze3D::show_graph(invariant::SmartSubPavingIBEX* subpaving){
     cout << "vtk paving" << endl;
 
     vtkSmartPointer<vtkAppendPolyData> polyData_paves = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -204,7 +204,7 @@ void VtkMaze3D::show_graph(invariant::SmartSubPaving<ibex::IntervalVector>* subp
 
 #pragma omp parallel for
     for(int pave_id=0; pave_id<nb_paves; pave_id++){
-        Pave<ibex::IntervalVector> *p = subpaving->get_paves()[pave_id];
+        PaveIBEX *p = subpaving->get_paves()[pave_id];
         vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
         IntervalVector position(p->get_position());
         cubedata->SetBounds(position[0].lb(), position[0].ub(),
@@ -319,7 +319,7 @@ void VtkMaze3D::show_maze(const string &file_name){
     outputWriter->Write();
 }
 
-void VtkMaze3D::show_maze(invariant::Maze<ibex::IntervalVector> *maze, std::string comment){
+void VtkMaze3D::show_maze(invariant::MazeIBEX *maze, std::string comment){
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
     //    vtkSmartPointer<vtkPoints> vec_field_points = vtkSmartPointer< vtkPoints >::New();
@@ -331,8 +331,8 @@ void VtkMaze3D::show_maze(invariant::Maze<ibex::IntervalVector> *maze, std::stri
 
 #pragma omp parallel for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
-        invariant::Pave<ibex::IntervalVector> *p = maze->get_subpaving()->get_paves()[pave_id];
-        invariant::Room<ibex::IntervalVector> *r = p->get_rooms()[maze];
+        invariant::PaveIBEX *p = maze->get_subpaving()->get_paves()[pave_id];
+        invariant::RoomIBEX *r = p->get_rooms()[maze];
 #pragma omp atomic
         step ++;
 
@@ -356,8 +356,8 @@ void VtkMaze3D::show_maze(invariant::Maze<ibex::IntervalVector> *maze, std::stri
 
             for(size_t direction=0; direction<3; direction++){
                 for(size_t sens = 0; sens <2; sens++){
-                    invariant::Face<ibex::IntervalVector> *f = p->get_faces()[direction][sens];
-                    invariant::Door<ibex::IntervalVector> *d = f->get_doors()[maze];
+                    invariant::FaceIBEX *f = p->get_faces()[direction][sens];
+                    invariant::DoorIBEX *d = f->get_doors()[maze];
                     if(!d->is_empty()){
                         nb_faces++;
 

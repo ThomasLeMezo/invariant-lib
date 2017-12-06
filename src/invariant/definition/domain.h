@@ -19,16 +19,17 @@ namespace invariant{
 
 namespace invariant{
 
-using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron>;
+using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
+using DomainIBEX = Domain<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
 
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
 
-template <typename _Tp> class SmartSubPaving;
-template <typename _Tp> class Maze;
-template <typename _Tp> class Room;
-template <typename _Tp> class Pave_node;
+template <typename _Tp, typename _V> class SmartSubPaving;
+template <typename _Tp, typename _V> class Maze;
+template <typename _Tp, typename _V> class Room;
+template <typename _Tp, typename _V> class Pave_node;
 
-template<typename _Tp=ibex::IntervalVector>
+template<typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
 class Domain
 {
 public:
@@ -37,7 +38,7 @@ public:
      * @param paving
      * @param link : specify if the initial condition in the case of a propagation maze is always link to the yellow zone
      */
-    Domain(SmartSubPaving<_Tp>* paving, DOMAIN_INITIALIZATION domain_init);
+    Domain(SmartSubPaving<_Tp, _V>* paving, DOMAIN_INITIALIZATION domain_init);
 
     // *************** Intput & Output *********************
 
@@ -47,14 +48,14 @@ public:
      * @param maze
      * @param bool complementary : true = remove empty, false = remove non empty
      */
-    void add_remove_maze(invariant::Maze<_Tp> *maze, bool complementary);
+    void add_remove_maze(invariant::Maze<_Tp, _V> *maze, bool complementary);
 
     /**
      * @brief Add a list of pair <maze, bool> where non empty (or empty depending of complementary parameter) doors (input and output)
      *        will be removed from the domain (input & output)
      * @param pairs (Maze, bool), see add_remove_maze(invariant::Maze *maze, bool complementary) function
      */
-    void add_remove_mazes(const std::vector<std::pair<invariant::Maze<_Tp>*, bool>>& pairs);
+    void add_remove_mazes(const std::vector<std::pair<invariant::Maze<_Tp, _V>*, bool>>& pairs);
 
     /**
      * @brief Set the separator to contract the Doors of a maze (output and input)
@@ -70,14 +71,14 @@ public:
      * @param maze
      * @param bool complementary : true = remove empty, false = remove non empty
      */
-    void add_remove_maze_input(invariant::Maze<_Tp> *maze, bool complementary);
+    void add_remove_maze_input(invariant::Maze<_Tp, _V> *maze, bool complementary);
 
     /**
      * @brief Add a list of pair <maze, bool> where non empty (or empty depending of complementary parameter) doors (input | output)
      *        will be removed from the domain (input)
      * @param pairs (Maze, bool), see add_remove_maze(invariant::Maze *maze, bool complementary) function
      */
-    void add_remove_mazes_input(const std::vector<std::pair<invariant::Maze<_Tp>*, bool>>& pairs);
+    void add_remove_mazes_input(const std::vector<std::pair<invariant::Maze<_Tp, _V>*, bool>>& pairs);
 
     /**
      * @brief Set the separator to contract the Doors of a maze (outside and inside)
@@ -93,14 +94,14 @@ public:
      * @param maze
      * @param bool complementary : true = remove empty, false = remove non empty
      */
-    void add_remove_maze_output(invariant::Maze<_Tp> *maze, bool complementary);
+    void add_remove_maze_output(invariant::Maze<_Tp, _V> *maze, bool complementary);
 
     /**
      * @brief Add a list of pair <maze, bool> where non empty (or empty depending of complementary parameter) doors (input | output)
      *        will be removed from the domain (output)
      * @param pairs (Maze, bool), see add_remove_maze(invariant::Maze *maze, bool complementary) function
      */
-    void add_remove_mazes_output(const std::vector<std::pair<invariant::Maze<_Tp>*, bool>>& pairs);
+    void add_remove_mazes_output(const std::vector<std::pair<invariant::Maze<_Tp, _V>*, bool>>& pairs);
 
     /**
      * @brief Set the separator to contract the Doors of a maze (output)
@@ -116,13 +117,13 @@ public:
      * @param pave_node
      * @param l
      */
-    void contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp> *> &list_room_deque);
+    void contract_domain(Maze<_Tp, _V> *maze, std::vector<Room<_Tp, _V> *> &list_room_deque);
 
     /**
      * @brief Return the paving associated with this domain
      * @return
      */
-    SmartSubPaving<_Tp>* get_subpaving() const;
+    SmartSubPaving<_Tp, _V>* get_subpaving() const;
 
     /**
      * @brief Set "in" to true if there are incoming paths on the border
@@ -140,25 +141,25 @@ public:
      * @brief add maze for domain intersection
      * @param maze
      */
-    void add_maze_inter(Maze<_Tp> *maze);
+    void add_maze_inter(Maze<_Tp, _V> *maze);
 
     /**
      * @brief add maze list for domain intersection
      * @param maze_list
      */
-    void add_maze_inter(std::vector<Maze<_Tp>*> maze_list);
+    void add_maze_inter(std::vector<Maze<_Tp, _V>*> maze_list);
 
     /**
      * @brief add maze for domain union
      * @param maze
      */
-    void add_maze_union(Maze<_Tp> *maze);
+    void add_maze_union(Maze<_Tp, _V> *maze);
 
     /**
      * @brief add maze list for domain union
      * @param maze_list
      */
-    void add_maze_union(std::vector<Maze<_Tp>*> maze_list);
+    void add_maze_union(std::vector<Maze<_Tp, _V>*> maze_list);
 
     /**
      * @brief Get the initialization condition on Room (Full door or Full wall)
@@ -174,28 +175,28 @@ private:
      * @param l
      * @param output : true => contract output, false => contract input
      */
-    void contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, std::vector<Room<_Tp> *> &list_room_deque, bool output, DOMAIN_SEP accelerator);
+    void contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V> *pave_node, std::vector<Room<_Tp, _V> *> &list_room_deque, bool output, DOMAIN_SEP accelerator);
 
     /**
      * @brief Contract the boarders according to the options
      * @param maze
      */
-    void contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque);
+    void contract_border(Maze<_Tp, _V> *maze, std::vector<Room<_Tp, _V>*> &list_room_deque);
 
     /**
      * @brief Contract the domain by intersecting with maze list
      * @param maze
      */
-    void contract_inter_maze(Maze<_Tp> *maze);
+    void contract_inter_maze(Maze<_Tp, _V> *maze);
 
     /**
      * @brief Contract the domain by union with maze list
      * @param maze
      */
-    void contract_union_maze(Maze<_Tp> *maze);
+    void contract_union_maze(Maze<_Tp, _V> *maze);
 
 private:
-    SmartSubPaving<_Tp> * m_subpaving;
+    SmartSubPaving<_Tp, _V> * m_subpaving;
 
     ibex::Sep* m_sep_input = NULL;
     ibex::Sep* m_sep_output = NULL;
@@ -205,66 +206,66 @@ private:
 
     DOMAIN_INITIALIZATION m_domain_init = FULL_DOOR;
 
-    std::vector<Maze<_Tp> *> m_maze_list_inter;
-    std::vector<Maze<_Tp> *> m_maze_list_union;
+    std::vector<Maze<_Tp, _V> *> m_maze_list_inter;
+    std::vector<Maze<_Tp, _V> *> m_maze_list_union;
 };
 }
 
 namespace invariant{
 
-template<typename _Tp>
-inline DOMAIN_INITIALIZATION Domain<_Tp>::get_init() const{
+template<typename _Tp, typename _V>
+inline DOMAIN_INITIALIZATION Domain<_Tp, _V>::get_init() const{
     return m_domain_init;
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::set_sep(ibex::Sep* sep){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::set_sep(ibex::Sep* sep){
     m_sep_input = sep;
     m_sep_output = sep;
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::set_sep_input(ibex::Sep* sep){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::set_sep_input(ibex::Sep* sep){
     m_sep_input = sep;
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::set_sep_output(ibex::Sep* sep){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::set_sep_output(ibex::Sep* sep){
     m_sep_output = sep;
 }
 
-template<typename _Tp>
-inline SmartSubPaving<_Tp>* Domain<_Tp>::get_subpaving() const{
+template<typename _Tp, typename _V>
+inline SmartSubPaving<_Tp, _V>* Domain<_Tp, _V>::get_subpaving() const{
     return m_subpaving;
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::set_border_path_in(bool in){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::set_border_path_in(bool in){
     m_border_path_in = in;
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::set_border_path_out(bool out){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::set_border_path_out(bool out){
     m_border_path_out = out;
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::add_maze_inter(Maze<_Tp> *maze){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::add_maze_inter(Maze<_Tp, _V> *maze){
     m_maze_list_inter.push_back(maze);
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::add_maze_union(Maze<_Tp> *maze){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::add_maze_union(Maze<_Tp, _V> *maze){
     m_maze_list_union.push_back(maze);
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::add_maze_inter(std::vector<Maze<_Tp> *> maze_list){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::add_maze_inter(std::vector<Maze<_Tp, _V> *> maze_list){
     m_maze_list_inter.insert(m_maze_list_inter.end(), maze_list.begin(), maze_list.end());
 }
 
-template<typename _Tp>
-inline void Domain<_Tp>::add_maze_union(std::vector<Maze<_Tp> *> maze_list){
+template<typename _Tp, typename _V>
+inline void Domain<_Tp, _V>::add_maze_union(std::vector<Maze<_Tp, _V> *> maze_list){
     m_maze_list_union.insert(m_maze_list_union.end(), maze_list.begin(), maze_list.end());
 }
 

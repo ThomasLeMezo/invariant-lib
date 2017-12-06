@@ -16,7 +16,7 @@ VtkMazePPL::VtkMazePPL(const string &file_name)
     m_file_name = file_name;
 }
 
-void VtkMazePPL::show_maze(invariant::Maze<C_Polyhedron> *maze, string comment)
+void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
 {
     cout << "vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -39,7 +39,7 @@ void VtkMazePPL::show_maze(invariant::Maze<C_Polyhedron> *maze, string comment)
             ppl::C_Polyhedron ph_union(dim, ppl::EMPTY);
 
             for(FacePPL *f:p->get_faces_vector()){
-                Door<ppl::C_Polyhedron> *d = f->get_doors()[maze];
+                DoorPPL *d = f->get_doors()[maze];
                 ph_union |= d->get_hull();
             }
 

@@ -8,9 +8,9 @@
 
 namespace invariant {
 
-template <typename _Tp> class Maze;
+template <typename _Tp, typename _V> class Maze;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
 class SepMaze : public ibex::Sep
 {
 public:
@@ -19,7 +19,7 @@ public:
      * @brief Constructor of the Maze separator
      * @param maze
      */
-    SepMaze(Maze<_Tp> *maze);
+    SepMaze(Maze<_Tp, _V> *maze);
 
     /**
      * @brief Separator to the maze polygon
@@ -28,7 +28,7 @@ public:
     virtual void separate(ibex::IntervalVector& x_in, ibex::IntervalVector& x_out);
 
 private:
-    Maze<_Tp> *m_maze;
+    Maze<_Tp, _V> *m_maze;
 };
 
 }

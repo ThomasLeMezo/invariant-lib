@@ -17,14 +17,15 @@
 
 namespace invariant {
 
-using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron>;
+using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
+using FaceIBEX = Face<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
 
-template <typename _Tp> class Pave;
-template <typename _Tp> class Door;
-template <typename _Tp> class Room;
-template <typename _Tp> class Maze;
+template <typename _Tp, typename _V> class Pave;
+template <typename _Tp, typename _V> class Door;
+template <typename _Tp, typename _V> class Room;
+template <typename _Tp, typename _V> class Maze;
 
-template <typename _Tp>
+template <typename _Tp, typename _V>
 class Face
 {
 public:
@@ -35,14 +36,14 @@ public:
      * @param orientation Vector ([0], [1] or [0,1] for each dimension)
      * @param p
      */
-    Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<_Tp>* p);
+    Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<_Tp, _V>* p);
 
     /**
      * @brief Face empty constructor with a Pave
      * (used for serialization)
      * @param p
      */
-    Face<_Tp>(Pave<_Tp>* p);
+    Face<_Tp, _V>(Pave<_Tp, _V>* p);
 
     /**
      * @brief Face destructor
@@ -78,7 +79,7 @@ public:
      * @param f
      * @return
      */
-    const bool is_equal(const Face<_Tp>& f) const;
+    const bool is_equal(const Face<_Tp, _V>& f) const;
 
     /**
      * @brief Return orientation of the Face
@@ -96,38 +97,38 @@ public:
      * @brief Add new neighbor to the Face if the position intersection is not empty
      * @param f
      */
-    void add_neighbor(Face<_Tp> *f);
+    void add_neighbor(Face<_Tp, _V> *f);
 
     /**
      * @brief Remove a neighbor from neighbors list
      * @param f
      */
-    void remove_neighbor(const Face<_Tp> *f);
+    void remove_neighbor(const Face<_Tp, _V> *f);
 
     /**
      * @brief Get neighbors list
      * @return
      */
-    const std::vector<Face<_Tp> *> &get_neighbors() const;
+    const std::vector<Face<_Tp, _V> *> &get_neighbors() const;
 
     /**
      * @brief Getter to the maze/door map
      * @return
      */
-    std::map<Maze<_Tp> *, Door<_Tp> *> get_doors();
+    std::map<Maze<_Tp, _V> *, Door<_Tp, _V> *> get_doors();
 
     /**
      * @brief Add a new door to the map
      * @param maze
      * @param door
      */
-    void add_door(Door<_Tp> *door);
+    void add_door(Door<_Tp, _V> *door);
 
     /**
      * @brief Getter to the pave of this face
      * @return
      */
-    Pave<_Tp> * get_pave() const;
+    Pave<_Tp, _V> * get_pave() const;
 
     /**
      * @brief Return true if this face has no neighbors
@@ -152,11 +153,11 @@ private:
     mutable ibex::IntervalVector      m_orientation; // Orientation of the Face : [1], [0] or [0,1]
     mutable ibex::IntervalVector      m_normal; // Normal vector of the face
     // for each dimension according to the position of the Face in the Pave
-    mutable Pave<_Tp>*                m_pave = NULL;
-    std::vector<Face<_Tp> *>          m_neighbors;
+    mutable Pave<_Tp, _V>*                m_pave = NULL;
+    std::vector<Face<_Tp, _V> *>          m_neighbors;
     bool                              m_border = false;
 
-    std::map<Maze<_Tp>*, Door<_Tp>*>  m_doors;
+    std::map<Maze<_Tp, _V>*, Door<_Tp, _V>*>  m_doors;
 
 };
 
@@ -166,8 +167,8 @@ private:
      * @param Face
      * @return
      */
-template <typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const Face<_Tp>& f);
+template <typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const Face<_Tp, _V>& f);
 
 /**
      * @brief Overloading of the operator << for a vector of Faces
@@ -175,84 +176,84 @@ std::ostream& operator<< (std::ostream& stream, const Face<_Tp>& f);
      * @param l
      * @return
      */
-template <typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const std::vector<Face<_Tp>*> &l);
+template <typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const std::vector<Face<_Tp, _V>*> &l);
 }
 
 /// ******** inline functions ******* //
 
 namespace invariant{
-template <typename _Tp> 
-const ibex::IntervalVector& Face<_Tp>::get_position() const{
+template <typename _Tp, typename _V>
+const ibex::IntervalVector& Face<_Tp, _V>::get_position() const{
     return m_position;
 }
 
-template <typename _Tp>
-const _Tp& Face<_Tp>::get_position_typed() const{
+template <typename _Tp, typename _V>
+const _Tp& Face<_Tp, _V>::get_position_typed() const{
     return m_position_typed;
 }
 
-template <typename _Tp> 
-const ibex::IntervalVector& Face<_Tp>::get_orientation() const{
+template <typename _Tp, typename _V>
+const ibex::IntervalVector& Face<_Tp, _V>::get_orientation() const{
     return m_orientation;
 }
 
-template <typename _Tp> 
-const ibex::IntervalVector &Face<_Tp>::get_normal() const{
+template <typename _Tp, typename _V>
+const ibex::IntervalVector &Face<_Tp, _V>::get_normal() const{
     return m_normal;
 }
 
-template <typename _Tp> 
-const std::vector<Face<_Tp> *> &Face<_Tp>::get_neighbors() const{
+template <typename _Tp, typename _V>
+const std::vector<Face<_Tp, _V> *> &Face<_Tp, _V>::get_neighbors() const{
     return m_neighbors;
 }
 
-template <typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const Face<_Tp>& f) {
+template <typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const Face<_Tp, _V>& f) {
     stream << f.get_position();
     return stream;
 }
 
-template <typename _Tp> 
-const bool Face<_Tp>::is_equal(const Face<_Tp>& f) const{
+template <typename _Tp, typename _V>
+const bool Face<_Tp, _V>::is_equal(const Face<_Tp, _V>& f) const{
     if(m_position == f.get_position() && this->m_orientation==f.get_orientation())
         return true;
     else
         return false;
 }
 
-template <typename _Tp> 
-std::map<Maze<_Tp> *, Door<_Tp> *> Face<_Tp>::get_doors(){
+template <typename _Tp, typename _V>
+std::map<Maze<_Tp, _V> *, Door<_Tp, _V> *> Face<_Tp, _V>::get_doors(){
     return m_doors;
 }
 
-template <typename _Tp> 
-Pave<_Tp>* Face<_Tp>::get_pave() const{
+template <typename _Tp, typename _V>
+Pave<_Tp, _V>* Face<_Tp, _V>::get_pave() const{
     return m_pave;
 }
 
-template <typename _Tp> 
-bool Face<_Tp>::is_border() const{
+template <typename _Tp, typename _V>
+bool Face<_Tp, _V>::is_border() const{
     return m_border;
 }
 
-template <typename _Tp> 
-bool Face<_Tp>::analyze_border(){
+template <typename _Tp, typename _V>
+bool Face<_Tp, _V>::analyze_border(){
     if(m_neighbors.size() == 0)
         m_border = true;
     return m_border;
 }
 
-template <typename _Tp> 
-void Face<_Tp>::set_border(){
+template <typename _Tp, typename _V>
+void Face<_Tp, _V>::set_border(){
     m_border = true;
 }
 
-template <typename _Tp>
-void Face<_Tp>::serialize(std::ofstream &binFile) const{}
+template <typename _Tp, typename _V>
+void Face<_Tp, _V>::serialize(std::ofstream &binFile) const{}
 
-template <typename _Tp>
-void Face<_Tp>::deserialize(std::ifstream& binFile){}
+template <typename _Tp, typename _V>
+void Face<_Tp, _V>::deserialize(std::ifstream& binFile){}
 
 /// ******************  Sepcialized ****************** ///
 

@@ -5,8 +5,8 @@ using namespace ibex;
 
 namespace invariant {
 
-template<typename _Tp>
-Pave<_Tp>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp> *g):
+template<typename _Tp, typename _V>
+Pave<_Tp, _V>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp, _V> *g):
     m_position(position)
 {
     m_subpaving = g;
@@ -34,35 +34,35 @@ Pave<_Tp>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp> *g):
         orient_lb[i] = ibex::Interval(0);
         orient_ub[i] = ibex::Interval(1);
 
-        Face<_Tp>* face_lb = new Face<_Tp>(iv_lb, orient_lb, normal_lb, this);
-        Face<_Tp>* face_ub = new Face<_Tp>(iv_ub, orient_ub, normal_ub, this);
+        Face<_Tp, _V>* face_lb = new Face<_Tp, _V>(iv_lb, orient_lb, normal_lb, this);
+        Face<_Tp, _V>* face_ub = new Face<_Tp, _V>(iv_ub, orient_ub, normal_ub, this);
 
-        std::array<Face<_Tp>*, 2> face_array = {face_lb, face_ub};
+        std::array<Face<_Tp, _V>*, 2> face_array = {face_lb, face_ub};
         m_faces.push_back(face_array);
         m_faces_vector.push_back(face_lb);
         m_faces_vector.push_back(face_ub);
     }
 }
 
-template<typename _Tp>
-Pave<_Tp>::Pave(SmartSubPaving<_Tp> *g):
+template<typename _Tp, typename _V>
+Pave<_Tp, _V>::Pave(SmartSubPaving<_Tp, _V> *g):
     m_position(0)
 {
     m_subpaving = g;
 }
 
-template<typename _Tp>
-Pave<_Tp>::~Pave(){
-    for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+template<typename _Tp, typename _V>
+Pave<_Tp, _V>::~Pave(){
+    for(typename std::map<Maze<_Tp, _V>*,Room<_Tp, _V>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         delete(it->second);
     }
-    for(Face<_Tp>* f:m_faces_vector){
+    for(Face<_Tp, _V>* f:m_faces_vector){
         delete(f);
     }
 }
 
-template<typename _Tp>
-void Pave<_Tp>::serialize(std::ofstream& binFile) const{
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::serialize(std::ofstream& binFile) const{
     // *** Pave serialization ***
     // size_t           Serialization id
     // ibex::IntervalVector   m_position
@@ -81,8 +81,8 @@ void Pave<_Tp>::serialize(std::ofstream& binFile) const{
     }
 }
 
-template<typename _Tp>
-void Pave<_Tp>::deserialize(std::ifstream& binFile){
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::deserialize(std::ifstream& binFile){
     binFile.read((char*)&m_serialization_id, sizeof(size_t));
     m_position = deserializeIntervalVector(binFile);
 
@@ -91,9 +91,9 @@ void Pave<_Tp>::deserialize(std::ifstream& binFile){
     // Create Faces
     const unsigned char dim = m_dim;
     for(unsigned char i=0; i<dim; i++){
-        Face<_Tp>* face_lb = new Face<_Tp>(this);
-        Face<_Tp>* face_ub = new Face<_Tp>(this);
-        std::array<Face<_Tp>*, 2> face_array = {face_lb, face_ub};
+        Face<_Tp, _V>* face_lb = new Face<_Tp, _V>(this);
+        Face<_Tp, _V>* face_ub = new Face<_Tp, _V>(this);
+        std::array<Face<_Tp, _V>*, 2> face_array = {face_lb, face_ub};
         m_faces.push_back(face_array);
     }
 
@@ -104,16 +104,16 @@ void Pave<_Tp>::deserialize(std::ifstream& binFile){
     }
 }
 
-template<typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const std::vector<Pave<_Tp>*> &l){
-    for(Pave<_Tp> *p:l){
+template<typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const std::vector<Pave<_Tp, _V>*> &l){
+    for(Pave<_Tp, _V> *p:l){
         stream << *p << std::endl;
     }
     return stream;
 }
 
-template<typename _Tp>
-const bool Pave<_Tp>::is_equal(const Pave<_Tp>& p) const{
+template<typename _Tp, typename _V>
+const bool Pave<_Tp, _V>::is_equal(const Pave<_Tp, _V>& p) const{
     if(m_position != p.get_position())
         return false;
     for(size_t i=0; i<m_dim; i++){
@@ -125,8 +125,8 @@ const bool Pave<_Tp>::is_equal(const Pave<_Tp>& p) const{
     return true;
 }
 
-template<typename _Tp>
-void Pave<_Tp>::bisect(){
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::bisect(){
     //    ibex::LargestFirst bisector(0, 0.5);
     //    std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = bisector.bisect(m_position);
 
@@ -142,14 +142,14 @@ void Pave<_Tp>::bisect(){
     }
 
     // Create new Paves
-    Pave<_Tp> *pave0 = new Pave<_Tp>(result_boxes.first, m_subpaving); // lb
-    Pave<_Tp> *pave1 = new Pave<_Tp>(result_boxes.second, m_subpaving); // ub
-    std::array<Pave<_Tp>*, 2> pave_result = {pave0, pave1};
+    Pave<_Tp, _V> *pave0 = new Pave<_Tp, _V>(result_boxes.first, m_subpaving); // lb
+    Pave<_Tp, _V> *pave1 = new Pave<_Tp, _V>(result_boxes.second, m_subpaving); // ub
+    std::array<Pave<_Tp, _V>*, 2> pave_result = {pave0, pave1};
 
     // 1) Update paves neighbors with the new two paves
     for(size_t face=0; face<dim; face++){
         for(int sens=0; sens<2; sens++){
-            for(Face<_Tp> *f:m_faces[face][sens]->get_neighbors()){
+            for(Face<_Tp, _V> *f:m_faces[face][sens]->get_neighbors()){
                 f->remove_neighbor(m_faces[face][sens]);
 
                 if(face==bisect_axis){
@@ -166,7 +166,7 @@ void Pave<_Tp>::bisect(){
     // 2) Copy brothers Pave (this) to pave1 and pave2
     for(size_t face=0; face<dim; face++){
         for(size_t sens=0; sens<2; sens++){
-            for(Face<_Tp> *f:m_faces[face][sens]->get_neighbors()){
+            for(Face<_Tp, _V> *f:m_faces[face][sens]->get_neighbors()){
                 if(!((face==bisect_axis) & (sens==1)))
                     pave_result[0]->get_faces()[face][sens]->add_neighbor(f);
                 if(!((face==bisect_axis) & (sens==0)))
@@ -193,11 +193,11 @@ void Pave<_Tp>::bisect(){
     m_tree->add_child(pave_result[0], pave_result[1]);
 
     // Add Room to the Paves
-    for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
-        Room<_Tp> *r = (it->second);
+    for(typename std::map<Maze<_Tp, _V>*,Room<_Tp, _V>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        Room<_Tp, _V> *r = (it->second);
 
-        Room<_Tp> *r_first = new Room<_Tp>(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
-        Room<_Tp> *r_second = new Room<_Tp>(pave_result[1],r->get_maze(), r->get_maze()->get_dynamics());
+        Room<_Tp, _V> *r_first = new Room<_Tp, _V>(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
+        Room<_Tp, _V> *r_second = new Room<_Tp, _V>(pave_result[1],r->get_maze(), r->get_maze()->get_dynamics());
 
         // ToDo : add a contraction of Room(s) according to father
 
@@ -232,17 +232,17 @@ void Pave<_Tp>::bisect(){
     m_result_bisected[1] = pave_result[1];
 }
 
-template<typename _Tp>
-const bool Pave<_Tp>::request_bisection(){
+template<typename _Tp, typename _V>
+const bool Pave<_Tp, _V>::request_bisection(){
     bool request_wall = false;
     bool one_wall = false;
 
     bool request_door = false;
     bool one_door = false;
 
-    for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
-        Room<_Tp> *r = it->second;
-        Maze<_Tp> *maze = it->first;
+    for(typename std::map<Maze<_Tp, _V>*,Room<_Tp, _V>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        Room<_Tp, _V> *r = it->second;
+        Maze<_Tp, _V> *maze = it->first;
         if(maze->get_domain()->get_init()==FULL_WALL){
             request_wall |= r->request_bisection();
             one_wall = true;
@@ -256,10 +256,10 @@ const bool Pave<_Tp>::request_bisection(){
     return (!one_wall | request_wall) & (!one_door | request_door);
 }
 
-template<typename _Tp>
-void Pave<_Tp>::set_removed_rooms(){
-    for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
-        Room<_Tp>* r = it->second;
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::set_removed_rooms(){
+    for(typename std::map<Maze<_Tp, _V>*,Room<_Tp, _V>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+        Room<_Tp, _V>* r = it->second;
         //        if(r->is_empty()) //?
         if(r->is_empty() || r->get_maze()->get_domain()->get_init()!=FULL_WALL){
             r->set_removed();
@@ -268,39 +268,39 @@ void Pave<_Tp>::set_removed_rooms(){
     }
 }
 
-template<typename _Tp>
-void Pave<_Tp>::add_room(Room<_Tp> *r){
-    m_rooms.insert(std::pair<Maze<_Tp>*,Room<_Tp>*>(r->get_maze(),r));
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::add_room(Room<_Tp, _V> *r){
+    m_rooms.insert(std::pair<Maze<_Tp, _V>*,Room<_Tp, _V>*>(r->get_maze(),r));
 }
 
-template<typename _Tp>
-void Pave<_Tp>::analyze_border(){
-    for(Face<_Tp>*f:m_faces_vector)
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::analyze_border(){
+    for(Face<_Tp, _V>*f:m_faces_vector)
         m_border |= f->analyze_border();
 }
 
-template<typename _Tp>
-void Pave<_Tp>::get_neighbors_pave(std::vector<Pave<_Tp>*> pave_list){
-    for(Face<_Tp> *f:m_faces_vector){
-        for(Face<_Tp> *f_n:f->get_neighbors()){
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::get_neighbors_pave(std::vector<Pave<_Tp, _V>*> pave_list){
+    for(Face<_Tp, _V> *f:m_faces_vector){
+        for(Face<_Tp, _V> *f_n:f->get_neighbors()){
             pave_list.push_back(f_n->get_pave());
         }
     }
 }
 
-template<typename _Tp>
-void Pave<_Tp>::get_neighbors_room(Maze<_Tp> *maze, std::vector<Room<_Tp>*>& room_list){
-    for(Face<_Tp> *f:m_faces_vector){
-        for(Face<_Tp> *f_n:f->get_neighbors()){
-            Room<_Tp> *r_n = f_n->get_pave()->get_rooms()[maze];
+template<typename _Tp, typename _V>
+void Pave<_Tp, _V>::get_neighbors_room(Maze<_Tp, _V> *maze, std::vector<Room<_Tp, _V>*>& room_list){
+    for(Face<_Tp, _V> *f:m_faces_vector){
+        for(Face<_Tp, _V> *f_n:f->get_neighbors()){
+            Room<_Tp, _V> *r_n = f_n->get_pave()->get_rooms()[maze];
             if(!r_n->is_removed())
                 room_list.push_back(r_n);
         }
     }
 }
 
-template<typename _Tp>
-int Pave<_Tp>::get_dim_inter_boundary(const ibex::IntervalVector &box){
+template<typename _Tp, typename _V>
+int Pave<_Tp, _V>::get_dim_inter_boundary(const ibex::IntervalVector &box){
     return 0;
 }
 

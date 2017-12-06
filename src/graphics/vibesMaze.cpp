@@ -9,7 +9,7 @@ using namespace invariant;
 using namespace ibex;
 using namespace std;
 
-VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPaving<ibex::IntervalVector> *g): VibesFigure(figure_name){
+VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g): VibesFigure(figure_name){
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/VibesMaze()] dim of paving is not equal to 2");
     m_subpaving = g;
@@ -21,7 +21,7 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPaving<i
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
 }
 
-VibesMaze::VibesMaze(const std::string& figure_name, invariant::Maze<ibex::IntervalVector>* maze, VIBES_MAZE_TYPE type): VibesMaze(figure_name, maze->get_subpaving()){
+VibesMaze::VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type): VibesMaze(figure_name, maze->get_subpaving()){
     if(type == VIBES_MAZE_OUTER){
         m_maze_outer = maze;
         m_type = VIBES_MAZE_OUTER;
@@ -32,7 +32,7 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::Maze<ibex::Inter
     }
 }
 
-VibesMaze::VibesMaze(const std::string& figure_name, invariant::Maze<ibex::IntervalVector>* outer, invariant::Maze<ibex::IntervalVector>* inner): VibesMaze(figure_name, outer->get_subpaving()){
+VibesMaze::VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner): VibesMaze(figure_name, outer->get_subpaving()){
     m_maze_outer = outer;
     m_maze_inner = inner;
     m_type = VIBES_MAZE_OUTER_AND_INNER;
@@ -49,7 +49,7 @@ void VibesMaze::show() const{
 
 }
 
-void VibesMaze::draw_room_inner(Pave<ibex::IntervalVector> *p) const{
+void VibesMaze::draw_room_inner(PaveIBEX *p) const{
     // Draw backward
 //    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
 //        vibes::drawBox(p->get_position(), "black[]");
@@ -58,7 +58,7 @@ void VibesMaze::draw_room_inner(Pave<ibex::IntervalVector> *p) const{
     vector<double> pt_x, pt_y;
 
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        invariant::Door<ibex::IntervalVector> *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
+        invariant::DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
         IntervalVector d_iv(d->get_input() | d->get_output());
         IntervalVector* d_iv_list;
         int nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
@@ -86,7 +86,7 @@ void VibesMaze::draw_room_inner(Pave<ibex::IntervalVector> *p) const{
 
     pt_x.clear(); pt_y.clear();
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        Door<ibex::IntervalVector> *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
+        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
         IntervalVector d_iv(d->get_input() | d->get_output());
 
         if(!d_iv.is_empty()){
@@ -111,20 +111,20 @@ void VibesMaze::draw_room_inner(Pave<ibex::IntervalVector> *p) const{
     show_theta(p, m_maze_inner);
 }
 
-void VibesMaze::draw_room_outer(Pave<ibex::IntervalVector> *p) const{
+void VibesMaze::draw_room_outer(PaveIBEX *p) const{
     // Draw backward
     vibes::drawBox(p->get_position(), "black[blue]");
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
 
-    invariant::Room<ibex::IntervalVector> *r = p->get_rooms()[m_maze_outer];
+    invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
     if(!r->is_removed() && r->get_contain_zero()){
         vibes::drawBox(p->get_position(), "black[yellow]");
     }
     else{
         for(const tuple<int, int, bool> &t:m_oriented_path){
-            Door<ibex::IntervalVector> *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
+            DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
             IntervalVector d_iv(d->get_input() | d->get_output());
 
             if(!d_iv.is_empty()){
@@ -149,7 +149,7 @@ void VibesMaze::draw_room_outer(Pave<ibex::IntervalVector> *p) const{
     show_theta(p, m_maze_outer);
 }
 
-void VibesMaze::draw_room_inner_outer(Pave<ibex::IntervalVector> *p) const{
+void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     // Draw backward
 //    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
 //        vibes::drawBox(p->get_position(), "black[]");
@@ -158,7 +158,7 @@ void VibesMaze::draw_room_inner_outer(Pave<ibex::IntervalVector> *p) const{
     vector<double> pt_x, pt_y;
 
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        Door<ibex::IntervalVector> *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
+        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
         IntervalVector d_iv(d->get_input() | d->get_output());
 
         if(!d_iv.is_empty()){
@@ -181,7 +181,7 @@ void VibesMaze::draw_room_inner_outer(Pave<ibex::IntervalVector> *p) const{
 
     pt_x.clear(); pt_y.clear();
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        Door<ibex::IntervalVector> *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
+        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
         IntervalVector d_iv(d->get_input() | d->get_output());
         IntervalVector* d_iv_list;
         int nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
@@ -209,7 +209,7 @@ void VibesMaze::draw_room_inner_outer(Pave<ibex::IntervalVector> *p) const{
 
     pt_x.clear(); pt_y.clear();
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        Door<ibex::IntervalVector> *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
+        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
         IntervalVector d_iv(d->get_input() | d->get_output());
         IntervalVector* d_iv_list;
         int nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
@@ -240,12 +240,12 @@ void VibesMaze::draw_room_inner_outer(Pave<ibex::IntervalVector> *p) const{
 }
 
 void VibesMaze::show_maze_outer() const{
-    for(Pave<ibex::IntervalVector> *p:m_subpaving->get_paves()){
+    for(PaveIBEX *p:m_subpaving->get_paves()){
         draw_room_outer(p);
     }
-    for(Pave<ibex::IntervalVector> *p:m_subpaving->get_paves_not_bisectable()){
+    for(PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-            invariant::Room<ibex::IntervalVector> *r = p->get_rooms()[m_maze_outer];
+            invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
             //            if(!r->is_removed()){
             draw_room_outer(p);
             //            }
@@ -256,12 +256,12 @@ void VibesMaze::show_maze_outer() const{
 }
 
 void VibesMaze::show_maze_inner() const{
-    for(invariant::Pave<ibex::IntervalVector> *p:m_subpaving->get_paves()){
+    for(invariant::PaveIBEX *p:m_subpaving->get_paves()){
         draw_room_inner(p);
     }
-    for(invariant::Pave<ibex::IntervalVector> *p:m_subpaving->get_paves_not_bisectable()){
+    for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-            invariant::Room<ibex::IntervalVector> *r = p->get_rooms()[m_maze_inner];
+            invariant::RoomIBEX *r = p->get_rooms()[m_maze_inner];
             //            if(!r->is_removed()){
             draw_room_inner(p);
             //            }
@@ -272,9 +272,9 @@ void VibesMaze::show_maze_inner() const{
 }
 
 void VibesMaze::show_maze_outer_inner() const{
-    for(Pave<ibex::IntervalVector> *p:m_subpaving->get_paves()){
-        invariant::Room<ibex::IntervalVector> *r_inner = p->get_rooms()[m_maze_inner];
-        invariant::Room<ibex::IntervalVector> *r_outer = p->get_rooms()[m_maze_outer];
+    for(PaveIBEX *p:m_subpaving->get_paves()){
+        invariant::RoomIBEX *r_inner = p->get_rooms()[m_maze_inner];
+        invariant::RoomIBEX *r_outer = p->get_rooms()[m_maze_outer];
         if(!r_inner->is_full_union()){
             if(r_outer->is_full_union())
                 draw_room_inner(p);
@@ -286,10 +286,10 @@ void VibesMaze::show_maze_outer_inner() const{
         }
     }
 
-    for(invariant::Pave<ibex::IntervalVector> *p:m_subpaving->get_paves_not_bisectable()){
+    for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-            invariant::Room<ibex::IntervalVector> *r_outer = p->get_rooms()[m_maze_outer];
-            invariant::Room<ibex::IntervalVector> *r_inner = p->get_rooms()[m_maze_inner];
+            invariant::RoomIBEX *r_outer = p->get_rooms()[m_maze_outer];
+            invariant::RoomIBEX *r_inner = p->get_rooms()[m_maze_inner];
             if(r_outer->is_empty())
                 vibes::drawBox(p->get_position(), "black[blue]");
             if(r_inner->is_empty())
@@ -298,10 +298,10 @@ void VibesMaze::show_maze_outer_inner() const{
     }
 }
 
-void VibesMaze::show_theta(invariant::Pave<ibex::IntervalVector> *p, invariant::Maze<ibex::IntervalVector>* maze) const{
+void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) const{
     IntervalVector position(p->get_position());
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.0;
-    invariant::Room<ibex::IntervalVector> *r = p->get_rooms()[maze];
+    invariant::RoomIBEX *r = p->get_rooms()[maze];
 
     const vector<IntervalVector> vector_fields = r->get_vector_fields();
     IntervalVector empty(2, ibex::Interval::EMPTY_SET);
@@ -367,12 +367,12 @@ void VibesMaze::show_graph() const{
 //    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
 //    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
-    for(Pave<ibex::IntervalVector>*p:m_subpaving->get_paves()){
+    for(PaveIBEX*p:m_subpaving->get_paves()){
         ibex::IntervalVector box(p->get_position());
 //        vibes::drawBox(box, params_bisectable);
         bounding_box |= box;
     }
-    for(Pave<ibex::IntervalVector>*p:m_subpaving->get_paves_not_bisectable()){
+    for(PaveIBEX*p:m_subpaving->get_paves_not_bisectable()){
         if(!p->get_position().is_unbounded()){
 //            vibes::drawBox(p->get_position(), params_not_bisectable);
             bounding_box |= p->get_position();
@@ -386,32 +386,32 @@ void VibesMaze::show_graph() const{
             m_name);
 }
 
-void VibesMaze::get_room_info(invariant::Maze<ibex::IntervalVector> *maze, const ibex::IntervalVector& position) const{
-    std::vector<invariant::Pave<ibex::IntervalVector>*> pave_list;
+void VibesMaze::get_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector& position) const{
+    std::vector<invariant::PaveIBEX*> pave_list;
     m_subpaving->get_room_info(maze, position, pave_list);
-    for(invariant::Pave<ibex::IntervalVector>* p:pave_list){
+    for(invariant::PaveIBEX* p:pave_list){
         vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
                 0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]");
     }
 }
 
-void VibesMaze::get_room_info(invariant::Maze<ibex::IntervalVector> *maze, double x, double y) const{
+void VibesMaze::get_room_info(invariant::MazeIBEX *maze, double x, double y) const{
     IntervalVector pos(2);
     pos[0] = ibex::Interval(x);
     pos[1] = ibex::Interval(y);
     get_room_info(maze, pos);
 }
 
-void VibesMaze::show_room_info(invariant::Maze<ibex::IntervalVector> *maze, const IntervalVector& position) const{
-    std::vector<invariant::Pave<ibex::IntervalVector>*> pave_list;
+void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& position) const{
+    std::vector<invariant::PaveIBEX*> pave_list;
     std::cout.precision(15);
     m_subpaving->get_room_info(maze, position, pave_list);
-    for(invariant::Pave<ibex::IntervalVector>* p:pave_list){
+    for(invariant::PaveIBEX* p:pave_list){
         vibes::drawCircle(p->get_position()[0].mid(), p->get_position()[1].mid(),
                 0.6*min(p->get_position()[0].diam()/2.0, p->get_position()[1].diam()/2.0), "[green]", vibesParams("figure", m_name));
     }
 
-    for(invariant::Pave<ibex::IntervalVector>* p:pave_list){
+    for(invariant::PaveIBEX* p:pave_list){
         IntervalVector p_position = p->get_position();
         double p_diam[2] = {p_position[0].diam(), p_position[1].diam()};
         double offset[2] = {p_diam[0]*0.05, p_diam[1]*0.05};
@@ -438,8 +438,8 @@ void VibesMaze::show_room_info(invariant::Maze<ibex::IntervalVector> *maze, cons
         // Draw Doors
         for(int face=0; face<2; face++){
             for(int sens=0; sens<2; sens++){
-                invariant::Face<ibex::IntervalVector> *f=p->get_faces()[face][sens];
-                invariant::Door<ibex::IntervalVector> *d = f->get_doors()[maze];
+                invariant::FaceIBEX *f=p->get_faces()[face][sens];
+                invariant::DoorIBEX *d = f->get_doors()[maze];
 
                 IntervalVector input = d->get_input();
                 IntervalVector output = d->get_output();
@@ -469,26 +469,26 @@ void VibesMaze::drawBox(const ibex::IntervalVector &box, std::string params) con
 }
 
 namespace vibes{
-inline void drawGraph(const invariant::SmartSubPaving<ibex::IntervalVector> &g, Params params){
+inline void drawGraph(const invariant::SmartSubPavingIBEX &g, Params params){
     vibes::drawPave(g.get_paves(), params);
     vibes::drawPave(g.get_paves_not_bisectable(), params);
 }
 
-inline void drawPave(const invariant::Pave<ibex::IntervalVector> &p, Params params){
+inline void drawPave(const invariant::PaveIBEX &p, Params params){
     vibes::drawBox(p.get_position(), params);
 }
 
-inline void drawPave(const vector<invariant::Pave<ibex::IntervalVector>*>& l_p, Params params){
-    for(Pave<ibex::IntervalVector> *p:l_p)
+inline void drawPave(const vector<invariant::PaveIBEX*>& l_p, Params params){
+    for(PaveIBEX *p:l_p)
         vibes::drawPave(*p, params);
 }
 
-inline void drawFace(const invariant::Face<ibex::IntervalVector> &f, Params params){
+inline void drawFace(const invariant::FaceIBEX &f, Params params){
     vibes::drawBox(f.get_position(), params);
 }
 
-inline void drawFace(const vector<invariant::Face<ibex::IntervalVector> *>& l_f, Params params){
-    for(invariant::Face<ibex::IntervalVector> *f:l_f)
+inline void drawFace(const vector<invariant::FaceIBEX *>& l_f, Params params){
+    for(invariant::FaceIBEX *f:l_f)
         vibes::drawFace(*f, params);
 }
 }

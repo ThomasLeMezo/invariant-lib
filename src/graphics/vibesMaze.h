@@ -12,12 +12,12 @@
 #include "vibes/vibes.h"
 
 //namespace invariant{
-//template <> class Pave<ibex::IntervalVector>;
-//template <> class SmartSubPaving<ibex::IntervalVector>;
-//template <> class Maze<ibex::IntervalVector>;
-//template <> class Room<ibex::IntervalVector>;
-//template <> class Domain<ibex::IntervalVector>;
-//template <> class Face<ibex::IntervalVector>;
+//template <> class PaveIBEX;
+//template <> class SmartSubPavingIBEX;
+//template <> class MazeIBEX;
+//template <> class RoomIBEX;
+//template <> class DomainIBEX;
+//template <> class FaceIBEX;
 //}
 
 class VibesMaze: public VibesFigure
@@ -26,17 +26,17 @@ class VibesMaze: public VibesFigure
 public:
     enum VIBES_MAZE_TYPE{VIBES_MAZE_INNER, VIBES_MAZE_OUTER, VIBES_MAZE_OUTER_AND_INNER};
 public:
-    VibesMaze(const std::string& figure_name, invariant::SmartSubPaving<ibex::IntervalVector> *g);
-    VibesMaze(const std::string& figure_name, invariant::Maze<ibex::IntervalVector>* maze, VIBES_MAZE_TYPE type=VIBES_MAZE_OUTER);
-    VibesMaze(const std::string& figure_name, invariant::Maze<ibex::IntervalVector>* outer, invariant::Maze<ibex::IntervalVector>* inner);
+    VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g);
+    VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type=VIBES_MAZE_OUTER);
+    VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner);
     ~VibesMaze(){}
 
     virtual void show() const;
 
-    void get_room_info(invariant::Maze<ibex::IntervalVector> *maze, const ibex::IntervalVector& position) const;
-    void get_room_info(invariant::Maze<ibex::IntervalVector> *maze, double x, double y) const;
+    void get_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector& position) const;
+    void get_room_info(invariant::MazeIBEX *maze, double x, double y) const;
 
-    void show_room_info(invariant::Maze<ibex::IntervalVector> *maze, const ibex::IntervalVector &position) const;
+    void show_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector &position) const;
 
     /**
      * @brief drawCircle for easier integration with the python binding
@@ -68,21 +68,21 @@ private:
     void show_graph() const;
     void show_maze_outer() const;
     void show_maze_inner() const;
-    void show_theta(invariant::Pave<ibex::IntervalVector> *p, invariant::Maze<ibex::IntervalVector> *maze) const;
+    void show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX *maze) const;
 
     void show_maze_outer_inner() const;
 
-    void draw_room_outer(invariant::Pave<ibex::IntervalVector> *p) const;
-    void draw_room_inner(invariant::Pave<ibex::IntervalVector> *p) const;
-    void draw_room_inner_outer(invariant::Pave<ibex::IntervalVector> *p) const;
+    void draw_room_outer(invariant::PaveIBEX *p) const;
+    void draw_room_inner(invariant::PaveIBEX *p) const;
+    void draw_room_inner_outer(invariant::PaveIBEX *p) const;
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
-    invariant::SmartSubPaving<ibex::IntervalVector>*   m_subpaving = NULL;
+    invariant::SmartSubPavingIBEX*   m_subpaving = NULL;
     double              m_overhead_factor;
 
-    invariant::Maze<ibex::IntervalVector>*    m_maze_outer = NULL;
-    invariant::Maze<ibex::IntervalVector>*    m_maze_inner = NULL;
+    invariant::MazeIBEX*    m_maze_outer = NULL;
+    invariant::MazeIBEX*    m_maze_inner = NULL;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;
 
@@ -91,11 +91,11 @@ private:
 };
 
 namespace vibes{
-    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::SmartSubPaving<ibex::IntervalVector> &, g)
-    VIBES_FUNC_COLOR_PARAM_1(drawPave,const invariant::Pave<ibex::IntervalVector> &, p)
-    VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::Face<ibex::IntervalVector> &, f)
-    VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::Pave<ibex::IntervalVector>*> &, l_p)
-    VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::Face<ibex::IntervalVector>*> &, l_f)
+    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::SmartSubPavingIBEX &, g)
+    VIBES_FUNC_COLOR_PARAM_1(drawPave,const invariant::PaveIBEX &, p)
+    VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::FaceIBEX &, f)
+    VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::PaveIBEX*> &, l_p)
+    VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::FaceIBEX*> &, l_f)
 }
 
 #endif // VibesMaze_H

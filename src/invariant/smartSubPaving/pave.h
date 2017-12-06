@@ -19,16 +19,17 @@
 
 namespace invariant {
 
-template <typename _Tp> class Pave;
-using PavePPL = Pave<Parma_Polyhedra_Library::C_Polyhedron>;
+template <typename _Tp, typename _V> class Pave;
+using PavePPL = Pave<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
+using PaveIBEX = Pave<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
 
-template <typename _Tp> class SmartSubPaving;
-template <typename _Tp> class Room;
-template <typename _Tp> class Face;
-template <typename _Tp> class Maze;
-template <typename _Tp> class Pave_node;
+template <typename _Tp, typename _V> class SmartSubPaving;
+template <typename _Tp, typename _V> class Room;
+template <typename _Tp, typename _V> class Face;
+template <typename _Tp, typename _V> class Maze;
+template <typename _Tp, typename _V> class Pave_node;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
 class Pave
 {
 public:
@@ -36,13 +37,13 @@ public:
      * @brief Construct a Pave with position and a SmartSubPaving
      * @param position of the Pave
      */
-    Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp>* g);
+    Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp, _V>* g);
 
     /**
      * @brief Construct an empty Pave link to a SmartSubPaving
      * @param g
      */
-    Pave(SmartSubPaving<_Tp>* g);
+    Pave(SmartSubPaving<_Tp, _V>* g);
 
     /**
      * @brief Construct an empty Pave
@@ -68,7 +69,7 @@ public:
      * @brief Return the array of an array of Faces of the Pave
      * @return A two arrays of pointer to the faces
      */
-    const std::vector< std::array<Face<_Tp> *, 2>>& get_faces() const;
+    const std::vector< std::array<Face<_Tp, _V> *, 2>>& get_faces() const;
 
     /**
      * @brief Get the Id of the Pave given by the serialization step
@@ -108,7 +109,7 @@ public:
      * @param i
      * @return
      */
-    const std::array<Face<_Tp>*, 2>& operator[](const std::size_t& i) const;
+    const std::array<Face<_Tp, _V>*, 2>& operator[](const std::size_t& i) const;
 
     /**
      * @brief Bisect the Pave
@@ -128,32 +129,32 @@ public:
      * @brief Return the two child Paves after calling bisection
      * @return
      */
-    const std::array<Pave<_Tp> *, 2> &get_result_bisected();
+    const std::array<Pave<_Tp, _V> *, 2> &get_result_bisected();
 
     /**
      * @brief Return all the Faces of the Pave in a vector
      * @return
      */
-    const std::vector<Face<_Tp> *> &get_faces_vector();
+    const std::vector<Face<_Tp, _V> *> &get_faces_vector();
 
     /**
      * @brief Setter to the pave node associated with this node
      * @param pave_node
      */
-    void set_pave_node(Pave_node<_Tp> *pave_node);
+    void set_pave_node(Pave_node<_Tp, _V> *pave_node);
 
     /**
      * @brief Getter to the maze/room map
      * @return
      */
-    std::map<Maze<_Tp> *, Room<_Tp> *> get_rooms() const;
+    std::map<Maze<_Tp, _V> *, Room<_Tp, _V> *> get_rooms() const;
 
     /**
      * @brief Add a new room to the map
      * @param maze
      * @param room
      */
-    void add_room(Room<_Tp> *r);
+    void add_room(Room<_Tp, _V> *r);
 
     /**
      * @brief Return true if the pave contain an infinite boundary
@@ -170,7 +171,7 @@ public:
      * @brief Get the pave node associated to this Pave
      * @return
      */
-    Pave_node<_Tp>* get_tree() const;
+    Pave_node<_Tp, _V>* get_tree() const;
 
     /**
      * @brief Return true if this pave has one or more border faces (face with no neighbors)
@@ -187,14 +188,14 @@ public:
      * @brief @brief Add all neighbors pave to the Pave list
      * @param pave_list
      */
-    void get_neighbors_pave(std::vector<Pave<_Tp>*> pave_list);
+    void get_neighbors_pave(std::vector<Pave<_Tp, _V>*> pave_list);
 
     /**
      * @brief @brief Add all neighbors room to the Pave list
      * @param room_list
      * @param maze
      */
-    void get_neighbors_room(Maze<_Tp> *maze, std::vector<Room<_Tp> *> &room_list);
+    void get_neighbors_room(Maze<_Tp, _V> *maze, std::vector<Room<_Tp, _V> *> &room_list);
 
     /**
      * @brief Set all the rooms attached to this pave to removed state
@@ -213,13 +214,13 @@ private:
 
     /** Class Variable **/
     mutable ibex::IntervalVector                            m_position; // Pave position
-    mutable std::vector< std::array<Face<_Tp>*, 2>>         m_faces; // Faces of the Pave
-    mutable std::vector<invariant::Face<_Tp> *>             m_faces_vector; // Faces of the Pave
-    mutable SmartSubPaving<_Tp>*                            m_subpaving = NULL;
-    mutable Pave_node<_Tp>*                                 m_tree = NULL;
+    mutable std::vector< std::array<Face<_Tp, _V>*, 2>>         m_faces; // Faces of the Pave
+    mutable std::vector<invariant::Face<_Tp, _V> *>             m_faces_vector; // Faces of the Pave
+    mutable SmartSubPaving<_Tp, _V>*                            m_subpaving = NULL;
+    mutable Pave_node<_Tp, _V>*                                 m_tree = NULL;
     mutable size_t                                          m_dim = 0;
-    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
-    std::map<Maze<_Tp>*, Room<_Tp>*>                        m_rooms;
+    std::array<Pave<_Tp, _V>*, 2>                               m_result_bisected;
+    std::map<Maze<_Tp, _V>*, Room<_Tp, _V>*>                        m_rooms;
     bool                                                    m_infinite_pave = false;
     size_t                                                  m_serialization_id=0;
     bool                                                    m_border = false;
@@ -234,8 +235,8 @@ private:
      * @param Pave
      * @return
      */
-template<typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const Pave<_Tp>& p);
+template<typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const Pave<_Tp, _V>& p);
 
 /**
      * @brief Overloading of the operator << for a vector of Paves
@@ -243,81 +244,81 @@ std::ostream& operator<< (std::ostream& stream, const Pave<_Tp>& p);
      * @param l
      * @return
      */
-template<typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const std::vector<Pave<_Tp>*> &l);
+template<typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const std::vector<Pave<_Tp, _V>*> &l);
 }
 
 /// ***** Inline functions *****///
 namespace invariant{
 
-template <typename _Tp>
-inline const ibex::IntervalVector& Pave<_Tp>::get_position() const{
+template <typename _Tp, typename _V>
+inline const ibex::IntervalVector& Pave<_Tp, _V>::get_position() const{
     return m_position;
 }
 
-template <typename _Tp>
-inline const std::vector<std::array<Face<_Tp> *, 2> > &Pave<_Tp>::get_faces() const{
+template <typename _Tp, typename _V>
+inline const std::vector<std::array<Face<_Tp, _V> *, 2> > &Pave<_Tp, _V>::get_faces() const{
     return m_faces;
 }
 
-template <typename _Tp>
-inline const size_t& Pave<_Tp>::get_serialization_id() const{
+template <typename _Tp, typename _V>
+inline const size_t& Pave<_Tp, _V>::get_serialization_id() const{
     return m_serialization_id;
 }
 
-template <typename _Tp>
-inline void Pave<_Tp>::set_serialization_id(const size_t &value){
+template <typename _Tp, typename _V>
+inline void Pave<_Tp, _V>::set_serialization_id(const size_t &value){
     m_serialization_id = value;
 }
 
-template<typename _Tp>
-inline std::ostream& operator<< (std::ostream& stream, const Pave<_Tp>& p) {
+template<typename _Tp, typename _V>
+inline std::ostream& operator<< (std::ostream& stream, const Pave<_Tp, _V>& p) {
     stream << p.get_position();
     return stream;
 }
 
-template <typename _Tp>
-inline const std::array<Face<_Tp>*, 2>& Pave<_Tp>::operator[](const std::size_t& i) const{
+template <typename _Tp, typename _V>
+inline const std::array<Face<_Tp, _V>*, 2>& Pave<_Tp, _V>::operator[](const std::size_t& i) const{
     return m_faces[i];
 }
 
-template <typename _Tp>
-inline const std::array<Pave<_Tp> *, 2>& Pave<_Tp>::get_result_bisected(){
+template <typename _Tp, typename _V>
+inline const std::array<Pave<_Tp, _V> *, 2>& Pave<_Tp, _V>::get_result_bisected(){
     return m_result_bisected;
 }
 
-template <typename _Tp>
-inline const std::vector<Face<_Tp> *> &Pave<_Tp>::get_faces_vector(){
+template <typename _Tp, typename _V>
+inline const std::vector<Face<_Tp, _V> *> &Pave<_Tp, _V>::get_faces_vector(){
     return m_faces_vector;
 }
 
-template <typename _Tp>
-inline void Pave<_Tp>::set_pave_node(Pave_node<_Tp> *pave_node){
+template <typename _Tp, typename _V>
+inline void Pave<_Tp, _V>::set_pave_node(Pave_node<_Tp, _V> *pave_node){
     m_tree = pave_node;
 }
 
-template <typename _Tp>
-inline std::map<Maze<_Tp> *, Room<_Tp>*> Pave<_Tp>::get_rooms() const{
+template <typename _Tp, typename _V>
+inline std::map<Maze<_Tp, _V> *, Room<_Tp, _V>*> Pave<_Tp, _V>::get_rooms() const{
     return m_rooms;
 }
 
-template <typename _Tp>
-inline bool Pave<_Tp>::is_infinite() const{
+template <typename _Tp, typename _V>
+inline bool Pave<_Tp, _V>::is_infinite() const{
     return m_infinite_pave;
 }
 
-template <typename _Tp>
-size_t Pave<_Tp>::get_dim() const{
+template <typename _Tp, typename _V>
+size_t Pave<_Tp, _V>::get_dim() const{
     return m_dim;
 }
 
-template <typename _Tp>
-inline Pave_node<_Tp>* Pave<_Tp>::get_tree() const{
+template <typename _Tp, typename _V>
+inline Pave_node<_Tp, _V>* Pave<_Tp, _V>::get_tree() const{
     return m_tree;
 }
 
-template <typename _Tp>
-inline bool Pave<_Tp>::is_border() const{
+template <typename _Tp, typename _V>
+inline bool Pave<_Tp, _V>::is_border() const{
     return m_border;
 }
 

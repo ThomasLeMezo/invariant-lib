@@ -14,18 +14,19 @@
 
 namespace invariant {
 
-template <typename _Tp> class Maze;
-using MazePPL = Maze<Parma_Polyhedra_Library::C_Polyhedron>;
+template <typename _Tp, typename _V> class Maze;
+using MazePPL = Maze<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
+using MazeIBEX = Maze<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
 
 class Dynamics; // declared only for friendship
-template <typename _Tp> class Room;
-template <typename _Tp> class Domain;
-template <typename _Tp> class SmartSubPaving;
-template <typename _Tp> class Pave;
-template <typename _Tp> class Face;
-template <typename _Tp> class Door;
+template <typename _Tp, typename _V> class Room;
+template <typename _Tp, typename _V> class Domain;
+template <typename _Tp, typename _V> class SmartSubPaving;
+template <typename _Tp, typename _V> class Pave;
+template <typename _Tp, typename _V> class Face;
+template <typename _Tp, typename _V> class Door;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
 class Maze
 {
 public:
@@ -35,7 +36,7 @@ public:
      * @param f_vect
      * @param type of operation (forward, backward or both)
      */
-    Maze(invariant::Domain<_Tp> *domain, Dynamics *dynamics);
+    Maze(invariant::Domain<_Tp, _V> *domain, Dynamics *dynamics);
 
     /**
      * @brief Maze destructor
@@ -46,13 +47,13 @@ public:
      * @brief Getter to the Domain
      * @return
      */
-    Domain<_Tp> * get_domain() const;
+    Domain<_Tp, _V> * get_domain() const;
 
     /**
      * @brief Getter to the SmartSubPaving
      * @return
      */
-    SmartSubPaving<_Tp> * get_subpaving() const;
+    SmartSubPaving<_Tp, _V> * get_subpaving() const;
 
     /**
      * @brief Getter to the dynamics
@@ -81,13 +82,13 @@ public:
      * (to short locking the deque)
      * @param r
      */
-    void add_to_deque(Room<_Tp> *r);
+    void add_to_deque(Room<_Tp, _V> *r);
 
     /**
      * @brief Add a list of rooms to the deque (check if already in)
      * @param list_rooms
      */
-    void add_rooms(const std::vector<Room<_Tp> *> &list_rooms);
+    void add_rooms(const std::vector<Room<_Tp, _V> *> &list_rooms);
 
     /**
      * @brief Return true if some trajectory can escape from the search space
@@ -102,11 +103,11 @@ public:
     bool is_empty();
 
 private:
-    invariant::Domain<_Tp> *    m_domain = NULL;
-    SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
+    invariant::Domain<_Tp, _V> *    m_domain = NULL;
+    SmartSubPaving<_Tp, _V>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
     Dynamics *  m_dynamics = NULL;
 
-    std::deque<Room<_Tp> *> m_deque_rooms;
+    std::deque<Room<_Tp, _V> *> m_deque_rooms;
 
     omp_lock_t  m_deque_access;
 
@@ -121,23 +122,23 @@ private:
 
 namespace invariant{
 
-template <typename _Tp>
-inline Domain<_Tp> * Maze<_Tp>::get_domain() const{
+template <typename _Tp, typename _V>
+inline Domain<_Tp, _V> * Maze<_Tp, _V>::get_domain() const{
     return m_domain;
 }
 
-template <typename _Tp>
-inline Dynamics * Maze<_Tp>::get_dynamics() const{
+template <typename _Tp, typename _V>
+inline Dynamics * Maze<_Tp, _V>::get_dynamics() const{
     return m_dynamics;
 }
 
-template <typename _Tp>
-inline SmartSubPaving<_Tp> * Maze<_Tp>::get_subpaving() const{
+template <typename _Tp, typename _V>
+inline SmartSubPaving<_Tp, _V> * Maze<_Tp, _V>::get_subpaving() const{
     return m_subpaving;
 }
 
-template <typename _Tp>
-inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
+template <typename _Tp, typename _V>
+inline void Maze<_Tp, _V>::add_to_deque(Room<_Tp, _V> *r){
     omp_set_lock(&m_deque_access);
     m_deque_rooms.push_back(r);
     omp_unset_lock(&m_deque_access);

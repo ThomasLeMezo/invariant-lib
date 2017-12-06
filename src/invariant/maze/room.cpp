@@ -6,7 +6,7 @@ namespace invariant{
 /// ******************  ibex::IntervalVector ****************** ///
 
 template<>
-void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect){
+void Room<ibex::IntervalVector, std::vector<ibex::IntervalVector>>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     // assert 0 not in v.
     ibex::IntervalVector c(out-in);
     ibex::IntervalVector v(vect);
@@ -20,22 +20,24 @@ void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::I
         alpha.set_empty();
 
     c &= alpha*v;
-    out &= c+in;
-    in &= out-c;
+    if(sens==FWD || sens==FWD_BWD)
+        out &= c+in;
+    if(sens==BWD || sens==FWD_BWD)
+        in &= out-c;
 }
 
 template <>
-ibex::IntervalVector get_empty_door_container<ibex::IntervalVector>(int dim){
- return IntervalVector(dim, ibex::Interval::EMPTY_SET);
+ibex::IntervalVector get_empty_door_container<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(int dim){
+    return IntervalVector(dim, ibex::Interval::EMPTY_SET);
 }
 
 template <>
-void set_empty<ibex::IntervalVector>(ibex::IntervalVector &T){
+void set_empty<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(ibex::IntervalVector &T){
     T.set_empty();
 }
 
 template <>
-ibex::IntervalVector get_diff_hull(const ibex::IntervalVector &a, const ibex::IntervalVector &b){
+ibex::IntervalVector get_diff_hull<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(const ibex::IntervalVector &a, const ibex::IntervalVector &b){
     ibex::IntervalVector *diff_list;
     int nb_boxes = a.diff(b, diff_list);
 
@@ -47,7 +49,7 @@ ibex::IntervalVector get_diff_hull(const ibex::IntervalVector &a, const ibex::In
 }
 
 template<>
-int get_nb_dim_flat<ibex::IntervalVector>(const ibex::IntervalVector &iv){
+int get_nb_dim_flat<ibex::IntervalVector, std::vector<ibex::IntervalVector>>(const ibex::IntervalVector &iv){
     int dim = iv.size();
     int flat=0;
     for(int i=0; i<dim; i++){
@@ -88,57 +90,59 @@ void recursive_linear_expression_from_iv(const ibex::IntervalVector &vect_field,
 }
 
 template<>
-void Room<ppl::C_Polyhedron>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect){
+void Room<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     if(vect.is_empty()){
         out = ppl::C_Polyhedron(in.space_dimension(), ppl::EMPTY);
         in = ppl::C_Polyhedron(in.space_dimension(), ppl::EMPTY);
         return;
     }
 
-//    ppl::C_Polyhedron out_tmp(out);
-    ppl::C_Polyhedron in_tmp(in);
-
-    Linear_Expression e_in = Linear_Expression(0);
-    std::vector<Linear_Expression> linear_expression_list_in;
-    recursive_linear_expression_from_iv(vect, vect.size(), linear_expression_list_in,e_in);
-    for(auto &l:linear_expression_list_in){
-        in_tmp.add_generator(ray(l));
+    if(sens == FWD || sens == FWD_BWD){
+        ppl::C_Polyhedron in_tmp(in);
+        Linear_Expression e_in = Linear_Expression(0);
+        std::vector<Linear_Expression> linear_expression_list_in;
+        recursive_linear_expression_from_iv(vect, vect.size(), linear_expression_list_in,e_in);
+        for(auto &l:linear_expression_list_in){
+            in_tmp.add_generator(ray(l));
+        }
+        out &= in_tmp;
     }
 
-//    Linear_Expression e_out = Linear_Expression(0);
-//    std::vector<Linear_Expression> linear_expression_list_out;
-//    recursive_linear_expression_from_iv(-vect, vect.size(), linear_expression_list_out,e_out);
-//    for(auto &l:linear_expression_list_out){
-//        out_tmp.add_generator(ray(l));
-//    }
-
-    out &= in_tmp;
-//    in &= out_tmp;
+    if(sens == FWD || sens == FWD_BWD){
+        ppl::C_Polyhedron out_tmp(out);
+        Linear_Expression e_out = Linear_Expression(0);
+        std::vector<Linear_Expression> linear_expression_list_out;
+        recursive_linear_expression_from_iv(-vect, vect.size(), linear_expression_list_out,e_out);
+        for(auto &l:linear_expression_list_out){
+            out_tmp.add_generator(ray(l));
+        }
+        in &= out_tmp;
+    }
 }
 
 template <>
-Parma_Polyhedra_Library::C_Polyhedron get_empty_door_container<Parma_Polyhedra_Library::C_Polyhedron>(int dim){
- return Parma_Polyhedra_Library::C_Polyhedron(dim, Parma_Polyhedra_Library::EMPTY);
+Parma_Polyhedra_Library::C_Polyhedron get_empty_door_container<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(int dim){
+    return Parma_Polyhedra_Library::C_Polyhedron(dim, Parma_Polyhedra_Library::EMPTY);
 }
 
 template <>
-void set_empty<Parma_Polyhedra_Library::C_Polyhedron>(Parma_Polyhedra_Library::C_Polyhedron &T){
-    T = get_empty_door_container<Parma_Polyhedra_Library::C_Polyhedron>(T.space_dimension());
+void set_empty<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(ppl::C_Polyhedron &T){
+    T = get_empty_door_container<Parma_Polyhedra_Library::C_Polyhedron,std::vector<Parma_Polyhedra_Library::Generator_System>>(T.space_dimension());
 }
 
 template <>
-Parma_Polyhedra_Library::C_Polyhedron get_diff_hull(const Parma_Polyhedra_Library::C_Polyhedron &a, const Parma_Polyhedra_Library::C_Polyhedron &b){
+Parma_Polyhedra_Library::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(const ppl::C_Polyhedron &a, const ppl::C_Polyhedron &b){
     Parma_Polyhedra_Library::C_Polyhedron tmp(b);
     tmp.poly_difference_assign(a);
 
-//    Parma_Polyhedra_Library::C_Polyhedron tmp(a);
-//    tmp.poly_difference_assign(b);
+    //    Parma_Polyhedra_Library::C_Polyhedron tmp(a);
+    //    tmp.poly_difference_assign(b);
 
     return tmp;
 }
 
 template<>
-int get_nb_dim_flat<Parma_Polyhedra_Library::C_Polyhedron>(const Parma_Polyhedra_Library::C_Polyhedron &p){
+int get_nb_dim_flat<ppl::C_Polyhedron, std::vector<ppl::Generator_System>>(const Parma_Polyhedra_Library::C_Polyhedron &p){
     return p.space_dimension() - p.affine_dimension();
 }
 

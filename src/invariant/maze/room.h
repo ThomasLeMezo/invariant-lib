@@ -1,7 +1,7 @@
 #ifndef FUNCTION_TOOLS
 #define FUNCTION_TOOLS
 namespace invariant {
-template <typename _Tp>
+template <typename _Tp, typename _V>
 _Tp get_empty_door_container(int dim);
 }
 #endif
@@ -28,17 +28,18 @@ namespace invariant {
 
 enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
 
-template <typename _Tp> class Room;
-using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron>;
+template <typename _Tp, typename _V> class Room;
+using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron, std::vector<Parma_Polyhedra_Library::Generator_System>>;
+using RoomIBEX = Room<ibex::IntervalVector, std::vector<ibex::IntervalVector>>;
 
 class Dynamics; // declared only for friendship
-template <typename _Tp> class Pave; // declared only for friendship
-template <typename _Tp> class Maze;
-template <typename _Tp> class Face;
-template <typename _Tp> class Door;
-template <typename _Tp> class Domain;
+template <typename _Tp, typename _V> class Pave; // declared only for friendship
+template <typename _Tp, typename _V> class Maze;
+template <typename _Tp, typename _V> class Face;
+template <typename _Tp, typename _V> class Door;
+template <typename _Tp, typename _V> class Domain;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _Tp=ibex::IntervalVector, typename _V=std::vector<ibex::IntervalVector>>
 class Room
 {
 public:
@@ -47,7 +48,7 @@ public:
      * @param p
      * @param f_vect
      */
-    Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics);
+    Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics);
 
     /**
      * @brief Room destructor
@@ -63,13 +64,13 @@ public:
      * @brief Getter to the associated Pave
      * @return
      */
-    Pave<_Tp>* get_pave() const;
+    Pave<_Tp, _V>* get_pave() const;
 
     /**
      * @brief Getter to the associated Maze
      * @return
      */
-    Maze<_Tp>* get_maze() const;
+    Maze<_Tp, _V>* get_maze() const;
 
     /**
      * @brief Set all the private output doors to empty
@@ -127,13 +128,13 @@ public:
      * @brief Return a list of neighbor Rooms that need an update according after contraction
      * @param list_rooms
      */
-    void analyze_change(std::vector<Room<_Tp> *> &list_rooms) const;
+    void analyze_change(std::vector<Room<_Tp, _V> *> &list_rooms) const;
 
     /**
      * @brief Get the list of all the not removed neighbors of this room
      * @param list_rooms
      */
-    void get_all_active_neighbors(std::vector<Room<_Tp> *> &list_rooms) const;
+    void get_all_active_neighbors(std::vector<Room<_Tp, _V> *> &list_rooms) const;
 
     /**
      * @brief Reset deque state to false
@@ -248,10 +249,10 @@ public:
      * @param r2
      * @return
      */
-    friend Room<_Tp>& operator&=(Room<_Tp>& r1, const Room<_Tp>& r2){
-        for(Face<_Tp> *f:r1.get_pave()->get_faces_vector()){
-            Door<_Tp> *d1 = f->get_doors()[r1.get_maze()];
-            Door<_Tp> *d2 = f->get_doors()[r2.get_maze()];
+    friend Room<_Tp, _V>& operator&=(Room<_Tp, _V>& r1, const Room<_Tp, _V>& r2){
+        for(Face<_Tp, _V> *f:r1.get_pave()->get_faces_vector()){
+            Door<_Tp, _V> *d1 = f->get_doors()[r1.get_maze()];
+            Door<_Tp, _V> *d2 = f->get_doors()[r2.get_maze()];
             *d1 &= *d2;
         }
         return r1;
@@ -262,10 +263,10 @@ public:
      * @param r2
      * @return
      */
-    friend Room<_Tp>& operator|=(Room<_Tp>& r1, const Room<_Tp>& r2){
-        for(Face<_Tp> *f:r1.get_pave()->get_faces_vector()){
-            Door<_Tp> *d1 = f->get_doors()[r1.get_maze()];
-            Door<_Tp> *d2 = f->get_doors()[r2.get_maze()];
+    friend Room<_Tp, _V>& operator|=(Room<_Tp, _V>& r1, const Room<_Tp, _V>& r2){
+        for(Face<_Tp, _V> *f:r1.get_pave()->get_faces_vector()){
+            Door<_Tp, _V> *d1 = f->get_doors()[r1.get_maze()];
+            Door<_Tp, _V> *d2 = f->get_doors()[r2.get_maze()];
             *d1 |= *d2;
         }
         return r1;
@@ -305,8 +306,8 @@ protected:
      * @param out
      * @param vect
      */
-    void contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect);
-    void contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect);
+    void contract_flow(_Tp &in, _Tp &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens);
+//    void contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect);
 
     /**
      * @brief Temp
@@ -353,9 +354,12 @@ public:
     int get_nb_contractions() const;
 
 protected:
-    Pave<_Tp>*   m_pave = NULL; // pointer to the associated face
-    Maze<_Tp>*   m_maze = NULL; // pointer to the associated maze
+    Pave<_Tp, _V>*   m_pave = NULL; // pointer to the associated face
+    Maze<_Tp, _V>*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
+
+    _V m_vector_fields_typed; // Typed Vector field of the Room
+
     std::vector<bool>    m_vector_field_zero;
     bool            m_contain_zero_coordinate = false;
     bool            m_contain_zero = false;
@@ -422,30 +426,30 @@ inline Parma_Polyhedra_Library::C_Polyhedron operator|(const Parma_Polyhedra_Lib
 /// \param b
 /// \return
 ///
-template <typename _Tp>
+template <typename _Tp, typename _V>
 _Tp get_diff_hull(const _Tp &a, const _Tp &b);
 
-template <typename _Tp>
+template <typename _Tp, typename _V>
 void set_empty(_Tp &T);
 
-template <typename _Tp>
+template <typename _Tp, typename _V>
 int get_nb_dim_flat(const _Tp &iv);
 
-template<typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r);
+template<typename _Tp, typename _V>
+std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r);
 
-template <typename _Tp>
-inline Pave<_Tp>* Room<_Tp>::get_pave() const{
+template <typename _Tp, typename _V>
+inline Pave<_Tp, _V>* Room<_Tp, _V>::get_pave() const{
     return m_pave;
 }
 
-template <typename _Tp>
-inline Maze<_Tp>* Room<_Tp>::get_maze() const{
+template <typename _Tp, typename _V>
+inline Maze<_Tp, _V>* Room<_Tp, _V>::get_maze() const{
     return m_maze;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_in_deque(){
+template <typename _Tp, typename _V>
+inline bool Room<_Tp, _V>::is_in_deque(){
     bool result;
     omp_set_lock(&m_lock_deque);
     result = m_in_deque;
@@ -453,62 +457,62 @@ inline bool Room<_Tp>::is_in_deque(){
     return result;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_in_queue(){
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::set_in_queue(){
     omp_set_lock(&m_lock_deque);
     m_in_deque = true;
     omp_unset_lock(&m_lock_deque);
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_deque(){
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::reset_deque(){
     omp_set_lock(&m_lock_deque);
     m_in_deque = false;
     omp_unset_lock(&m_lock_deque);
 }
 
-template <typename _Tp>
-inline std::vector<ibex::IntervalVector> Room<_Tp>::get_vector_fields() const{
+template <typename _Tp, typename _V>
+inline std::vector<ibex::IntervalVector> Room<_Tp, _V>::get_vector_fields() const{
     return m_vector_fields;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::lock_contraction(){
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::lock_contraction(){
     omp_set_lock(&m_lock_contraction);
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::unlock_contraction(){
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::unlock_contraction(){
     omp_unset_lock(&m_lock_contraction);
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_removed() const{
+template <typename _Tp, typename _V>
+inline bool Room<_Tp, _V>::is_removed() const{
     return m_removed;
 }
 
-template <typename _Tp>
-inline int Room<_Tp>::get_nb_contractions() const{
+template <typename _Tp, typename _V>
+inline int Room<_Tp, _V>::get_nb_contractions() const{
     return m_nb_contract;
 }
 
-template <typename _Tp>
-inline std::vector<bool> Room<_Tp>::get_vector_fields_zero(){
+template <typename _Tp, typename _V>
+inline std::vector<bool> Room<_Tp, _V>::get_vector_fields_zero(){
     return m_vector_field_zero;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::get_contain_zero_coordinate() const{
+template <typename _Tp, typename _V>
+inline bool Room<_Tp, _V>::get_contain_zero_coordinate() const{
     return m_contain_zero_coordinate;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::get_contain_zero() const{
+template <typename _Tp, typename _V>
+inline bool Room<_Tp, _V>::get_contain_zero() const{
     return m_contain_zero;
 }
 
-template <typename _Tp>
-inline const ibex::IntervalVector Room<_Tp>::get_one_vector_fields(int n_vf){
+template <typename _Tp, typename _V>
+inline const ibex::IntervalVector Room<_Tp, _V>::get_one_vector_fields(int n_vf){
     return m_vector_fields[n_vf];
 }
 
