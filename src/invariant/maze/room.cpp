@@ -142,18 +142,18 @@ void Room<ppl::C_Polyhedron, ppl::Generator_System>::contract_flow(ppl::C_Polyhe
 }
 
 template <>
-Parma_Polyhedra_Library::C_Polyhedron get_empty_door_container<ppl::C_Polyhedron, ppl::Generator_System>(int dim){
-    return Parma_Polyhedra_Library::C_Polyhedron(dim, Parma_Polyhedra_Library::EMPTY);
+ppl::C_Polyhedron get_empty_door_container<ppl::C_Polyhedron, ppl::Generator_System>(int dim){
+    return ppl::C_Polyhedron(dim, Parma_Polyhedra_Library::EMPTY);
 }
 
 template <>
 void set_empty<ppl::C_Polyhedron, ppl::Generator_System>(ppl::C_Polyhedron &T){
-    T = get_empty_door_container<Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::Generator_System>(T.space_dimension());
+    T = ppl::C_Polyhedron(T.space_dimension(), ppl::EMPTY);
 }
 
 template <>
-Parma_Polyhedra_Library::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, ppl::Generator_System>(const ppl::C_Polyhedron &a, const ppl::C_Polyhedron &b){
-    Parma_Polyhedra_Library::C_Polyhedron tmp(b);
+ppl::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, ppl::Generator_System>(const ppl::C_Polyhedron &a, const ppl::C_Polyhedron &b){
+    ppl::C_Polyhedron tmp(b);
     tmp.poly_difference_assign(a);
     return tmp;
 }
