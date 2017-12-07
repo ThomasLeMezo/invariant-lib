@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../catch/catch.hpp"
 #include "../catch/catch_interval.hpp"
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_IntervalVector.h"
 
 #include "tests_graph.hpp"
 #include "smartSubPaving.h"

@@ -1,4 +1,4 @@
-#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex_SepFwdBwd.h"
 #include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
@@ -11,8 +11,8 @@
 #include <omp.h>
 #include "vtkMaze3D.h"
 
-#include "ibex/ibex_SepFwdBwd.h"
-#include "ibex/ibex_SepInter.h"
+#include "ibex_SepFwdBwd.h"
+#include "ibex_SepInter.h"
 
 #include <string>
 

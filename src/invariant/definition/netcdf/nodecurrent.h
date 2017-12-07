@@ -1,7 +1,7 @@
 #ifndef NODECURRENT_H
 #define NODECURRENT_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 
 class NodeCurrent
 {

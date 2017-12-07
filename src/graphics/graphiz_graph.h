@@ -3,7 +3,7 @@
 
 #include "smartSubPaving.h"
 #include <string>
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_IntervalVector.h"
 
 class Graphiz_Graph
 {

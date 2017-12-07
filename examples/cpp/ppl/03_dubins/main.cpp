@@ -1,4 +1,4 @@
-#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex_SepFwdBwd.h"
 #include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
@@ -12,7 +12,6 @@
 #include "vtkmazeppl.h"
 
 #include "ppl.hh"
-#include "errno.h"
 
 using namespace std;
 using namespace ibex;
@@ -59,7 +58,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<13; i++){
+    for(int i=0; i<11; i++){
         paving.bisect();
         cout << i << " outer - ";
         maze_outer.contract();

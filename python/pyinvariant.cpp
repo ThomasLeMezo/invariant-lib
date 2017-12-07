@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "ibex/ibex_IntervalVector.h"
-#include "ibex/ibex_Function.h"
-#include "ibex/ibex_Sep.h"
+#include "ibex_IntervalVector.h"
+#include "ibex_Function.h"
+#include "ibex_Sep.h"
 
 #include "smartSubPaving.h"
 #include "domain.h"

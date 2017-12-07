@@ -1,5 +1,5 @@
 #include "face.h"
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_IntervalVector.h"
 /// ******************  Sepcialized ****************** ///
 namespace invariant{
 

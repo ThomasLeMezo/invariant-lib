@@ -1,5 +1,5 @@
 #include "room.h"
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_IntervalVector.h"
 
 namespace invariant{
 

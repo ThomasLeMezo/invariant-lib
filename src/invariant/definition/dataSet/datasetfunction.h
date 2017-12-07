@@ -1,8 +1,8 @@
 #ifndef DATASETFUNCTION_H
 #define DATASETFUNCTION_H
 
-#include "ibex/ibex_IntervalVector.h"
-#include "ibex/ibex_Fnc.h"
+#include "ibex_IntervalVector.h"
+#include "ibex_Fnc.h"
 #include <string>
 #include "datasetnode.h"
 

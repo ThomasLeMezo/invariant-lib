@@ -4,7 +4,7 @@
 #include "maze.h"
 #include "vibesMaze.h"
 
-#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex_SepFwdBwd.h"
 
 #include <iostream>
 #include "vibes/vibes.h"

@@ -1,7 +1,7 @@
 #ifndef MAZE_H
 #define MAZE_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 #include <deque>
 #include <omp.h>
 #include <iostream>

@@ -10,7 +10,7 @@ _Tp get_empty_door_container(int dim);
 #ifndef ROOM_H
 #define ROOM_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 
 #include <omp.h>
 

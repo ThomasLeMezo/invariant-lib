@@ -1,7 +1,7 @@
 #ifndef PAVE_H
 #define PAVE_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 
 #include <map>
 #include <fstream>
@@ -62,7 +62,7 @@ public:
     const ibex::IntervalVector &get_position() const;
     const ibex::IntervalVector get_position_copy() const;
 
-    const _Tp get_position_typed() const;
+    const _Tp &get_position_typed() const;
     const _Tp get_position_copy_typed() const;
 
     /**
@@ -211,9 +211,16 @@ public:
     int get_dim_inter_boundary(const ibex::IntervalVector &box);
 
 private:
+    /**
+     * @brief compute typed position
+     */
+    void compute_typed_position();
+
+private:
 
     /** Class Variable **/
     mutable ibex::IntervalVector                            m_position; // Pave position
+    mutable _Tp                                             *m_position_typed; // Pave position
     mutable std::vector< std::array<Face<_Tp, _V>*, 2>>         m_faces; // Faces of the Pave
     mutable std::vector<invariant::Face<_Tp, _V> *>             m_faces_vector; // Faces of the Pave
     mutable SmartSubPaving<_Tp, _V>*                            m_subpaving = NULL;
@@ -254,6 +261,11 @@ namespace invariant{
 template <typename _Tp, typename _V>
 inline const ibex::IntervalVector& Pave<_Tp, _V>::get_position() const{
     return m_position;
+}
+
+template <typename _Tp, typename _V>
+const _Tp& Pave<_Tp, _V>::get_position_typed() const{
+    return *m_position_typed;
 }
 
 template <typename _Tp, typename _V>

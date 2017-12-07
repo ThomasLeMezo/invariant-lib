@@ -1,7 +1,7 @@
 #ifndef NODECURRENT3D_H
 #define NODECURRENT3D_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 #include "previmer3d.h"
 
 namespace invariant {

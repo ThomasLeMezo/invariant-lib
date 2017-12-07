@@ -6,7 +6,7 @@
 
 #set -x # debugging
 
-if [ ! -e "$HOME/ppl/lib/libppl.so" ]; then
+if [ ! -e "$HOME/gmp/lib/libgmp.so" ]; then
   echo 'Installing PPL-lib...';
   GMP_VERSION=6.1.2
   GMP_FILE_NAME=gmp-${VERSION}

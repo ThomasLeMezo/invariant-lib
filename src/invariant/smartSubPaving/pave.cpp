@@ -14,16 +14,17 @@ int Pave<ibex::IntervalVector, ibex::IntervalVector>::get_dim_inter_boundary(con
     return m_dim - invariant::get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(intersection);
 }
 
-template <>
-const ibex::IntervalVector Pave<ibex::IntervalVector, ibex::IntervalVector>::get_position_typed() const{
-    return m_position;
+template<>
+void Pave<ibex::IntervalVector, ibex::IntervalVector>::compute_typed_position(){
+    m_position_typed = new ibex::IntervalVector(m_position);
 }
 
 /// ******************  ppl::C_Polyhedron ****************** ///
 
-template <>
-const ppl::C_Polyhedron Pave<ppl::C_Polyhedron, ppl::Generator_System>::get_position_typed() const{
-    return iv_2_polyhedron(this->m_position);
+template<>
+void Pave<ppl::C_Polyhedron, ppl::Generator_System>::compute_typed_position(){
+    m_position_typed = new ppl::C_Polyhedron(iv_2_polyhedron(m_position));
+    m_position_typed->minimized_constraints();
 }
 
 }

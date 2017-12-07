@@ -24,6 +24,8 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     int step = 0;
 
     int dim = maze->get_subpaving()->dim();
+    int max_generator=0;
+    int min_generator=1e5;
 
 //#pragma omp parallel for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
@@ -43,10 +45,10 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
             }
 
             if(ph_union.space_dimension()==3){
-                int nb_points = 0;
+                int nb_generator = 0;
                 for(auto &g:ph_union.generators()){
+                    nb_generator++;
                     if(g.is_point()){
-                        nb_points++;
                         std::vector<double> coord;
                         for(size_t i=0; i<3; i++){
                             ppl::Variable x(i);
@@ -60,6 +62,10 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                         points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
+                if(max_generator<nb_generator)
+                    max_generator = nb_generator;
+                if(min_generator>nb_generator)
+                    min_generator = nb_generator;
 //                cout << nb_points << endl;
             }
 
@@ -95,6 +101,8 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     outputWriter->SetFileName(file.c_str());
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
+
+    cout << "generators (max/min) = " << max_generator << "/" << min_generator << endl;
 
 }
 

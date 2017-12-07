@@ -1,7 +1,7 @@
 #ifndef VibesMaze_H
 #define VibesMaze_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 #include "smartSubPaving.h"
 #include "maze.h"
 #include "pave.h"

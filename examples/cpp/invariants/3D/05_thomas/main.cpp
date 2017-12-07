@@ -1,5 +1,5 @@
-#include "ibex/ibex_SepFwdBwd.h"
-#include "ibex/ibex_SepInter.h"
+#include "ibex_SepFwdBwd.h"
+#include "ibex_SepInter.h"
 #include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"

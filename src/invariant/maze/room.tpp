@@ -1,6 +1,6 @@
 #include "iostream"
 
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_IntervalVector.h"
 #include "../definition/dynamics.h"
 #include "../definition/domain.h"
 #include "pave.h"

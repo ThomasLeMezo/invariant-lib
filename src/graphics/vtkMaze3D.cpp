@@ -1,7 +1,7 @@
 #include "vtkMaze3D.h"
 
 #include <string>
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_IntervalVector.h"
 #include "smartSubPaving.h"
 
 #include <vtkSmartPointer.h>

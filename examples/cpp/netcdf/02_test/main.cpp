@@ -1,4 +1,4 @@
-#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex_SepFwdBwd.h"
 #include <iostream>
 #include "previmer3d.h"
 #include "maze.h"

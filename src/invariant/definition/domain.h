@@ -8,8 +8,8 @@ namespace invariant{
 #ifndef DOMAIN_H
 #define DOMAIN_H
 
-#include <ibex/ibex_IntervalVector.h>
-#include <ibex/ibex_Sep.h>
+#include <ibex_IntervalVector.h>
+#include <ibex_Sep.h>
 #include <utility>
 
 #include "../smartSubPaving/smartSubPaving.h"

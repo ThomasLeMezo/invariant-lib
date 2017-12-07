@@ -3,8 +3,8 @@
 
 #include <utility>
 
-#include <ibex/ibex_IntervalVector.h>
-#include <ibex/ibex_Ctc.h>
+#include <ibex_IntervalVector.h>
+#include <ibex_Ctc.h>
 
 #include "pave.h"
 #include "face.h"

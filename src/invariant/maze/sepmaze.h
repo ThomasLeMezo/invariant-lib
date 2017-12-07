@@ -1,8 +1,8 @@
 #ifndef SEPMAZE_H
 #define SEPMAZE_H
 
-#include "ibex/ibex_Sep.h"
-#include "ibex/ibex_IntervalVector.h"
+#include "ibex_Sep.h"
+#include "ibex_IntervalVector.h"
 
 #include "maze.h"
 

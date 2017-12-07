@@ -1,7 +1,7 @@
 #ifndef DOOR_H
 #define DOOR_H
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 
 #include "ppl.hh"
 

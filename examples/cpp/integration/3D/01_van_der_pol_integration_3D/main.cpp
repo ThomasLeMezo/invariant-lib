@@ -8,7 +8,7 @@
 
 #include "vtkMaze3D.h"
 
-#include "ibex/ibex_SepFwdBwd.h"
+#include "ibex_SepFwdBwd.h"
 
 using namespace std;
 using namespace ibex;

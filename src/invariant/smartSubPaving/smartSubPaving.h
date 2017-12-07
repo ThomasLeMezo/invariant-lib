@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 
 #include "pave.h"
 #include "pave_node.h"

@@ -2,7 +2,7 @@
 #define PREVIMER3D_H
 
 #include <string>
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 #include "dataSet/datasetnode.h"
 #include "dynamics.h"
 #include <utility>

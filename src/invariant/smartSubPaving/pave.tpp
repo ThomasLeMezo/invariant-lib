@@ -42,6 +42,7 @@ Pave<_Tp, _V>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp, _V
         m_faces_vector.push_back(face_lb);
         m_faces_vector.push_back(face_ub);
     }
+    compute_typed_position();
 }
 
 template<typename _Tp, typename _V>
@@ -59,6 +60,7 @@ Pave<_Tp, _V>::~Pave(){
     for(Face<_Tp, _V>* f:m_faces_vector){
         delete(f);
     }
+    delete(m_position_typed);
 }
 
 template<typename _Tp, typename _V>

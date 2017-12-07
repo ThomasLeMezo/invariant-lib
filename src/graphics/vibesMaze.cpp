@@ -1,6 +1,6 @@
 
 #include "vibesMaze.h"
-#include <ibex/ibex_IntervalVector.h>
+#include <ibex_IntervalVector.h>
 #include "ostream"
 #include "smartSubPaving.h"
 #include "maze.h"
