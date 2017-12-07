@@ -262,8 +262,8 @@ protected:
 
     std::vector<bool>    m_possible_out;
     std::vector<bool>    m_possible_in;
-    bool                 m_possible_in_union;
-    bool                 m_possible_out_union;
+    bool                 m_possible_in_union = false;
+    bool                 m_possible_out_union = false;
     std::vector<bool>    m_collinear_vector_field;
     std::vector<std::vector<bool>> m_zeros_in_vector_fields;
 };
