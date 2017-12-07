@@ -80,7 +80,7 @@ include_directories(maze)
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-core
+  add_library(invariant-core #SHARED
       ${SRC}
       ${HEADERS}
   )
@@ -90,6 +90,11 @@ include_directories(maze)
       ${LIBS_PPL}
       ${LIBS_GMP}
   )
+
+    target_include_directories(invariant-core
+        PUBLIC ${PPL_INCLUDES}
+        PUBLIC ${GMP_INCLUDES}
+    )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")
   install(TARGETS invariant-core DESTINATION lib)

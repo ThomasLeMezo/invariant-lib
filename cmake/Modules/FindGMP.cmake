@@ -8,25 +8,47 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
+if (NOT GMP_ROOT_DIR)
+  set (GMP_ROOT_DIR ${GMP_ROOT})
+endif (NOT GMP_ROOT_DIR)
 
-if (GMP_INCLUDE_DIR AND GMP_LIBRARIES)
-  # Already in cache, be silent
-  set(GMP_FIND_QUIETLY TRUE)
-endif (GMP_INCLUDE_DIR AND GMP_LIBRARIES)
-
-find_path(GMP_INCLUDE_DIR 
+find_path(GMP_INCLUDES
 	NAMES gmp.h gmpxx.h
+        HINTS ${GMP_ROOT_DIR}
+        PATH_SUFFIXES include
+        NO_DEFAULT_PATH
 )
+
 
 find_library(GMP_LIBRARIES_C
 	NAMES gmp
+        HINTS ${GMP_ROOT_DIR}
+        PATH_SUFFIXES lib
+        NO_DEFAULT_PATH
 )
+
 find_library(GMP_LIBRARIES_CXX
 	NAMES gmpxx
+        HINTS ${GMP_ROOT_DIR}
+        PATH_SUFFIXES lib
+        NO_DEFAULT_PATH
 )
 set(GMP_LIBRARIES "${GMP_LIBRARIES_CXX};${GMP_LIBRARIES_C}")
 
 include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(GMP DEFAULT_MSG GMP_INCLUDE_DIR GMP_LIBRARIES)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(GMP DEFAULT_MSG GMP_INCLUDES GMP_LIBRARIES)
+
+if (GMP_FOUND)
+  if (NOT GMP_FIND_QUIETLY)
+    message (STATUS "Found components for GMP")
+    message (STATUS "GMP_ROOT_DIR  = ${GMP_ROOT_DIR}")
+    message (STATUS "GMP_INCLUDES  = ${GMP_INCLUDES}")
+    message (STATUS "GMP_LIBRARIES = ${GMP_LIBRARIES}")
+  endif (NOT GMP_FIND_QUIETLY)
+else (GMP_FOUND)
+  if (GMP_FIND_REQUIRED)
+    message (FATAL_ERROR "Could not find GMP!")
+  endif (GMP_FIND_REQUIRED)
+endif (GMP_FOUND)
 
 mark_as_advanced(GMP_INCLUDE_DIR GMP_LIBRARIES)

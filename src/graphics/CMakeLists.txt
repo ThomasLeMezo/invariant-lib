@@ -11,6 +11,8 @@ include_directories(../invariant/definition/netcdf)
 include_directories(../invariant/serialization)
 include_directories(vibes)
 
+
+#################################  3D (VTK) #################################
 if(WITH_3D)
     include(${VTK_USE_FILE})
 
@@ -23,7 +25,7 @@ if(WITH_3D)
         vtkmazeppl.h
     )
 
-    add_library(invariant-graphics-3D
+    add_library(invariant-graphics-3D #SHARED
         ${SRC_3D}
         ${HEADERS_3D}
     )
@@ -32,10 +34,13 @@ if(WITH_3D)
         ${LIBS_VTK}
         invariant-core
     )
+    target_include_directories(invariant-graphics-3D PUBLIC ${LIBS_VTK})
 
     install(FILES ${HEADERS_3D} DESTINATION "include/invariant-lib")
     install(TARGETS invariant-graphics-3D DESTINATION lib)
 endif()
+
+#################################  Graphiz #################################
 
 if(WITH_GRAPHIZ)
     set(SRC_graphiz
@@ -58,6 +63,9 @@ if(WITH_GRAPHIZ)
     install(FILES ${HEADERS_graphiz} DESTINATION "include/invariant-lib")
     install(TARGETS invariant-graphics-graphiz DESTINATION lib)
 endif()
+
+
+#################################  Vibes #################################
 
   set(SRC
     vibes/vibes.cpp

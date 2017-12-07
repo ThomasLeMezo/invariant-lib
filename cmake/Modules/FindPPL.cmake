@@ -45,22 +45,19 @@ if (NOT PPL_FOUND)
     NAMES ppl.hh
     HINTS ${PPL_ROOT_DIR}
     PATH_SUFFIXES include
-    )
+    NO_DEFAULT_PATH
+  )
 
   ##_____________________________________________________________________________
   ## Check for the library
 
-  set (PPL_LIBRARIES "")
-
   ## libppl
-
-  find_library (PPL_PPL_LIBRARY ppl
+  find_library (PPL_LIBRARIES
+    NAMES ppl
     HINTS ${PPL_ROOT_DIR}
     PATH_SUFFIXES lib
-    )
-  if (PPL_PPL_LIBRARY)
-    list (APPEND PPL_LIBRARIES ${PPL_PPL_LIBRARY})
-  endif (PPL_PPL_LIBRARY)
+    NO_DEFAULT_PATH
+  )
 
   ##_____________________________________________________________________________
   ## Actions taken when all components have been found
@@ -87,6 +84,6 @@ if (NOT PPL_FOUND)
     PPL_ROOT_DIR
     PPL_INCLUDES
     PPL_LIBRARIES
-    )
+  )
 
 endif (NOT PPL_FOUND)

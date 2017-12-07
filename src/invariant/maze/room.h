@@ -20,7 +20,6 @@ _Tp get_empty_door_container(int dim);
 #include "maze.h"
 #include "door.h"
 #include "../smartSubPaving/face.h"
-#include "ppl.hh"
 
 namespace ppl=Parma_Polyhedra_Library;
 

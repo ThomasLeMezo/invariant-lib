@@ -3,7 +3,7 @@
 
 #include <ibex/ibex_IntervalVector.h>
 
-#include <ppl.hh>
+#include "ppl.hh"
 
 #include <omp.h>
 #include <iostream>

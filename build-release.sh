@@ -19,6 +19,7 @@ cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
 	  -DIBEX_ROOT=${HOME}/ibex \
 	  -DVTK_ROOT=${HOME}/vtk \
 	  -DPPL_ROOT=${HOME}/ppl \
+	  -DGMP_ROOT=${HOME}/gmp \
 	  -DCMAKE_BUILD_TYPE=RELEASE \
 	  -DBUILD_TESTS=OFF \
 	  -DWITH_PYTHON=OFF \

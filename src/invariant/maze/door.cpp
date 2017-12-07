@@ -1,5 +1,4 @@
 #include "door.h"
-#include "ppl.hh"
 
 namespace ppl=Parma_Polyhedra_Library;
 

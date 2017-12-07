@@ -47,7 +47,7 @@ cache:
   directories:
   - "$HOME/ibex"
   - "$HOME/ppl"
-  # - "$HOME/patchelf"
+  - "$HOME/gmp"
 notifications:
   email: false
 before_install:

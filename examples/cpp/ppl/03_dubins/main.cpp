@@ -12,6 +12,7 @@
 #include "vtkmazeppl.h"
 
 #include "ppl.hh"
+#include "errno.h"
 
 using namespace std;
 using namespace ibex;

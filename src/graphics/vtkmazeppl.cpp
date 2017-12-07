@@ -8,7 +8,6 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkXMLPolyDataWriter.h"
 
-
 using namespace invariant;
 
 VtkMazePPL::VtkMazePPL(const string &file_name)
