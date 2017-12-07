@@ -68,6 +68,7 @@ int Maze<_Tp, _V>::contract(){
     std::cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << std::endl;
     t_start = omp_get_wtime();
     int nb_operations = 0;
+    int nb_deque = 0;
 
     // Propagation of contractions
     bool deque_empty = m_deque_rooms.empty();
@@ -86,7 +87,7 @@ int Maze<_Tp, _V>::contract(){
 #pragma omp task
                 {
 #pragma omp atomic
-                            nb_operations++;
+                            nb_deque++;
                     // Take one Room
                     omp_set_lock(&m_deque_access);
                     Room<_Tp, _V> *r = NULL;
@@ -126,8 +127,8 @@ int Maze<_Tp, _V>::contract(){
                             add_rooms(rooms_to_update);
 
                             // Increment operations
-//#pragma omp atomic
-//                            nb_operations++;
+#pragma omp atomic
+                            nb_operations++;
                         }
 
                         /// DEBUG
@@ -154,7 +155,7 @@ int Maze<_Tp, _V>::contract(){
         }
     }
 
-    std::cout << " => contractions (" << nb_operations << ") : " << omp_get_wtime() - t_start << " s";
+    std::cout << " => contractions (" << nb_operations << "/" << nb_deque << ") : " << omp_get_wtime() - t_start << " s";
     return nb_operations;
 }
 

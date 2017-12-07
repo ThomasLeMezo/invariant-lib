@@ -262,6 +262,8 @@ protected:
 
     std::vector<bool>    m_possible_out;
     std::vector<bool>    m_possible_in;
+    bool                 m_possible_in_union;
+    bool                 m_possible_out_union;
     std::vector<bool>    m_collinear_vector_field;
     std::vector<std::vector<bool>> m_zeros_in_vector_fields;
 };
@@ -315,11 +317,13 @@ inline Room<_Tp, _V> * Door<_Tp, _V>::get_room() const{
 template <typename _Tp, typename _V>
 inline void Door<_Tp, _V>::push_back_possible_in(bool val){
     m_possible_in.push_back(val);
+    m_possible_in_union |= val;
 }
 
 template <typename _Tp, typename _V>
 inline void Door<_Tp, _V>::push_back_possible_out(bool val){
     m_possible_out.push_back(val);
+    m_possible_out_union |= val;
 }
 
 template <typename _Tp, typename _V>

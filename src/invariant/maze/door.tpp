@@ -117,7 +117,7 @@ bool Door<_Tp, _V>::contract_continuity_private(){
 
     bool change = false;
 
-    if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
+    if((dynamics_sens == FWD || dynamics_sens == FWD_BWD) && m_possible_in_union){
         _Tp door_input = get_empty_door_container<_Tp, _V>(m_face->get_pave()->get_dim());
         for(Face<_Tp, _V>* f:m_face->get_neighbors()){
             Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
@@ -132,7 +132,7 @@ bool Door<_Tp, _V>::contract_continuity_private(){
         }
     }
 
-    if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
+    if((dynamics_sens == BWD || dynamics_sens == FWD_BWD) && m_possible_out_union){
         _Tp door_output = get_empty_door_container<_Tp, _V>(m_face->get_pave()->get_dim());
         for(Face<_Tp, _V>* f:m_face->get_neighbors()){
             Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
