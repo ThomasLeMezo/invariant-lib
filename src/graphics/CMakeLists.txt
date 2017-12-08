@@ -34,7 +34,11 @@ if(WITH_3D)
         ${LIBS_VTK}
         invariant-core
     )
-    target_include_directories(invariant-graphics-3D PUBLIC ${LIBS_VTK})
+
+    target_include_directories(invariant-graphics-3D
+        PUBLIC ${IBEX_INCLUDE_DIRS}
+        PUBLIC ${VTK_INCLUDE_DIRS}
+    )
 
     install(FILES ${HEADERS_3D} DESTINATION "include/invariant-lib")
     install(TARGETS invariant-graphics-3D DESTINATION lib)
@@ -59,6 +63,12 @@ if(WITH_GRAPHIZ)
         ${LIBS}
         ${LIBS_GRAPHIZ}
     )
+
+    target_include_directories(invariant-graphics-graphiz
+        PUBLIC ${IBEX_INCLUDE_DIRS}
+        PUBLIC ${LIBGVC_INCLUDE_DIRS}
+    )
+
 
     install(FILES ${HEADERS_graphiz} DESTINATION "include/invariant-lib")
     install(TARGETS invariant-graphics-graphiz DESTINATION lib)
@@ -90,6 +100,10 @@ endif()
   target_link_libraries(invariant-graphics
       ${LIBS}
   )
+
+    target_include_directories(invariant-graphics
+        PUBLIC ${IBEX_INCLUDE_DIRS}
+    )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")
   install(TARGETS invariant-graphics DESTINATION lib)

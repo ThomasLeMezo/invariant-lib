@@ -130,8 +130,8 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
         }
     }
     std::array<int, 2> root_t = {0, file_id-1};
-    std::array<int, 2> root_i = {0, i_max_save-1};
-    std::array<int, 2> root_j = {0, j_max_save-1};
+    std::array<int, 2> root_i = {0, (int)i_max_save-1};
+    std::array<int, 2> root_j = {0, (int)j_max_save-1};
     m_node_root_position.push_back(root_t);
     m_node_root_position.push_back(root_i);
     m_node_root_position.push_back(root_j);
@@ -249,9 +249,9 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
     // Apply function of conversion raster <--> Reality
     std::vector<std::array<int, 2>> target;
 
-    array<int, 2> t = {floor(position[0].lb()/m_grid_conversion[0]), floor(position[0].ub()/m_grid_conversion[0])};
-    array<int, 2> i = {floor(position[1].lb()/m_grid_conversion[1]-m_offset_i), floor(position[1].ub()/m_grid_conversion[1]-m_offset_i)};
-    array<int, 2> j = {floor(position[2].lb()/m_grid_conversion[2]-m_offset_j), floor(position[2].ub()/m_grid_conversion[2]-m_offset_j)};
+    array<int, 2> t = {(int)floor(position[0].lb()/m_grid_conversion[0]), (int)floor(position[0].ub()/m_grid_conversion[0])};
+    array<int, 2> i = {(int)floor(position[1].lb()/m_grid_conversion[1]-m_offset_i), (int)floor(position[1].ub()/m_grid_conversion[1]-m_offset_i)};
+    array<int, 2> j = {(int)floor(position[2].lb()/m_grid_conversion[2]-m_offset_j), (int)floor(position[2].ub()/m_grid_conversion[2]-m_offset_j)};
     target.push_back(t);
     target.push_back(i);
     target.push_back(j);

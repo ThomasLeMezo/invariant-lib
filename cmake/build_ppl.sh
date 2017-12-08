@@ -8,7 +8,7 @@
 
 if [ ! -e "$HOME/gmp/lib/libgmp.so" ]; then
   echo 'Installing PPL-lib...';
-  GMP_VERSION=6.1.2
+  GMP_VERSION="6.1.2"
   GMP_FILE_NAME=gmp-${VERSION}
   GMP_ARCHIVE_NAME=${FILE_NAME}.tar.xz
 
