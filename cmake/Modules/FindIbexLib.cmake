@@ -6,7 +6,7 @@
 #  IBEX_DEFINITIONS - Compiler switches required for using ibex
 
 find_package(PkgConfig)
-pkg_check_modules(PC_IBEXLIB QUIET ibex)
+#pkg_check_modules(PC_IBEXLIB QUIET ibex)
 message(STATUS "IBEX_ROOT ${IBEX_ROOT}")
 
 if(IbexLib_USE_STATIC)
@@ -15,23 +15,26 @@ endif()
 
 set(IBEX_DEFINITIONS ${PC_IBEX_CFLAGS_OTHER})
 find_path(IBEX_INCLUDE_DIR ibex.h
-          HINTS ${PC_IBEX_INCLUDEDIR} ${PC_IBEX_INCLUDE_DIRS} ${IBEX_ROOT}
-          PATH_SUFFIXES include include/ibex )
+          HINTS ${IBEX_ROOT}
+          PATH_SUFFIXES include include/ibex
+          NO_DEFAULT_PATH)
 
 find_path(FILIB_INCLUDE_DIR ieee/primitive.hpp
-          HINTS ${PC_IBEX_INCLUDEDIR} ${PC_IBEX_INCLUDE_DIRS} ${IBEX_ROOT}
+          HINTS ${IBEX_ROOT}
           PATH_SUFFIXES include
+          NO_DEFAULT_PATH
           )
 
-
 find_library(IBEX_LIBRARY NAMES ibex
-            HINTS ${PC_IBEX_LIBDIR} ${PC_IBEX_LIBRARY_DIRS}  ${IBEX_ROOT}
+            HINTS ${IBEX_ROOT}
             PATH_SUFFIXES lib
+            NO_DEFAULT_PATH
 						)
 
 find_library(FILIB_LIBRARY NAMES prim
-            HINTS ${PC_IBEX_LIBDIR} ${PC_IBEX_LIBRARY_DIRS}  ${IBEX_ROOT}
+            HINTS ${IBEX_ROOT}
             PATH_SUFFIXES lib
+            NO_DEFAULT_PATH
 						)
 
 set(IBEX_LIBRARIES ${IBEX_LIBRARY} ${FILIB_LIBRARY})

@@ -80,7 +80,7 @@ include_directories(maze)
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-core #SHARED
+  add_library(invariant-core SHARED
       ${SRC}
       ${HEADERS}
   )
