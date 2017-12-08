@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
     // ******* Mazes ********* //
     MazePPL maze_outer(&dom_outer, &dyn_outer);
 
+    VtkMazePPL vtkMazePPL("DubinsPPL");
+
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
@@ -63,11 +65,10 @@ int main(int argc, char *argv[])
         cout << i << " outer - ";
         maze_outer.contract();
         cout << " - paving = " << paving.size() << endl;
+        vtkMazePPL.show_maze(&maze_outer);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    VtkMazePPL vtkMazePPL("DubinsPPL");
-    vtkMazePPL.show_maze(&maze_outer);
 }

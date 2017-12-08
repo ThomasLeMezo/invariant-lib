@@ -7,22 +7,21 @@
 #set -x # debugging
 
 if [ ! -e "$HOME/gmp/lib/libgmp.so" ]; then
-  echo 'Installing PPL-lib...';
+  echo 'Installing GMP-lib...';
   GMP_VERSION="6.1.2"
-  GMP_FILE_NAME=gmp-${VERSION}
-  GMP_ARCHIVE_NAME=${FILE_NAME}.tar.xz
+  GMP_FILE_NAME=gmp-${GMP_VERSION}
+  GMP_ARCHIVE_NAME=${GMP_FILE_NAME}.tar.xz
 
-  wget https://gmplib.org/download/gmp/${VERSION}/${ARCHIVE_NAME}
+  wget https://gmplib.org/download/gmp/${GMP_ARCHIVE_NAME}
   tar xf ${GMP_ARCHIVE_NAME}
   rm ${GMP_ARCHIVE_NAME}
   cd ${GMP_FILE_NAME}
 
-  ./configure --prefix=$HOME/gmp --enable-cxx CXXFLAGS=-fPIC CFLAGS=-fPIC
+  ./configure --prefix=$HOME/gmp --enable-cxx CXXFLAGS="-fPIC -O2" CFLAGS="-fPIC -O2" CPPFLAGS="-fPIC -O2" --with-gnu-ld 
   make
   make check
   make install
   cd ..
-  rm -R ${GMP_ARCHIVE_NAME}
 fi
 
 

@@ -23,6 +23,7 @@ public:
 private:
 
     std::string         m_file_name = "";
+    int                 m_number_export = 0;
 };
 
 #endif // VTKMAZEPPL_H

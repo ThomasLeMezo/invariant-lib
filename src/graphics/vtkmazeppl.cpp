@@ -8,6 +8,11 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkXMLPolyDataWriter.h"
 
+#include <ostream>
+#include <iostream>
+#include <fstream>
+#include <string>
+
 using namespace invariant;
 
 VtkMazePPL::VtkMazePPL(const string &file_name)
@@ -43,6 +48,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                 DoorPPL *d = f->get_doors()[maze];
                 ph_union |= d->get_hull();
             }
+            ph_union.minimized_constraints();
 
             if(ph_union.space_dimension()==3){
                 int nb_generator = 0;
@@ -97,8 +103,10 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     polyData_polygon->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-    string file = m_file_name + "_polygon" + comment + ".vtp";
-    outputWriter->SetFileName(file.c_str());
+    std::stringstream file_name;
+    file_name << m_file_name << "_polygon" << comment << "_" << m_number_export << ".vtp";
+    m_number_export++;
+    outputWriter->SetFileName(file_name.str().c_str());
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
 
