@@ -129,6 +129,7 @@ void Room<_Tp, _V>::contract_vector_field(){
 
     int dim = m_pave->get_dim();
     DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
+    DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
 
     for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
@@ -154,76 +155,45 @@ void Room<_Tp, _V>::contract_vector_field(){
                 }
 
                 if((f->get_orientation() & v_bool_in).is_empty()){
-                    if(dynamics_sens == BWD || dynamics_sens == FWD_BWD)
+                    d->push_back_possible_in(false);
+                    if(domain_init == FULL_DOOR && (dynamics_sens == BWD || dynamics_sens == FWD_BWD))
                         d->set_empty_private_input();
                 }
+                else
+                    d->push_back_possible_in(true);
+
                 if((f->get_orientation() & v_bool_out).is_empty()){
-                    if(dynamics_sens == FWD || dynamics_sens == FWD_BWD)
+                    d->push_back_possible_out(false);
+                    if(domain_init == FULL_DOOR && (dynamics_sens == FWD || dynamics_sens == FWD_BWD))
                         d->set_empty_private_output();
                 }
-            }
-
-            // Note : synchronization will be proceed at the end of all contractors
-            // to avoid unecessary lock
-        }
-    }
-}
-
-template<typename _Tp, typename _V>
-void Room<_Tp, _V>::eval_vector_field_possibility(){
-    int dim = m_pave->get_dim();
-    ibex::IntervalVector zero = ibex::IntervalVector(dim, ibex::Interval::ZERO);
-
-    for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
-        Door<_Tp, _V> *d = f->get_doors()[m_maze];
-        std::vector<ibex::IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
-
-        for(ibex::IntervalVector &v:vector_fields_face){
-            // Construct the boolean interval vector of the vector_field
-            ibex::IntervalVector v_bool_in = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
-            ibex::IntervalVector v_bool_out = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
-
-            for(int i=0; i<dim; i++){
-                if(!(v[i] & ibex::Interval::POS_REALS).is_empty())
-                    v_bool_out[i] |= ibex::Interval(1);
-                if(!(v[i] & ibex::Interval::NEG_REALS).is_empty())
-                    v_bool_out[i] |= ibex::Interval(0);
-                if(!((-v[i]) & ibex::Interval::POS_REALS).is_empty())
-                    v_bool_in[i] |= ibex::Interval(1);
-                if(!((-v[i]) & ibex::Interval::NEG_REALS).is_empty())
-                    v_bool_in[i] |= ibex::Interval(0);
-            }
-
-            if((f->get_orientation() & v_bool_in).is_empty())
-                d->push_back_possible_in(false);
-            else
-                d->push_back_possible_in(true);
-
-            if((f->get_orientation() & v_bool_out).is_empty())
-                d->push_back_possible_out(false);
-            else
-                d->push_back_possible_out(true);
-
-            // Note : synchronization will be proceed at the end of all contractors
-            // to avoid unecessary lock
-
-            for(const ibex::IntervalVector&v:get_vector_fields()){
-                ibex::IntervalVector product = hadamard_product(v, f->get_normal());
-                std::vector<bool> where_zeros;
-
-                if(zero.is_subset(product)){
-                    d->push_back_collinear_vector_field(true);
-                    for(int n_dim=0; n_dim<dim; n_dim++){
-                        if(ibex::Interval::ZERO.is_subset(v[n_dim]))
-                            where_zeros.push_back(true);
-                        else
-                            where_zeros.push_back(false);
-                    }
-                }
                 else
-                    d->push_back_collinear_vector_field(false);
-                d->push_back_zeros_in_vector_field(where_zeros);
+                    d->push_back_possible_out(true);
+
+                // Note : synchronization will be proceed at the end of all contractors
+                // to avoid unecessary lock
+
+                for(const ibex::IntervalVector&v:get_vector_fields()){
+                    ibex::IntervalVector product = hadamard_product(v, f->get_normal());
+                    std::vector<bool> where_zeros;
+
+                    if(zero.is_subset(product)){
+                        d->push_back_collinear_vector_field(true);
+                        for(int n_dim=0; n_dim<dim; n_dim++){
+                            if(ibex::Interval::ZERO.is_subset(v[n_dim]))
+                                where_zeros.push_back(true);
+                            else
+                                where_zeros.push_back(false);
+                        }
+                    }
+                    else
+                        d->push_back_collinear_vector_field(false);
+                    d->push_back_zeros_in_vector_field(where_zeros);
+                }
             }
+
+            // Note : synchronization will be proceed at the end of all contractors
+            // to avoid unecessary lock
         }
     }
 }
@@ -628,21 +598,14 @@ bool Room<_Tp, _V>::contract(){
     bool change = false;
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
-        if(m_first_contract && domain_init == FULL_DOOR){
-            contract_vector_field();
-            change = true;
-        }
-        else if(m_first_contract && domain_init == FULL_WALL){
-            if(m_pave->is_border()) // Case only the border is full
-                change = true;
-        }
-
         if(m_first_contract){
-            eval_vector_field_possibility();
+            contract_vector_field();
+            if(domain_init == FULL_DOOR || (domain_init == FULL_WALL && m_pave->is_border()))
+                change = true;
             m_first_contract = false;
         }
 
-        if(!m_first_contract && ((is_full() && domain_init==FULL_WALL) || (is_empty() && domain_init == FULL_DOOR)))
+        if(!m_first_contract && ((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty())))
             return false;
 
         //        get_private_doors_info("before");
@@ -818,7 +781,9 @@ const bool Room<_Tp, _V>::get_one_vector_fields_zero(int n_vf) const{
 
 template<typename _Tp, typename _V>
 void Room<_Tp, _V>::set_removed(){
+    omp_set_lock(&m_lock_deque);
     m_removed = true;
+    omp_unset_lock(&m_lock_deque);
     // Free memory (private doors)
     for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
         Door<_Tp, _V> *d = f->get_doors()[m_maze];

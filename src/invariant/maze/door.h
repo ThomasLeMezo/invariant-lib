@@ -154,12 +154,16 @@ public:
      * @return
      */
     bool is_empty() const;
+    bool is_empty_output() const;
+    bool is_empty_input() const;
 
     /**
      * @brief Return true if input & output doors are full (ie equal to position)
      * @return
      */
     bool is_full() const;
+    bool is_full_output() const;
+    bool is_full_input() const;
 
     /**
      * @brief Return true if the union of input & output doors are full
@@ -358,10 +362,38 @@ inline const std::vector<bool>& Door<_Tp, _V>::is_possible_in() const{
 
 template <typename _Tp, typename _V>
 inline bool Door<_Tp, _V>::is_empty() const{
+    bool result;
+    omp_set_lock(&m_lock_read);
     if(m_input_public.is_empty() && m_output_public.is_empty())
-        return true;
+        result = true;
     else
-        return false;
+        result = false;
+    omp_unset_lock(&m_lock_read);
+    return result;
+}
+
+template <typename _Tp, typename _V>
+inline bool Door<_Tp, _V>::is_empty_output() const{
+    bool result;
+    omp_set_lock(&m_lock_read);
+    if(m_output_public.is_empty())
+        result = true;
+    else
+        result = false;
+    omp_unset_lock(&m_lock_read);
+    return result;
+}
+
+template <typename _Tp, typename _V>
+inline bool Door<_Tp, _V>::is_empty_input() const{
+    bool result;
+    omp_set_lock(&m_lock_read);
+    if(m_input_public.is_empty())
+        result = true;
+    else
+        result = false;
+    omp_unset_lock(&m_lock_read);
+    return result;
 }
 
 template <typename _Tp, typename _V>

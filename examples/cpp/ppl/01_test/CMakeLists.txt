@@ -18,10 +18,8 @@ if(WITH_PPL)
   add_executable(ppl_test ${SRC})
 
   target_link_libraries(ppl_test
-    ${LIBS}
-    ${LIBS_PPL}
-    ${LIBS_VTK}
-    ${LIBS_GMP}
+    invariant-core
+    invariant-graphics-3D
   )
 endif()
 

@@ -43,8 +43,9 @@ int main(int argc, char *argv[])
 //    maze.init();
     for(int i=0; i<12; i++){
         paving.bisect();
-        cout << i << " - " << maze.contract() << " - ";
-        cout << paving.size() << endl;
+        cout << i << " - ";
+        maze.contract();
+        cout << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -60,11 +61,11 @@ int main(int argc, char *argv[])
 //    position_info[1] = ibex::Interval(1);
 //    v_maze.get_room_info(&maze, position_info);
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(-1);
-    position_info[1] = ibex::Interval(1);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(-1);
+//    position_info[1] = ibex::Interval(1);
 //    v_maze.get_room_info(&maze, position_info);
-    v_maze.show_room_info(&maze, position_info);
+//    v_maze.show_room_info(&maze, position_info);
 
 //    position_info[0] = ibex::Interval(0);
 //    position_info[1] = ibex::Interval(-1);

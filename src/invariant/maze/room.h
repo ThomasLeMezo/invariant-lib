@@ -121,7 +121,7 @@ public:
     /**
      * @brief Declare this room in the deque of the maze
      */
-    void set_in_queue();
+    bool set_in_queue();
 
     /**
      * @brief Return a list of neighbor Rooms that need an update according after contraction
@@ -298,13 +298,9 @@ protected:
 
     /**
      * @brief Contract the doors according to the vector field orientation
+     * and Test the doors according to the vector field orientation and save the result in each doors
      */
     void contract_vector_field();
-
-    /**
-     * @brief Test the doors according to the vector field orientation and save the result in each doors
-     */
-    void eval_vector_field_possibility();
 
     /**
      * @brief Basic contraction between [in] and [out] according to a [vect].
@@ -490,10 +486,15 @@ inline bool Room<_Tp, _V>::is_in_deque(){
 }
 
 template <typename _Tp, typename _V>
-inline void Room<_Tp, _V>::set_in_queue(){
+inline bool Room<_Tp, _V>::set_in_queue(){
+    bool result = false;
     omp_set_lock(&m_lock_deque);
-    m_in_deque = true;
+    if(!m_in_deque && !m_removed){
+        m_in_deque = true;
+        result = true;
+    }
     omp_unset_lock(&m_lock_deque);
+    return result;
 }
 
 template <typename _Tp, typename _V>

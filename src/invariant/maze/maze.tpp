@@ -36,7 +36,7 @@ void Maze<_Tp, _V>::init(){
 template<typename _Tp, typename _V>
 int Maze<_Tp, _V>::contract(){
     if(m_empty){
-        std::cout << " ==> MAZE EMPTY" << std::endl;
+        std::cout << " ==> MAZE EMPTY (begin)" << std::endl;
         return 0;
     }
     // Domain contraction
@@ -211,10 +211,9 @@ bool Maze<_Tp, _V>::is_escape_trajectories(){
 template<typename _Tp, typename _V>
 void Maze<_Tp, _V>::add_rooms(const std::vector<Room<_Tp, _V> *>& list_rooms){
     for(Room<_Tp, _V> *r:list_rooms){
-        if(!r->is_in_deque() && !r->is_removed()){
-            r->set_in_queue();
+        bool valid = r->set_in_queue();
+        if(valid)
             this->add_to_deque(r);
-        }
     }
 }
 
