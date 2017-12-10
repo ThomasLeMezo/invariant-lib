@@ -24,6 +24,8 @@ public:
 
     virtual const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector& position) =0;
 
+    virtual const std::vector<ibex::IntervalVector> eval_d1(const ibex::IntervalVector &position) =0;
+
     DYNAMICS_SENS get_sens() const;
 
 private:

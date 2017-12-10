@@ -27,13 +27,6 @@ Maze<_Tp, _V>::~Maze(){
 }
 
 template<typename _Tp, typename _V>
-void Maze<_Tp, _V>::init(){
-    std::vector<Room<_Tp, _V> *> list_room_to_contract;
-    invariant::Domain<_Tp, _V> *d = m_domain;
-    d->contract_domain(this, list_room_to_contract);
-}
-
-template<typename _Tp, typename _V>
 int Maze<_Tp, _V>::contract(){
     if(m_empty){
         std::cout << " ==> MAZE EMPTY (begin)" << std::endl;
@@ -47,8 +40,7 @@ int Maze<_Tp, _V>::contract(){
 
     // Add Room to the Deque
     for(Room<_Tp, _V> *r:list_room_to_contract){
-        if(!r->is_in_deque()){
-            r->set_in_queue();
+        if(r->set_in_queue()){
             add_to_deque(r);
         }
     }
@@ -73,7 +65,7 @@ int Maze<_Tp, _V>::contract(){
     // Propagation of contractions
     bool deque_empty = m_deque_rooms.empty();
 
-    if(deque_empty){
+    if(deque_empty && m_contraction_step!=0){
         std::cout << " => MAZE EMPTY" << std::endl;
         m_empty = true;
         return 0;
@@ -156,6 +148,7 @@ int Maze<_Tp, _V>::contract(){
     }
 
     std::cout << " => contractions (" << nb_operations << "/" << nb_deque << ") : " << omp_get_wtime() - t_start << " s";
+    m_contraction_step++;
     return nb_operations;
 }
 

@@ -34,8 +34,28 @@ public:
      */
     const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector &position);
 
+    /**
+     * @brief Eval the derivate vector field from the state space
+     * @param position
+     * @return
+     */
+    const std::vector<ibex::IntervalVector> eval_d1(const ibex::IntervalVector &position);
+
+    /**
+     * @brief add_function_d1
+     * @param functions_list
+     */
+    void add_function_d1(std::vector<ibex::Function *> &functions_list);
+
+    /**
+     * @brief add_function_d1
+     * @param function
+     */
+    void add_function_d1(ibex::Function* f);
+
 private:
     std::vector<ibex::Function*> m_functions;
+    std::vector<ibex::Function*> m_functions_d1;
     omp_lock_t  m_lock_dynamics; // Lock
 };
 }

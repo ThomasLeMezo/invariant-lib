@@ -54,8 +54,10 @@ int main(int argc, char *argv[])
 
 #if 1
     // ****** Domain *******
-    invariant::SmartSubPavingPPL paving(search_space);
-    invariant::DomainPPL dom(&paving, FULL_WALL);
+//    invariant::SmartSubPavingPPL paving(search_space);
+//    invariant::DomainPPL dom(&paving, FULL_WALL);
+    invariant::SmartSubPavingIBEX paving(search_space);
+    invariant::DomainIBEX dom(&paving, FULL_WALL);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -75,11 +77,14 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ******* Maze *********
-    invariant::MazePPL maze(&dom, &pm3d);
+//    invariant::MazePPL maze(&dom, &pm3d);
+    invariant::MazeIBEX maze(&dom, &pm3d);
 
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
+//    VtkMazePPL vtkMazePPL("PrevimerPPL");
+    VtkMaze3D vtkMaze3D("PrevimerIBEX");
     omp_set_num_threads(1);
     for(int i=0; i<20; i++){
         cout << i << endl;
@@ -87,6 +92,8 @@ int main(int argc, char *argv[])
         paving.bisect();
         cout << " => bisection : " << omp_get_wtime() - time_start_bisection << "s - " << paving.size() << endl;
         maze.contract();
+//        vtkMazePPL.show_maze(&maze);
+        vtkMaze3D.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
 
@@ -103,8 +110,6 @@ int main(int argc, char *argv[])
 //    position[2] = ibex::Interval(y_c); // 119766, 120469
 //    vtkMaze3D.show_room_info(&maze, position);
 
-    VtkMazePPL vtkMazePPL("Previmer");
-    vtkMazePPL.show_maze(&maze);
 #endif
 
     return 0;

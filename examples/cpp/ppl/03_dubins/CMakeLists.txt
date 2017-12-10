@@ -9,7 +9,6 @@
   )
 
   set(HEADERS
-
   )
 
   add_executable(ppl_3D_dubins ${SRC})

@@ -62,11 +62,6 @@ public:
     Dynamics *get_dynamics() const;
 
     /**
-     * @brief Initialize the Maze by applying only a domain contractor
-     */
-    void init();
-
-    /**
      * @brief Contract the Maze
      * @return the number of contractions
      */
@@ -116,6 +111,7 @@ private:
     bool    m_contract_once = false;
 
     bool m_empty = false;
+    int m_contraction_step = 0;
 
 };
 }

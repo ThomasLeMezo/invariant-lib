@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
     u_var.getVar(&raw_u);
 
     vtkSmartPointer<vtkAppendPolyData> polyData = vtkSmartPointer<vtkAppendPolyData>::New();
-    for(size_t j=0; j<j_max; j++){
+    for(size_t j=1; j<j_max-1; j++){
         cout << j << endl;
-        for(size_t i=0; i<i_max; i++){
+        for(size_t i=1; i<i_max-1; i++){
             if(raw_u[j*i_max+i]==fill_value){
                 vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
                 cubedata->SetBounds(0.0,15*60,

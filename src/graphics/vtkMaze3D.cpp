@@ -483,8 +483,10 @@ void VtkMaze3D::show_maze(invariant::MazeIBEX *maze, std::string comment){
     polyData_polygon->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-    string file = m_file_name + "_polygon" + comment + ".vtp";
-    outputWriter->SetFileName(file.c_str());
+    std::stringstream file_name;
+    file_name << m_file_name << "_polygon" << comment << "_" << m_number_export << ".vtp";
+    m_number_export++;
+    outputWriter->SetFileName(file_name.str().c_str());
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
 

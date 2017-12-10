@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     IntervalVector space(3);
     space[0] = ibex::Interval(-10, 10);
     space[1] = ibex::Interval(-10, 10);
-    space[2] = ibex::Interval(0, 10);
+    space[2] = ibex::Interval::ZERO | ibex::Interval::TWO_PI;
 
     ibex::Interval v = ibex::Interval(0.1);
     ibex::Interval u = ibex::Interval(0.3);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     omp_set_num_threads(1);
     for(int i=0; i<15; i++){
         paving.bisect();
-        cout << i << " outer - ";
+        cout << i << endl;
         maze_outer.contract();
         cout << " - paving = " << paving.size() << endl;
         vtkMazePPL.show_maze(&maze_outer);

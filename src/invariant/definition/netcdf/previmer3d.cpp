@@ -269,10 +269,11 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec = IntervalVector(3, Interval::EMPTY_SET);
     }
     else{
-        vec[0] = Interval(0.9999, 1.0001);
-        vec[1] = Interval(data[0][0] * m_scale_factor, data[0][1] * m_scale_factor) + Interval(-0.01, 0.01);
-        vec[2] = Interval(data[1][0] * m_scale_factor, data[1][1] * m_scale_factor) + Interval(-0.01, 0.01);
+        vec[0] = 1e6 * (Interval(0.9999, 1.0001));
+        vec[1] = 1e6 * (Interval(data[0][0] * m_scale_factor, data[0][1] * m_scale_factor) + Interval(-0.01, 0.01));
+        vec[2] = 1e6 * (Interval(data[1][0] * m_scale_factor, data[1][1] * m_scale_factor) + Interval(-0.01, 0.01));
     }
+
     vector_fields.push_back(vec);
     return vector_fields;
 }

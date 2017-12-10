@@ -55,6 +55,7 @@ public:
 private:
     std::string         m_file_name = "";
     bool                m_memory_optimization = false;
+    int                 m_number_export = 0;
 };
 
 /**

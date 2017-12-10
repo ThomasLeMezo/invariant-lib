@@ -65,7 +65,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                                 coord.push_back(0.0); // ?
                             }
                         }
-                        points->InsertNextPoint(coord[0], coord[1], coord[2]);
+//                        points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
                 if(max_generator<nb_generator)

@@ -7,23 +7,123 @@ namespace invariant{
 
 template<>
 void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
-    // assert 0 not in v.
-    ibex::IntervalVector c(out-in);
-    ibex::IntervalVector v(vect);
-    ibex::Interval alpha(ibex::Interval::POS_REALS);
 
-    for(int i=0; i<v.size(); i++){
-        if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
-            alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
+    if(in.size()==2 && m_vector_fields_d1.size()!=0){
+        IntervalVector vect_d1 = m_vector_fields_d1[0];
+        if(sens==FWD || sens==FWD_BWD){
+            int out_comp = 0;
+            if(out[1].is_degenerated())
+                out_comp=1;
+
+            ibex::Interval y(ibex::Interval::EMPTY_SET);
+            ibex::Interval t;
+
+            IntervalVector in0_lb = IntervalVector(in.lb());
+            IntervalVector vec_in0_lb = m_maze->get_dynamics()->eval(in0_lb)[0];
+            ibex::Interval a1=0.5*vect_d1[out_comp];
+            ibex::Interval b1=vec_in0_lb[out_comp];
+            ibex::Interval c1=in0_lb[out_comp]-out[out_comp].lb();
+
+            if(a1 == ibex::Interval(0)){
+                t = -c1/b1 & ibex::Interval::POS_REALS;
+                y |= 0.5*vect_d1[1-out_comp]*(pow(t,2))+vec_in0_lb[1-out_comp]*t+in0_lb[1-out_comp];
+            }
+            else{
+                t = ((-b1+sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1)) & ibex::Interval::POS_REALS;
+                y |= 0.5*vect_d1[1-out_comp]*(pow(t,2))+vec_in0_lb[1-out_comp]*t+in0_lb[1-out_comp];
+
+                t = ((-b1-sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1)) & ibex::Interval::POS_REALS;
+                y |= 0.5*vect_d1[1-out_comp]*(pow(t,2))+vec_in0_lb[1-out_comp]*t+in0_lb[1-out_comp];
+            }
+
+            IntervalVector in0_ub = IntervalVector(in.ub());
+            IntervalVector vec_in0_ub = m_maze->get_dynamics()->eval(in0_ub)[0];
+            a1=0.5*vect_d1[out_comp];
+            b1=vec_in0_ub[out_comp];
+            c1=in0_ub[out_comp]-out[out_comp].lb();
+
+            if(a1 == ibex::Interval(0)){
+                t = -c1/b1 & ibex::Interval::POS_REALS;
+                y |= 0.5*vect_d1[1-out_comp]*(pow(t,2))+vec_in0_ub[1-out_comp]*t+in0_ub[1-out_comp];
+            }
+            else{
+                t = ((-b1+sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1)) & ibex::Interval::POS_REALS;
+                y |= 0.5*vect_d1[1-out_comp]*(pow(t,2))+vec_in0_ub[1-out_comp]*t+in0_ub[1-out_comp];
+
+                t = ((-b1-sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1)) & ibex::Interval::POS_REALS;
+                y |= 0.5*vect_d1[1-out_comp]*(pow(t,2))+vec_in0_ub[1-out_comp]*t+in0_ub[1-out_comp];
+            }
+
+            out[1-out_comp] &= y;
+        }
+
+        if(sens==BWD || sens==FWD_BWD){
+            int in_comp = 0;
+            if(in[1].is_degenerated())
+                in_comp=1;
+
+            ibex::Interval x(ibex::Interval::EMPTY_SET);
+            ibex::Interval t;
+
+            IntervalVector out0_lb = IntervalVector(out.lb());
+            IntervalVector vec_out0_lb = -m_maze->get_dynamics()->eval(out0_lb)[0];
+            ibex::Interval a1=-0.5*vect_d1[in_comp];
+            ibex::Interval b1=vec_out0_lb[in_comp];
+            ibex::Interval c1=out0_lb[in_comp]-in[in_comp].lb();
+
+            if(a1 == ibex::Interval(0)){
+                t = -c1/b1 & ibex::Interval::POS_REALS;
+                x |= -0.5*vect_d1[1-in_comp]*(pow(t,2))+vec_out0_lb[1-in_comp]*t+out0_lb[1-in_comp];
+            }
+            else{
+                t = (-b1+sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1) & ibex::Interval::POS_REALS;
+                x |= -0.5*vect_d1[1-in_comp]*(pow(t,2))+vec_out0_lb[1-in_comp]*t+out0_lb[1-in_comp];
+
+                t = (-b1-sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1) & ibex::Interval::POS_REALS;
+                x |= -0.5*vect_d1[1-in_comp]*(pow(t,2))+vec_out0_lb[1-in_comp]*t+out0_lb[1-in_comp];
+            }
+
+            IntervalVector out0_ub = IntervalVector(out.ub());
+            IntervalVector vec_out0_ub = -m_maze->get_dynamics()->eval(out0_ub)[0];
+            a1=-0.5*vect_d1[in_comp];
+            b1=vec_out0_ub[in_comp];
+            c1=out0_ub[in_comp]-in[in_comp].lb();
+
+            if(a1 == ibex::Interval(0)){
+                t = -c1/b1 & ibex::Interval::POS_REALS;
+                x |= -0.5*vect_d1[1-in_comp]*(pow(t,2))+vec_out0_lb[1-in_comp]*t+out0_ub[1-in_comp];
+            }
+            else{
+                t = (-b1+sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1) & ibex::Interval::POS_REALS;
+                x |= -0.5*vect_d1[1-in_comp]*(pow(t,2))+vec_out0_lb[1-in_comp]*t+out0_ub[1-in_comp];
+
+                t = (-b1-sqrt((pow(b1, 2)-4*a1*c1) & ibex::Interval::POS_REALS))/(2*a1) & ibex::Interval::POS_REALS;
+                x |= -0.5*vect_d1[1-in_comp]*(pow(t,2))+vec_out0_lb[1-in_comp]*t+out0_ub[1-in_comp];
+            }
+
+            in[1-in_comp] &= x;
+        }
     }
-    if(alpha==ibex::Interval::ZERO)
-        alpha.set_empty();
+    else{
+        // assert 0 not in v.
+        ibex::IntervalVector c(out-in);
+        ibex::IntervalVector v(vect);
+        ibex::Interval alpha(ibex::Interval::POS_REALS);
 
-    c &= alpha*v;
-    if(sens==FWD || sens==FWD_BWD)
-        out &= c+in;
-    if(sens==BWD || sens==FWD_BWD)
-        in &= out-c;
+        for(int i=0; i<v.size(); i++){
+            if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
+                alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
+        }
+        if(alpha==ibex::Interval::ZERO)
+            alpha.set_empty();
+
+        c &= alpha*v;
+        if(sens==FWD || sens==FWD_BWD)
+            out &= c+in;
+        if(sens==BWD || sens==FWD_BWD)
+            in &= out-c;
+    }
+
 }
 
 template <>

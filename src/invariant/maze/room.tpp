@@ -36,6 +36,9 @@ Room<_Tp, _V>::Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics)
         }
     }
 
+    // Eval Vector field d1
+    m_vector_fields_d1 = dynamics->eval_d1(position);
+
     // Create Doors
     int dim = m_pave->get_dim();
     for(int face=0; face<dim; face++){

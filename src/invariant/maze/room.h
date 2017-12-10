@@ -371,6 +371,7 @@ protected:
     Pave<_Tp, _V>*   m_pave = NULL; // pointer to the associated face
     Maze<_Tp, _V>*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
+    std::vector<ibex::IntervalVector> m_vector_fields_d1; // Vector field of the Room
 
     std::vector<_V> m_vector_fields_typed_fwd; // Typed Vector field of the Room
     std::vector<_V> m_vector_fields_typed_bwd; // Typed Vector field of the Room

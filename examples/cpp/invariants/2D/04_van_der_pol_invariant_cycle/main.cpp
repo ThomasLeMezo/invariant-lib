@@ -37,7 +37,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
+    ibex::Function fd(x1, x2, Return(x2,
+                                     -2*pow(x1,3)*x2+(1-pow(x1, 2))-x1));
     Dynamics_Function dyn(&f, FWD_BWD);
+    dyn.add_function_d1(&fd);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);
@@ -46,7 +49,9 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){
         paving.bisect();
-        cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
+        cout << i << endl;
+        maze.contract();
+        cout << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

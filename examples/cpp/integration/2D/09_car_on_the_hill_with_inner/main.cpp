@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_outer.init();
+    
     maze_inner.init();
     for(int i=0; i<15; i++){
         paving.bisect();
