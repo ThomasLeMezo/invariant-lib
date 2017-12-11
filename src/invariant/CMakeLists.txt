@@ -19,6 +19,7 @@ include_directories(maze)
 
     maze/room.cpp
     maze/door.cpp
+    maze/maze.cpp
     smartSubPaving/face.cpp
 
     smartSubPaving/pave.cpp
@@ -80,7 +81,7 @@ include_directories(maze)
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-core #SHARED
+  add_library(invariant-core
       ${SRC}
       ${HEADERS}
   )
