@@ -12,6 +12,7 @@
 #include "dynamics.h"
 #include "dynamics_function.h"
 #include "vibesMaze.h"
+#include "vtkMaze3D.h"
 #include <string>
 
 namespace py = pybind11;
@@ -112,5 +113,18 @@ using namespace ibex;
           .def("drawBox", (void (VibesMaze::*)(const ibex::IntervalVector &box, std::string params) const) &VibesMaze::drawBox)
           .def("drawBox", (void (VibesMaze::*)(double x_min, double x_max, double y_min, double y_max, std::string params) const) &VibesMaze::drawBox)
   ;
+
+  py::class_<VtkMaze3D>(m, "VtkMaze3D")
+          .def(py::init<const std::string&,
+               bool>(),
+               "name"_a,
+               "optimization"_a=false)
+
+          .def("show_graph", &VtkMaze3D::show_graph)
+          .def("show_maze", (void (VtkMaze3D::*)(const std::string &file_name)) &VtkMaze3D::show_maze)
+          .def("show_maze", (void (VtkMaze3D::*)(invariant::Maze<ibex::IntervalVector> *maze, std::string comment)) &VtkMaze3D::show_maze)
+          .def("show_room_info", &VtkMaze3D::show_room_info)
+          .def("serialize_maze", &VtkMaze3D::serialize_maze)
+    ;
 
 }

@@ -18,6 +18,8 @@ include_directories(.)
 include_directories(../src/invariant/smartSubPaving)
 include_directories(../src/invariant/maze)
 include_directories(../src/invariant/definition)
+include_directories(../src/invariant/definition/netcdf)
+include_directories(../src/invariant/definition/dataSet)
 include_directories(../src/graphics)
 
 pybind11_add_module(pyinvariant
@@ -27,6 +29,12 @@ pybind11_add_module(pyinvariant
 target_link_libraries(pyinvariant PRIVATE
     invariant-core
     invariant-graphics
+    invariant-graphics-3D
+)
+
+target_include_directories(pyinvariant
+    PUBLIC ${IBEX_INCLUDE_DIRS}
+    PUBLIC ${VTK_INCLUDE_DIRS}
 )
 
 # Copie des fichiers .so dans le module python

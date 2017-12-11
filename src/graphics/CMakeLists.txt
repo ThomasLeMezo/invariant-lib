@@ -14,7 +14,7 @@ include_directories(vibes)
 
 #################################  3D (VTK) #################################
 if(WITH_3D)
-    include(${VTK_USE_FILE})
+#    include(${VTK_USE_FILE})
 
     set(SRC_3D
         vtkMaze3D.cpp
