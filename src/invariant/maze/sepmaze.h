@@ -10,6 +10,10 @@ namespace invariant {
 
 template <typename _Tp, typename _V> class Maze;
 
+template <typename _Tp, typename _V> class SepMaze;
+using SepMazePPL = SepMaze<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
+using SepMazeIBEX = SepMaze<ibex::IntervalVector, ibex::IntervalVector>;
+
 template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
 class SepMaze : public ibex::Sep
 {

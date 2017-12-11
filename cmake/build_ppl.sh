@@ -17,7 +17,7 @@ if [ ! -e "$HOME/gmp/lib/libgmp.so" ]; then
   rm ${GMP_ARCHIVE_NAME}
   cd ${GMP_FILE_NAME}
 
-  ./configure --prefix=$HOME/gmp --enable-cxx CXXFLAGS="-fPIC -O2" CFLAGS="-fPIC -O2" CPPFLAGS="-fPIC -O2" --with-gnu-ld 
+  ./configure --prefix=$HOME/gmp --enable-cxx CXXFLAGS="-O2" CFLAGS="-O2" CPPFLAGS="-O2" --with-gnu-ld --with-pic
   make
   make check
   make install
@@ -30,11 +30,12 @@ if [ ! -e "$HOME/ppl/lib/libppl.so" ]; then
 
   git clone git://git.cs.unipr.it/ppl/ppl.git
   cd ppl
+  git pull
   git checkout devel
   autoreconf
   ./configure --prefix=$HOME/ppl --enable-interfaces=cxx --enable-optimization=sspeed --enable-fpmath=default \
       --disable-ppl_lpsol --disable-ppl_lcdd --enable-thread-safe --enable-shared --with-cxxflags=-fPIC --with-cflags=-fPIC \
-      --with-gmp=$HOME/gmp
+      --with-gmp=$HOME/gmp --disable-documentation
   make -j4
   make install
 fi

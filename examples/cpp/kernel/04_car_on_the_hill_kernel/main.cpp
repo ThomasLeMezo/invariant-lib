@@ -69,8 +69,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
-    maze_inner.contract();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
@@ -79,7 +78,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("graph_inner", /*&maze_outer,*/ &maze_inner);
+    VibesMaze v_maze("graph_inner", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 512, 512);
     v_maze.show();
 

@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
 //    vibes::beginDrawing();
     double time_start = omp_get_wtime();
-    maze_inner.init();
+    
     
     for(int i=0; i<15; i++){
         paving.bisect();
