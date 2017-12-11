@@ -61,15 +61,15 @@ Room<_Tp, _V>::Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics)
 
     compute_vector_field_typed();
 
-//    for(int face_in=0; face_in<dim; face_in++){
-//        std::vector< std::vector<bool>> vect_temp;
-//        for(int sens_in = 0; sens_in < 2; sens_in++){
-//            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
-//            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
-//            vect_temp.push_back(door_in->is_collinear());
-//        }
-//        m_door_collinearity.push_back(vect_temp);
-//    }
+    //    for(int face_in=0; face_in<dim; face_in++){
+    //        std::vector< std::vector<bool>> vect_temp;
+    //        for(int sens_in = 0; sens_in < 2; sens_in++){
+    //            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
+    //            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
+    //            vect_temp.push_back(door_in->is_collinear());
+    //        }
+    //        m_door_collinearity.push_back(vect_temp);
+    //    }
 }
 
 template<typename _Tp, typename _V>
@@ -137,52 +137,41 @@ void Room<_Tp, _V>::contract_vector_field(){
 
     for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
         Door<_Tp, _V> *d = f->get_doors()[m_maze];
-        std::vector<ibex::IntervalVector> vector_fields_face = m_maze->get_dynamics()->eval(f->get_position());
-        //        std::vector<IntervalVector> vector_fields_face = this->get_vector_fields();
 
-        for(const ibex::IntervalVector &v:vector_fields_face){
-            if(!zero.is_subset(v)){
-                // Construct the boolean interval vector of the vector_field
-                ibex::IntervalVector v_bool_in = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
-                ibex::IntervalVector v_bool_out = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
+        for(const ibex::IntervalVector &v:m_vector_fields){
+            /// ************* Compute Vector possibilities *************
+            // Construct the boolean interval vector of the vector_field
+            ibex::IntervalVector v_bool_in = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
+            ibex::IntervalVector v_bool_out = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
 
-                for(int i=0; i<dim; i++){
-                    if(!(v[i] & ibex::Interval::POS_REALS).is_empty())
-                        v_bool_out[i] |= ibex::Interval(1);
-                    if(!(v[i] & ibex::Interval::NEG_REALS).is_empty())
-                        v_bool_out[i] |= ibex::Interval(0);
-                    if(!((-v[i]) & ibex::Interval::POS_REALS).is_empty())
-                        v_bool_in[i] |= ibex::Interval(1);
-                    if(!((-v[i]) & ibex::Interval::NEG_REALS).is_empty())
-                        v_bool_in[i] |= ibex::Interval(0);
-                }
-
-                if((f->get_orientation() & v_bool_in).is_empty()){
-                    d->push_back_possible_in(false);
-                    if(domain_init == FULL_DOOR && (dynamics_sens == BWD || dynamics_sens == FWD_BWD))
-                        d->set_empty_private_input();
-                }
-                else
-                    d->push_back_possible_in(true);
-
-                if((f->get_orientation() & v_bool_out).is_empty()){
-                    d->push_back_possible_out(false);
-                    if(domain_init == FULL_DOOR && (dynamics_sens == FWD || dynamics_sens == FWD_BWD))
-                        d->set_empty_private_output();
-                }
-                else
-                    d->push_back_possible_out(true);
-
-                // Note : synchronization will be proceed at the end of all contractors
-                // to avoid unecessary lock
+            for(int i=0; i<dim; i++){
+                if(!(v[i] & ibex::Interval::POS_REALS).is_empty())
+                    v_bool_out[i] |= ibex::Interval(1);
+                if(!(v[i] & ibex::Interval::NEG_REALS).is_empty())
+                    v_bool_out[i] |= ibex::Interval(0);
+                if(!((-v[i]) & ibex::Interval::POS_REALS).is_empty())
+                    v_bool_in[i] |= ibex::Interval(1);
+                if(!((-v[i]) & ibex::Interval::NEG_REALS).is_empty())
+                    v_bool_in[i] |= ibex::Interval(0);
             }
-            else{
+
+            if((f->get_orientation() & v_bool_in).is_empty()){
+                d->push_back_possible_in(false);
+                if(!zero.is_subset(v) && domain_init == FULL_DOOR && (dynamics_sens == BWD || dynamics_sens == FWD_BWD))
+                    d->set_empty_private_input();
+            }
+            else
                 d->push_back_possible_in(true);
-                d->push_back_possible_out(true);
-            }
-        }
 
-        for(const ibex::IntervalVector&v:get_vector_fields()){
+            if((f->get_orientation() & v_bool_out).is_empty()){
+                d->push_back_possible_out(false);
+                if(!zero.is_subset(v) && domain_init == FULL_DOOR && (dynamics_sens == FWD || dynamics_sens == FWD_BWD))
+                    d->set_empty_private_output();
+            }
+            else
+                d->push_back_possible_out(true);
+
+            /// ************* Compute Collinearity *************
             ibex::IntervalVector product = hadamard_product(v, f->get_normal());
 
             // Collinearity
