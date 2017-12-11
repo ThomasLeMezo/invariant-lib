@@ -6,7 +6,7 @@
 
 #set -x # debugging
 
-if [ ! -e "$HOME/vtk/bin/vtkH5detect" ]; then
+if [ ! -e "$HOME/vtk/lib/libvtkCommonCore-8.0.so" ]; then
   echo 'Installing VTK-lib...';
   # git clone https://gitlab.kitware.com/vtk/vtk
   # cd vtk

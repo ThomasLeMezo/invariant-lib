@@ -32,6 +32,16 @@ cmake_minimum_required(VERSION 3.2.2)
 
     FIND_PACKAGE(PkgConfig)
 
+# OpenMP library
+    find_package(OpenMP)
+    if(OPENMP_FOUND)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        message(STATUS "[OPENMP] OK")
+    else()
+        message(WARNING "[OPENMP] NO")
+    endif()
+
 # IBEX-lib package
    set(IbexLib_USE_STATIC 1)
     # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${IBEX_ROOT}/share/pkgconfig/")
@@ -68,21 +78,12 @@ cmake_minimum_required(VERSION 3.2.2)
         endif()
     endif()
 
-# OpenMP library
-    find_package(OpenMP)
-    if(OPENMP_FOUND)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        message(STATUS "[OPENMP] OK")
-    else()
-        message(WARNING "[OPENMP] NO")
-    endif()
-
 # VTK
     if(WITH_3D)
-        set(VTK_DIR ${VTK_ROOT})
-        list(APPEND CMAKE_MODULE_PATH ${VTK_ROOT})
-        find_package(VTK REQUIRED)
+        find_package(VTK REQUIRED
+            PATHS ${VTK_ROOT}
+            NO_DEFAULT_PATH
+        )
         if(VTK_FOUND)
             set(LIBS_VTK ${LIBS_VTK} ${VTK_LIBRARIES})
             message (STATUS "VTK_DIR  = ${VTK_DIR}")
