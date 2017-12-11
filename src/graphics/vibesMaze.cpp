@@ -423,10 +423,10 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height));
 
         // Draw Pave
-        if(maze->get_domain()->get_init() == FULL_WALL){
+        if(m_maze_inner != NULL){ //maze->get_domain()->get_init() == FULL_WALL){
             draw_room_inner(p);
         }
-        else if(maze->get_domain()->get_init() == FULL_DOOR){
+        if(m_maze_outer != NULL){//maze->get_domain()->get_init() == FULL_DOOR){
             draw_room_outer(p);
         }
 //        else{

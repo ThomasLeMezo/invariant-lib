@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     ibex::Function fd(x1, x2, Return(x2,
                                      -2*pow(x1,3)*x2+(1-pow(x1, 2))-x1));
     Dynamics_Function dyn(&f, FWD_BWD);
-    dyn.add_function_d1(&fd);
+//    dyn.add_function_d1(&fd);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

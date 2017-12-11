@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     invariant::Domain<> dom(&paving, FULL_WALL);
 
     dom.set_border_path_in(true);
-    dom.set_border_path_out(false);
+    dom.set_border_path_out(true);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,

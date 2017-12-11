@@ -123,15 +123,7 @@ void Room<_Tp, _V>::set_full_private(){
 
 template<typename _Tp, typename _V>
 void Room<_Tp, _V>::contract_vector_field(){
-    // Test
-    //    IntervalVector test(2);
-    //    test[0] = Interval(-2.25, -1.5);
-    //    test[1] = Interval(-3, -1.5);
-    //    if(m_pave->get_position() == test)
-    //        std::cout << "TEST" << std::endl;
-
     int dim = m_pave->get_dim();
-    DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
 
@@ -157,7 +149,7 @@ void Room<_Tp, _V>::contract_vector_field(){
 
             if((f->get_orientation() & v_bool_in).is_empty()){
                 d->push_back_possible_in(false);
-                if(!zero.is_subset(v) && domain_init == FULL_DOOR && (dynamics_sens == BWD || dynamics_sens == FWD_BWD))
+                if(!zero.is_subset(v) && domain_init == FULL_DOOR)
                     d->set_empty_private_input();
             }
             else
@@ -165,7 +157,7 @@ void Room<_Tp, _V>::contract_vector_field(){
 
             if((f->get_orientation() & v_bool_out).is_empty()){
                 d->push_back_possible_out(false);
-                if(!zero.is_subset(v) && domain_init == FULL_DOOR && (dynamics_sens == FWD || dynamics_sens == FWD_BWD))
+                if(!zero.is_subset(v) && domain_init == FULL_DOOR)
                     d->set_empty_private_output();
             }
             else
@@ -593,19 +585,17 @@ bool Room<_Tp, _V>::contract_continuity(){
 template<typename _Tp, typename _V>
 bool Room<_Tp, _V>::contract(){
     // Do not synchronization in this function or sub-functions
-
     bool change = false;
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
         if(m_first_contract){
             contract_vector_field();
-            if(domain_init == FULL_DOOR || (domain_init == FULL_WALL && m_pave->is_border()))
-                change = true;
+            change = true;
             m_first_contract = false;
         }
-
-        if(!m_first_contract && ((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty())))
+        else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty())){
             return false;
+        }
 
         //        get_private_doors_info("before");
         change |= contract_continuity();

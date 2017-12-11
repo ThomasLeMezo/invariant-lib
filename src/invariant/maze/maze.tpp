@@ -79,10 +79,10 @@ int Maze<_Tp, _V>::contract(){
 #pragma omp task
                 {
 #pragma omp atomic
-                            nb_deque++;
+                    nb_deque++;
                     // Take one Room
-                    omp_set_lock(&m_deque_access);
                     Room<_Tp, _V> *r = NULL;
+                    omp_set_lock(&m_deque_access);
                     if(!m_deque_rooms.empty()){
                         // To improve the efficiency, we start half of the thread on the back of the deque
                         // and the other on the front
@@ -98,7 +98,7 @@ int Maze<_Tp, _V>::contract(){
                     }
                     omp_unset_lock(&m_deque_access);
 
-                    if(r!=NULL){
+                    if(r!=NULL){ // Room can be empty (because m_deque_rooms need lock)
                         r->lock_contraction();
                         // Contract
                         bool change = false;

@@ -62,14 +62,12 @@ int main(int argc, char *argv[])
                                     -sin(x2)));
     ibex::Function fd(x1, x2, Return(ibex::Interval(0),
                                          -cos(x2)*x2));
-    Dynamics_Function dyn_outer(&f, FWD);
-    dyn_outer.add_function_d1(&fd);
-    Dynamics_Function dyn_inner(&f, FWD);
-    dyn_inner.add_function_d1(&fd);
+    Dynamics_Function dyn(&f, FWD);
+//    dyn.add_function_d1(&fd);
 
     // ******* Mazes ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
