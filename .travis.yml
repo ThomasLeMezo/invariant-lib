@@ -4,45 +4,45 @@ matrix:
   include:
   - os: linux
     language: pyhton
-    env: PYTHON=2.7 CPP=11 GCC=4.8
+    env: PYTHON=2.7 CPP=11 GCC=4.9
     python: "2.7"
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        packages: [g++-4.9, cmake, cmake-data, pkg-config]
   - os: linux
     language: python
-    env: PYTHON=3.4 CPP=11 GCC=4.8
+    env: PYTHON=3.4 CPP=11 GCC=4.9
     python: "3.4"
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        packages: [g++-4.9, cmake, cmake-data, pkg-config]
   - os: linux
     language: python
-    env: PYTHON=3.5 CPP=11 GCC=4.8
+    env: PYTHON=3.5 CPP=11 GCC=4.9
     python: "3.5"
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        packages: [g++-4.9, cmake, cmake-data, pkg-config]
   - os: linux
     language: python
-    env: PYTHON=3.6 CPP=11 GCC=4.8
+    env: PYTHON=3.6 CPP=11 GCC=4.9
     python: "3.6"
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config]
+        packages: [g++-4.9, cmake, cmake-data, pkg-config]
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=2.7 CPP=11 GCC=4.8
+    env: PYTHON=2.7 CPP=11 GCC=4.9
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=3.6 CPP=11 GCC=4.8
+    env: PYTHON=3.6 CPP=11 GCC=4.9
   - os: osx
     osx_image: xcode7.3
-    env: PYTHON=3.5 CPP=11 GCC=4.8
+    env: PYTHON=3.5 CPP=11 GCC=4.9
 cache:
   directories:
   - "$HOME/ibex"
@@ -55,7 +55,7 @@ before_install:
 - |
   # Configure build variables
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    if [ -z "$GCC" ]; then export GCC=4.8; fi
+    if [ -z "$GCC" ]; then export GCC=4.9; fi
     export CXX=g++-$GCC CC=gcc-$GCC;
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     export CXX=g++-$GCC CC=gcc-$GCC;
@@ -70,7 +70,7 @@ before_install:
       fi
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     brew update;
-    brew install gcc48;
+    brew install gcc49;
     if [ "$PY" = "3" ]; then
       brew install python$PY;
     else
