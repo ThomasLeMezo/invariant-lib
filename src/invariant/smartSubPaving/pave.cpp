@@ -11,7 +11,7 @@ int Pave<ibex::IntervalVector, ibex::IntervalVector>::get_dim_inter_boundary(con
     for(invariant::Face<ibex::IntervalVector, ibex::IntervalVector> *f:m_faces_vector){
         intersection |= (box & f->get_position());
     }
-    return m_dim - invariant::get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(intersection);
+    return m_dim - invariant::get_nb_dim_flat(intersection);
 }
 
 template<>

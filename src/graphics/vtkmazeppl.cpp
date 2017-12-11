@@ -31,6 +31,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     int dim = maze->get_subpaving()->dim();
     int max_generator=0;
     int min_generator=1e5;
+    int nb_pave_not_empty=0;
 
 //#pragma omp parallel for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
@@ -40,6 +41,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
         step ++;
 
         if(!r->is_empty()){
+            nb_pave_not_empty++;
             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
             ppl::C_Polyhedron ph_union(dim, ppl::EMPTY);
@@ -54,18 +56,13 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                 int nb_generator = 0;
                 for(auto &g:ph_union.generators()){
                     nb_generator++;
-                    if(g.is_point()){
+                    if(g.is_point() && g.space_dimension()==3){
                         std::vector<double> coord;
                         for(size_t i=0; i<3; i++){
                             ppl::Variable x(i);
-                            if(g.space_dimension()>i){
-                                coord.push_back(g.coefficient(x).get_d()/(g.divisor().get_d()*IBEX_PPL_PRECISION));
-                            }
-                            else{
-                                coord.push_back(0.0); // ?
-                            }
+                            coord.push_back(g.coefficient(x).get_d()/(g.divisor().get_d()*IBEX_PPL_PRECISION));
                         }
-//                        points->InsertNextPoint(coord[0], coord[1], coord[2]);
+                        points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
                 if(max_generator<nb_generator)
@@ -110,7 +107,8 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     outputWriter->SetInputData(polyData_polygon->GetOutput());
     outputWriter->Write();
 
-    cout << "generators (max/min) = " << max_generator << "/" << min_generator << endl;
+    cout << " ==> generators (max/min) = " << max_generator << "/" << min_generator << endl;
+    cout << " ==> nb pave drawn = " << nb_pave_not_empty << endl;
 
 }
 

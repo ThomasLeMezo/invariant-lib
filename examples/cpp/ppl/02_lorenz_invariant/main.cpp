@@ -1,4 +1,6 @@
 #include "ibex_SepFwdBwd.h"
+#include "ibex_SepInter.h"
+#include "ibex_SepUnion.h"
 #include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
@@ -31,8 +33,26 @@ int main(int argc, char *argv[])
     ibex::Interval beta = ibex::Interval(8.0/3.0);
 
     // ****** Domain ******* //
-    SmartSubPavingPPL paving(space);
-    DomainPPL dom(&paving, FULL_DOOR);
+    invariant::SmartSubPavingPPL paving(space);
+    invariant::DomainPPL dom(&paving, FULL_DOOR);
+    ibex::Interval pt_xy = sqrt(beta*(rho-1.0));
+    ibex::Interval pt_z = rho-1.0;
+    double r = 3.0;
+
+    // Remove zeros
+    Function f_sep1(x1, x2, x3, pow(x1, 2)+pow(x2, 2)+pow(x3, 2)-pow(r, 2));
+    SepFwdBwd s1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT
+    Function f_sep2(x1, x2, x3, pow(x1-pt_xy, 2)+pow(x2-pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));
+    SepFwdBwd s2(f_sep2, GEQ); // LT, LEQ, EQ, GEQ, GT
+    Function f_sep3(x1, x2, x3, pow(x1+pt_xy, 2)+pow(x2+pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));
+    SepFwdBwd s3(f_sep3, GEQ); // LT, LEQ, EQ, GEQ, GT
+
+    Array<Sep> array_sep;
+    array_sep.add(s1);
+    array_sep.add(s2);
+    array_sep.add(s3);
+    SepInter sep_total(array_sep);
+    dom.set_sep(&sep_total);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -48,17 +68,17 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
+    VtkMazePPL vtkMazePPL("LorenzPPL");
 
     omp_set_num_threads(1);
     for(int i=0; i<10; i++){
         paving.bisect();
-        cout << i << " - " << maze.contract() << " - ";
-        cout << paving.size() << endl;
+        cout << i << endl;
+        maze.contract();
+        cout << "=> " << paving.size() << endl;
+        vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
-
-    VtkMazePPL vtkMazePPL("LorenzPPL");
-    vtkMazePPL.show_maze(&maze);
 }

@@ -148,8 +148,7 @@ ibex::IntervalVector get_diff_hull<ibex::IntervalVector, ibex::IntervalVector>(c
     return union_of_diff;
 }
 
-template<>
-int get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(const ibex::IntervalVector &iv){
+int get_nb_dim_flat(const ibex::IntervalVector &iv){
     int dim = iv.size();
     int flat=0;
     for(int i=0; i<dim; i++){
@@ -191,7 +190,8 @@ void recursive_linear_expression_from_iv(const ibex::IntervalVector &vect_field,
         recursive_linear_expression_from_iv(vect_field, dim-1, gs, linear_expression_lb);
     }
     else{
-        gs.insert(ppl::ray(local_linear_expression));
+        if(!local_linear_expression.all_homogeneous_terms_are_zero()) // ie cannot add ray 0
+            gs.insert(ppl::ray(local_linear_expression));
     }
 }
 
@@ -258,8 +258,7 @@ ppl::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, ppl::Generator_System>(const 
     return tmp;
 }
 
-template<>
-int get_nb_dim_flat<ppl::C_Polyhedron, ppl::Generator_System>(const Parma_Polyhedra_Library::C_Polyhedron &p){
+int get_nb_dim_flat(const ppl::C_Polyhedron &p){
     return p.space_dimension() - p.affine_dimension();
 }
 

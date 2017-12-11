@@ -380,8 +380,6 @@ protected:
     bool            m_contain_zero_coordinate = false;
     bool            m_contain_zero = false;
 
-    std::vector< std::vector <std::vector<bool> > > m_door_collinearity;
-
     mutable bool    m_empty = false;
     mutable bool    m_full = false;
 
@@ -411,27 +409,23 @@ namespace invariant {
 
 inline Parma_Polyhedra_Library::C_Polyhedron& operator&=(Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     p1.intersection_assign(p2);
-//    p1.simplify_using_context_assign(ppl::C_Polyhedron(p1.space_dimension(), ppl::UNIVERSE));
     return p1;
 }
 
 inline Parma_Polyhedra_Library::C_Polyhedron& operator|=(Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     p1.poly_hull_assign(p2);
-//    p1.simplify_using_context_assign(ppl::C_Polyhedron(p1.space_dimension(), ppl::UNIVERSE));
     return p1;
 }
 
 inline Parma_Polyhedra_Library::C_Polyhedron operator&(const Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     Parma_Polyhedra_Library::C_Polyhedron p_return(p1);
     p_return.intersection_assign(p2);
-//    p_return.simplify_using_context_assign(ppl::C_Polyhedron(p_return.space_dimension(), ppl::UNIVERSE));
     return p_return;
 }
 
 inline Parma_Polyhedra_Library::C_Polyhedron operator|(const Parma_Polyhedra_Library::C_Polyhedron& p1, const Parma_Polyhedra_Library::C_Polyhedron& p2){
     Parma_Polyhedra_Library::C_Polyhedron p_return(p1);
     p_return.poly_hull_assign(p2);
-//    p_return.simplify_using_context_assign(ppl::C_Polyhedron(p_return.space_dimension(), ppl::UNIVERSE));
     return p_return;
 }
 
@@ -448,8 +442,8 @@ _Tp get_diff_hull(const _Tp &a, const _Tp &b);
 template <typename _Tp, typename _V>
 void set_empty(_Tp &T);
 
-template <typename _Tp, typename _V>
-int get_nb_dim_flat(const _Tp &iv);
+int get_nb_dim_flat(const ibex::IntervalVector &iv);
+int get_nb_dim_flat(const ppl::C_Polyhedron &p);
 
 template<typename _Tp, typename _V>
 std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r);

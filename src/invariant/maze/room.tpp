@@ -59,17 +59,17 @@ Room<_Tp, _V>::Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics)
     omp_init_lock(&m_lock_deque);
     omp_init_lock(&m_lock_vector_field);
 
-    for(int face_in=0; face_in<dim; face_in++){
-        std::vector< std::vector<bool>> vect_temp;
-        for(int sens_in = 0; sens_in < 2; sens_in++){
-            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
-            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
-            vect_temp.push_back(door_in->is_collinear());
-        }
-        m_door_collinearity.push_back(vect_temp);
-    }
-
     compute_vector_field_typed();
+
+//    for(int face_in=0; face_in<dim; face_in++){
+//        std::vector< std::vector<bool>> vect_temp;
+//        for(int sens_in = 0; sens_in < 2; sens_in++){
+//            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
+//            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
+//            vect_temp.push_back(door_in->is_collinear());
+//        }
+//        m_door_collinearity.push_back(vect_temp);
+//    }
 }
 
 template<typename _Tp, typename _V>
@@ -175,29 +175,35 @@ void Room<_Tp, _V>::contract_vector_field(){
 
                 // Note : synchronization will be proceed at the end of all contractors
                 // to avoid unecessary lock
-
-                for(const ibex::IntervalVector&v:get_vector_fields()){
-                    ibex::IntervalVector product = hadamard_product(v, f->get_normal());
-                    std::vector<bool> where_zeros;
-
-                    if(zero.is_subset(product)){
-                        d->push_back_collinear_vector_field(true);
-                        for(int n_dim=0; n_dim<dim; n_dim++){
-                            if(ibex::Interval::ZERO.is_subset(v[n_dim]))
-                                where_zeros.push_back(true);
-                            else
-                                where_zeros.push_back(false);
-                        }
-                    }
-                    else
-                        d->push_back_collinear_vector_field(false);
-                    d->push_back_zeros_in_vector_field(where_zeros);
-                }
             }
-
-            // Note : synchronization will be proceed at the end of all contractors
-            // to avoid unecessary lock
+            else{
+                d->push_back_possible_in(true);
+                d->push_back_possible_out(true);
+            }
         }
+
+        for(const ibex::IntervalVector&v:get_vector_fields()){
+            ibex::IntervalVector product = hadamard_product(v, f->get_normal());
+
+            // Collinearity
+            if(zero.is_subset(product))
+                d->push_back_collinear_vector_field(true);
+            else
+                d->push_back_collinear_vector_field(false);
+
+            // Composante collineaire
+            std::vector<bool> where_zeros;
+            for(int n_dim=0; n_dim<dim; n_dim++){
+                if(ibex::Interval::ZERO.is_subset(v[n_dim]))
+                    where_zeros.push_back(true);
+                else
+                    where_zeros.push_back(false);
+            }
+            d->push_back_zeros_in_vector_field(where_zeros);
+        }
+
+        // Note : synchronization will be proceed at the end of all contractors
+        // to avoid unecessary lock
     }
 }
 
@@ -209,10 +215,10 @@ void Room<_Tp, _V>::compute_sliding_mode(const int n_vf, std::vector<std::vector
 
     for(int face_in=0; face_in<dim; face_in++){
         for(int sens_in = 0; sens_in < 2; sens_in++){
-            if(domain_init == FULL_DOOR && m_door_collinearity[face_in][sens_in][n_vf]){
-                Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
-                Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
+            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
+            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
 
+            if(domain_init == FULL_DOOR && door_in->is_collinear()[n_vf]){
                 /// INPUT
                 _Tp out_return = get_empty_door_container<_Tp, _V>(dim);
                 _Tp in_return = get_empty_door_container<_Tp, _V>(dim);
@@ -258,17 +264,18 @@ void Room<_Tp, _V>::compute_standard_mode(const int n_vf, std::vector<std::vecto
 
     for(int face_in=0; face_in<dim; face_in++){
         for(int sens_in = 0; sens_in < 2; sens_in++){
-            if(!(domain_init == FULL_DOOR && m_door_collinearity[face_in][sens_in][n_vf])){ // avoid sliding mode on face in
-                Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
-                Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
+            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
+            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
+
+            if(!(domain_init == FULL_DOOR && door_in->is_collinear()[n_vf])){ // avoid sliding mode on face in
                 const _Tp in(door_in->get_input_private());
 
                 for(int face_out=0; face_out<dim; face_out++){
                     for(int sens_out = 0; sens_out < 2; sens_out++){
                         if(!(face_out == face_in && sens_out == sens_in)){
-                            if(!(domain_init == FULL_DOOR && m_door_collinearity[face_out][sens_out][n_vf])){ // avoid sliding mode on face out
-                                Face<_Tp, _V>* f_out = m_pave->get_faces()[face_out][sens_out];
-                                Door<_Tp, _V>* door_out = f_out->get_doors()[m_maze];
+                            Face<_Tp, _V>* f_out = m_pave->get_faces()[face_out][sens_out];
+                            Door<_Tp, _V>* door_out = f_out->get_doors()[m_maze];
+                            if(!(domain_init == FULL_DOOR && door_out->is_collinear()[n_vf])){ // avoid sliding mode on face out
                                 const _Tp out(door_out->get_output_private());
 
                                 /// ************ IN -> OUT ************
@@ -434,7 +441,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
         // Find adjacent paves that extrude this pave in the directions of zeros
         ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
 
-        if(get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(inter_extrude)==get_nb_dim_flat<ibex::IntervalVector, ibex::IntervalVector>(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
+        if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
             adjacent_paves_valid.push_back(pave_adj);
             Room<_Tp, _V> *room_n= pave_adj->get_rooms()[m_maze];
             vec_field_global |= room_n->get_one_vector_fields(n_vf);
@@ -445,7 +452,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
     }
 
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
-    if(zero.is_subset(vec_field_global)){ // Case no contraction (if there is a possible cycle)
+    if(zero.is_subset(vec_field_global)){ // Case no contraction (if there is a possible cycle) or border face
         in_return = door_in->get_input_private();
         out_return = door_in->get_output_private();
         return;
@@ -503,7 +510,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
 
                         /// Note : computation of the own_surface will remove the propagation of exact face_in to itself
                     }
-                    if(get_nb_dim_flat<_Tp, _V>(own_surface)==2)
+                    if(get_nb_dim_flat(own_surface)==2)
                         set_empty<_Tp, _V>(own_surface);
 
                     /// ************* Compute the propagation *************
@@ -521,7 +528,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
                                 out_tmp_IN &= d_out_adj->get_output(); // Do not use the private door here !
 
                             // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
-                            if(get_nb_dim_flat<_Tp, _V>(out_tmp_IN)==2)
+                            if(get_nb_dim_flat(out_tmp_IN)==2)
                                 set_empty<_Tp, _V>(out_tmp_IN);
 
                             if(!out_tmp_IN.is_empty()){
@@ -543,7 +550,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
                             else
                                 in_tmp_OUT &= d_out_adj->get_input();
 
-                            if(get_nb_dim_flat<_Tp, _V>(in_tmp_OUT)==2)
+                            if(get_nb_dim_flat(in_tmp_OUT)==2)
                                 set_empty<_Tp, _V>(in_tmp_OUT);
 
                             if(!in_tmp_OUT.is_empty()){
