@@ -7,6 +7,7 @@
 #include "ibex_SepFwdBwd.h"
 #include "ibex_SepInter.h"
 #include "ibex_SepUnion.h"
+#include "ibex_SepNot.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -49,9 +50,7 @@ int main(int argc, char *argv[])
     // ****** Domain Inner ******* //
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
 
-    SepFwdBwd s_inner_x1(f_sep_outer_x1, GEQ); // LT, LEQ, EQ, GEQ, GT
-    SepFwdBwd s_inner_x2(f_sep_outer_x2, GEQ); // LT, LEQ, EQ, GEQ, GT
-    SepUnion s_inner(s_inner_x1, s_inner_x2);
+    SepNot s_inner(s_outer);
     dom_inner.set_sep(&s_inner);
 
     dom_inner.set_border_path_in(true);
@@ -74,8 +73,9 @@ int main(int argc, char *argv[])
     maze_outer.contract();
     for(int i=0; i<15; i++){
         paving.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
+        cout << i << endl;
+        maze_inner.contract();
+        maze_outer.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

@@ -69,7 +69,6 @@ DataSetFunction::~DataSetFunction(){
 }
 
 void DataSetFunction::append_data(){
-
     m_root->fill_tree();
 }
 
@@ -145,6 +144,9 @@ void DataSetFunction::serialize(string file_name) const{
     binFile.close();
 }
 
+ibex::Interval DataSetFunction::eval(const ibex::IntervalVector& box) const{
+    return ibex::Interval(ibex::Interval::EMPTY_SET);
+}
 ibex::IntervalVector DataSetFunction::eval_vector(const ibex::IntervalVector& box) const{
     return ibex::IntervalVector(box.size(), ibex::Interval::EMPTY_SET);
 }

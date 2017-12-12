@@ -80,6 +80,7 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
                 }
             }
         }
+        delete[] d_iv_list;
     }
     if(!pt_x.empty())
         vibes::drawPolygon(pt_x, pt_y, "black[#FF00FF]");

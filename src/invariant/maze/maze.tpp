@@ -147,7 +147,7 @@ int Maze<_Tp, _V>::contract(){
         }
     }
 
-    std::cout << " => contractions (" << nb_operations << "/" << nb_deque << ") : " << omp_get_wtime() - t_start << " s";
+    std::cout << " => contractions (" << nb_operations << "/" << nb_deque << ") : " << omp_get_wtime() - t_start << " s" << std::endl;
     m_contraction_step++;
     return nb_operations;
 }

@@ -23,6 +23,9 @@ include_directories(maze)
     smartSubPaving/face.cpp
 
     smartSubPaving/pave.cpp
+
+    definition/dataSet/datasetfunction.cpp
+    definition/dataSet/datasetnode.cpp
   )
 
   if(WITH_NETCDF)
@@ -30,8 +33,6 @@ include_directories(maze)
       definition/netcdf/nodecurrent.cpp
       definition/netcdf/previmer.cpp
       definition/netcdf/previmer3d.cpp
-
-      definition/dataSet/datasetfunction.cpp
     )
   endif()
 
@@ -52,6 +53,12 @@ include_directories(maze)
     definition/dynamics.h
     definition/dynamics_function.h
 
+    definition/dataSet/datasetnode.h
+    definition/dataSet/datasetnode.tpp
+
+    definition/dataSet/datasetfunction.h
+    definition/dataSet/datasetvirtualnode.h
+
     smartSubPaving/smartSubPaving.tpp
     smartSubPaving/pave.tpp
     smartSubPaving/face.tpp
@@ -70,18 +77,12 @@ include_directories(maze)
       definition/netcdf/nodecurrent.h
       definition/netcdf/previmer.h
       definition/netcdf/previmer3d.h
-
-      definition/dataSet/datasetnode.h
-      definition/dataSet/datasetnode.tpp
-
-      definition/dataSet/datasetfunction.h
-      definition/dataSet/datasetvirtualnode.h
     )
   endif()
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
 
-  add_library(invariant-core
+  add_library(invariant-core #SHARED
       ${SRC}
       ${HEADERS}
   )

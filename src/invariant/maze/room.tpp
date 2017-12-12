@@ -678,36 +678,36 @@ void Room<_Tp, _V>::get_all_active_neighbors(std::vector<Room *> &list_rooms) co
 }
 
 template<typename _Tp, typename _V>
-const bool& Room<_Tp, _V>::is_empty(){
+const bool Room<_Tp, _V>::is_empty(){
     if(m_empty && !m_empty_first_eval)
-        return m_empty;
+        return true;
     else{
         m_empty_first_eval = false;
         for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_empty()){
-                return m_empty;
+                return false;
             }
         }
         if(m_maze->get_domain()->get_init()!=FULL_WALL)
             m_empty = true;
-        return m_empty;
+        return true;
     }
 }
 
 template<typename _Tp, typename _V>
-const bool& Room<_Tp, _V>::is_full(){
+const bool Room<_Tp, _V>::is_full(){
     if(!m_full && !m_full_first_eval)
-        return m_full;
+        return false;
     else{
         m_full_first_eval = false;
         for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_full()){
                 if(m_maze->get_domain()->get_init()!=FULL_WALL)
                     m_full = false;
-                return m_full;
+                return false;
             }
         }
-        return m_full;
+        return true;
     }
 }
 

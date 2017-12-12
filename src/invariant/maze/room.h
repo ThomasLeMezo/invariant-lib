@@ -151,14 +151,14 @@ public:
      * (true if all doors are empty)
      * @return
      */
-    const bool &is_empty();
+    const bool is_empty();
 
     /**
      * @brief Return true if this Room is full
      * (true if all doors are full)
      * @return
      */
-    const bool &is_full();
+    const bool is_full();
 
     /**
      * @brief Return true if the Union of outer & inner for each doors is full
