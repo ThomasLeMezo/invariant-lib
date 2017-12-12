@@ -48,10 +48,9 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){
-        paving.bisect();
         cout << i << endl;
+        paving.bisect();
         maze.contract();
-        cout << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

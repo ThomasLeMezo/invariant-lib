@@ -23,8 +23,8 @@ Dynamics_Function::~Dynamics_Function(){
 }
 
 const std::vector<ibex::IntervalVector> Dynamics_Function::eval(const IntervalVector& position){
-    omp_set_lock(&m_lock_dynamics);
     vector<IntervalVector> vector_field;
+    omp_set_lock(&m_lock_dynamics);
     for(Function*f:m_functions){
         IntervalVector result = f->eval_vector(position);
         vector_field.push_back(result);

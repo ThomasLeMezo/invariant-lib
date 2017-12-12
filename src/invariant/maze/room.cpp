@@ -9,14 +9,14 @@ inline ibex::Interval root_zero(const ibex::Interval &a, const ibex::Interval &b
     return (-c/b) & ibex::Interval::POS_REALS;
 }
 inline ibex::Interval root_positive(const ibex::Interval &a, const ibex::Interval &b, const ibex::Interval &c){
-    return ((-b+sqrt((pow(b, 2)-4*a*c)))/(2*a)) & ibex::Interval::POS_REALS;
+    return (-b+sqrt(b*b-4*a*c))/(2*a) & ibex::Interval::POS_REALS;
 }
 inline ibex::Interval root_negative(const ibex::Interval &a, const ibex::Interval &b, const ibex::Interval &c){
-    return ((-b-sqrt((pow(b, 2)-4*a*c)))/(2*a)) & ibex::Interval::POS_REALS;
+    return (-b-sqrt(b*b-4*a*c))/(2*a) & ibex::Interval::POS_REALS;
 }
 
 inline ibex::Interval taylor(const ibex::Interval &t, const ibex::Interval &x_dot2, const ibex::Interval &x0_dot, const ibex::Interval &x0){
-    return 0.5*x_dot2*(pow(t,2))+x0_dot*t+x0;
+    return 0.5*x_dot2*t*t+x0_dot*t+x0;
 }
 
 template<>
@@ -34,10 +34,10 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
             // IN_lb
             IntervalVector in0_lb = IntervalVector(in.lb());
             IntervalVector vec_in0_lb = m_maze->get_dynamics()->eval(in0_lb)[0];
-            ibex::Interval a1_lb(0.5*vect_d1[out_comp].lb());
-            ibex::Interval a1_ub(0.5*vect_d1[out_comp].ub());
-            ibex::Interval b1=vec_in0_lb[out_comp];
-            ibex::Interval c1=in0_lb[out_comp]-out[out_comp].lb();
+            ibex::Interval a1_lb = ibex::Interval(0.5*vect_d1[out_comp].lb());
+            ibex::Interval a1_ub = ibex::Interval(0.5*vect_d1[out_comp].ub());
+            ibex::Interval b1 = vec_in0_lb[out_comp];
+            ibex::Interval c1 = in0_lb[out_comp]-out[out_comp].lb();
 
             std::vector<ibex::Interval> t_list;
             if(a1_lb==ibex::Interval(0))
@@ -59,10 +59,10 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
             // IN_ub
             IntervalVector in0_ub = IntervalVector(in.ub());
             IntervalVector vec_in0_ub = m_maze->get_dynamics()->eval(in0_ub)[0];
-            a1_lb=ibex::Interval(0.5*vect_d1[out_comp].lb());
-            a1_ub=ibex::Interval(0.5*vect_d1[out_comp].ub());
-            b1=vec_in0_ub[out_comp];
-            c1=in0_ub[out_comp]-out[out_comp].lb();
+            a1_lb = ibex::Interval(0.5*vect_d1[out_comp].lb());
+            a1_ub = ibex::Interval(0.5*vect_d1[out_comp].ub());
+            b1 = vec_in0_ub[out_comp];
+            c1 = in0_ub[out_comp]-out[out_comp].lb();
             t_list.clear();
 
             if(a1_lb==ibex::Interval(0))
@@ -93,11 +93,11 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
 
             // Out_lb
             IntervalVector out0_lb = IntervalVector(out.lb());
-            IntervalVector vec_out0_lb = m_maze->get_dynamics()->eval(out0_lb)[0];
-            double a1_lb =0.5*vect_d1[in_comp].lb();
-            double a1_ub =0.5*vect_d1[in_comp].ub();
-            ibex::Interval b1=vec_out0_lb[in_comp];
-            ibex::Interval c1=out0_lb[in_comp]-in[in_comp].lb();
+            IntervalVector vec_out0_lb = -m_maze->get_dynamics()->eval(out0_lb)[0];
+            ibex::Interval a1_lb = ibex::Interval(0.5*vect_d1[in_comp].lb());
+            ibex::Interval a1_ub = ibex::Interval(0.5*vect_d1[in_comp].ub());
+            ibex::Interval b1 = vec_out0_lb[in_comp];
+            ibex::Interval c1 = out0_lb[in_comp]-in[in_comp].lb();
 
             std::vector<ibex::Interval> t_list;
             if(a1_lb==0)
@@ -118,10 +118,10 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
 
             IntervalVector out0_ub = IntervalVector(out.ub());
             IntervalVector vec_out0_ub = -m_maze->get_dynamics()->eval(out0_ub)[0];
-            a1_lb =0.5*vect_d1[in_comp].lb();
-            a1_ub =0.5*vect_d1[in_comp].ub();
-            b1=vec_out0_ub[in_comp];
-            c1=out0_ub[in_comp]-in[in_comp].lb();
+            a1_lb = ibex::Interval(0.5*vect_d1[in_comp].lb());
+            a1_ub = ibex::Interval(0.5*vect_d1[in_comp].ub());
+            b1 = vec_out0_ub[in_comp];
+            c1 = out0_ub[in_comp]-in[in_comp].lb();
             t_list.clear();
 
             if(a1_lb==0)
