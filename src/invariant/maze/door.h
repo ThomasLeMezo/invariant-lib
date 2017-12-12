@@ -277,10 +277,10 @@ namespace invariant{
 
 ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv);
 
-template <typename _Tp, typename _V>
-inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp, _V>& d){
-    return stream;
-}
+//template <typename _Tp, typename _V>
+//inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp, _V>& d){
+//    return stream;
+//}
 
 template <typename _Tp, typename _V>
 inline const _Tp Door<_Tp, _V>::get_input() const{
@@ -402,11 +402,9 @@ inline void Door<_Tp, _V>::set_empty_private(){
     set_empty_private_output();
 }
 
-}
-
 /// ******************  Other functions ****************** ///
-// out of invariant namespace
-inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<ibex::IntervalVector>& d){
+
+inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorIBEX& d){
     std::ostringstream input, output;
     input << d.get_input();
     output << d.get_output();
@@ -414,6 +412,14 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<ibex
     return stream;
 }
 
+inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorPPL& d){
+    d.get_output().print();
+    d.get_input().print();
+    return stream;
+}
+}
+
 #include "door.tpp"
 
 #endif // DOOR_H
+

@@ -151,14 +151,14 @@ public:
      * (true if all doors are empty)
      * @return
      */
-    bool is_empty();
+    const bool &is_empty();
 
     /**
      * @brief Return true if this Room is full
      * (true if all doors are full)
      * @return
      */
-    bool is_full();
+    const bool &is_full();
 
     /**
      * @brief Return true if the Union of outer & inner for each doors is full
@@ -171,6 +171,7 @@ public:
      * @return
      */
     std::vector<ibex::IntervalVector> get_vector_fields() const;
+    std::vector<ibex::IntervalVector> get_vector_fields_d() const;
 
     /**
      * @brief Getter to one of the the vector fields
@@ -503,6 +504,12 @@ template <typename _Tp, typename _V>
 inline std::vector<ibex::IntervalVector> Room<_Tp, _V>::get_vector_fields() const{
     return m_vector_fields;
 }
+
+template <typename _Tp, typename _V>
+inline std::vector<ibex::IntervalVector> Room<_Tp, _V>::get_vector_fields_d() const{
+    return m_vector_fields_d1;
+}
+
 
 template <typename _Tp, typename _V>
 inline void Room<_Tp, _V>::lock_contraction(){

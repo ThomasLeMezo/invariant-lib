@@ -28,10 +28,15 @@ fi
 if [ ! -e "$HOME/ppl/lib/libppl.so" ]; then
   echo 'Installing PPL-lib...';
 
-  git clone git://git.cs.unipr.it/ppl/ppl.git
-  cd ppl
-  git pull
-  git checkout devel
+  if [ ! -e "ppl" ]; then
+    git clone git://git.cs.unipr.it/ppl/ppl.git*
+    cd ppl
+    git pull
+    git checkout devel
+  else
+    cd ppl
+  fi
+  
   autoreconf
   ./configure --prefix=$HOME/ppl --enable-interfaces=cxx --enable-optimization=sspeed --enable-fpmath=default \
       --disable-ppl_lpsol --disable-ppl_lcdd --enable-thread-safe --enable-shared --with-cxxflags=-fPIC --with-cflags=-fPIC \

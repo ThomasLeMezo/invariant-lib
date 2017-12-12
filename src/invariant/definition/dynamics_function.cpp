@@ -37,7 +37,10 @@ const std::vector<ibex::IntervalVector> Dynamics_Function::eval_d1(const ibex::I
     omp_set_lock(&m_lock_dynamics);
     vector<IntervalVector> vector_field;
     for(Function*f:m_functions_d1){
-        IntervalVector result = f->eval_vector(position);
+        IntervalMatrix jacobian= f->eval_matrix(position);
+        IntervalVector result(position.size());
+        for(int dim=0; dim<position.size(); dim++)
+            result[dim] = jacobian[dim][dim];
         vector_field.push_back(result);
     }
     omp_unset_lock(&m_lock_dynamics);

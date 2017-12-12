@@ -148,4 +148,7 @@ void DataSetFunction::serialize(string file_name) const{
 ibex::IntervalVector DataSetFunction::eval_vector(const ibex::IntervalVector& box) const{
     return ibex::IntervalVector(box.size(), ibex::Interval::EMPTY_SET);
 }
+ibex::IntervalMatrix DataSetFunction::eval_matrix(const ibex::IntervalVector& box) const{
+    return ibex::IntervalMatrix(box.size(), box.size(), ibex::Interval::EMPTY_SET);
+}
 }

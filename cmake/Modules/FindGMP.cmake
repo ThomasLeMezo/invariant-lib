@@ -18,7 +18,7 @@ find_path(GMP_INCLUDES
         PATH_SUFFIXES include
         NO_DEFAULT_PATH
 )
-
+message(STATUS "${GMP_ROOT_DIR} ${GMP_LIBRARIES_CXX} ${GMP_LIBRARIES_C}")
 
 find_library(GMP_LIBRARIES_C
 	NAMES gmp
@@ -33,6 +33,7 @@ find_library(GMP_LIBRARIES_CXX
         PATH_SUFFIXES lib
         NO_DEFAULT_PATH
 )
+
 set(GMP_LIBRARIES "${GMP_LIBRARIES_CXX};${GMP_LIBRARIES_C}")
 
 include(FindPackageHandleStandardArgs)

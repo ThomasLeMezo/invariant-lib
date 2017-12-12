@@ -37,10 +37,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    ibex::Function fd(x1, x2, Return(x2,
-                                     -2*pow(x1,3)*x2+(1-pow(x1, 2))-x1));
-    Dynamics_Function dyn(&f, FWD_BWD);
-//    dyn.add_function_d1(&fd);
+    Dynamics_Function dyn(&f, FWD);
+
+    ibex::Function f_diff(f, ibex::Function::DIFF);
+    dyn.add_function_d1(&f_diff);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

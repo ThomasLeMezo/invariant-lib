@@ -165,7 +165,7 @@ public:
      * @brief Return the dimension of the maze
      * @return
      */
-    size_t get_dim() const;
+    size_t &get_dim() const;
 
     /**
      * @brief Get the pave node associated to this Pave
@@ -177,7 +177,7 @@ public:
      * @brief Return true if this pave has one or more border faces (face with no neighbors)
      * @return
      */
-    bool is_border() const;
+    const bool &is_border() const;
 
     /**
      * @brief Analyze if this Pave is a border (see is_border)
@@ -320,7 +320,7 @@ inline bool Pave<_Tp, _V>::is_infinite() const{
 }
 
 template <typename _Tp, typename _V>
-size_t Pave<_Tp, _V>::get_dim() const{
+size_t& Pave<_Tp, _V>::get_dim() const{
     return m_dim;
 }
 
@@ -330,7 +330,7 @@ inline Pave_node<_Tp, _V>* Pave<_Tp, _V>::get_tree() const{
 }
 
 template <typename _Tp, typename _V>
-inline bool Pave<_Tp, _V>::is_border() const{
+inline const bool& Pave<_Tp, _V>::is_border() const{
     return m_border;
 }
 

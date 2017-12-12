@@ -678,36 +678,36 @@ void Room<_Tp, _V>::get_all_active_neighbors(std::vector<Room *> &list_rooms) co
 }
 
 template<typename _Tp, typename _V>
-bool Room<_Tp, _V>::is_empty(){
+const bool& Room<_Tp, _V>::is_empty(){
     if(m_empty && !m_empty_first_eval)
-        return true;
+        return m_empty;
     else{
         m_empty_first_eval = false;
         for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_empty()){
-                return false;
+                return m_empty;
             }
         }
         if(m_maze->get_domain()->get_init()!=FULL_WALL)
             m_empty = true;
-        return true;
+        return m_empty;
     }
 }
 
 template<typename _Tp, typename _V>
-bool Room<_Tp, _V>::is_full(){
+const bool& Room<_Tp, _V>::is_full(){
     if(!m_full && !m_full_first_eval)
-        return false;
+        return m_full;
     else{
         m_full_first_eval = false;
         for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_full()){
                 if(m_maze->get_domain()->get_init()!=FULL_WALL)
                     m_full = false;
-                return false;
+                return m_full;
             }
         }
-        return true;
+        return m_full;
     }
 }
 
@@ -732,6 +732,10 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r) {
     stream << "Room = " << r.get_pave()->get_position() << " - " << r.get_pave()->get_faces_vector().size() << " faces";
     stream << ", vector field = ";
     for(ibex::IntervalVector &v:r.get_vector_fields()){
+        stream << v << " ";
+    }
+    stream << ", vector field d = ";
+    for(ibex::IntervalVector &v:r.get_vector_fields_d()){
         stream << v << " ";
     }
     stream << std::endl;

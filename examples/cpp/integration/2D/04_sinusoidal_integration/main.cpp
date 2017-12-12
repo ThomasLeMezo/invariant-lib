@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics Outer & Inner ******* //
     ibex::Function f(x1, x2, Return(ibex::Interval(1.0),
                                     -sin(x2)));
-    ibex::Function fd(x1, x2, Return(ibex::Interval(0),
-                                         -cos(x2)*x2));
     Dynamics_Function dyn(&f, FWD);
-//    dyn.add_function_d1(&fd);
+
+    ibex::Function fd(f, ibex::Function::DIFF);
+    dyn.add_function_d1(&fd);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -87,10 +87,10 @@ int main(int argc, char *argv[])
     v_maze.show();
     vibes::drawBox(ibex::Interval(0, 0.5), ibex::Interval(-2, 2), "red[]");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(0.01);
-//    position_info[1] = ibex::Interval(1.99);
-//    v_maze.show_room_info(&maze_outer, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(1.015);
+    position_info[1] = ibex::Interval(-1.605);
+    v_maze.show_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 
