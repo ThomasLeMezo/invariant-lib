@@ -56,14 +56,18 @@ bool Door<_Tp, _V>::analyze_change(std::vector<Room<_Tp, _V> *>&list_rooms){
     DOMAIN_INITIALIZATION domain_init = m_room->get_maze()->get_domain()->get_init();
     bool sens_fwd = (sens==FWD|| sens==FWD_BWD);
     bool sens_bwd = (sens == BWD || sens==FWD_BWD);
+    bool dom_door = (domain_init == FULL_DOOR);
+    bool dom_wall = (domain_init == FULL_WALL);
 
-    if((sens_bwd && (*m_input_private) != get_input())
-            || (sens_fwd && (*m_output_private) != get_output() )){ // operator != is generic for iv & polyhedron
+    if((sens_bwd && ( (dom_door && !is_subset(get_input(), *m_input_private))
+                      || (dom_wall && !is_subset(*m_input_private, get_input()))))
+       || (sens_fwd && ( (dom_door && !is_subset(get_output(), *m_output_private))
+                         || (dom_wall && !is_subset(*m_output_private, get_output()))))){ // operator != is generic for iv & polyhedron
         std::vector<Face<_Tp, _V> *> l_face = m_face->get_neighbors();
         for(Face<_Tp, _V>* f_n:l_face){
             Door *d_n = f_n->get_doors()[m_room->get_maze()];
             if((domain_init == FULL_DOOR && ((sens_fwd && !d_n->is_empty_input()) || (sens_bwd && !d_n->is_empty_output())))
-                    || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
+               || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
                 list_rooms.push_back(f_n->get_pave()->get_rooms()[m_room->get_maze()]);
         }
         return true;
@@ -181,13 +185,18 @@ bool Door<_Tp, _V>::contract_continuity_private(){
             Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
             door_output |= d->get_input();
         }
-        door_output &= m_face->get_position_typed();
-        if(door_output != (*m_output_private)){
+
+        if(domain_init == FULL_DOOR && !is_subset(*m_output_private,door_output)){
+            *m_output_private &= door_output;
             change = true;
-            if(domain_init == FULL_DOOR)
-                (*m_output_private) &= door_output;
-            else if(domain_init == FULL_WALL)
-                (*m_output_private) |= door_output;
+        }
+        else if(domain_init == FULL_WALL && !is_subset(door_output,*m_output_private)){
+            if(m_room->get_nb_contractions()>80)
+                union_widening(m_output_private, door_output);
+            else
+                *m_output_private |= door_output;
+            *m_output_private &= m_face->get_position_typed();
+            change = true;
         }
     }
     return change;

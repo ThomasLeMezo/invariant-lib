@@ -30,5 +30,9 @@ cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
   	  -DWITH_EXAMPLES=ON \
 	  -DWITH_PPL=ON \
 	  $INVARIANTLIB_DIR
-make -j4 "$1"
+if [ -z "$1" ]; then
+	make -j4
+else
+	make -j4 "$1"
+fi
 cd ..
