@@ -165,6 +165,10 @@ public:
     bool is_full_output() const;
     bool is_full_input() const;
 
+    bool is_full_private() const;
+    bool is_full_private_output() const;
+    bool is_full_private_input() const;
+
     /**
      * @brief Return true if the union of input & output doors are full
      * @return

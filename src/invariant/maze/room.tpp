@@ -197,21 +197,21 @@ void Room<_Tp, _V>::compute_sliding_mode(const int n_vf, std::vector<std::vector
     for(int face_in=0; face_in<dim; face_in++){
         for(int sens_in = 0; sens_in < 2; sens_in++){
             Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
-            Door<_Tp, _V>* door_in = f_in->get_doors()[m_maze];
+            Door<_Tp, _V>* door = f_in->get_doors()[m_maze];
 
-            if(domain_init == FULL_DOOR && door_in->is_collinear()[n_vf]){
+            if(domain_init == FULL_DOOR && door->is_collinear()[n_vf]){
                 /// INPUT
                 _Tp out_return = get_empty_door_container<_Tp, _V>(dim);
                 _Tp in_return = get_empty_door_container<_Tp, _V>(dim);
                 contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_return);
 
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
-                    door_in->set_input_private(in_return); // Write input
+                    door->set_input_private(in_return); // Write input
                     in_results[n_vf][face_in][sens_in] = in_return;
                 }
                 if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
                     /// Write output here to improve standard mode efficency
-                    door_in->set_output_private(out_return); // Write output
+                    door->set_output_private(out_return); // Write output
                     out_results[n_vf][face_in][sens_in] = out_return;
 
                     /// Impact on other faces (IN -> OUT)
@@ -393,11 +393,19 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
     /// Compute IN_OUT door
     _Tp output_global_door(door_in->get_output_private());
     _Tp input_global_door(door_in->get_input_private());
+    bool input_full = door_in->is_full_private_input();
+    bool output_full = door_in->is_full_private_output();
     for(Face<_Tp, _V> *f_n:f_in->get_neighbors()){
         Door<_Tp, _V>* d_n = f_n->get_doors()[m_maze];
-        output_global_door |= (d_n->get_output() & f_in->get_position_typed());
-        input_global_door |= (d_n->get_input() & f_in->get_position_typed());
+        if(!output_full)
+            output_global_door |= d_n->get_output();
+        if(!input_full)
+            input_global_door |= d_n->get_input();
     }
+    if(!output_full)
+        output_global_door &= f_in->get_position_typed();
+    if(!input_full)
+        input_global_door &= f_in->get_position_typed();
 
     /// ************* Find adjacent paves *************
     /// --> In the direction of the zeros
@@ -420,13 +428,17 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
 
     for(Pave<_Tp, _V> *pave_adj:adjacent_paves){
         // Find adjacent paves that extrude this pave in the directions of zeros
-        ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
-
-        if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
+        if(pave_adj==this->m_pave){
             adjacent_paves_valid.push_back(pave_adj);
-            Room<_Tp, _V> *room_n= pave_adj->get_rooms()[m_maze];
-            vec_field_global |= room_n->get_one_vector_fields(n_vf);
-            if(pave_adj->get_position() != get_pave()->get_position()){
+            vec_field_global |= this->get_one_vector_fields(n_vf);
+        }
+        else{
+            ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
+
+            if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
+                adjacent_paves_valid.push_back(pave_adj);
+                Room<_Tp, _V> *room_n= pave_adj->get_rooms()[m_maze];
+                vec_field_global |= room_n->get_one_vector_fields(n_vf);
                 vec_field_neighbors |= room_n->get_one_vector_fields(n_vf);
             }
         }
@@ -447,7 +459,7 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
 
     for(Pave<_Tp, _V> *pave_adj:adjacent_paves_valid){
         bool local_pave = false;
-        if(pave_adj->get_position() == m_pave->get_position())
+        if(pave_adj == m_pave)
             local_pave = true;
         _V vec_field_typed_local_fwd(pave_adj->get_rooms()[m_maze]->get_one_vector_fields_fwd(n_vf));
         _V vec_field_typed_local_bwd(pave_adj->get_rooms()[m_maze]->get_one_vector_fields_bwd(n_vf));
@@ -457,7 +469,8 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
                 Face<_Tp, _V> *f_out_adj = pave_adj->get_faces()[face_out_adj][sens_out_adj];
                 Door<_Tp, _V> *d_out_adj = f_out_adj->get_doors()[m_maze];
 
-                if(!(d_out_adj->get_output().is_empty() && d_out_adj->get_input().is_empty())){
+                if((!local_pave && !(d_out_adj->get_output().is_empty() && d_out_adj->get_input().is_empty()))
+                   || (local_pave && !(d_out_adj->get_output_private().is_empty() && d_out_adj->get_input_private().is_empty()))){
 
                     /// ************* Determine if the face is part of the hull *************
                     /// Test if the Face intersect another face of the neighbours ?
@@ -473,9 +486,9 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
                         bool is_in_adj_pave_list = false;
                         bool is_same_face = false;
                         for(Pave<_Tp, _V> *pave_test:adjacent_paves_valid){
-                            if(pave_test->get_position() == pave_out_n->get_position()){ // Pointer comparison (?working?)
+                            if(pave_test == pave_out_n){ // Pointer comparison (?working?)
                                 is_in_adj_pave_list = true;
-                                if(face_out_n->get_position() == f_out_adj->get_position())
+                                if(face_out_n == f_out_adj)
                                     is_same_face = true;
                                 break;
                             }
@@ -597,13 +610,13 @@ bool Room<_Tp, _V>::contract(){
             return false;
         }
 
-        //        get_private_doors_info("before");
+        get_private_doors_info("before");
         change |= contract_continuity();
-        //        get_private_doors_info("continuity");
+        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
-            //            get_private_doors_info("consistency");
+            get_private_doors_info("consistency");
         }
     }
     return change;
@@ -615,8 +628,8 @@ bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_messag
         return false;
     ibex::IntervalVector position(2);
     //
-    position[0] = ibex::Interval(-0.0625, 0.03125);
-    position[1] = ibex::Interval(0.125, 0.1875);
+    position[0] = ibex::Interval(-4.6875, -4.5);
+    position[1] = ibex::Interval(-0.375, 0);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
@@ -632,11 +645,11 @@ bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_messag
 
             std::cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << std::endl;
             for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
-                Door<_Tp, _V> *d = f->get_doors()[m_maze];
+                //                Door<_Tp, _V> *d = f->get_doors()[m_maze];
                 std::cout << " Face : ";
                 std::ostringstream input, output;
-                input << d->get_input_private();
-                output << d->get_output_private();
+                //                input << d->get_input_private();
+                //                output << d->get_output_private();
                 std::cout << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str() << std::endl;
             }
             std::cout << "----" << std::endl;

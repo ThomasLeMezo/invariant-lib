@@ -143,6 +143,30 @@ bool Door<_Tp, _V>::is_full_input() const{
 }
 
 template <typename _Tp, typename _V>
+bool Door<_Tp, _V>::is_full_private() const{
+    if(*m_input_private == m_face->get_position_typed() && *m_output_private == m_face->get_position_typed())
+        return true;
+    else
+        return false;
+}
+
+template <typename _Tp, typename _V>
+bool Door<_Tp, _V>::is_full_private_input() const{
+    if(*m_input_private == m_face->get_position_typed())
+        return true;
+    else
+        return false;
+}
+
+template <typename _Tp, typename _V>
+bool Door<_Tp, _V>::is_full_private_output() const{
+    if(*m_output_private == m_face->get_position_typed())
+        return true;
+    else
+        return false;
+}
+
+template <typename _Tp, typename _V>
 bool Door<_Tp, _V>::is_full_union() const{
     if((m_input_public | m_output_public) == m_face->get_position())
         return true;
@@ -170,7 +194,7 @@ bool Door<_Tp, _V>::contract_continuity_private(){
             change = true;
         }
         else if(domain_init == FULL_WALL && !is_subset(door_input,*m_input_private)){
-            if(m_room->get_nb_contractions()>80)
+            if(m_room->get_nb_contractions()>1000)
                 union_widening(m_input_private, door_input);
             else
                 *m_input_private |= door_input;
