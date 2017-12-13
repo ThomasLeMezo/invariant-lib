@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-10, 10);
-    space[1] = ibex::Interval(-10, 10);
+    space[0] = ibex::Interval(-6, 6);
+    space[1] = ibex::Interval(-6, 6);
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
@@ -62,10 +62,10 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<15; i++){
+    for(int i=0; i<16; i++){
         cout << i << endl;
         paving.bisect();
-        cout << maze_outer.contract() << endl;
+        maze_outer.contract();
 //        cout << maze_inner.contract() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
@@ -73,9 +73,11 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer/*, &maze_inner*/);
+    VibesMaze v_maze("Cordeliere", &maze_outer/*, &maze_inner*/);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/cordeliere_invariant.svg");
+
 //    v_maze.drawCircle(0, 0, 0.5, "black[red]");
 //    v_maze.drawCircle(1.78129, 1.78129, 0.5, "black[red]");
 //    v_maze.drawCircle(-1.78129, -1.78129, 0.5, "black[red]");

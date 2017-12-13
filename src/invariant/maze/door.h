@@ -417,6 +417,30 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorPPL& 
     d.get_input().print();
     return stream;
 }
+
+inline bool is_subset(const ibex::IntervalVector &iv1, const ibex::IntervalVector &iv2){
+    return iv1.is_subset(iv2);
+}
+
+inline bool is_subset(const ppl::C_Polyhedron &p1, const ppl::C_Polyhedron &p2){
+    return p2.contains(p1);
+}
+
+inline void union_widening(ppl::C_Polyhedron* p1, const ppl::C_Polyhedron& p2){
+//    if(!p1->is_empty()){
+        ppl::C_Polyhedron p_result(p2);
+        p_result.poly_hull_assign(*p1);
+        p_result.BHRZ03_widening_assign(*p1);
+        *p1 = p_result;
+//    }
+//    else
+//        *p1 = p2;
+}
+
+inline void union_widening(ibex::IntervalVector* iv1, const ibex::IntervalVector& iv2){
+    *(iv1) |= iv2;
+}
+
 }
 
 #include "door.tpp"

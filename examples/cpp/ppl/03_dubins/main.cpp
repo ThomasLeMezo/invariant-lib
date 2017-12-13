@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         paving.bisect();
         cout << i << endl;
         maze_outer.contract();

@@ -63,8 +63,8 @@ bool Door<_Tp, _V>::analyze_change(std::vector<Room<_Tp, _V> *>&list_rooms){
         for(Face<_Tp, _V>* f_n:l_face){
             Door *d_n = f_n->get_doors()[m_room->get_maze()];
             if((domain_init == FULL_DOOR && ((sens_fwd && !d_n->is_empty_input()) || (sens_bwd && !d_n->is_empty_output())))
-               || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
-            list_rooms.push_back(f_n->get_pave()->get_rooms()[m_room->get_maze()]);
+                    || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
+                list_rooms.push_back(f_n->get_pave()->get_rooms()[m_room->get_maze()]);
         }
         return true;
     }
@@ -83,7 +83,7 @@ void Door<_Tp, _V>::set_full_private_output(){
 
 template <typename _Tp, typename _V>
 void Door<_Tp, _V>::set_full_private_input(){
-   (*m_input_private) = m_face->get_position_typed();
+    (*m_input_private) = m_face->get_position_typed();
 }
 
 template <typename _Tp, typename _V>
@@ -146,6 +146,7 @@ bool Door<_Tp, _V>::is_full_union() const{
         return false;
 }
 
+
 template <typename _Tp, typename _V>
 bool Door<_Tp, _V>::contract_continuity_private(){
     DYNAMICS_SENS dynamics_sens = m_room->get_maze()->get_dynamics()->get_sens();
@@ -159,13 +160,18 @@ bool Door<_Tp, _V>::contract_continuity_private(){
             Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
             door_input |= d->get_output();
         }
-        door_input &= m_face->get_position_typed();
-        if(door_input != *m_input_private){
+
+        if(domain_init == FULL_DOOR && !is_subset(*m_input_private,door_input)){
+            (*m_input_private) &= door_input;
             change = true;
-            if(domain_init == FULL_DOOR)
-                (*m_input_private) &= door_input;
-            else if(domain_init == FULL_WALL)
-                (*m_input_private) |= door_input;
+        }
+        else if(domain_init == FULL_WALL && !is_subset(door_input,*m_input_private)){
+            if(m_room->get_nb_contractions()>80)
+                union_widening(m_input_private, door_input);
+            else
+                *m_input_private |= door_input;
+            *m_input_private &= m_face->get_position_typed();
+            change = true;
         }
     }
 
@@ -189,6 +195,5 @@ bool Door<_Tp, _V>::contract_continuity_private(){
 
 /// ******************  Sepcialized ****************** ///
 
-
-
 }
+
