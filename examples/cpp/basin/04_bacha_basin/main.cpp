@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("Synchronous Generator Basin", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Synchronous Generator Basin", &maze_outer/*, &maze_inner*/);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
