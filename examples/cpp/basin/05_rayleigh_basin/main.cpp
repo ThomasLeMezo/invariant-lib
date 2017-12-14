@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     r = 0.4;
     Function f_sep_outer(x, pow(x[0]-x1_c, 2)+pow(x[1]-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    dom_outer.set_sep_output(&s_outer);
+    dom_outer.set_sep_input(&s_outer);
 
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
@@ -53,12 +53,11 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x, Return(x[1],
                            -1.0*(x[0]+pow(x[1],3)-x[1])));
-    Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
 //    vibes::beginDrawing();

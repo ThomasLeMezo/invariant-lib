@@ -70,7 +70,6 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_outer.contract();
     for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << endl;
@@ -88,9 +87,9 @@ int main(int argc, char *argv[])
     vibes::drawBox(ibex::Interval(0, 0.5), ibex::Interval(-2, 2), "red[]");
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(1.015);
-    position_info[1] = ibex::Interval(-1.605);
-    v_maze.show_room_info(&maze_outer, position_info);
+    position_info[0] = ibex::Interval(4);
+    position_info[1] = ibex::Interval(1);
+//    v_maze.show_room_info(&maze_outer, position_info);
 
     vibes::endDrawing();
 

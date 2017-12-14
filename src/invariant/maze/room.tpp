@@ -610,13 +610,14 @@ bool Room<_Tp, _V>::contract(){
             return false;
         }
 
-        //        get_private_doors_info("before");
+        get_private_doors_info("before");
         change |= contract_continuity();
-        //        get_private_doors_info("continuity");
+        get_private_doors_info("continuity");
 
         if(change){
-            contract_consistency();
-            //            get_private_doors_info("consistency");
+            if(!m_first_contract || !is_empty_private())
+                contract_consistency();
+                get_private_doors_info("consistency");
         }
     }
     return change;
@@ -624,12 +625,12 @@ bool Room<_Tp, _V>::contract(){
 
 template<typename _Tp, typename _V>
 bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() != FULL_DOOR)
+    if(m_maze->get_domain()->get_init() != FULL_WALL)
         return false;
     ibex::IntervalVector position(2);
     //
-    position[0] = ibex::Interval(4.5, 6);
-    position[1] = ibex::Interval(-3, 0);
+    position[0] = ibex::Interval(3, 6);
+    position[1] = ibex::Interval(0.050000000000000044, 3.1);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);

@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     r = 0.4;
     Function f_sep_outer(x, pow(x[0]-x1_c, 2)+pow(x[1]-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    dom_outer.set_sep_output(&s_outer);
+    dom_outer.set_sep_input(&s_outer);
 
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("Synchronous Generator Basin", &maze_outer/*, &maze_inner*/);
+    VibesMaze v_maze("Synchronous Generator Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");

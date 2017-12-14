@@ -7,6 +7,7 @@
 #include "ibex_SepFwdBwd.h"
 #include "ibex_SepInter.h"
 #include "ibex_SepUnion.h"
+#include "ibex_SepNot.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -59,13 +60,7 @@ int main(int argc, char *argv[])
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
-    SepFwdBwd s1_inner1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepFwdBwd s1_inner2(f_sep2, GEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepUnion s1_inner(s1_inner1, s1_inner2);
-    SepFwdBwd s2_inner1(f2_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepFwdBwd s2_inner2(f2_sep2, GEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepUnion s2_inner(s2_inner1, s2_inner2);
-    SepInter s_inner(s1_inner, s2_inner);
+    SepNot s_inner(s_outer);
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //

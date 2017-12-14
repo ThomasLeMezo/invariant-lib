@@ -21,7 +21,7 @@ inline ibex::Interval taylor(const ibex::Interval &t, const ibex::Interval &x_do
 
 template<>
 void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
-
+    // Contraction with Taylor 1 order
     if(m_pave->get_dim()==2 && m_vector_fields_d1.size()!=0){
         IntervalVector vect_d1 = hadamard_product(m_vector_fields_d1[0],vect);
         if(sens==FWD || sens==FWD_BWD){
@@ -53,8 +53,12 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                 t_list.push_back(root_positive(a1_ub, b1, c1));
                 t_list.push_back(root_negative(a1_ub, b1, c1));
             }
-            for(const ibex::Interval &t:t_list)
-                y |= taylor(t, vect_d1[1-out_comp], vec_in0_lb[1-out_comp], in0_lb[1-out_comp]);
+            for(const ibex::Interval &t:t_list){
+                if(!ibex::Interval::ZERO.is_subset(t))
+                    y |= taylor(t, vect_d1[1-out_comp], vec_in0_lb[1-out_comp], in0_lb[1-out_comp]);
+                else
+                    y |= out[1-out_comp];
+            }
 
             // IN_ub
             IntervalVector in0_ub = IntervalVector(in.ub());
@@ -78,8 +82,12 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                 t_list.push_back(root_positive(a1_ub, b1, c1));
                 t_list.push_back(root_negative(a1_ub, b1, c1));
             }
-            for(const ibex::Interval &t:t_list)
-                y |= taylor(t, vect_d1[1-out_comp], vec_in0_ub[1-out_comp], in0_ub[1-out_comp]);
+            for(const ibex::Interval &t:t_list){
+                if(!ibex::Interval::ZERO.is_subset(t))
+                    y |= taylor(t, vect_d1[1-out_comp], vec_in0_ub[1-out_comp], in0_ub[1-out_comp]);
+                else
+                    y |= out[1-out_comp];
+            }
 
             out[1-out_comp] &= y;
         }
@@ -113,8 +121,12 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                 t_list.push_back(root_positive(a1_ub, b1, c1));
                 t_list.push_back(root_negative(a1_ub, b1, c1));
             }
-            for(const ibex::Interval &t:t_list)
-                x |= taylor(t, vect_d1[1-in_comp], vec_out0_lb[1-in_comp], out0_lb[1-in_comp]);
+            for(const ibex::Interval &t:t_list){
+                if(!ibex::Interval::ZERO.is_subset(t))
+                    x |= taylor(t, vect_d1[1-in_comp], vec_out0_lb[1-in_comp], out0_lb[1-in_comp]);
+                else
+                    x |= in[1-in_comp];
+            }
 
             IntervalVector out0_ub = IntervalVector(out.ub());
             IntervalVector vec_out0_ub = -m_maze->get_dynamics()->eval(out0_ub)[0];
@@ -137,32 +149,36 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                 t_list.push_back(root_positive(a1_ub, b1, c1));
                 t_list.push_back(root_negative(a1_ub, b1, c1));
             }
-            for(const ibex::Interval &t:t_list)
-                x |= taylor(t, vect_d1[1-in_comp], vec_out0_lb[1-in_comp], out0_lb[1-in_comp]);
+            for(const ibex::Interval &t:t_list){
+                if(!ibex::Interval::ZERO.is_subset(t))
+                    x |= taylor(t, vect_d1[1-in_comp], vec_out0_lb[1-in_comp], out0_lb[1-in_comp]);
+                else
+                    x |= in[1-in_comp];
+            }
 
             in[1-in_comp] &= x;
         }
     }
-    else{
-        // assert 0 not in v.
-        ibex::IntervalVector c(out-in);
-        ibex::IntervalVector v(vect);
-        ibex::Interval alpha(ibex::Interval::POS_REALS);
 
-        for(int i=0; i<v.size(); i++){
-            if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
-                alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
-        }
-        if(alpha==ibex::Interval::ZERO)
-            alpha.set_empty();
+    // Contraction with Taylor 0 order
+    // assert 0 not in v.
 
-        c &= alpha*v;
-        if(sens==FWD || sens==FWD_BWD)
-            out &= c+in;
-        if(sens==BWD || sens==FWD_BWD)
-            in &= out-c;
+    ibex::IntervalVector c(out-in);
+    ibex::IntervalVector v(vect);
+    ibex::Interval alpha(ibex::Interval::POS_REALS);
+
+    for(int i=0; i<v.size(); i++){
+        if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
+            alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
     }
+    if(alpha==ibex::Interval::ZERO)
+        alpha.set_empty();
 
+    c &= alpha*v;
+    if(sens==FWD || sens==FWD_BWD)
+        out &= (c+in);
+    if(sens==BWD || sens==FWD_BWD)
+        in &= (out-c);
 }
 
 template <>

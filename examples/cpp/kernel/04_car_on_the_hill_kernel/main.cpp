@@ -45,16 +45,16 @@ int main(int argc, char *argv[])
     ibex::Function f_outer(x1, x2, Return(x2,
                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-3.0, 3.0)));
 
-    Dynamics_Function dyn_outer(&f_outer, BWD);
+    Dynamics_Function dyn_outer(&f_outer, FWD);
 
     // ****** Dynamics Inner ******* //
 //    ibex::Function f_inner1(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(-0.5))));
 //    ibex::Function f_inner2(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(0.5))));
-    ibex::Function f_inner1(x1, x2, -Return(x2,
+    ibex::Function f_inner1(x1, x2, Return(x2,
                                      (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-3.0))));
-    ibex::Function f_inner2(x1, x2, -Return(x2,
+    ibex::Function f_inner2(x1, x2, Return(x2,
                                      (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(3.0))));
 
     vector<Function *> f_list_inner;
@@ -70,9 +70,10 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
+        maze_inner.contract();
+        maze_outer.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -85,8 +86,8 @@ int main(int argc, char *argv[])
     IntervalVector position_info(2);
     position_info[0] = ibex::Interval(6.6);
     position_info[1] = ibex::Interval(-2.4, -2.05);
-    v_maze.setProperties(600, 0, 512, 512);
-    v_maze.show_room_info(&maze_inner, position_info);
+//    v_maze.setProperties(600, 0, 512, 512);
+//    v_maze.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 }
