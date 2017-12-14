@@ -157,6 +157,8 @@ public:
     bool is_empty_output() const;
     bool is_empty_input() const;
 
+    bool is_empty_private() const;
+
     /**
      * @brief Return true if input & output doors are full (ie equal to position)
      * @return
@@ -362,6 +364,14 @@ inline const std::vector<bool>& Door<_Tp, _V>::is_possible_out() const{
 template <typename _Tp, typename _V>
 inline const std::vector<bool>& Door<_Tp, _V>::is_possible_in() const{
     return m_possible_in;
+}
+
+template <typename _Tp, typename _V>
+inline bool Door<_Tp, _V>::is_empty_private() const{
+    if(m_input_private->is_empty() && m_output_private->is_empty())
+        return true;
+    else
+        return false;
 }
 
 template <typename _Tp, typename _V>

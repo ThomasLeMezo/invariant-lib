@@ -323,7 +323,7 @@ void Room<_Tp, _V>::contract_consistency(){
     bool global_compute = false;
     for(int n_vf=0; n_vf<nb_vec; n_vf++){
         if(m_vector_field_zero[n_vf]){ // Case Zero in f
-            if(domain_init == FULL_WALL)
+            if(domain_init == FULL_WALL && !is_empty_private())
                 this->set_full_possible();
         }
         else{
@@ -468,95 +468,95 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
 
                 if(!(local_pave && face_out_adj==face_in && sens_out_adj==sens_in) || !local_pave){
 
-                if((!local_pave && !(d_out_adj->get_output().is_empty() && d_out_adj->get_input().is_empty()))
-                   || (local_pave && !(d_out_adj->get_output_private().is_empty() && d_out_adj->get_input_private().is_empty()))){
+                    if((!local_pave && !(d_out_adj->get_output().is_empty() && d_out_adj->get_input().is_empty()))
+                            || (local_pave && !(d_out_adj->get_output_private().is_empty() && d_out_adj->get_input_private().is_empty()))){
 
-                    /// ************* Determine if the face is part of the hull *************
-                    /// Test if the Face intersect another face of the neighbours ?
-                    /// By default, the "own surface" of the adjacent face is equal to its position
-                    /// But in the case the face intersect an other face of the adjacents faces
-                    /// it means that the intersected part is not on the hull
+                        /// ************* Determine if the face is part of the hull *************
+                        /// Test if the Face intersect another face of the neighbours ?
+                        /// By default, the "own surface" of the adjacent face is equal to its position
+                        /// But in the case the face intersect an other face of the adjacents faces
+                        /// it means that the intersected part is not on the hull
 
-                    _Tp own_surface(f_out_adj->get_position_typed());
-                    for(Face<_Tp, _V> *face_out_n:f_out_adj->get_neighbors()){
-                        Pave<_Tp, _V> *pave_out_n = face_out_n->get_pave();
+                        _Tp own_surface(f_out_adj->get_position_typed());
+                        for(Face<_Tp, _V> *face_out_n:f_out_adj->get_neighbors()){
+                            Pave<_Tp, _V> *pave_out_n = face_out_n->get_pave();
 
-                        /// Find if this face is on the adjacent paves valid list ?
-                        bool is_in_adj_pave_list = false;
-                        bool is_same_face = false;
-                        for(Pave<_Tp, _V> *pave_test:adjacent_paves_valid){
-                            if(pave_test == pave_out_n){ // Pointer comparison (?working?)
-                                is_in_adj_pave_list = true;
-                                if(face_out_n == f_out_adj)
-                                    is_same_face = true;
-                                break;
+                            /// Find if this face is on the adjacent paves valid list ?
+                            bool is_in_adj_pave_list = false;
+                            bool is_same_face = false;
+                            for(Pave<_Tp, _V> *pave_test:adjacent_paves_valid){
+                                if(pave_test == pave_out_n){ // Pointer comparison (?working?)
+                                    is_in_adj_pave_list = true;
+                                    if(face_out_n == f_out_adj)
+                                        is_same_face = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        /// Compute the part of the face which is on the hull (reduce the size of own_surface)
-                        /// There is an over approximation made because of the diff operator
-                        if(is_same_face)
+                            /// Compute the part of the face which is on the hull (reduce the size of own_surface)
+                            /// There is an over approximation made because of the diff operator
+                            if(is_same_face)
+                                set_empty<_Tp, _V>(own_surface);
+                            else if(is_in_adj_pave_list){
+                                own_surface &= get_diff_hull<_Tp, _V>(f_out_adj->get_position_typed(), face_out_n->get_position_typed() & f_out_adj->get_position_typed());
+                            }
+
+                            /// Note : computation of the own_surface will remove the propagation of exact face_in to itself
+                        }
+                        if(get_nb_dim_flat(own_surface)==2)
                             set_empty<_Tp, _V>(own_surface);
-                        else if(is_in_adj_pave_list){
-                            own_surface &= get_diff_hull<_Tp, _V>(f_out_adj->get_position_typed(), face_out_n->get_position_typed() & f_out_adj->get_position_typed());
-                        }
 
-                        /// Note : computation of the own_surface will remove the propagation of exact face_in to itself
-                    }
-                    if(get_nb_dim_flat(own_surface)==2)
-                        set_empty<_Tp, _V>(own_surface);
+                        /// ************* Compute the propagation *************
+                        if(!own_surface.is_empty()){
+                            // OUT -> IN
+                            if(!input_global_door.is_empty()){
+                                /// WARNING : do no set in_tmp_IN only to private door
+                                /// because only half part is taken into account => take the union with the IN of the neighbour
+                                _Tp in_tmp_IN(input_global_door);
 
-                    /// ************* Compute the propagation *************
-                    if(!own_surface.is_empty()){
-                        // OUT -> IN
-                        if(!input_global_door.is_empty()){
-                            /// WARNING : do no set in_tmp_IN only to private door
-                            /// because only half part is taken into account => take the union with the IN of the neighbour
-                            _Tp in_tmp_IN(input_global_door);
-
-                            _Tp out_tmp_IN(own_surface);
-                            if(local_pave)
-                                out_tmp_IN &= d_out_adj->get_output_private();
-                            else
-                                out_tmp_IN &= d_out_adj->get_output(); // Do not use the private door here !
-
-                            // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
-                            if(get_nb_dim_flat(out_tmp_IN)==2)
-                                set_empty<_Tp, _V>(out_tmp_IN);
-
-                            if(!out_tmp_IN.is_empty()){
+                                _Tp out_tmp_IN(own_surface);
                                 if(local_pave)
-                                    contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_fwd(n_vf), BWD); // The vector is fwd but we need to contract the input
+                                    out_tmp_IN &= d_out_adj->get_output_private();
                                 else
-                                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_fwd, BWD);
+                                    out_tmp_IN &= d_out_adj->get_output(); // Do not use the private door here !
 
-                                in_return |= in_tmp_IN ;
+                                // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
+                                if(get_nb_dim_flat(out_tmp_IN)==2)
+                                    set_empty<_Tp, _V>(out_tmp_IN);
+
+                                if(!out_tmp_IN.is_empty()){
+                                    if(local_pave)
+                                        contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_fwd(n_vf), BWD); // The vector is fwd but we need to contract the input
+                                    else
+                                        contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_fwd, BWD);
+
+                                    in_return |= in_tmp_IN ;
+                                }
                             }
-                        }
 
-                        // IN -> OUT
-                        if(!output_global_door.is_empty()){
-                            _Tp out_tmp_OUT(output_global_door);
-                            _Tp in_tmp_OUT(own_surface);
-                            if(local_pave)
-                                in_tmp_OUT &= d_out_adj->get_input_private();
-                            else
-                                in_tmp_OUT &= d_out_adj->get_input();
-
-                            if(get_nb_dim_flat(in_tmp_OUT)==2)
-                                set_empty<_Tp, _V>(in_tmp_OUT);
-
-                            if(!in_tmp_OUT.is_empty()){
+                            // IN -> OUT
+                            if(!output_global_door.is_empty()){
+                                _Tp out_tmp_OUT(output_global_door);
+                                _Tp in_tmp_OUT(own_surface);
                                 if(local_pave)
-                                    contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_fwd(n_vf), FWD);
+                                    in_tmp_OUT &= d_out_adj->get_input_private();
                                 else
-                                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
-                                out_return |= out_tmp_OUT;
+                                    in_tmp_OUT &= d_out_adj->get_input();
+
+                                if(get_nb_dim_flat(in_tmp_OUT)==2)
+                                    set_empty<_Tp, _V>(in_tmp_OUT);
+
+                                if(!in_tmp_OUT.is_empty()){
+                                    if(local_pave)
+                                        contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_fwd(n_vf), FWD);
+                                    else
+                                        contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
+                                    out_return |= out_tmp_OUT;
+                                }
                             }
                         }
                     }
                 }
-            }
             }
         }
     }
@@ -610,13 +610,13 @@ bool Room<_Tp, _V>::contract(){
             return false;
         }
 
-//        get_private_doors_info("before");
+        //        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        //        get_private_doors_info("continuity");
 
         if(change){
             contract_consistency();
-//            get_private_doors_info("consistency");
+            //            get_private_doors_info("consistency");
         }
     }
     return change;
@@ -688,6 +688,16 @@ void Room<_Tp, _V>::get_all_active_neighbors(std::vector<Room *> &list_rooms) co
                 list_rooms.push_back(r_n);
         }
     }
+}
+
+template<typename _Tp, typename _V>
+const bool Room<_Tp, _V>::is_empty_private(){
+    for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
+        if(!f->get_doors()[m_maze]->is_empty_private()){
+            return false;
+        }
+    }
+    return true;
 }
 
 template<typename _Tp, typename _V>

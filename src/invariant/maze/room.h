@@ -152,6 +152,7 @@ public:
      * @return
      */
     const bool is_empty();
+    const bool is_empty_private();
 
     /**
      * @brief Return true if this Room is full
