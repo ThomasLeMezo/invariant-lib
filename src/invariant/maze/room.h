@@ -561,6 +561,17 @@ inline ibex::IntervalVector Room<_Tp, _V>::get_one_vector_fields(int n_vf) const
     return m_vector_fields[n_vf];
 }
 
+inline std::string print(const ibex::IntervalVector &iv){
+    std::ostringstream stream;
+    stream << iv;
+    return stream.str();
+}
+
+inline std::string print(const ppl::C_Polyhedron &p){
+    std::ostringstream stream;
+    p.print();
+    return stream.str();
+}
 }
 #include "room.tpp"
 

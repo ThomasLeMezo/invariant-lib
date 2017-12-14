@@ -403,7 +403,7 @@ void VibesMaze::get_room_info(invariant::MazeIBEX *maze, double x, double y) con
     get_room_info(maze, pos);
 }
 
-void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& position) const{
+void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& position){
     std::vector<invariant::PaveIBEX*> pave_list;
     std::cout.precision(15);
     m_subpaving->get_room_info(maze, position, pave_list);
@@ -421,7 +421,8 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         ostringstream name;
         name << p_position;
         vibes::newFigure(name.str());
-        vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height));
+        vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height, "x", m_x,"y", m_y));
+        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave
         if(m_maze_inner != NULL){ //maze->get_domain()->get_init() == FULL_WALL){

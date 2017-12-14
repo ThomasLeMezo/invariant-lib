@@ -36,7 +36,7 @@ public:
     void get_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector& position) const;
     void get_room_info(invariant::MazeIBEX *maze, double x, double y) const;
 
-    void show_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector &position) const;
+    void show_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector &position);
 
     /**
      * @brief drawCircle for easier integration with the python binding
