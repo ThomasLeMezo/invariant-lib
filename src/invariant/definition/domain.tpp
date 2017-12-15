@@ -21,6 +21,7 @@ void Domain<_Tp, _V>::contract_domain(Maze<_Tp, _V> *maze, std::vector<Room<_Tp,
             else if(m_domain_init == FULL_WALL)
                 r->set_empty_private();
             r->synchronize();
+//            r->reset_update_neighbors();
         }
     }
 

@@ -42,13 +42,13 @@ void Door<_Tp, _V>::set_removed(){
     m_input_private = NULL;
 }
 
-template <typename _Tp, typename _V>
-void Door<_Tp, _V>::synchronize(){
-    omp_set_lock(&m_lock_read);
-    m_input_public = *m_input_private;
-    m_output_public = *m_output_private;
-    omp_unset_lock(&m_lock_read);
-}
+//template <typename _Tp, typename _V>
+//void Door<_Tp, _V>::synchronize(){
+//    omp_set_lock(&m_lock_read);
+//    m_input_public = *m_input_private;
+//    m_output_public = *m_output_private;
+//    omp_unset_lock(&m_lock_read);
+//}
 
 template <typename _Tp, typename _V>
 bool Door<_Tp, _V>::analyze_change(std::vector<Room<_Tp, _V> *>&list_rooms){
@@ -183,48 +183,112 @@ bool Door<_Tp, _V>::contract_continuity_private(){
     bool change = false;
 
     if((dynamics_sens == FWD || dynamics_sens == FWD_BWD) && m_possible_in_union){
-        _Tp door_input = get_empty_door_container<_Tp, _V>(m_face->get_pave()->get_dim());
-        for(Face<_Tp, _V>* f:m_face->get_neighbors()){
-            Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
-            door_input |= d->get_output();
-        }
 
-        if(domain_init == FULL_DOOR && !is_subset(*m_input_private,door_input)){
-            (*m_input_private) &= door_input;
-            change = true;
+        // Test if there is changes (with update counter)
+//        bool change_output = false;
+//        for(Face<_Tp, _V>* f:m_face->get_neighbors()){
+//            Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
+//            size_t update_status = d->get_update_output();
+//            if(m_update_neighbors_output.count(d)>0){
+//                if(m_update_neighbors_output[d]<update_status){
+//                    change_output = true;
+//                    m_update_neighbors_output[d]=update_status;
+//                }
+//            }
+//            else{
+//                change_output = true;
+//                m_update_neighbors_output[d]=update_status;
+//            }
+//        }
+
+        // Compute change
+//        if(change_output){
+            _Tp door_input = get_empty_door_container<_Tp, _V>(m_face->get_pave()->get_dim());
+            for(Face<_Tp, _V>* f:m_face->get_neighbors()){
+                Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
+                door_input |= d->get_output();
+            }
+
+            if(domain_init == FULL_DOOR && !is_subset(*m_input_private,door_input)){
+                (*m_input_private) &= door_input;
+                change = true;
+            }
+            else if(domain_init == FULL_WALL && !is_subset(door_input,*m_input_private)){
+                if(m_room->get_nb_contractions()>1000)
+                    union_widening(m_input_private, door_input);
+                else
+                    *m_input_private |= door_input;
+                *m_input_private &= m_face->get_position_typed();
+                change = true;
+            }
         }
-        else if(domain_init == FULL_WALL && !is_subset(door_input,*m_input_private)){
-            if(m_room->get_nb_contractions()>1000)
-                union_widening(m_input_private, door_input);
-            else
-                *m_input_private |= door_input;
-            *m_input_private &= m_face->get_position_typed();
-            change = true;
-        }
-    }
+//    }
 
     if((dynamics_sens == BWD || dynamics_sens == FWD_BWD) && m_possible_out_union){
-        _Tp door_output = get_empty_door_container<_Tp, _V>(m_face->get_pave()->get_dim());
-        for(Face<_Tp, _V>* f:m_face->get_neighbors()){
-            Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
-            door_output |= d->get_input();
-        }
 
-        if(domain_init == FULL_DOOR && !is_subset(*m_output_private,door_output)){
-            *m_output_private &= door_output;
-            change = true;
+//        bool change_input = false;
+//        for(Face<_Tp, _V>* f:m_face->get_neighbors()){
+//            Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
+//            size_t update_status = d->get_update_input();
+//            if(m_update_neighbors_input.count(d)>0){
+//                if(m_update_neighbors_input[d]<update_status){
+//                    change_input = true;
+//                    m_update_neighbors_input[d]=update_status;
+//                }
+//            }
+//            else{
+//                change_input = true;
+//                m_update_neighbors_input[d]=update_status;
+//            }
+//        }
+
+//        if(change_input){
+            _Tp door_output = get_empty_door_container<_Tp, _V>(m_face->get_pave()->get_dim());
+            for(Face<_Tp, _V>* f:m_face->get_neighbors()){
+                Door<_Tp, _V> *d = f->get_doors()[m_room->get_maze()];
+                door_output |= d->get_input();
+            }
+
+            if(domain_init == FULL_DOOR && !is_subset(*m_output_private,door_output)){
+                *m_output_private &= door_output;
+                change = true;
+            }
+            else if(domain_init == FULL_WALL && !is_subset(door_output,*m_output_private)){
+                if(m_room->get_nb_contractions()>80)
+                    union_widening(m_output_private, door_output);
+                else
+                    *m_output_private |= door_output;
+                *m_output_private &= m_face->get_position_typed();
+                change = true;
+            }
         }
-        else if(domain_init == FULL_WALL && !is_subset(door_output,*m_output_private)){
-            if(m_room->get_nb_contractions()>80)
-                union_widening(m_output_private, door_output);
-            else
-                *m_output_private |= door_output;
-            *m_output_private &= m_face->get_position_typed();
-            change = true;
-        }
-    }
+//    }
     return change;
 }
+
+//template <typename _Tp, typename _V>
+//size_t Door<_Tp, _V>::get_update_output() const{
+//    size_t result;
+//    omp_set_lock(&m_lock_read);
+//    result = m_update_output;
+//    omp_unset_lock(&m_lock_read);
+//    return result;
+//}
+
+//template <typename _Tp, typename _V>
+//size_t Door<_Tp, _V>::get_update_input() const{
+//    size_t result;
+//    omp_set_lock(&m_lock_read);
+//    result = m_update_input;
+//    omp_unset_lock(&m_lock_read);
+//    return result;
+//}
+
+//template <typename _Tp, typename _V>
+//void Door<_Tp, _V>::reset_update_neighbors(){
+//    m_update_neighbors_input.clear();
+//    m_update_neighbors_output.clear();
+//}
 
 /// ******************  Sepcialized ****************** ///
 

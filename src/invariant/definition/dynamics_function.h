@@ -14,13 +14,13 @@ public:
      * @brief Dynamics constructor
      * @param functions
      */
-    Dynamics_Function(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD);
+    Dynamics_Function(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool taylor=false);
 
     /**
      * @brief Dynamics constructor
      * @param functions
      */
-    Dynamics_Function(ibex::Function *functions, const DYNAMICS_SENS sens=FWD);
+    Dynamics_Function(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool taylor=false);
 
     /**
      * @brief Dynamics destructor
@@ -41,6 +41,7 @@ public:
      */
     const std::vector<ibex::IntervalVector> eval_d1(const ibex::IntervalVector &position);
 
+private:
     /**
      * @brief add_function_d1
      * @param functions_list

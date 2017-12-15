@@ -205,6 +205,11 @@ public:
     void synchronize();
 
     /**
+     * @brief reset update neighbors
+     */
+//    void reset_update_neighbors();
+
+    /**
      * @brief Get if this room is removed (i.e. if it is active)
      * @return
      */

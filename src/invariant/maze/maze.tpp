@@ -210,5 +210,4 @@ void Maze<_Tp, _V>::add_rooms(const std::vector<Room<_Tp, _V> *>& list_rooms){
     }
 }
 
-
 }

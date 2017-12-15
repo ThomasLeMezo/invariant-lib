@@ -37,17 +37,14 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, FWD);
-
-    ibex::Function f_diff(f, ibex::Function::DIFF);
-    dyn.add_function_d1(&f_diff);
+    Dynamics_Function dyn(&f, FWD_BWD, true);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<9; i++){
+    for(int i=0; i<4; i++){
         cout << i << endl;
         paving.bisect();
         maze.contract();
@@ -62,8 +59,8 @@ int main(int argc, char *argv[])
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(-1.89);
-    position_info[1] = ibex::Interval(0.508);
+    position_info[0] = ibex::Interval(-1);
+    position_info[1] = ibex::Interval(2);
     v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();

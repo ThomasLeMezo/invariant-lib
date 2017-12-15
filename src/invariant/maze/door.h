@@ -15,6 +15,7 @@
 #include "room.h"
 #include "maze.h"
 #include "../smartSubPaving/pave.h"
+#include <map>
 
 #define IBEX_PPL_PRECISION 1e3
 
@@ -261,6 +262,16 @@ public:
         return d1;
     }
 
+    /**
+     * @brief get update_input
+     * @return
+     */
+//    size_t get_update_input() const;
+
+//    size_t get_update_output() const;
+
+//    void reset_update_neighbors();
+
 protected:
     _Tp m_input_public;
     _Tp m_output_public; //input and output doors public
@@ -269,6 +280,11 @@ protected:
     Face<_Tp, _V> *               m_face = NULL; // pointer to the associated face
     Room<_Tp, _V> *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
+
+//    size_t  m_update_input = 0;
+//    size_t  m_update_output = 0;
+//    std::map<Door<_Tp, _V>*,size_t> m_update_neighbors_input;
+//    std::map<Door<_Tp, _V>*,size_t> m_update_neighbors_output;
 
     std::vector<bool>    m_possible_out;
     std::vector<bool>    m_possible_in;

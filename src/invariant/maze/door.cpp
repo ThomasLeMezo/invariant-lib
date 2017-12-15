@@ -38,6 +38,19 @@ void Door<ibex::IntervalVector, ibex::IntervalVector>::set_output_private(const 
     *m_output_private = iv_output;
 }
 
+template <>
+void Door<ibex::IntervalVector, ibex::IntervalVector>::synchronize(){
+    omp_set_lock(&m_lock_read);
+//    if(*m_input_private != m_input_public)
+//        m_update_input++;
+//    if(*m_output_private != m_output_public)
+//        m_update_output++;
+
+    m_input_public = *m_input_private;
+    m_output_public = *m_output_private;
+    omp_unset_lock(&m_lock_read);
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
@@ -78,8 +91,15 @@ void Door<ppl::C_Polyhedron, ppl::Generator_System>::synchronize(){
     omp_set_lock(&m_lock_read);
     m_input_private->minimized_constraints();
     m_output_private->minimized_constraints();
-    m_input_public = *m_input_private;
-    m_output_public = *m_output_private;
+//    if(!m_input_private->contains(m_input_public) || !m_input_public.contains(*m_input_private)){
+//        m_update_input++;
+        m_input_public = *m_input_private;
+//    }
+//    if(!m_output_private->contains(m_output_public) || !m_output_public.contains(*m_output_private)){
+//        m_update_output++;
+        m_output_public = *m_output_private;
+//    }
+
     omp_unset_lock(&m_lock_read);
 }
 

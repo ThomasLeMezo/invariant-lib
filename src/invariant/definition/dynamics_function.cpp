@@ -4,22 +4,34 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-Dynamics_Function::Dynamics_Function(const vector<Function*> functions, const DYNAMICS_SENS sens):
-Dynamics(sens)
+Dynamics_Function::Dynamics_Function(const vector<Function*> functions, const DYNAMICS_SENS sens, bool taylor):
+    Dynamics(sens)
 {
     m_functions = functions;
     omp_init_lock(&m_lock_dynamics);
+    if(taylor){
+        for(Function* f:functions){
+            ibex::Function *f_diff = new ibex::Function(*f, ibex::Function::DIFF);
+            m_functions_d1.push_back(f_diff);
+        }
+    }
 }
 
-Dynamics_Function::Dynamics_Function(Function *functions, const DYNAMICS_SENS sens):
+Dynamics_Function::Dynamics_Function(Function *f, const DYNAMICS_SENS sens, bool taylor):
     Dynamics(sens)
 {
-    m_functions.push_back(functions);
+    m_functions.push_back(f);
+    if(taylor){
+        ibex::Function *f_diff = new ibex::Function(*f, ibex::Function::DIFF);
+        m_functions_d1.push_back(f_diff);
+    }
     omp_init_lock(&m_lock_dynamics);
 }
 
 Dynamics_Function::~Dynamics_Function(){
     omp_destroy_lock(&m_lock_dynamics);
+    for(Function* f:m_functions_d1)
+        delete(f);
 }
 
 const std::vector<ibex::IntervalVector> Dynamics_Function::eval(const IntervalVector& position){

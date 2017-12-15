@@ -9,19 +9,21 @@ def drawBox(x, color=''):
 	vibes.drawBox(x[0].lb(), x[0].ub(), x[1].lb(), x[1].ub(), color)
 
 def f_numpy(x1, x2):
-	return [1, -np.sin(x2)]
+	# return [1, -np.sin(x2)]
+	return [x2, (1-x1**2)*x2-x1]
 
 def f_numpy2(x1, x2):
-	return [0, np.cos(x2)*np.sin(x2)]
+	# return [0, np.cos(x2)*np.sin(x2)]
+	return [0, 0]
 
 def f_n_numpy(x1, x2):
-	normalization = 1000.0
+	normalization = 10.0
 	[fx1, fx2] = f_numpy(x1, x2)
 	coeff = np.sqrt(fx1**2+fx2**2)*normalization
 	return [fx1/coeff, fx2/coeff]
 
 def f_n_numpy2(x1, x2):
-	normalization = 1000.0
+	normalization = 100.0
 	[fx1, fx2] = f_numpy2(x1, x2)
 	coeff = np.sqrt(fx1**2+fx2**2)*normalization
 	return [fx1/coeff, fx2/coeff]
@@ -37,23 +39,27 @@ def draw_vector_field():
 ######################## Main ########################
 # pave = IntervalVector([[0, 1], [-0.5, 0.5]])
 # pave = IntervalVector(([1.0078125, 1.03125] , [-1.61796874999999, -1.5703125]))
-pave = IntervalVector([[3, 6], [0.050000000000000044, 3.1]])
+# pave = IntervalVector([[3, 6], [0.050000000000000044, 3.1]])
+pave = IntervalVector([[-3, -1.5], [1.5, 3]])
 
-f = Function("x[2]", "(1, -sin(x[1]))")
+# f = Function("x[2]", "(1, -sin(x[1]))")
 # f = Function("x[2]", "(1, [1, 2])")
+f = Function("x[2]", "(x[1], (1-x[0]^2)*x[1]-x[0])")
 
 # IN = IntervalVector([Interval(pave[0].lb()), [-0.25, 0.5]])
 # IN = IntervalVector([[0.25, 0.5], Interval(pave[1].lb())])
 # IN = IntervalVector([[0.75, 1], Interval(pave[1].lb())])
 # IN = IntervalVector([[0.0, 0.25], Interval(pave[1].lb())])
 # IN = IntervalVector([[1.00782, 1.00782],[-1.57389, -1.57031]])
-IN = IntervalVector([[3, 3], [0.050000000000000044, 3.1]])
+# IN = IntervalVector([[3, 3], [0.050000000000000044, 3.1]])
+IN = IntervalVector([[-3, -1.5], [1.5, 1.5]])
 
 # OUT = IntervalVector([Interval(pave[0].ub()), [-0.5, 0.5]])
 # OUT = IntervalVector([[0, 1], Interval(pave[1].ub())])
 # OUT = IntervalVector([[1.00782, 1.03125],[-1.57031, -1.57031]])
 # OUT = IntervalVector([[6, 6], [0.050000000000000044, 3.1]])
-OUT = IntervalVector([[3, 6], [0.050000000000000044, 0.050000000000000044]])
+# OUT = IntervalVector([[3, 6], [0.050000000000000044, 0.050000000000000044]])
+OUT = IntervalVector([[-1.5, -1.5], [1.5, 3]])
 
 OUT_contract = IntervalVector(OUT)
 
@@ -96,30 +102,36 @@ print("c1 = ", c1)
 
 if(a1.lb() != 0):
 	t = ((-b1-sqrt((pow(b1, 2)-4*a1.lb()*c1)))/(2*a1.lb())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_lb[1-out_degenerated]*t+in_lb[1-out_degenerated]
 	t = ((-b1+sqrt((pow(b1, 2)-4*a1.lb()*c1)))/(2*a1.lb())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_lb[1-out_degenerated]*t+in_lb[1-out_degenerated]
 else:
 	t= -c1/b1 & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_lb[1-out_degenerated]*t+in_lb[1-out_degenerated]
 
 if(a1.ub() != 0):
 	t = ((-b1-sqrt((pow(b1, 2)-4*a1.ub()*c1)))/(2*a1.ub())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_lb[1-out_degenerated]*t+in_lb[1-out_degenerated]
 	t = ((-b1+sqrt((pow(b1, 2)-4*a1.ub()*c1)))/(2*a1.ub())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_lb[1-out_degenerated]*t+in_lb[1-out_degenerated]
 else:
 	t= -c1/b1 & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_lb[1-out_degenerated]*t+in_lb[1-out_degenerated]
@@ -139,30 +151,36 @@ print("c1 = ", c1)
 
 if(a1.lb() != 0):
 	t = ((-b1-sqrt((pow(b1, 2)-4*a1.lb()*c1)))/(2*a1.lb())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_ub[1-out_degenerated]*t+in_ub[1-out_degenerated]
 	t = ((-b1+sqrt((pow(b1, 2)-4*a1.lb()*c1)))/(2*a1.lb())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_ub[1-out_degenerated]*t+in_ub[1-out_degenerated]
 else:
 	t= -c1/b1 & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_ub[1-out_degenerated]*t+in_ub[1-out_degenerated]
 
 if(a1.ub() != 0):
 	t = ((-b1-sqrt((pow(b1, 2)-4*a1.ub()*c1)))/(2*a1.ub())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_ub[1-out_degenerated]*t+in_ub[1-out_degenerated]
 	t = ((-b1+sqrt((pow(b1, 2)-4*a1.ub()*c1)))/(2*a1.ub())) & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_ub[1-out_degenerated]*t+in_ub[1-out_degenerated]
 else:
 	t= -c1/b1 & Interval.POS_REALS
+	print("t=", t)
 	if(t.lb()==0):
 		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated]*(t**2)+vect_in_ub[1-out_degenerated]*t+in_ub[1-out_degenerated]
@@ -177,12 +195,14 @@ vibes.setFigureSize(512, 512)
 vibes.axisLimits(pave[0].lb(), pave[0].ub(), pave[1].lb(), pave[1].ub())
 
 ########## Trajectories ##########
+
+## Taylor 1
 pt_lb_list_ub = []
 pt_lb_list_lb = []
 pt_ub_list_ub = []
 pt_ub_list_lb = []
 
-time = np.linspace(0, 3, 100)
+time = np.linspace(0, 1, 100)
 for t in time:
 	pt_x = 0.5*vect_d[0]*(t**2)+vect_in_lb[0]*t+in_lb[0]
 	pt_y = 0.5*vect_d[1]*(t**2)+vect_in_lb[1]*t+in_lb[1]
@@ -198,6 +218,31 @@ vibes.drawLine(pt_lb_list_ub, "orange")
 vibes.drawLine(pt_lb_list_lb, "orange")
 vibes.drawLine(pt_ub_list_ub, "orange")
 vibes.drawLine(pt_ub_list_lb, "orange")
+
+## Taylor 0
+
+pt_lb_list_ub = []
+pt_lb_list_lb = []
+pt_ub_list_ub = []
+pt_ub_list_lb = []
+
+time = np.linspace(0, 3, 100)
+for t in time:
+	pt_x = vect[0]*t+in_lb[0]
+	pt_y = vect[1]*t+in_lb[1]
+	pt_lb_list_ub.append([pt_x.ub(), pt_y.ub()])
+	pt_lb_list_lb.append([pt_x.lb(), pt_y.lb()])
+
+	pt_x = vect[0]*t+in_ub[0]
+	pt_y = vect[1]*t+in_ub[1]
+	pt_ub_list_ub.append([pt_x.ub(), pt_y.ub()])
+	pt_ub_list_lb.append([pt_x.lb(), pt_y.lb()])
+
+vibes.drawLine(pt_lb_list_ub, "green")
+vibes.drawLine(pt_lb_list_lb, "green")
+vibes.drawLine(pt_ub_list_ub, "green")
+vibes.drawLine(pt_ub_list_lb, "green")
+
 
 ########## Boxes ##########
 drawBox(pave, "black[]")

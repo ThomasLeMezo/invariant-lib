@@ -595,6 +595,14 @@ bool Room<_Tp, _V>::contract_continuity(){
     return change;
 }
 
+//template <typename _Tp, typename _V>
+//void Room<_Tp, _V>::reset_update_neighbors(){
+//    for(Face<_Tp, _V> *f:m_pave->get_faces_vector()){
+//            Door<_Tp, _V> *d = f->get_doors()[m_maze];
+//            d->reset_update_neighbors();
+//    }
+//}
+
 template<typename _Tp, typename _V>
 bool Room<_Tp, _V>::contract(){
     // Do not synchronization in this function or sub-functions
@@ -625,12 +633,12 @@ bool Room<_Tp, _V>::contract(){
 
 template<typename _Tp, typename _V>
 bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() != FULL_WALL)
+    if(m_maze->get_domain()->get_init() != FULL_DOOR)
         return false;
     ibex::IntervalVector position(2);
     //
-    position[0] = ibex::Interval(3, 6);
-    position[1] = ibex::Interval(0.050000000000000044, 3.1);
+    position[0] = ibex::Interval(-1.5, 0.0);
+    position[1] = ibex::Interval(1.5, 3.0);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
