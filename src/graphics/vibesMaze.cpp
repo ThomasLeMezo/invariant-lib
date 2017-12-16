@@ -422,7 +422,7 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         name << p_position;
         vibes::newFigure(name.str());
         vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height, "x", m_x,"y", m_y));
-        setProperties(m_x+m_width, m_y, m_width, m_height);
+//        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave
         if(m_maze_inner != NULL){ //maze->get_domain()->get_init() == FULL_WALL){

@@ -194,31 +194,49 @@ void Room<_Tp, _V>::compute_sliding_mode(const int n_vf, std::vector<std::vector
     DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
 
-    for(int face_in=0; face_in<dim; face_in++){
-        for(int sens_in = 0; sens_in < 2; sens_in++){
-            Face<_Tp, _V>* f_in = m_pave->get_faces()[face_in][sens_in];
+    for(int face=0; face<dim; face++){
+        for(int sens = 0; sens < 2; sens++){
+            Face<_Tp, _V>* f_in = m_pave->get_faces()[face][sens];
             Door<_Tp, _V>* door = f_in->get_doors()[m_maze];
 
             if(domain_init == FULL_DOOR && door->is_collinear()[n_vf]){
                 /// INPUT
                 _Tp out_return = get_empty_door_container<_Tp, _V>(dim);
                 _Tp in_return = get_empty_door_container<_Tp, _V>(dim);
-                contract_sliding_mode(n_vf, face_in, sens_in, out_return, in_return);
+                contract_sliding_mode(n_vf, face, sens, out_return, in_return);
 
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
                     door->set_input_private(in_return); // Write input
-                    in_results[n_vf][face_in][sens_in] = in_return;
+                    in_results[n_vf][face][sens] = in_return;
+
+                    /// Impact on other faces (OUT -> IN)
+                    if(!out_return.is_empty()){
+                        for(int face_in=0; face_in<dim; face_in++){
+                            for(int sens_in = 0; sens_in < 2; sens_in++){
+                                if(!(face_in == face && sens_in == sens)){
+                                    Face<_Tp, _V>* f_out = m_pave->get_faces()[face_in][sens_in];
+                                    Door<_Tp, _V>* door_in = f_out->get_doors()[m_maze];
+                                    _Tp out_tmp(out_return);
+                                    _Tp in_tmp(door_in->get_input_private());
+                                    if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_fwd(n_vf), BWD); // ToDo : check _fwd ?
+                                        in_results[n_vf][face_in][sens_in] |= in_tmp;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
                     /// Write output here to improve standard mode efficency
                     door->set_output_private(out_return); // Write output
-                    out_results[n_vf][face_in][sens_in] = out_return;
+                    out_results[n_vf][face][sens] = out_return;
 
                     /// Impact on other faces (IN -> OUT)
                     if(!in_return.is_empty()){
                         for(int face_out=0; face_out<dim; face_out++){
                             for(int sens_out = 0; sens_out < 2; sens_out++){
-                                if(!(face_out == face_in && sens_in == sens_out)){
+                                if(!(face_out == face && sens_out == sens)){
                                     Face<_Tp, _V>* f_out = m_pave->get_faces()[face_out][sens_out];
                                     Door<_Tp, _V>* door_out = f_out->get_doors()[m_maze];
                                     _Tp out_tmp(door_out->get_output_private());
@@ -637,8 +655,8 @@ bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_messag
         return false;
     ibex::IntervalVector position(2);
     //
-    position[0] = ibex::Interval(-1.5, 0.0);
-    position[1] = ibex::Interval(1.5, 3.0);
+    position[0] = ibex::Interval(1.5, 3);
+    position[1] = ibex::Interval(0, 3);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);

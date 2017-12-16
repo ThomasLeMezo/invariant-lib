@@ -44,7 +44,8 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<4; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<3; i++){
         cout << i << endl;
         paving.bisect();
         maze.contract();
@@ -59,8 +60,8 @@ int main(int argc, char *argv[])
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(-1);
-    position_info[1] = ibex::Interval(2);
+    position_info[0] = ibex::Interval(2);
+    position_info[1] = ibex::Interval(-1, 1.5);
     v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();
