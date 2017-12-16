@@ -40,11 +40,11 @@ def draw_vector_field():
 # pave = IntervalVector([[0, 1], [-0.5, 0.5]])
 # pave = IntervalVector(([1.0078125, 1.03125] , [-1.61796874999999, -1.5703125]))
 # pave = IntervalVector([[3, 6], [0.050000000000000044, 3.1]])
-pave = IntervalVector([[0, 0.75], [1.5, 3]])
+pave = IntervalVector([[1.5, 3] , [0, 3]])
 
 # f = Function("x[2]", "(1, -sin(x[1]))")
 # f = Function("x[2]", "(1, [1, 2])")
-f = Function("x[2]", "-(x[1], (1-x[0]^2)*x[1]-x[0])")
+f = Function("x[2]", "(x[1], (1-x[0]^2)*x[1]-x[0])")
 
 # IN = IntervalVector([Interval(pave[0].lb()), [-0.25, 0.5]])
 # IN = IntervalVector([[0.25, 0.5], Interval(pave[1].lb())])
@@ -54,7 +54,7 @@ f = Function("x[2]", "-(x[1], (1-x[0]^2)*x[1]-x[0])")
 # IN = IntervalVector([[3, 3], [0.050000000000000044, 3.1]])
 
 # OUT = IntervalVector([[-1.5, -1.5], [1.5, 3]])
-IN = IntervalVector([[0, 0.75], [1.5, 1.5]])
+IN = IntervalVector([[1.5, 1.5] , [0, 3]])
 
 # OUT = IntervalVector([Interval(pave[0].ub()), [-0.5, 0.5]])
 # OUT = IntervalVector([[0, 1], Interval(pave[1].ub())])
@@ -63,7 +63,7 @@ IN = IntervalVector([[0, 0.75], [1.5, 1.5]])
 # OUT = IntervalVector([[3, 6], [0.050000000000000044, 0.050000000000000044]])
 
 # IN = IntervalVector([[0, 0], [2.25, 3]])
-OUT = IntervalVector([[0, 0], [1.5, 3]])
+OUT = IntervalVector([[1.5, 3] , [0, 0]])
 
 OUT_contract = IntervalVector(OUT)
 
@@ -108,7 +108,7 @@ if(a1 != Interval(0)):
 	t = ((-b1-sqrt((pow(b1, 2)-4*a1*c1)))/(2*a1)) & Interval.POS_REALS
 	print("t=", t)
 	if(Interval.ZERO.is_subset(t)):
-		y |= Interval(OUT[1-out_degenerated].lb())
+		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated].lb()*(t**2)+vect_in_lb[1-out_degenerated].lb()*t+in_lb[1-out_degenerated].lb()
 	t = ((-b1+sqrt((pow(b1, 2)-4*a1*c1)))/(2*a1)) & Interval.POS_REALS
 	print("t=", t)
@@ -121,7 +121,7 @@ else:
 	t = -c1/b1 & Interval.POS_REALS
 	print("t=", t)
 	if(Interval.ZERO.is_subset(t)):
-		y |= Interval(OUT[1-out_degenerated].lb())
+		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated].lb()*(t**2)+vect_in_lb[1-out_degenerated].lb()*t+in_lb[1-out_degenerated].lb()
 
 # if(a1.ub() != 0):
@@ -182,7 +182,7 @@ if(a1 != Interval(0)):
 	t = ((-b1+sqrt((pow(b1, 2)-4*a1*c1)))/(2*a1)) & Interval.POS_REALS
 	print("t=", t)
 	if(Interval.ZERO.is_subset(t)):
-		y |= Interval(OUT[1-out_degenerated].ub())
+		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated].ub()*(t**2)+vect_in_ub[1-out_degenerated].ub()*t+in_ub[1-out_degenerated].ub()
 else:
 	if(b1 == Interval.ZERO):
@@ -191,7 +191,7 @@ else:
 		
 	print("t=", t, -c1/b1)
 	if(Interval.ZERO.is_subset(t)):
-		y |= Interval(OUT[1-out_degenerated].ub())
+		y |= OUT[1-out_degenerated]
 	y |= 0.5*vect_d[1-out_degenerated].ub()*(t**2)+vect_in_ub[1-out_degenerated].ub()*t+in_ub[1-out_degenerated].ub()
 
 OUT_contract[1-out_degenerated] &= y

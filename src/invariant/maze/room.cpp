@@ -57,7 +57,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     if(!ibex::Interval::ZERO.is_subset(t))
                         y |= taylor(t, ibex::Interval(vect_d1[1-out_comp].lb()), ibex::Interval(vec_in0_lb[1-out_comp].lb()), ibex::Interval(in0_lb[1-out_comp].lb()));
                     else
-                        y |= ibex::Interval(out[1-out_comp].lb());
+                        y |= out[1-out_comp];
                 }
             }
 
@@ -84,7 +84,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     if(!ibex::Interval::ZERO.is_subset(t))
                         y |= taylor(t, ibex::Interval(vect_d1[1-out_comp].ub()), ibex::Interval(vec_in0_ub[1-out_comp].ub()), ibex::Interval(in0_ub[1-out_comp].ub()));
                     else
-                        y |= ibex::Interval(out[1-out_comp].ub());
+                        y |= out[1-out_comp];
                 }
             }
 
@@ -123,7 +123,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     if(!ibex::Interval::ZERO.is_subset(t))
                         x |= taylor(t, ibex::Interval(vect_d1[1-in_comp].lb()), ibex::Interval(vec_out0_lb[1-in_comp].lb()), ibex::Interval(out0_lb[1-in_comp].lb()));
                     else
-                        x |= ibex::Interval(in[1-in_comp].lb());
+                        x |= in[1-in_comp];
                 }
             }
 
@@ -149,7 +149,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     if(!ibex::Interval::ZERO.is_subset(t))
                         x |= taylor(t, ibex::Interval(vect_d1[1-in_comp].ub()), ibex::Interval(vec_out0_ub[1-in_comp].ub()), ibex::Interval(out0_ub[1-in_comp].ub()));
                     else
-                        x |= ibex::Interval(in[1-in_comp].ub());
+                        x |= in[1-in_comp];
                 }
             }
 
