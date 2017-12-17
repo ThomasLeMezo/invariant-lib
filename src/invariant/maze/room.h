@@ -11,6 +11,7 @@ _Tp get_empty_door_container(int dim);
 #define ROOM_H
 
 #include <ibex_IntervalVector.h>
+#include <ibex_IntervalMatrix.h>
 
 #include <omp.h>
 
@@ -172,7 +173,7 @@ public:
      * @return
      */
     std::vector<ibex::IntervalVector> get_vector_fields() const;
-    std::vector<ibex::IntervalVector> get_vector_fields_d() const;
+    std::vector<ibex::IntervalMatrix> get_vector_fields_d() const;
 
     /**
      * @brief Getter to one of the the vector fields
@@ -378,7 +379,7 @@ protected:
     Pave<_Tp, _V>*   m_pave = NULL; // pointer to the associated face
     Maze<_Tp, _V>*   m_maze = NULL; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
-    std::vector<ibex::IntervalVector> m_vector_fields_d1; // Vector field of the Room
+    std::vector<ibex::IntervalMatrix> m_vector_fields_d1; // Vector field of the Room
 
     std::vector<_V> m_vector_fields_typed_fwd; // Typed Vector field of the Room
     std::vector<_V> m_vector_fields_typed_bwd; // Typed Vector field of the Room
@@ -512,7 +513,7 @@ inline std::vector<ibex::IntervalVector> Room<_Tp, _V>::get_vector_fields() cons
 }
 
 template <typename _Tp, typename _V>
-inline std::vector<ibex::IntervalVector> Room<_Tp, _V>::get_vector_fields_d() const{
+inline std::vector<ibex::IntervalMatrix> Room<_Tp, _V>::get_vector_fields_d() const{
     return m_vector_fields_d1;
 }
 

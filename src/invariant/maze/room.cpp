@@ -23,7 +23,10 @@ template<>
 void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     // Contraction with Taylor 1 order
     if(m_pave->get_dim()==2 && m_vector_fields_d1.size()!=0){
-        IntervalVector vect_d1 = hadamard_product(m_vector_fields_d1[0],vect);
+        IntervalVector vect_d1(in.size());
+        vect_d1[0] = m_vector_fields_d1[0][0][0]*vect[0] + m_vector_fields_d1[0][0][1]*vect[1];
+        vect_d1[1] = m_vector_fields_d1[0][1][1]*vect[1] + m_vector_fields_d1[0][1][0]*vect[0];
+//        IntervalVector vect_d1 = hadamard_product(jacobian_vect,vect);
 
         /// **************** FWD ****************
         if(sens==FWD || sens==FWD_BWD){
@@ -48,8 +51,14 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     t_list.push_back(root_zero(a1, b1, c1));
             }
             else{
-                t_list.push_back(root_positive(a1, b1, c1));
-                t_list.push_back(root_negative(a1, b1, c1));
+                ibex::Interval t1 = root_positive(a1, b1, c1);
+                ibex::Interval t2 = root_negative(a1, b1, c1);
+                if(!t1.is_empty() && !t2.is_empty())
+                    t_list.push_back(min(t1, t2));
+                else if(!t1.is_empty())
+                    t_list.push_back(t1);
+                else
+                    t_list.push_back(t2);
             }
 
             for(const ibex::Interval &t:t_list){
@@ -57,7 +66,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     if(!ibex::Interval::ZERO.is_subset(t))
                         y |= taylor(t, ibex::Interval(vect_d1[1-out_comp].lb()), ibex::Interval(vec_in0_lb[1-out_comp].lb()), ibex::Interval(in0_lb[1-out_comp].lb()));
                     else
-                        y |= out[1-out_comp];
+                        y |= out[1-out_comp];// & in[1-out_comp];
                 }
             }
 
@@ -76,15 +85,21 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     t_list.push_back(root_zero(a1, b1, c1));
             }
             else{
-                t_list.push_back(root_positive(a1, b1, c1));
-                t_list.push_back(root_negative(a1, b1, c1));
+                ibex::Interval t1 = root_positive(a1, b1, c1);
+                ibex::Interval t2 = root_negative(a1, b1, c1);
+                if(!t1.is_empty() && !t2.is_empty())
+                    t_list.push_back(min(t1, t2));
+                else if(!t1.is_empty())
+                    t_list.push_back(t1);
+                else
+                    t_list.push_back(t2);
             }
             for(const ibex::Interval &t:t_list){
                 if(!t.is_empty()){
                     if(!ibex::Interval::ZERO.is_subset(t))
                         y |= taylor(t, ibex::Interval(vect_d1[1-out_comp].ub()), ibex::Interval(vec_in0_ub[1-out_comp].ub()), ibex::Interval(in0_ub[1-out_comp].ub()));
                     else
-                        y |= out[1-out_comp];
+                        y |= out[1-out_comp];// & in[1-out_comp];
                 }
             }
 
@@ -114,8 +129,14 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     t_list.push_back(root_zero(a1, b1, c1));
             }
             else{
-                t_list.push_back(root_positive(a1, b1, c1));
-                t_list.push_back(root_negative(a1, b1, c1));
+                ibex::Interval t1 = root_positive(a1, b1, c1);
+                ibex::Interval t2 = root_negative(a1, b1, c1);
+                if(!t1.is_empty() && !t2.is_empty())
+                    t_list.push_back(min(t1, t2));
+                else if(!t1.is_empty())
+                    t_list.push_back(t1);
+                else
+                    t_list.push_back(t2);
             }
 
             for(const ibex::Interval &t:t_list){
@@ -123,7 +144,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     if(!ibex::Interval::ZERO.is_subset(t))
                         x |= taylor(t, ibex::Interval(vect_d1[1-in_comp].lb()), ibex::Interval(vec_out0_lb[1-in_comp].lb()), ibex::Interval(out0_lb[1-in_comp].lb()));
                     else
-                        x |= in[1-in_comp];
+                        x |= in[1-in_comp];// & out[1-in_comp];
                 }
             }
 
@@ -141,15 +162,21 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
                     t_list.push_back(root_zero(a1, b1, c1));
             }
             else{
-                t_list.push_back(root_positive(a1, b1, c1));
-                t_list.push_back(root_negative(a1, b1, c1));
+                ibex::Interval t1 = root_positive(a1, b1, c1);
+                ibex::Interval t2 = root_negative(a1, b1, c1);
+                if(!t1.is_empty() && !t2.is_empty())
+                    t_list.push_back(min(t1, t2));
+                else if(!t1.is_empty())
+                    t_list.push_back(t1);
+                else
+                    t_list.push_back(t2);
             }
             for(const ibex::Interval &t:t_list){
                 if(!t.is_empty()){
                     if(!ibex::Interval::ZERO.is_subset(t))
                         x |= taylor(t, ibex::Interval(vect_d1[1-in_comp].ub()), ibex::Interval(vec_out0_ub[1-in_comp].ub()), ibex::Interval(out0_ub[1-in_comp].ub()));
                     else
-                        x |= in[1-in_comp];
+                        x |= in[1-in_comp];// & out[1-in_comp];
                 }
             }
 

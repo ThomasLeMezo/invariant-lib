@@ -45,15 +45,12 @@ const std::vector<ibex::IntervalVector> Dynamics_Function::eval(const IntervalVe
     return vector_field;
 }
 
-const std::vector<ibex::IntervalVector> Dynamics_Function::eval_d1(const ibex::IntervalVector &position){
+const std::vector<ibex::IntervalMatrix> Dynamics_Function::eval_d1(const ibex::IntervalVector &position){
     omp_set_lock(&m_lock_dynamics);
-    vector<IntervalVector> vector_field;
+    vector<IntervalMatrix> vector_field;
     for(Function*f:m_functions_d1){
         IntervalMatrix jacobian= f->eval_matrix(position);
-        IntervalVector result(position.size());
-        for(int dim=0; dim<position.size(); dim++)
-            result[dim] = jacobian[dim][dim];
-        vector_field.push_back(result);
+        vector_field.push_back(jacobian);
     }
     omp_unset_lock(&m_lock_dynamics);
     return vector_field;

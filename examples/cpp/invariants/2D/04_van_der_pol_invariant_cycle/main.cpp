@@ -42,26 +42,51 @@ int main(int argc, char *argv[])
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);
 
+    vibes::beginDrawing();
+
+    vector<double> ptX, ptY;
+    ptX.push_back(-1.5);
+    ptY.push_back(0.814);
+    double dt=0.01;
+    for(double t=0; t<20; t+=dt){
+        size_t k=ptX.size()-1;
+        ptX.push_back(ptX[k]+dt*ptY[k]);
+        ptY.push_back(ptY[k]+dt*((1-pow(ptX[k], 2))*ptY[k]-ptX[k]));
+    }
+
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-//    omp_set_num_threads(1);
-    for(int i=0; i<7; i++){
+    omp_set_num_threads(1);
+    for(int i=0; i<4; i++){
         cout << i << endl;
         paving.bisect();
-        maze.contract();
+//        if(i==7)
+//            for(int j=184; j<185; j+=1){
+//                maze.contract(j);
+
+//                stringstream name;
+//                name << "SmartSubPaving_" << j << "_";
+//                VibesMaze v_maze(name.str(), &maze);
+//                v_maze.setProperties(0, 0, 10, 10);
+//                v_maze.show();
+//                vibes::drawLine(ptX, ptY, "green[green]");
+
+//                v_maze.saveImage("/home/lemezoth/Pictures/cycle_tests/", ".png");
+//            }
+//        else
+            maze.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    vibes::beginDrawing();
     VibesMaze v_maze("SmartSubPaving", &maze);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.setProperties(0, 0, 512, 521);
     v_maze.show();
 
     IntervalVector position_info(2);
     position_info[0] = ibex::Interval(2);
-    position_info[1] = ibex::Interval(-1, 1.5);
+    position_info[1] = ibex::Interval(0.3);
 //    v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();

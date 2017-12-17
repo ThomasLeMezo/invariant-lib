@@ -84,7 +84,7 @@ class VibesFigure
      * \param suffix optional part name that can be added to figure_name, empty by default
      * \param extension optional part to specify image type, ".svg" by default
      */
-    void saveImage(const std::string& suffix = "", const std::string& extension = ".svg") const;
+    void saveImage(const std::string& prefix = "", const std::string& extension = ".svg") const;
 
     /**
      * \brief Display the figure.

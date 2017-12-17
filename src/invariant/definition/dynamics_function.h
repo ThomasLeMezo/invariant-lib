@@ -39,7 +39,7 @@ public:
      * @param position
      * @return
      */
-    const std::vector<ibex::IntervalVector> eval_d1(const ibex::IntervalVector &position);
+    const std::vector<ibex::IntervalMatrix> eval_d1(const ibex::IntervalVector &position);
 
 private:
     /**

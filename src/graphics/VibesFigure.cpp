@@ -13,6 +13,7 @@
 #include <cstdio>
 #include "VibesFigure.h"
 #include "vibes.h"
+#include <iostream>
 
 using namespace std;
 
@@ -49,9 +50,10 @@ void VibesFigure::setProperties(int x, int y, int width, int height)
                         "height", m_height));
 }
 
-void VibesFigure::saveImage(const string& suffix, const string& extension) const
+void VibesFigure::saveImage(const string& prefix, const string& extension) const
 {
-  vibes::saveImage(m_name + suffix + extension, m_name);
+  vibes::saveImage(prefix + m_name + extension, m_name);
+  std::cout << "Saved to : " << prefix << m_name << extension << std::endl;
 }
 
 double VibesFigure::x() const

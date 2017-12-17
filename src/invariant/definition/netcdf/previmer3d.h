@@ -38,8 +38,8 @@ public:
      */
     const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector &position);
 
-    const std::vector<ibex::IntervalVector> eval_d1(const ibex::IntervalVector &position){
-        std::vector<ibex::IntervalVector> empty;
+    const std::vector<ibex::IntervalMatrix> eval_d1(const ibex::IntervalVector &position){
+        std::vector<ibex::IntervalMatrix> empty;
         return empty;
     }
 

@@ -65,7 +65,7 @@ public:
      * @brief Contract the Maze
      * @return the number of contractions
      */
-    int contract();
+    int contract(size_t nb_operations=0);
 
     /**
      * @brief Contract the Maze by intersecting with other domain mazes
@@ -112,6 +112,8 @@ private:
 
     bool m_empty = false;
     int m_contraction_step = 0;
+
+    size_t m_nb_operations=0;
 
 };
 }

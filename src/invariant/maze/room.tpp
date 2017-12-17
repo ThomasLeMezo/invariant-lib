@@ -655,8 +655,8 @@ bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_messag
         return false;
     ibex::IntervalVector position(2);
     //
-    position[0] = ibex::Interval(1.5, 3);
-    position[1] = ibex::Interval(0, 3);
+    position[0] = ibex::Interval(1.875, 2.25);
+    position[1] = ibex::Interval(0, 0.375);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
@@ -785,7 +785,7 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r) {
         stream << v << " ";
     }
     stream << ", vector field d = ";
-    for(ibex::IntervalVector &v:r.get_vector_fields_d()){
+    for(ibex::IntervalMatrix &v:r.get_vector_fields_d()){
         stream << v << " ";
     }
     stream << std::endl;

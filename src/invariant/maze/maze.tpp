@@ -27,21 +27,23 @@ Maze<_Tp, _V>::~Maze(){
 }
 
 template<typename _Tp, typename _V>
-int Maze<_Tp, _V>::contract(){
+int Maze<_Tp, _V>::contract(size_t nb_operations){
     if(m_empty){
         std::cout << " ==> MAZE EMPTY (begin)" << std::endl;
         return 0;
     }
-    // Domain contraction
-    std::vector<Room<_Tp, _V> *> list_room_to_contract;
-    invariant::Domain<_Tp, _V> *d = m_domain;
     double t_start = omp_get_wtime();
-    d->contract_domain(this, list_room_to_contract);
+    // Domain contraction
+    if(m_nb_operations == 0){
+        std::vector<Room<_Tp, _V> *> list_room_to_contract;
+        invariant::Domain<_Tp, _V> *d = m_domain;
+        d->contract_domain(this, list_room_to_contract);
 
-    // Add Room to the Deque
-    for(Room<_Tp, _V> *r:list_room_to_contract){
-        if(r->set_in_queue()){
-            add_to_deque(r);
+        // Add Room to the Deque
+        for(Room<_Tp, _V> *r:list_room_to_contract){
+            if(r->set_in_queue()){
+                add_to_deque(r);
+            }
         }
     }
 
@@ -57,15 +59,14 @@ int Maze<_Tp, _V>::contract(){
     //        std::cout << "debug graph_debug" << std::endl;
     //    }
 
-    std::cout << " => sep : " << omp_get_wtime() - t_start << " deque size = " << m_deque_rooms.size() << std::endl;
+    std::cout << " => domain contraction : " << omp_get_wtime() - t_start << "s, " << m_deque_rooms.size() << " rooms in deque" << std::endl;
     t_start = omp_get_wtime();
-    int nb_operations = 0;
     int nb_deque = 0;
 
     // Propagation of contractions
-    bool deque_empty = m_deque_rooms.empty();
+    bool stop_contraction = m_deque_rooms.empty();
 
-    if(deque_empty && m_contraction_step!=0){
+    if(stop_contraction && m_contraction_step!=0){
         std::cout << " => MAZE EMPTY" << std::endl;
         m_empty = true;
         return 0;
@@ -75,7 +76,7 @@ int Maze<_Tp, _V>::contract(){
     {
 #pragma omp single
         {
-            while(!deque_empty){
+            while(!stop_contraction){
 #pragma omp task
                 {
 #pragma omp atomic
@@ -119,36 +120,40 @@ int Maze<_Tp, _V>::contract(){
                             add_rooms(rooms_to_update);
 
                             // Increment operations
-#pragma omp atomic
-                            nb_operations++;
+#pragma omp critical (nb_operation)
+                            {
+                                m_nb_operations++;
+                            }
                         }
-
-                        /// DEBUG
-                        //                        VibesMaze v_maze("SmartSubPaving", m_subpaving, this);
-                        //                        v_maze.setProperties(0, 0, 512, 512);
-                        //                        v_maze.show();
-                        //                        v_maze.show_room_info(this, test);
 
                         r->unlock_contraction();
                     }
                 }
 
                 omp_set_lock(&m_deque_access);
-                deque_empty = m_deque_rooms.empty();
+#pragma omp critical (nb_operation)
+                {
+                    stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations);
+                }
                 omp_unset_lock(&m_deque_access);
 
-                if(deque_empty){
+                if(stop_contraction){
 #pragma omp taskwait
                     omp_set_lock(&m_deque_access);
-                    deque_empty = m_deque_rooms.empty(); // New Rooms could have been added to the deque meanwhile taskwait
+#pragma omp critical (nb_operation)
+                    {
+                        stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations) ; // New Rooms could have been added to the deque meanwhile taskwait
+                    }
                     omp_unset_lock(&m_deque_access);
                 }
             }
         }
     }
 
-    std::cout << " => contractions (" << nb_operations << "/" << nb_deque << ") : " << omp_get_wtime() - t_start << " s" << std::endl;
+    std::cout << " => contractions : " << omp_get_wtime() - t_start << " s, with " << m_nb_operations << "/" << nb_deque << " operations" <<  std::endl;
     m_contraction_step++;
+    if(m_deque_rooms.empty())
+        m_nb_operations = 0;
     return nb_operations;
 }
 
