@@ -1,5 +1,7 @@
 #include "room.h"
 #include "ibex_IntervalVector.h"
+#include "ibex_CtcFwdBwd.h"
+#include "ibex_Function.h"
 
 namespace invariant{
 
@@ -26,161 +28,75 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
         IntervalVector vect_d1(in.size());
         vect_d1[0] = m_vector_fields_d1[0][0][0]*vect[0] + m_vector_fields_d1[0][0][1]*vect[1];
         vect_d1[1] = m_vector_fields_d1[0][1][1]*vect[1] + m_vector_fields_d1[0][1][0]*vect[0];
-//        IntervalVector vect_d1 = hadamard_product(jacobian_vect,vect);
 
         /// **************** FWD ****************
         if(sens==FWD || sens==FWD_BWD){
-            int out_comp = 0;
-            if(out[1].is_degenerated())
-                out_comp=1;
+            IntervalVector vect_in = m_maze->get_dynamics()->eval(in)[0];
+            IntervalVector out_result(2, ibex::Interval::EMPTY_SET);
 
-            ibex::Interval y(ibex::Interval::EMPTY_SET);
+            ibex::IntervalVector c(9);
+            c[0] = vect_d1[0] & ibex::Interval::NEG_REALS;
+            c[1] = vect_d1[1] & ibex::Interval::NEG_REALS;
+            c[2] = vect_in[0];
+            c[3] = vect_in[1];
+            c[4] = in[0];
+            c[5] = in[1];
+            c[6] = out[0];
+            c[7] = out[1];
+            c[8] = ibex::Interval::POS_REALS;
+            m_ctc->contract(c);
+            out_result[0] |= c[6];
+            out_result[1] |= c[7];
 
-            // IN_lb
-            IntervalVector in0_lb = IntervalVector(in.lb());
-            IntervalVector vec_in0_lb = m_maze->get_dynamics()->eval(in0_lb)[0];
-            ibex::Interval a1 = ibex::Interval(0.5*vect_d1[out_comp].lb());
-            ibex::Interval b1 = ibex::Interval(vec_in0_lb[out_comp].lb());
-            ibex::Interval c1 = in0_lb[out_comp]-out[out_comp].lb();
+            c[0] = vect_d1[0] & ibex::Interval::POS_REALS;
+            c[1] = vect_d1[1] & ibex::Interval::POS_REALS;
+            c[2] = vect_in[0];
+            c[3] = vect_in[1];
+            c[4] = in[0];
+            c[5] = in[1];
+            c[6] = out[0];
+            c[7] = out[1];
+            c[8] = ibex::Interval::POS_REALS;
+            m_ctc->contract(c);
+            out_result[0] |= c[6];
+            out_result[1] |= c[7];
 
-            std::vector<ibex::Interval> t_list;
-            if(ibex::Interval::ZERO.is_subset(a1)){
-                if(ibex::Interval::ZERO.is_subset(b1))
-                    t_list.push_back(ibex::Interval(0));
-                else
-                    t_list.push_back(root_zero(a1, b1, c1));
-            }
-            else{
-                ibex::Interval t1 = root_positive(a1, b1, c1);
-                ibex::Interval t2 = root_negative(a1, b1, c1);
-                if(!t1.is_empty() && !t2.is_empty())
-                    t_list.push_back(min(t1, t2));
-                else if(!t1.is_empty())
-                    t_list.push_back(t1);
-                else
-                    t_list.push_back(t2);
-            }
-
-            for(const ibex::Interval &t:t_list){
-                if(!t.is_empty()){
-                    if(!ibex::Interval::ZERO.is_subset(t))
-                        y |= taylor(t, ibex::Interval(vect_d1[1-out_comp].lb()), ibex::Interval(vec_in0_lb[1-out_comp].lb()), ibex::Interval(in0_lb[1-out_comp].lb()));
-                    else
-                        y |= out[1-out_comp];// & in[1-out_comp];
-                }
-            }
-
-            // IN_ub
-            IntervalVector in0_ub = IntervalVector(in.ub());
-            IntervalVector vec_in0_ub = m_maze->get_dynamics()->eval(in0_ub)[0];
-            a1 = ibex::Interval(0.5*vect_d1[out_comp].ub());
-            b1 = ibex::Interval(vec_in0_ub[out_comp].ub());
-            c1 = in0_ub[out_comp]-out[out_comp].lb();
-            t_list.clear();
-
-            if(ibex::Interval::ZERO.is_subset(a1)){
-                if(ibex::Interval::ZERO.is_subset(b1))
-                    t_list.push_back(ibex::Interval(0));
-                else
-                    t_list.push_back(root_zero(a1, b1, c1));
-            }
-            else{
-                ibex::Interval t1 = root_positive(a1, b1, c1);
-                ibex::Interval t2 = root_negative(a1, b1, c1);
-                if(!t1.is_empty() && !t2.is_empty())
-                    t_list.push_back(min(t1, t2));
-                else if(!t1.is_empty())
-                    t_list.push_back(t1);
-                else
-                    t_list.push_back(t2);
-            }
-            for(const ibex::Interval &t:t_list){
-                if(!t.is_empty()){
-                    if(!ibex::Interval::ZERO.is_subset(t))
-                        y |= taylor(t, ibex::Interval(vect_d1[1-out_comp].ub()), ibex::Interval(vec_in0_ub[1-out_comp].ub()), ibex::Interval(in0_ub[1-out_comp].ub()));
-                    else
-                        y |= out[1-out_comp];// & in[1-out_comp];
-                }
-            }
-
-            out[1-out_comp] &= y;
+            out &= out_result;
         }
 
         /// **************** BWD ****************
         if(sens==BWD || sens==FWD_BWD){
-            int in_comp = 0;
-            if(in[1].is_degenerated())
-                in_comp=1;
+            IntervalVector vect_in = -m_maze->get_dynamics()->eval(out)[0];
+            IntervalVector in_result(2, ibex::Interval::EMPTY_SET);
 
-            ibex::Interval x(ibex::Interval::EMPTY_SET);
+            ibex::IntervalVector c(9);
+            c[0] = vect_d1[0] & ibex::Interval::NEG_REALS;
+            c[1] = vect_d1[1] & ibex::Interval::NEG_REALS;
+            c[2] = vect_in[0];
+            c[3] = vect_in[1];
+            c[4] = out[0];
+            c[5] = out[1];
+            c[6] = in[0];
+            c[7] = in[1];
+            c[8] = ibex::Interval::POS_REALS;
+            m_ctc->contract(c);
+            in_result[0] |= c[4];
+            in_result[1] |= c[5];
 
-            // Out_lb
-            IntervalVector out0_lb = IntervalVector(out.lb());
-            IntervalVector vec_out0_lb = -m_maze->get_dynamics()->eval(out0_lb)[0];
-            ibex::Interval a1 = ibex::Interval(0.5*vect_d1[in_comp].lb());
-            ibex::Interval b1 = ibex::Interval(vec_out0_lb[in_comp].lb());
-            ibex::Interval c1 = out0_lb[in_comp]-in[in_comp].lb();
+            c[0] = vect_d1[0] & ibex::Interval::POS_REALS;
+            c[1] = vect_d1[1] & ibex::Interval::POS_REALS;
+            c[2] = vect_in[0];
+            c[3] = vect_in[1];
+            c[4] = out[0];
+            c[5] = out[1];
+            c[6] = in[0];
+            c[7] = in[1];
+            c[8] = ibex::Interval::POS_REALS;
+            m_ctc->contract(c);
+            in_result[0] |= c[6];
+            in_result[1] |= c[7];
 
-            std::vector<ibex::Interval> t_list;
-            if(ibex::Interval::ZERO.is_subset(a1)){
-                if(ibex::Interval::ZERO.is_subset(b1))
-                    t_list.push_back(ibex::Interval(0));
-                else
-                    t_list.push_back(root_zero(a1, b1, c1));
-            }
-            else{
-                ibex::Interval t1 = root_positive(a1, b1, c1);
-                ibex::Interval t2 = root_negative(a1, b1, c1);
-                if(!t1.is_empty() && !t2.is_empty())
-                    t_list.push_back(min(t1, t2));
-                else if(!t1.is_empty())
-                    t_list.push_back(t1);
-                else
-                    t_list.push_back(t2);
-            }
-
-            for(const ibex::Interval &t:t_list){
-                if(!t.is_empty()){
-                    if(!ibex::Interval::ZERO.is_subset(t))
-                        x |= taylor(t, ibex::Interval(vect_d1[1-in_comp].lb()), ibex::Interval(vec_out0_lb[1-in_comp].lb()), ibex::Interval(out0_lb[1-in_comp].lb()));
-                    else
-                        x |= in[1-in_comp];// & out[1-in_comp];
-                }
-            }
-
-            IntervalVector out0_ub = IntervalVector(out.ub());
-            IntervalVector vec_out0_ub = -m_maze->get_dynamics()->eval(out0_ub)[0];
-            a1 = ibex::Interval(0.5*vect_d1[in_comp].ub());
-            b1 = ibex::Interval(vec_out0_ub[in_comp].ub());
-            c1 = out0_ub[in_comp]-in[in_comp].lb();
-            t_list.clear();
-
-            if(ibex::Interval::ZERO.is_subset(a1)){
-                if(ibex::Interval::ZERO.is_subset(b1))
-                    t_list.push_back(ibex::Interval(0));
-                else
-                    t_list.push_back(root_zero(a1, b1, c1));
-            }
-            else{
-                ibex::Interval t1 = root_positive(a1, b1, c1);
-                ibex::Interval t2 = root_negative(a1, b1, c1);
-                if(!t1.is_empty() && !t2.is_empty())
-                    t_list.push_back(min(t1, t2));
-                else if(!t1.is_empty())
-                    t_list.push_back(t1);
-                else
-                    t_list.push_back(t2);
-            }
-            for(const ibex::Interval &t:t_list){
-                if(!t.is_empty()){
-                    if(!ibex::Interval::ZERO.is_subset(t))
-                        x |= taylor(t, ibex::Interval(vect_d1[1-in_comp].ub()), ibex::Interval(vec_out0_ub[1-in_comp].ub()), ibex::Interval(out0_ub[1-in_comp].ub()));
-                    else
-                        x |= in[1-in_comp];// & out[1-in_comp];
-                }
-            }
-
-            in[1-in_comp] &= x;
+            in &= in_result;
         }
     }
 

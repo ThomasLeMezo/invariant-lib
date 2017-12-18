@@ -12,6 +12,8 @@ _Tp get_empty_door_container(int dim);
 
 #include <ibex_IntervalVector.h>
 #include <ibex_IntervalMatrix.h>
+#include <ibex_Function.h>
+#include <ibex_CtcFwdBwd.h>
 
 #include <omp.h>
 
@@ -406,6 +408,9 @@ protected:
     int     m_nb_contract = 0;
     bool m_debug_room = false;
     int m_time_debug = 0;
+
+    ibex::Function *m_contract_function;
+    ibex::CtcFwdBwd *m_ctc;
 
     // For PPL
 //    std::vector<std::vector<ppl::Generator>> *m_ray_vector_field;

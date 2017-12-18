@@ -70,6 +70,11 @@ Room<_Tp, _V>::Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics)
     //        }
     //        m_door_collinearity.push_back(vect_temp);
     //    }
+
+    ibex::Variable v(9);
+    m_contract_function = new ibex::Function(v, ibex::Return(v[0]*pow(v[8],2)+v[2]*v[8]+v[4]-v[6], v[1]*pow(v[8],2)+v[3]*v[8]+v[5]-v[7]));
+    m_ctc = new ibex::CtcFwdBwd(*m_contract_function);
+
 }
 
 template<typename _Tp, typename _V>
@@ -77,6 +82,8 @@ Room<_Tp, _V>::~Room(){
     omp_destroy_lock(&m_lock_contraction);
     omp_destroy_lock(&m_lock_deque);
     omp_destroy_lock(&m_lock_vector_field);
+    delete(m_ctc);
+    delete(m_contract_function);
 }
 
 template<typename _Tp, typename _V>
