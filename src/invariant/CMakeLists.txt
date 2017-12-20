@@ -14,6 +14,7 @@ include_directories(maze)
   set(SRC
     definition/dynamics.cpp
     definition/dynamics_function.cpp
+    definition/dynamicsinclusionfunction.cpp
 
     serialization/ibex_serialization.cpp
 
@@ -52,6 +53,7 @@ include_directories(maze)
     definition/domain.h
     definition/dynamics.h
     definition/dynamics_function.h
+    definition/dynamicsinclusionfunction.h
 
     definition/dataSet/datasetnode.h
     definition/dataSet/datasetnode.tpp

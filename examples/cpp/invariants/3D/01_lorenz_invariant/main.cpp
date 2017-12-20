@@ -25,9 +25,14 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = ibex::Interval(-30,30);
-    space[1] = ibex::Interval(-20,20);
-    space[2] = ibex::Interval(0,50);
+
+    space[0] = ibex::Interval(-100,100);
+    space[1] = ibex::Interval(-100,100);
+    space[2] = ibex::Interval(-100,100);
+
+//    space[0] = ibex::Interval(-30,30);
+//    space[1] = ibex::Interval(-20,20);
+//    space[2] = ibex::Interval(0,50);
 
     ibex::Interval rho = ibex::Interval(28.0);
     ibex::Interval sigma = ibex::Interval(10.0);

@@ -468,6 +468,8 @@ void Room<_Tp, _V>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _T
             }
         }
     }
+//    if(vec_field_neighbors.is_empty())
+//        std::cout << "ERROR" << std::endl;
 
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
     if(zero.is_subset(vec_field_global)){ // Case no contraction (if there is a possible cycle) or border face

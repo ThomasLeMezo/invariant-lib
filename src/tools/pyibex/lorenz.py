@@ -13,11 +13,11 @@ beta = 7.0 / 3.0
 
 def f(state, t):
   x, y, z = state  # unpack the state vector
-  return sigma * (y - x), x * (rho - z) - y, x * y - beta * z  # derivatives
+  return sigma * (y - x), (x * (rho - z) - y), (x * y - beta * z)  # derivatives
 
-state0 = [30, 3, 27]
+state0 = [100, 100, 5]
 # state0 = [-1.0, 2.0, 5.0]
-t = np.arange(0.0, 100.0, 0.01)
+t = np.arange(0.0, 100.0, 0.001)
 
 states = odeint(f, state0, t)
 
