@@ -143,7 +143,8 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
                 }
             }
         }
-        vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
+        if(pt_x.size()>2)
+            vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
     }
 
     // Draw Cone

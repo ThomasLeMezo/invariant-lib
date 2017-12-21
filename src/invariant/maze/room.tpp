@@ -72,6 +72,7 @@ template<typename _Tp, typename _V>
 void Room<_Tp, _V>::compute_vector_field(){
     m_vector_field_zero.clear();
     m_vector_fields.clear();
+    m_contain_zero = false;
     const ibex::IntervalVector position(m_pave->get_position());
     std::vector<ibex::IntervalVector> vector_field_list = m_maze->get_dynamics()->eval(position);
     // Eval Vector field
@@ -808,6 +809,7 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r) {
     stream << std::endl;
     stream << " nb_contractions = " << r.get_nb_contractions();
     stream << ", removed = " << (r.is_removed()?"true":"false");
+    stream << ", zero = " << (r.get_contain_zero()?"true":"false");
     stream << std::endl;
     for(Face<_Tp, _V> *f:r.get_pave()->get_faces_vector()){
         Door<_Tp, _V> *d = f->get_doors()[r.get_maze()];

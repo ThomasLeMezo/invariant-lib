@@ -220,13 +220,28 @@ void Pave<_Tp, _V>::bisect(){
         else
             m_tree->add_fullness((it->first), false);
 
-        if(r->is_removed())
+        if(r->is_removed()){
             m_tree->add_removed((it->first), true);
-        else
+            if(r->is_full()){
+                r_first->set_empty_private();
+                r_second->set_full_private();
+            }
+            if(r->is_empty()){
+                r_first->set_empty_private();
+                r_second->set_empty_private();
+            }
+            r_first->synchronize();
+            r_first->set_removed();
+            r_second->synchronize();
+            r_second->set_removed();
+        }
+        else{
             m_tree->add_removed((it->first), false);
+            r_first->synchronize();
+            r_second->synchronize();
+        }
 
-        r_first->synchronize();
-        r_second->synchronize();
+
     }
 
     // Save results in this pave

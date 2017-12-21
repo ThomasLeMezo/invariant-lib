@@ -241,13 +241,8 @@ void Pave_node<_Tp, _V>::get_bounding_fullness(Maze<_Tp, _V> *maze, ibex::Interv
             result |= r->get_hull();
     }
     else{
-//        if(!this->get_removed()[maze] && !get_fullness()[maze]){
-//            result |= m_position;
-//        }
-//        else if(!this->get_removed()[maze] && !get_emptyness()[maze]){
-            m_children.first->get_bounding_fullness(maze, result);
-            m_children.second->get_bounding_fullness(maze, result);
-//        }
+        m_children.first->get_bounding_fullness(maze, result);
+        m_children.second->get_bounding_fullness(maze, result);
     }
 }
 

@@ -35,15 +35,16 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f1(x1, x2, x3, Return(x2,
-                                         -x1+x3-5*x2));
+                                         -sin(x1)+x3-x2));
     DynamicsInclusionFunction dyn1(&f1, ibex::IntervalVector(1, ibex::Interval(-1, 0)), FWD_BWD);
 
     ibex::Function f2(x1, x2, x3, Return(x2,
-                                         -x1+x3-5*x2));
+                                         -sin(x1)+x3-x2));
     DynamicsInclusionFunction dyn2(&f2, ibex::IntervalVector(1, ibex::Interval(0, 1)), FWD_BWD);
 
     ibex::Variable theta1, theta2;
     ibex::Function f_attraction(theta1, theta2, 1.0/(cos(theta1)-cos(theta2)+2.5));
+//    ibex::Function f_attraction(theta1, theta2, 0.0*theta1);
 
     // ******* Maze ********* //
     invariant::MazeIBEX maze1(&dom, &dyn1);
@@ -55,8 +56,8 @@ int main(int argc, char *argv[])
     IntervalVector theta(2);
     ibex::Interval force;
     //
-    omp_set_num_threads(1);
-    for(int i=0; i<12; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<15; i++){
         paving.bisect();
         size_t step = 0;
         cout << "bisection = " << i << endl;
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
         IntervalVector bounding_box_1_old = maze1.get_bounding_box();
         IntervalVector bounding_box_2_old = maze2.get_bounding_box();
 
-        while(bounding_box_1_old != bounding_box_1 && bounding_box_2_old != bounding_box_2 && step <3){
+        while(bounding_box_1_old != bounding_box_1 && bounding_box_2_old != bounding_box_2 && step <4){
             cout << "step = " << step << endl;
             step++;
             maze1.contract();
@@ -108,20 +109,11 @@ int main(int argc, char *argv[])
     bounding_box = maze2.get_bounding_box();
     v_maze2.drawBox(bounding_box, "green[]");
 
-    //    IntervalVector position_info(2);
-    //    position_info[0] = ibex::Interval(0);
-    //    position_info[1] = ibex::Interval(1);
-    //    v_maze.get_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(0.335);
+    position_info[1] = ibex::Interval(-0.02);
+    v_maze2.show_room_info(&maze2, position_info);
 
-    //    IntervalVector position_info(2);
-    //    position_info[0] = ibex::Interval(-1);
-    //    position_info[1] = ibex::Interval(1);
-    //    v_maze.get_room_info(&maze, position_info);
-    //    v_maze.show_room_info(&maze, position_info);
-
-    //    position_info[0] = ibex::Interval(0);
-    //    position_info[1] = ibex::Interval(-1);
-    //    v_maze.get_room_info(&maze, position_info);
     vibes::endDrawing();
 
 }
