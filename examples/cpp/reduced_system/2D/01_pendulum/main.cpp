@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(2);
-    space[0] = -ibex::Interval::PI | ibex::Interval::PI;
+    space[0] = -ibex::Interval::HALF_PI | ibex::Interval::HALF_PI;
     space[1] = -ibex::Interval::PI | ibex::Interval::PI;
 
     // ****** Domain ******* //
@@ -35,15 +35,15 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     ibex::Function f1(x1, x2, x3, Return(x2,
-                                         -x1+x3*sin(x1)-0.5*x2));
+                                         -x1+x3-5*x2));
     DynamicsInclusionFunction dyn1(&f1, ibex::IntervalVector(1, ibex::Interval(-1, 0)), FWD_BWD);
 
     ibex::Function f2(x1, x2, x3, Return(x2,
-                                         -x1+x3*sin(x1)-0.5*x2));
+                                         -x1+x3-5*x2));
     DynamicsInclusionFunction dyn2(&f2, ibex::IntervalVector(1, ibex::Interval(0, 1)), FWD_BWD);
 
-    ibex::Variable p1(2), p2(2);
-    ibex::Function f_attraction(p1, p2, 1.0/(1.0+pow(p2[1]-p1[1], 2)+pow(p1[0]-p1[0],2)));
+    ibex::Variable theta1, theta2;
+    ibex::Function f_attraction(theta1, theta2, 1.0/(cos(theta1)-cos(theta2)+2.5));
 
     // ******* Maze ********* //
     invariant::MazeIBEX maze1(&dom, &dyn1);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    IntervalVector distance(4);
+    IntervalVector theta(2);
     ibex::Interval force;
     //
     omp_set_num_threads(1);
@@ -72,12 +72,10 @@ int main(int argc, char *argv[])
             maze1.contract();
             bounding_box_1 = maze1.get_bounding_box();
 
-            distance[0] = cos(bounding_box_1[0]);
-            distance[1] = sin(bounding_box_1[0]);
-            distance[2] = cos(bounding_box_2[0]);
-            distance[3] = sin(bounding_box_2[0])+1;
+            theta[0] = bounding_box_1[0];
+            theta[1] = bounding_box_2[0];
 
-            force = f_attraction.eval(distance);
+            force = f_attraction.eval(theta);
             dyn2.set_inclusion_parameter(force);
             cout << "force = " << force << endl;
             maze2.compute_vector_field();
@@ -85,12 +83,10 @@ int main(int argc, char *argv[])
             maze2.contract();
             bounding_box_2 = maze2.get_bounding_box();
 
-            distance[0] = cos(bounding_box_1[0]);
-            distance[1] = sin(bounding_box_1[0]);
-            distance[2] = cos(bounding_box_2[0]);
-            distance[3] = sin(bounding_box_2[0])+1;
+            theta[0] = bounding_box_1[0];
+            theta[1] = bounding_box_2[0];
 
-            force = f_attraction.eval(distance);
+            force = f_attraction.eval(theta);
             dyn1.set_inclusion_parameter(-force);
             maze1.compute_vector_field();
         }
