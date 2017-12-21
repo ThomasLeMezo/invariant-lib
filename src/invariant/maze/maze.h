@@ -97,6 +97,17 @@ public:
      */
     bool is_empty();
 
+    /**
+     * @brief get the bounding box
+     * @return
+     */
+    ibex::IntervalVector get_bounding_box();
+
+    /**
+     * @brief compute_vector_field
+     */
+    void compute_vector_field();
+
 private:
     invariant::Domain<_Tp, _V> *    m_domain = NULL;
     SmartSubPaving<_Tp, _V>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze

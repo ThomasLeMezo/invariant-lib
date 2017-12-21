@@ -75,58 +75,66 @@ dx = f.eval_vector(IN)
 x = IN
 y = OUT
 
-g = Function("ddx[2]", "dx[2]", "c[2]", "t", "(ddx[0]*t^2+dx[0]*t+c[0], ddx[1]*t^2+dx[1]*t+c[1])")
+g = Function("ddx[2]", "dx[2]", "x[2]", "y[2]", "t", "(ddx[0]*t^2+dx[0]*t+x[0]-y[0], ddx[1]*t^2+dx[1]*t+x[1]-y[1])")
 ctc = CtcFwdBwd(g)
-c1 = IntervalVector(7)
+c1 = IntervalVector(9)
 c1[0] = ddx[0] & Interval.NEG_REALS
 c1[1] = ddx[1] & Interval.NEG_REALS
 c1[2] = dx[0] & Interval.NEG_REALS
 c1[3] = dx[1] & Interval.NEG_REALS
-c1[4] = x[0] - y[0]
-c1[5] = x[1] - y[1]
-c1[6] = Interval.POS_REALS
+c1[4] = x[0]
+c1[5] = x[1]
+c1[6] = y[0]
+c1[7] = y[1]
+c1[8] = Interval.POS_REALS
 print("c1 = ", c1)
 ctc.contract(c1)
 print(" c1 = ", c1)
 
-c3 = IntervalVector(7)
+c3 = IntervalVector(9)
 c3[0] = ddx[0] & Interval.NEG_REALS
 c3[1] = ddx[1] & Interval.NEG_REALS
 c3[2] = dx[0] & Interval.POS_REALS
 c3[3] = dx[1] & Interval.POS_REALS
-c3[4] = x[0] - y[0]
-c3[5] = x[1] - y[1]
-c3[6] = Interval.POS_REALS
+c3[4] = x[0]
+c3[5] = x[1]
+c3[6] = y[0]
+c3[7] = y[1]
+c3[8] = Interval.POS_REALS
 print("c3 = ", c3)
 ctc.contract(c3)
 print(" c3 = ", c3)
 
-c2 = IntervalVector(7)
+c2 = IntervalVector(9)
 c2[0] = ddx[0] & Interval.POS_REALS
 c2[1] = ddx[1] & Interval.POS_REALS
 c2[2] = dx[0] & Interval.NEG_REALS
 c2[3] = dx[1] & Interval.NEG_REALS
-c2[4] = x[0] - y[0]
-c2[5] = x[1] - y[1]
-c2[6] = Interval.POS_REALS
+c2[4] = x[0]
+c2[5] = x[1]
+c2[6] = y[0]
+c2[7] = y[1]
+c2[8] = Interval.POS_REALS
 print("c2 = ", c2)
 ctc.contract(c2)
 print(" c2 = ", c2)
 
-c4 = IntervalVector(7)
+c4 = IntervalVector(9)
 c4[0] = ddx[0] & Interval.POS_REALS
 c4[1] = ddx[1] & Interval.POS_REALS
 c4[2] = dx[0] & Interval.POS_REALS
 c4[3] = dx[1] & Interval.POS_REALS
-c4[4] = x[0] - y[0]
-c4[5] = x[1] - y[1]
-c4[6] = Interval.POS_REALS
+c4[4] = x[0]
+c4[5] = x[1]
+c4[6] = y[0]
+c4[7] = y[1]
+c4[8] = Interval.POS_REALS
 print("c4 = ", c4)
 ctc.contract(c4)
 print(" c4 = ", c4)
 
-OUT_contract[0] = (c1[4] | c2[4] | c3[4] | c4[4]) - IN[0]
-OUT_contract[1] = (c1[5] | c2[5] | c3[5] | c4[5]) - IN[1]
+OUT_contract[0] = (c1[6] | c2[6] | c3[6] | c4[6])
+OUT_contract[1] = (c1[7] | c2[7] | c3[7] | c4[7])
 
 ############
 

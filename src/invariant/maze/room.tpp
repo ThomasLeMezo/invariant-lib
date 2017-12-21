@@ -16,25 +16,7 @@ Room<_Tp, _V>::Room(Pave<_Tp, _V> *p, Maze<_Tp, _V> *m, Dynamics *dynamics)
     m_pave = p;
     m_maze = m;
     const ibex::IntervalVector position(p->get_position());
-    std::vector<ibex::IntervalVector> vector_field_list = dynamics->eval(position);
-
-    // Eval Vector field
-    for(ibex::IntervalVector &vector_field:vector_field_list){
-        // Test if 0 is inside the vector_field IV
-        ibex::IntervalVector zero(m_pave->get_dim(), ibex::Interval::ZERO);
-        if((zero.is_subset(vector_field))){
-            m_vector_field_zero.push_back(true);
-            m_contain_zero = true;
-        }
-        else{
-            m_vector_field_zero.push_back(false);
-        }
-        m_vector_fields.push_back(vector_field);
-        for(int i=0; i<vector_field.size(); i++){
-            if(!(vector_field[i] & ibex::Interval::ZERO).is_empty())
-                m_contain_zero_coordinate = true;
-        }
-    }
+    this->compute_vector_field();
 
     // Eval Vector field d1
     m_vector_fields_d1 = dynamics->eval_d1(position);
@@ -85,6 +67,32 @@ Room<_Tp, _V>::~Room(){
     delete(m_ctc);
     delete(m_contract_function);
 }
+
+template<typename _Tp, typename _V>
+void Room<_Tp, _V>::compute_vector_field(){
+    m_vector_field_zero.clear();
+    m_vector_fields.clear();
+    const ibex::IntervalVector position(m_pave->get_position());
+    std::vector<ibex::IntervalVector> vector_field_list = m_maze->get_dynamics()->eval(position);
+    // Eval Vector field
+    for(ibex::IntervalVector &vector_field:vector_field_list){
+        // Test if 0 is inside the vector_field IV
+        ibex::IntervalVector zero(m_pave->get_dim(), ibex::Interval::ZERO);
+        if((zero.is_subset(vector_field))){
+            m_vector_field_zero.push_back(true);
+            m_contain_zero = true;
+        }
+        else{
+            m_vector_field_zero.push_back(false);
+        }
+        m_vector_fields.push_back(vector_field);
+        for(int i=0; i<vector_field.size(); i++){
+            if(!(vector_field[i] & ibex::Interval::ZERO).is_empty())
+                m_contain_zero_coordinate = true;
+        }
+    }
+}
+
 
 template<typename _Tp, typename _V>
 void Room<_Tp, _V>::set_empty_private_output(){
@@ -841,16 +849,6 @@ void Room<_Tp, _V>::set_removed(){
         Door<_Tp, _V> *d = f->get_doors()[m_maze];
         d->set_removed();
     }
-}
-
-template<typename _Tp, typename _V>
-const ibex::IntervalVector Room<_Tp, _V>::get_hull() const{
-    ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
-    for(Face<_Tp, _V> *f:get_pave()->get_faces_vector()){
-        Door<_Tp, _V> *d = f->get_doors()[m_maze];
-        result |= d->get_hull();
-    }
-    return result;
 }
 
 template<typename _Tp, typename _V>

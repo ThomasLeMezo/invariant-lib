@@ -2,6 +2,7 @@
 #include "ibex_IntervalVector.h"
 #include "ibex_CtcFwdBwd.h"
 #include "ibex_Function.h"
+#include "door.h"
 
 namespace invariant{
 
@@ -159,6 +160,16 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::compute_vector_field_type
     m_vector_fields_typed_bwd = m_vector_fields;// No negative bc of the way the contractor is coded
 }
 
+template <>
+const ibex::IntervalVector Room<ibex::IntervalVector, ibex::IntervalVector>::get_hull() const{
+    ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
+    for(FaceIBEX *f:get_pave()->get_faces_vector()){
+        DoorIBEX *d = f->get_doors()[m_maze];
+        result |= d->get_hull();
+    }
+    return result;
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 void recursive_linear_expression_from_iv(const ibex::IntervalVector &vect_field,
@@ -255,6 +266,16 @@ ppl::C_Polyhedron get_diff_hull<ppl::C_Polyhedron, ppl::Generator_System>(const 
 
 int get_nb_dim_flat(const ppl::C_Polyhedron &p){
     return p.space_dimension() - p.affine_dimension();
+}
+
+template <>
+const ibex::IntervalVector Room<ppl::C_Polyhedron, ppl::Generator_System>::get_hull() const{
+    ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
+    for(FacePPL *f:get_pave()->get_faces_vector()){
+        DoorPPL *d = f->get_doors()[m_maze];
+        result |= polyhedron_2_iv(d->get_hull());
+    }
+    return result;
 }
 
 /// ******************  Other functions ****************** ///

@@ -54,7 +54,7 @@ private:
      */
     void add_function_d1(ibex::Function* f);
 
-private:
+protected:
     std::vector<ibex::Function*> m_functions;
     std::vector<ibex::Function*> m_functions_d1;
     omp_lock_t  m_lock_dynamics; // Lock

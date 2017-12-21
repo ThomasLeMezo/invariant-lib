@@ -156,6 +156,12 @@ public:
     const std::pair<Pave_node<_Tp, _V> *, Pave_node<_Tp, _V> *> get_children() const;
 
     /**
+     * @brief get bounding fullness
+     * @return
+     */
+    void get_bounding_fullness(Maze<_Tp, _V> *maze, ibex::IntervalVector &result);
+
+    /**
      * @brief Add a flag to the emptyness map to tell if a room was empty at that level of the tree
      * @param maze
      * @param empty

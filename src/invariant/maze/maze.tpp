@@ -215,4 +215,19 @@ void Maze<_Tp, _V>::add_rooms(const std::vector<Room<_Tp, _V> *>& list_rooms){
     }
 }
 
+template<typename _Tp, typename _V>
+ibex::IntervalVector Maze<_Tp, _V>::get_bounding_box(){
+    ibex::IntervalVector result(m_subpaving->dim(), ibex::Interval::EMPTY_SET);
+    m_subpaving->get_tree()->get_bounding_fullness(this, result);
+    return result;
+}
+
+template<typename _Tp, typename _V>
+void Maze<_Tp, _V>::compute_vector_field(){
+    for(Pave<_Tp, _V>*p:m_subpaving->get_paves()){
+        Room<_Tp, _V> *r = p->get_rooms()[this];
+        r->compute_vector_field();
+    }
+}
+
 }

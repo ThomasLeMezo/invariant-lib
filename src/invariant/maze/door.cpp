@@ -41,10 +41,10 @@ void Door<ibex::IntervalVector, ibex::IntervalVector>::set_output_private(const 
 template <>
 void Door<ibex::IntervalVector, ibex::IntervalVector>::synchronize(){
     omp_set_lock(&m_lock_read);
-//    if(*m_input_private != m_input_public)
-//        m_update_input++;
-//    if(*m_output_private != m_output_public)
-//        m_update_output++;
+    //    if(*m_input_private != m_input_public)
+    //        m_update_input++;
+    //    if(*m_output_private != m_output_public)
+    //        m_update_output++;
 
     m_input_public = *m_input_private;
     m_output_public = *m_output_private;
@@ -91,14 +91,14 @@ void Door<ppl::C_Polyhedron, ppl::Generator_System>::synchronize(){
     omp_set_lock(&m_lock_read);
     m_input_private->minimized_constraints();
     m_output_private->minimized_constraints();
-//    if(!m_input_private->contains(m_input_public) || !m_input_public.contains(*m_input_private)){
-//        m_update_input++;
-        m_input_public = *m_input_private;
-//    }
-//    if(!m_output_private->contains(m_output_public) || !m_output_public.contains(*m_output_private)){
-//        m_update_output++;
-        m_output_public = *m_output_private;
-//    }
+    //    if(!m_input_private->contains(m_input_public) || !m_input_public.contains(*m_input_private)){
+    //        m_update_input++;
+    m_input_public = *m_input_private;
+    //    }
+    //    if(!m_output_private->contains(m_output_public) || !m_output_public.contains(*m_output_private)){
+    //        m_update_output++;
+    m_output_public = *m_output_private;
+    //    }
 
     omp_unset_lock(&m_lock_read);
 }
@@ -106,15 +106,26 @@ void Door<ppl::C_Polyhedron, ppl::Generator_System>::synchronize(){
 /// ******************  Other functions ****************** ///
 
 ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv){
-        Rational_Box box(iv.size());
-        for(size_t i=0; i<box.space_dimension(); i++){
-            ppl::Variable x(i);
-            if(!iv[i].is_empty()){
-                box.add_constraint(x >= floor(iv[i].lb()*IBEX_PPL_PRECISION));
-                box.add_constraint(x <= ceil(iv[i].ub()*IBEX_PPL_PRECISION));
-            }
+    Rational_Box box(iv.size());
+    for(size_t i=0; i<box.space_dimension(); i++){
+        ppl::Variable x(i);
+        if(!iv[i].is_empty()){
+            box.add_constraint(x >= floor(iv[i].lb()*IBEX_PPL_PRECISION));
+            box.add_constraint(x <= ceil(iv[i].ub()*IBEX_PPL_PRECISION));
         }
-        return ppl::C_Polyhedron(box);
+    }
+    return ppl::C_Polyhedron(box);
+}
+
+ibex::IntervalVector polyhedron_2_iv(const ppl::C_Polyhedron& p){
+    ppl::Rational_Box box(p);
+    ibex::IntervalVector result(p.space_dimension(), ibex::Interval::EMPTY_SET);
+
+    for(size_t i=0; i<box.space_dimension(); i++){
+        ppl::Variable x(i);
+        result[i] = ibex::Interval(box.get_interval(x).lower().get_d()/IBEX_PPL_PRECISION, box.get_interval(x).upper().get_d()/IBEX_PPL_PRECISION);
+    }
+    return result;
 }
 
 }

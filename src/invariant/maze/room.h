@@ -377,6 +377,11 @@ public:
      */
     const std::vector<_V>& get_vector_fields_typed_bwd() const;
 
+    /**
+     * @brief recompute_vector_field
+     */
+    void compute_vector_field();
+
 protected:
     Pave<_Tp, _V>*   m_pave = NULL; // pointer to the associated face
     Maze<_Tp, _V>*   m_maze = NULL; // pointer to the associated maze
@@ -584,6 +589,7 @@ inline std::string print(const ppl::C_Polyhedron &p){
     p.print();
     return stream.str();
 }
+
 }
 #include "room.tpp"
 

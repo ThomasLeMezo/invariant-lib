@@ -231,6 +231,27 @@ void Pave_node<_Tp, _V>::get_all_child_rooms_inside_outside(std::vector<Room<_Tp
 }
 
 template<typename _Tp, typename _V>
+void Pave_node<_Tp, _V>::get_bounding_fullness(Maze<_Tp, _V> *maze, ibex::IntervalVector &result){
+    if(m_position.is_subset(result))
+        return;
+
+    if(is_leaf()){
+        Room<_Tp, _V> *r = m_pave->get_rooms()[maze];
+        if(!r->is_empty())
+            result |= r->get_hull();
+    }
+    else{
+//        if(!this->get_removed()[maze] && !get_fullness()[maze]){
+//            result |= m_position;
+//        }
+//        else if(!this->get_removed()[maze] && !get_emptyness()[maze]){
+            m_children.first->get_bounding_fullness(maze, result);
+            m_children.second->get_bounding_fullness(maze, result);
+//        }
+    }
+}
+
+template<typename _Tp, typename _V>
 void Pave_node<_Tp, _V>::get_border_paves(std::vector<Pave<_Tp, _V>*>& pave_list) const{
     if(is_leaf() && m_pave->is_border()){
         pave_list.push_back(m_pave);
