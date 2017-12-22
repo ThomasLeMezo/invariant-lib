@@ -145,6 +145,13 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
         }
         if(pt_x.size()>2)
             vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
+
+//        if(r->is_initial_door_input()){
+//            vibes::drawBox(r->get_initial_door_input(), "black[red]");
+//        }
+//        if(r->is_initial_door_output()){
+//            vibes::drawBox(r->get_initial_door_output(), "black[red]");
+//        }
     }
 
     // Draw Cone

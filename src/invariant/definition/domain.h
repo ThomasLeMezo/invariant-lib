@@ -12,10 +12,11 @@ namespace invariant{
 #include <ibex_Sep.h>
 #include <utility>
 
-#include "../smartSubPaving/smartSubPaving.h"
-#include "../maze/maze.h"
-#include "../maze/room.h"
-#include "../smartSubPaving/pave_node.h"
+#include "smartSubPaving.h"
+#include "maze.h"
+#include "room.h"
+#include "door.h"
+#include "pave_node.h"
 
 namespace invariant{
 
@@ -23,6 +24,7 @@ using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_
 using DomainIBEX = Domain<ibex::IntervalVector, ibex::IntervalVector>;
 
 enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
+enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
 
 template <typename _Tp, typename _V> class SmartSubPaving;
 template <typename _Tp, typename _V> class Maze;
@@ -195,6 +197,13 @@ private:
      */
     void contract_union_maze(Maze<_Tp, _V> *maze);
 
+    /**
+     * @brief Contract doors according to a virtual door inside the room
+     * @param box
+     * @param output
+     */
+    void contract_box(Room<_Tp, _V> *room, const ibex::IntervalVector &initial_condition, DOOR_SELECTOR doorSelector=DOOR_INPUT_OUTPUT);
+
 private:
     SmartSubPaving<_Tp, _V> * m_subpaving;
 
@@ -268,6 +277,11 @@ template<typename _Tp, typename _V>
 inline void Domain<_Tp, _V>::add_maze_union(std::vector<Maze<_Tp, _V> *> maze_list){
     m_maze_list_union.insert(m_maze_list_union.end(), maze_list.begin(), maze_list.end());
 }
+
+template <typename _Tp>
+_Tp convert(const ibex::IntervalVector &iv);
+template <typename _Tp>
+_Tp convert(const ppl::C_Polyhedron &p);
 
 }
 

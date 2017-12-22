@@ -15,6 +15,7 @@ include_directories(maze)
     definition/dynamics.cpp
     definition/dynamics_function.cpp
     definition/dynamicsinclusionfunction.cpp
+    definition/domain.cpp
 
     serialization/ibex_serialization.cpp
 
@@ -50,11 +51,6 @@ include_directories(maze)
     smartSubPaving/face.h
     smartSubPaving/pave_node.h
 
-    definition/domain.h
-    definition/dynamics.h
-    definition/dynamics_function.h
-    definition/dynamicsinclusionfunction.h
-
     definition/dataSet/datasetnode.h
     definition/dataSet/datasetnode.tpp
 
@@ -71,7 +67,11 @@ include_directories(maze)
     maze/door.tpp
     maze/sepmaze.tpp
 
+    definition/domain.h
     definition/domain.tpp
+    definition/dynamics.h
+    definition/dynamics_function.h
+    definition/dynamicsinclusionfunction.h
   )
 
   if(WITH_NETCDF)

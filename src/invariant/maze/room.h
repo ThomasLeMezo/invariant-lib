@@ -28,8 +28,6 @@ namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
 
-enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
-
 template <typename _Tp, typename _V> class Room;
 using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
 using RoomIBEX = Room<ibex::IntervalVector, ibex::IntervalVector>;
@@ -288,13 +286,6 @@ public:
         return r1;
     }
 
-    /**
-     * @brief Contract doors according to a virtual door inside the room
-     * @param box
-     * @param output
-     */
-    void contract_box(ibex::IntervalVector& virtual_door, ibex::Sep *sep, DOOR_SELECTOR doorSelector=DOOR_INPUT_OUTPUT);
-
 protected:
     /**
      * @brief Contract doors according to the neighbors
@@ -382,6 +373,25 @@ public:
      */
     void compute_vector_field();
 
+    /**
+     * @brief is initial door input/output
+     * @return
+     */
+    bool is_initial_door_input() const;
+    bool is_initial_door_output() const;
+
+    /**
+     * @brief set_initial_condition
+     */
+    void set_initial_door_input(const _Tp &door);
+    void set_initial_door_output(const _Tp &door);
+
+    _Tp& get_initial_door_input();
+    _Tp &get_initial_door_output();
+
+    void set_full_initial_door_input();
+    void set_full_initial_door_output();
+
 protected:
     Pave<_Tp, _V>*   m_pave = NULL; // pointer to the associated face
     Maze<_Tp, _V>*   m_maze = NULL; // pointer to the associated maze
@@ -408,6 +418,11 @@ protected:
 
     bool    m_in_deque = false;
     bool    m_removed = false;
+
+    bool    m_initial_condition_input = false;
+    bool    m_initial_condition_output = false;
+    _Tp* m_initial_door_input = NULL;
+    _Tp* m_initial_door_output = NULL;
 
     // To Be Removed
     int     m_nb_contract = 0;
@@ -472,6 +487,70 @@ _V convert_vec_field(const ibex::IntervalVector &vect);
 template <typename _Tp, typename _V>
 inline Pave<_Tp, _V>* Room<_Tp, _V>::get_pave() const{
     return m_pave;
+}
+
+template <typename _Tp, typename _V>
+inline bool Room<_Tp, _V>::is_initial_door_input() const{
+    return m_initial_condition_input;
+}
+
+template <typename _Tp, typename _V>
+inline bool Room<_Tp, _V>::is_initial_door_output() const{
+    return m_initial_condition_output;
+}
+
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::set_initial_door_input(const _Tp &door){
+    m_initial_condition_input = true;
+    if(m_initial_door_input == NULL){
+        m_initial_door_input = new _Tp(door);
+    }
+    else{
+        *m_initial_door_input = door;
+    }
+}
+
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::set_initial_door_output(const _Tp &door){
+    m_initial_condition_output = true;
+    if(m_initial_door_output == NULL){
+        m_initial_door_output = new _Tp(door);
+    }
+    else{
+        *m_initial_door_output = door;
+    }
+}
+
+template <typename _Tp, typename _V>
+inline _Tp& Room<_Tp, _V>::get_initial_door_input(){
+    return *m_initial_door_input;
+}
+
+template <typename _Tp, typename _V>
+inline _Tp& Room<_Tp, _V>::get_initial_door_output(){
+    return *m_initial_door_output;
+}
+
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::set_full_initial_door_input(){
+    m_initial_condition_input = true;
+    if(m_initial_door_input == NULL){
+        m_initial_door_input = new _Tp(m_pave->get_position_typed());
+    }
+    else{
+        *m_initial_door_input = m_pave->get_position_typed();
+    }
+}
+
+template <typename _Tp, typename _V>
+inline void Room<_Tp, _V>::set_full_initial_door_output(){
+    m_initial_condition_output = true;
+    if(m_initial_door_output == NULL){
+        m_initial_door_output = new _Tp(m_pave->get_position_typed());
+    }
+    else{
+        *m_initial_door_output = m_pave->get_position_typed();
+    }
 }
 
 template <typename _Tp, typename _V>

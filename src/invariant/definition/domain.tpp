@@ -63,10 +63,16 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                 Pave<_Tp, _V>* p = pave_node->get_pave();
                 Room<_Tp, _V> *r = p->get_rooms()[maze];
                 if(!r->is_removed()){
-                    if(output)
+                    if(output){
                         r->set_full_private_output();
-                    else
+                        if(m_domain_init == FULL_WALL)
+                            r->set_full_initial_door_output();
+                    }
+                    else{
                         r->set_full_private_input();
+                        if(m_domain_init == FULL_WALL)
+                            r->set_full_initial_door_input();
+                    }
                     if(m_domain_init == FULL_WALL)
                         p->get_neighbors_room(maze, list_room_deque);
                     r->synchronize();
@@ -108,14 +114,20 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
             m_sep_input->separate(x_in, x_out);
 
         if(pave_node->is_leaf()){
-            Pave<_Tp, _V>* p = pave_node->get_pave();
+            Pave<_Tp, _V> *p = pave_node->get_pave();
             Room<_Tp, _V> *r = p->get_rooms()[maze];
             if(!r->is_removed()){
                 if(x_in.is_empty()){ // Inside the constraint
-                    if(output)
+                    if(output){
                         r->set_full_private_output();
-                    else
+                        if(m_domain_init == FULL_WALL)
+                            r->set_full_initial_door_output();
+                    }
+                    else{
                         r->set_full_private_input();
+                        if(m_domain_init == FULL_WALL)
+                            r->set_full_initial_door_input();
+                    }
                     if(m_domain_init == FULL_WALL){
                         p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
@@ -128,10 +140,23 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                         r->set_empty_private_input();
                 }
                 else{ // Inside & Outside the constraint => all full (over approximation)
-                    if(output)
-                        r->set_full_private_output();
-                    else
-                        r->set_full_private_input();
+                    if(output){
+                        if(m_domain_init == FULL_WALL){
+                            r->set_initial_door_output(convert<_Tp>(x_out));
+                        }
+                        else{
+//                            r->set_full_private_output();
+                            contract_box(r, x_out, DOOR_INPUT);
+                        }
+                    }
+                    else{
+                        if(m_domain_init == FULL_WALL)
+                            r->set_initial_door_input(convert<_Tp>(x_out));
+                        else{
+//                            r->set_full_private_input();
+                            contract_box(r, x_out, DOOR_OUTPUT);
+                        }
+                    }
 
 //                    if(output)
 //                        r->contract_box(x_out, m_sep_output, DOOR_INPUT);
@@ -262,6 +287,17 @@ void Domain<_Tp, _V>::contract_union_maze(Maze<_Tp, _V> *maze){
             r->synchronize();
         }
     }
+}
+
+template<typename _Tp, typename _V>
+void Domain<_Tp, _V>::contract_box(Room<_Tp, _V> *room, const ibex::IntervalVector& initial_condition, DOOR_SELECTOR doorSelector){
+    for(Face<_Tp, _V> *f:room->get_pave()->get_faces_vector()){
+        Door<_Tp, _V> *d = f->get_doors()[room->get_maze()];
+            if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                d->set_output_private(convert<_Tp>(initial_condition & convert<ibex::IntervalVector>(d->get_output_private())));
+            if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)
+                d->set_input_private(convert<_Tp>(initial_condition & convert<ibex::IntervalVector>(d->get_input_private())));
+        }
 }
 
 }

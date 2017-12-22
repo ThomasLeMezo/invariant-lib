@@ -300,7 +300,6 @@ namespace invariant{
 ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv);
 ibex::IntervalVector polyhedron_2_iv(const ppl::C_Polyhedron& p);
 
-
 //template <typename _Tp, typename _V>
 //inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp, _V>& d){
 //    return stream;
