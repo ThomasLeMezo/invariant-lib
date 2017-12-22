@@ -73,8 +73,10 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                         if(m_domain_init == FULL_WALL)
                             r->set_full_initial_door_input();
                     }
-                    if(m_domain_init == FULL_WALL)
-                        p->get_neighbors_room(maze, list_room_deque);
+                    if(m_domain_init == FULL_WALL){
+//                        p->get_neighbors_room(maze, list_room_deque);
+                        list_room_deque.push_back(r);
+                    }
                     r->synchronize();
                 }
             }
@@ -139,13 +141,12 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                     else
                         r->set_empty_private_input();
                 }
-                else{ // Inside & Outside the constraint => all full (over approximation)
+                else{ // Inside & Outside the constraint => x_out not empty & x_in not empty
                     if(output){
                         if(m_domain_init == FULL_WALL){
                             r->set_initial_door_output(convert<_Tp>(x_out));
                         }
                         else{
-//                            r->set_full_private_output();
                             contract_box(r, x_out, DOOR_INPUT);
                         }
                     }
@@ -153,18 +154,12 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                         if(m_domain_init == FULL_WALL)
                             r->set_initial_door_input(convert<_Tp>(x_out));
                         else{
-//                            r->set_full_private_input();
                             contract_box(r, x_out, DOOR_OUTPUT);
                         }
                     }
 
-//                    if(output)
-//                        r->contract_box(x_out, m_sep_output, DOOR_INPUT);
-//                    else
-//                        r->contract_box(x_out, m_sep_input, DOOR_OUTPUT);
-
                     if(m_domain_init == FULL_WALL){
-                        p->get_neighbors_room(maze, list_room_deque);
+//                        p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
                     }
                 }

@@ -392,7 +392,7 @@ void Room<_Tp, _V>::contract_consistency(){
     bool global_compute = false;
     for(int n_vf=0; n_vf<nb_vec; n_vf++){
         if(m_vector_field_zero[n_vf]){ // Case Zero in f
-            if(domain_init == FULL_WALL && !is_empty_private())
+            if(domain_init == FULL_WALL && (!is_empty_private() || (m_initial_condition_input || m_initial_condition_output)))
                 this->set_full_possible();
         }
         else{
@@ -693,8 +693,8 @@ bool Room<_Tp, _V>::contract(){
         change |= contract_continuity();
         get_private_doors_info("continuity");
 
-        if(change){
-            if(!m_first_contract || !is_empty_private())
+        if(change || m_first_contract){
+//            if(!m_first_contract || (!is_empty_private() ))
                 contract_consistency();
             get_private_doors_info("consistency");
         }

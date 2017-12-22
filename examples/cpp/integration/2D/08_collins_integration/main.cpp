@@ -7,6 +7,7 @@
 #include "ibex_SepFwdBwd.h"
 #include "ibex_SepUnion.h"
 #include "ibex_SepInter.h"
+#include "ibex_SepNot.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -53,12 +54,8 @@ int main(int argc, char *argv[])
     // ****** Domain Inner ******* //
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
 
-    Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
-    Function f_sep_inner_bis(x1, x2, pow(x1-1, 2)+pow(x2+3, 2)-pow(0.1, 2));
-    SepFwdBwd s_inner_bis(f_sep_inner_bis, GEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepInter sep_i(s_inner, s_inner_bis);
-    dom_inner.set_sep(&sep_i);
+    SepNot sep_inner(sep_u);
+    dom_inner.set_sep_input(&sep_inner);
 
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
@@ -75,11 +72,10 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_outer.contract();
     for(int i=0; i<15; i++){
         paving.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
         cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
+        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -93,10 +89,17 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(1, -3, 0.1, "red[]");
     v_maze.drawCircle(0.0, 1.0, 9.0/100.0, "black[green]");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-0.015);
-//    position_info[1] = ibex::Interval(-3);
-//    v_maze.show_room_info(&maze_outer, position_info);
+    VibesMaze v_maze_inner("SmartSubPaving", &maze_inner);
+    v_maze_inner.setProperties(0, 0, 1024, 1024);
+    v_maze_inner.show();
+    v_maze_inner.drawCircle(x1_c, x2_c, r, "red[]");
+    v_maze_inner.drawCircle(1, -3, 0.1, "red[]");
+    v_maze_inner.drawCircle(0.0, 1.0, 9.0/100.0, "black[green]");
+
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(0.01);
+    position_info[1] = ibex::Interval(-3.02);
+    v_maze_inner.show_room_info(&maze_inner, position_info);
 
 //    IntervalVector x_out(2);
 //    x_out[0] = ibex::Interval(0);
