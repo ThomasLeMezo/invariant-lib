@@ -64,17 +64,18 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                 Room<_Tp, _V> *r = p->get_rooms()[maze];
                 if(!r->is_removed()){
                     if(output){
-                        r->set_full_private_output();
                         if(m_domain_init == FULL_WALL)
                             r->set_full_initial_door_output();
+                        else
+                            r->set_full_private_output();
                     }
                     else{
-                        r->set_full_private_input();
                         if(m_domain_init == FULL_WALL)
                             r->set_full_initial_door_input();
+                        else
+                            r->set_full_private_input();
                     }
                     if(m_domain_init == FULL_WALL){
-//                        p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
                     }
                     r->synchronize();
@@ -121,17 +122,18 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
             if(!r->is_removed()){
                 if(x_in.is_empty()){ // Inside the constraint
                     if(output){
-                        r->set_full_private_output();
                         if(m_domain_init == FULL_WALL)
                             r->set_full_initial_door_output();
+                        else
+                            r->set_full_private_output();
                     }
                     else{
-                        r->set_full_private_input();
                         if(m_domain_init == FULL_WALL)
                             r->set_full_initial_door_input();
+                        else
+                            r->set_full_private_input();
                     }
                     if(m_domain_init == FULL_WALL){
-                        p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
                     }
                 }
@@ -144,22 +146,22 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
                 else{ // Inside & Outside the constraint => x_out not empty & x_in not empty
                     if(output){
                         if(m_domain_init == FULL_WALL){
-                            r->set_initial_door_output(convert<_Tp>(x_out));
+                            r->set_initial_door_output(convert<_Tp>(x_out)); // r->set_full_initial_door_output();
                         }
                         else{
-                            contract_box(r, x_out, DOOR_INPUT);
+                            contract_box(r, x_out, DOOR_INPUT); // r->set_full_private_output();
                         }
                     }
                     else{
-                        if(m_domain_init == FULL_WALL)
-                            r->set_initial_door_input(convert<_Tp>(x_out));
+                        if(m_domain_init == FULL_WALL){
+                            r->set_initial_door_input(convert<_Tp>(x_out)); // r->set_full_initial_door_input();
+                        }
                         else{
-                            contract_box(r, x_out, DOOR_OUTPUT);
+                            contract_box(r, x_out, DOOR_OUTPUT); // r->set_full_private_input();
                         }
                     }
 
                     if(m_domain_init == FULL_WALL){
-//                        p->get_neighbors_room(maze, list_room_deque);
                         list_room_deque.push_back(r);
                     }
                 }

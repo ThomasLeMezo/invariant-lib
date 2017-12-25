@@ -30,38 +30,29 @@ int main(int argc, char *argv[])
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
 
-    double x1_c, x2_c, r;
-    x1_c = 1.0;
-    x2_c = 0.0;
-    r = 0.4;
-    Function f_sep1(x, sqr(x[0]-x1_c)-sqr(r));
-    Function f_sep2(x, sqr(x[1]-x2_c)-sqr(r));
+    ibex::IntervalVector box1(2), box2(2);
+    box1[0] = ibex::Interval(0.6, 1.4);
+    box1[1] = ibex::Interval(-0.4, 0.4);
+    box2[0] = ibex::Interval(-1.0, -0.6);
+    box2[1] = ibex::Interval(0.3, 0.7);
 
-    double x1_c2, x2_c2, r2;
-    x1_c2 = -0.8;
-    x2_c2 = 0.5;
-    r2 = 0.2;
-    Function f2_sep1(x, sqr(x[0]-x1_c2)-sqr(r2));
-    Function f2_sep2(x, sqr(x[1]-x2_c2)-sqr(r2));
+    Function f_id("x[2]", "(x[0], x[1])");
+    SepFwdBwd s_outer_box1(f_id, box1);
+    SepFwdBwd s_outer_box2(f_id, box2);
+    SepUnion s_outer(s_outer_box1, s_outer_box2);
+    SepNot s_inner(s_outer);
+
+    // Domains
 
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
-
-    SepFwdBwd s1_outer1(f_sep1, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepFwdBwd s1_outer2(f_sep2, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepInter s1_outer(s1_outer1, s1_outer2);
-    SepFwdBwd s2_outer1(f2_sep1, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepFwdBwd s2_outer2(f2_sep2, LEQ); // LT, LEQ, EQ, GEQ, GT)
-    SepInter s2_outer(s2_outer1, s2_outer2);
-    SepUnion s_outer(s1_outer, s2_outer);
     dom_outer.set_sep_output(&s_outer);
 
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
-    SepNot s_inner(s_outer);
-    dom_inner.set_sep_input(&s_inner);
+    dom_inner.set_sep_output(&s_inner);
 
     // ****** Dynamics ******* //
     ibex::Function f(x, -Return(x[1],
@@ -74,7 +65,6 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    
     
     for(int i=0; i<15; i++){
         paving.bisect();
@@ -95,17 +85,17 @@ int main(int argc, char *argv[])
 //    v_maze_inner.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-0.4);
-//    position_info[1] = ibex::Interval(1.34);
-//    v_maze.get_room_info(&maze_inner, position_info);
+//    position_info[0] = ibex::Interval(-1);
+//    position_info[1] = ibex::Interval(0.68);
+//    v_maze.show_room_info(&maze_inner, position_info);
 
 //    position_info[0] = ibex::Interval(-0.34);
 //    position_info[1] = ibex::Interval(1.34);
 //    v_maze.get_room_info(&maze_inner, position_info);
 
-//    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
-    v_maze.drawBox(x1_c-r, x1_c+r,x2_c-r, x2_c+r, "black[red]");
-    v_maze.drawBox(x1_c2-r2, x1_c2+r2,x2_c2-r2, x2_c2+r2, "black[red]");
+////    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
+    v_maze.drawBox(box1, "red[]");
+    v_maze.drawBox(box2, "red[]");
     vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol2_basin.svg", "Van Der Pol 2 Basin");
     vibes::endDrawing();
 

@@ -345,8 +345,8 @@ void Room<_Tp, _V>::compute_standard_mode(const int n_vf, std::vector<std::vecto
                 }
 
                 if(m_initial_condition_output && !m_initial_door_output->is_empty() && (dynamics_sens == BWD || dynamics_sens == FWD_BWD) && door->is_possible_in()[n_vf]){
-                    _Tp in_tmp(*m_initial_door_output);
-                    _Tp out_tmp(door->get_input_private());
+                    _Tp out_tmp(*m_initial_door_output);
+                    _Tp in_tmp(door->get_input_private());
                     if(domain_init == FULL_WALL)
                         in_tmp = f->get_position_typed();
 
@@ -683,32 +683,32 @@ bool Room<_Tp, _V>::contract(){
         if(m_first_contract){
             contract_vector_field();
             change = true;
-            m_first_contract = false;
         }
         else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty())){
             return false;
         }
 
-        get_private_doors_info("before");
+//        get_private_doors_info("before");
         change |= contract_continuity();
-        get_private_doors_info("continuity");
+//        get_private_doors_info("continuity");
 
         if(change || m_first_contract){
-//            if(!m_first_contract || (!is_empty_private() ))
+            if(!is_empty_private() || (m_initial_condition_input || m_initial_condition_output))
                 contract_consistency();
-            get_private_doors_info("consistency");
+//            get_private_doors_info("consistency");
         }
     }
+    m_first_contract = false;
     return change;
 }
 
 template<typename _Tp, typename _V>
 bool Room<_Tp, _V>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() != FULL_DOOR)
+    if(m_maze->get_domain()->get_init() != FULL_WALL)
         return false;
+
     ibex::IntervalVector position(2);
-    //
-    position[0] = ibex::Interval(1.875, 2.25);
+    position[0] = ibex::Interval(0.5625, 0.75);
     position[1] = ibex::Interval(0, 0.375);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
@@ -842,10 +842,18 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp, _V>& r) {
         stream << v << " ";
     }
     stream << std::endl;
-    stream << " nb_contractions = " << r.get_nb_contractions();
-    stream << ", removed = " << (r.is_removed()?"true":"false");
-    stream << ", zero = " << (r.get_contain_zero()?"true":"false");
-    stream << std::endl;
+    stream << " => nb_contractions = " << r.get_nb_contractions() << std::endl;
+    stream << " => removed = " << (r.is_removed()?"true":"false") << std::endl;
+    stream << " => zero = " << (r.get_contain_zero()?"true":"false") << std::endl;
+    stream << " => initial door (input/output) = " << (r.is_initial_door_input()?"true":"false") << "/" << (r.is_initial_door_output()?"true":"false") << std::endl;
+
+    if(r.is_initial_door_input()){
+        stream << "    |=> input = " << r.get_initial_door_input() << std::endl;
+    }
+    if(r.is_initial_door_output()){
+        stream << "    |=> output = " << r.get_initial_door_output() << std::endl;
+    }
+
     for(Face<_Tp, _V> *f:r.get_pave()->get_faces_vector()){
         Door<_Tp, _V> *d = f->get_doors()[r.get_maze()];
         stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << std::endl;

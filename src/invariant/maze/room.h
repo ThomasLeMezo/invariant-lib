@@ -386,8 +386,8 @@ public:
     void set_initial_door_input(const _Tp &door);
     void set_initial_door_output(const _Tp &door);
 
-    _Tp& get_initial_door_input();
-    _Tp &get_initial_door_output();
+    const _Tp& get_initial_door_input() const;
+    const _Tp& get_initial_door_output() const;
 
     void set_full_initial_door_input();
     void set_full_initial_door_output();
@@ -522,12 +522,12 @@ inline void Room<_Tp, _V>::set_initial_door_output(const _Tp &door){
 }
 
 template <typename _Tp, typename _V>
-inline _Tp& Room<_Tp, _V>::get_initial_door_input(){
+inline const _Tp& Room<_Tp, _V>::get_initial_door_input() const{
     return *m_initial_door_input;
 }
 
 template <typename _Tp, typename _V>
-inline _Tp& Room<_Tp, _V>::get_initial_door_output(){
+inline const _Tp& Room<_Tp, _V>::get_initial_door_output() const{
     return *m_initial_door_output;
 }
 
