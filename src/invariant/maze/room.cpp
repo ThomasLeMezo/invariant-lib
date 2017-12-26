@@ -112,7 +112,7 @@ void Room<ibex::IntervalVector, ibex::IntervalVector>::contract_flow(ibex::Inter
         if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
             alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
     }
-    if(alpha==ibex::Interval::ZERO)
+    if(alpha==ibex::Interval::ZERO && m_maze->get_domain()->get_init()==FULL_DOOR) // To check ?
         alpha.set_empty();
 
     c &= alpha*v;

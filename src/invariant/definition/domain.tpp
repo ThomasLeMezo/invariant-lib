@@ -54,6 +54,12 @@ void Domain<_Tp, _V>::contract_domain(Maze<_Tp, _V> *maze, std::vector<Room<_Tp,
 
 template<typename _Tp, typename _V>
 void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V> *pave_node, std::vector<Room<_Tp, _V>*> &list_room_deque, bool output, DOMAIN_SEP accelerator){
+//    ibex::IntervalVector test(2);
+//    test[0] = ibex::Interval(0, 2);
+//    test[1] = ibex::Interval(-3.5, -1.125);
+//    if(test==pave_node->get_position())
+//        std::cout << "Test" << std::endl;
+
     if(pave_node->get_removed()[maze])
         return;
     switch (accelerator) {
