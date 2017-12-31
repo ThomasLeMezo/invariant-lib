@@ -17,23 +17,21 @@
 #include "../smartSubPaving/pave.h"
 #include <map>
 
-#define IBEX_PPL_PRECISION 1e3
-
 namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
 
-template <typename _Tp, typename _V> class Door;
-using DoorPPL = Door<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
-using DoorIBEX = Door<ibex::IntervalVector, ibex::IntervalVector>;
+template <typename _Tp> class Door;
+using DoorPPL = Door<Parma_Polyhedra_Library::C_Polyhedron>;
+using DoorIBEX = Door<ibex::IntervalVector>;
 
-template <typename _Tp, typename _V> class Face;
-template <typename _Tp, typename _V> class Room;
-template <typename _Tp, typename _V> class Maze;
-template <typename _Tp, typename _V> class Pave;
-template <typename _Tp, typename _V> class Domain;
+template <typename _Tp> class Face;
+template <typename _Tp> class Room;
+template <typename _Tp> class Maze;
+template <typename _Tp> class Pave;
+template <typename _Tp> class Domain;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
+template <typename _Tp=ibex::IntervalVector>
 class Door
 {
 public:
@@ -42,7 +40,7 @@ public:
      * @param face
      * By default doors are set open
      */
-    Door(invariant::Face<_Tp, _V>* face, invariant::Room<_Tp, _V> *room);
+    Door(invariant::Face<_Tp>* face, invariant::Room<_Tp> *room);
 
     /**
      * @brief Destructor of a Door
@@ -94,13 +92,13 @@ public:
      * @brief Getter to the associated Face
      * @return
      */
-    Face<_Tp, _V> * get_face() const;
+    Face<_Tp> * get_face() const;
 
     /**
      * @brief Getter to the associated Room
      * @return
      */
-    Room<_Tp, _V> *get_room() const;
+    Room<_Tp> *get_room() const;
 
     /**
      * @brief Set the private output doors to empty
@@ -148,7 +146,7 @@ public:
      * add the neighbor room to the list
      * @param list_rooms
      */
-    bool analyze_change(std::vector<Room<_Tp, _V> *>&list_rooms);
+    bool analyze_change(std::vector<Room<_Tp> *>&list_rooms);
 
     /**
      * @brief Return true if input & output doors are empty
@@ -262,29 +260,14 @@ public:
         return d1;
     }
 
-    /**
-     * @brief get update_input
-     * @return
-     */
-//    size_t get_update_input() const;
-
-//    size_t get_update_output() const;
-
-//    void reset_update_neighbors();
-
 protected:
     _Tp m_input_public;
     _Tp m_output_public; //input and output doors public
     _Tp *m_input_private;
     _Tp *m_output_private; //input and output doors private (for contraction)
-    Face<_Tp, _V> *               m_face = NULL; // pointer to the associated face
-    Room<_Tp, _V> *               m_room = NULL; // pointer to the associated face
+    Face<_Tp> *               m_face = NULL; // pointer to the associated face
+    Room<_Tp> *               m_room = NULL; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
-
-//    size_t  m_update_input = 0;
-//    size_t  m_update_output = 0;
-//    std::map<Door<_Tp, _V>*,size_t> m_update_neighbors_input;
-//    std::map<Door<_Tp, _V>*,size_t> m_update_neighbors_output;
 
     std::vector<bool>    m_possible_out;
     std::vector<bool>    m_possible_in;
@@ -300,99 +283,99 @@ namespace invariant{
 ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv);
 ibex::IntervalVector polyhedron_2_iv(const ppl::C_Polyhedron& p);
 
-//template <typename _Tp, typename _V>
-//inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp, _V>& d){
+//template <typename _Tp>
+//inline std::ostream& operator<<(std::ostream& stream, const invariant::Door<_Tp>& d){
 //    return stream;
 //}
 
-template <typename _Tp, typename _V>
-inline const _Tp Door<_Tp, _V>::get_input() const{
+template <typename _Tp>
+inline const _Tp Door<_Tp>::get_input() const{
     omp_set_lock(&m_lock_read);
     _Tp tmp(m_input_public);
     omp_unset_lock(&m_lock_read);
     return tmp;
 }
 
-template <typename _Tp, typename _V>
-inline const _Tp Door<_Tp, _V>::get_output() const{
+template <typename _Tp>
+inline const _Tp Door<_Tp>::get_output() const{
     omp_set_lock(&m_lock_read);
     _Tp tmp(m_output_public);
     omp_unset_lock(&m_lock_read);
     return tmp;
 }
 
-template <typename _Tp, typename _V>
-inline const _Tp& Door<_Tp, _V>::get_input_private() const{
+template <typename _Tp>
+inline const _Tp& Door<_Tp>::get_input_private() const{
     return *m_input_private;
 }
 
-template <typename _Tp, typename _V>
-inline const _Tp& Door<_Tp, _V>::get_output_private() const{
+template <typename _Tp>
+inline const _Tp& Door<_Tp>::get_output_private() const{
     return *m_output_private;
 }
 
-template <typename _Tp, typename _V>
-inline Face<_Tp, _V> * Door<_Tp, _V>::get_face() const{
+template <typename _Tp>
+inline Face<_Tp> * Door<_Tp>::get_face() const{
     return m_face;
 }
 
-template <typename _Tp, typename _V>
-inline Room<_Tp, _V> * Door<_Tp, _V>::get_room() const{
+template <typename _Tp>
+inline Room<_Tp> * Door<_Tp>::get_room() const{
     return m_room;
 }
 
-template <typename _Tp, typename _V>
-inline void Door<_Tp, _V>::push_back_possible_in(bool val){
+template <typename _Tp>
+inline void Door<_Tp>::push_back_possible_in(bool val){
     m_possible_in.push_back(val);
     m_possible_in_union |= val;
 }
 
-template <typename _Tp, typename _V>
-inline void Door<_Tp, _V>::push_back_possible_out(bool val){
+template <typename _Tp>
+inline void Door<_Tp>::push_back_possible_out(bool val){
     m_possible_out.push_back(val);
     m_possible_out_union |= val;
 }
 
-template <typename _Tp, typename _V>
-inline void Door<_Tp, _V>::push_back_collinear_vector_field(bool val){
+template <typename _Tp>
+inline void Door<_Tp>::push_back_collinear_vector_field(bool val){
     m_collinear_vector_field.push_back(val);
 }
 
-template <typename _Tp, typename _V>
-inline void Door<_Tp, _V>::push_back_zeros_in_vector_field(std::vector<bool> zeros){
+template <typename _Tp>
+inline void Door<_Tp>::push_back_zeros_in_vector_field(std::vector<bool> zeros){
     m_zeros_in_vector_fields.push_back(zeros);
 }
 
-template <typename _Tp, typename _V>
-inline const std::vector<bool>& Door<_Tp, _V>::get_where_zeros(size_t vector_field_id) const{
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::get_where_zeros(size_t vector_field_id) const{
     return m_zeros_in_vector_fields[vector_field_id];
 }
 
-template <typename _Tp, typename _V>
-inline const std::vector<bool>& Door<_Tp, _V>::is_collinear() const{
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::is_collinear() const{
     return m_collinear_vector_field;
 }
 
-template <typename _Tp, typename _V>
-inline const std::vector<bool>& Door<_Tp, _V>::is_possible_out() const{
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::is_possible_out() const{
     return m_possible_out;
 }
 
-template <typename _Tp, typename _V>
-inline const std::vector<bool>& Door<_Tp, _V>::is_possible_in() const{
+template <typename _Tp>
+inline const std::vector<bool>& Door<_Tp>::is_possible_in() const{
     return m_possible_in;
 }
 
-template <typename _Tp, typename _V>
-inline bool Door<_Tp, _V>::is_empty_private() const{
+template <typename _Tp>
+inline bool Door<_Tp>::is_empty_private() const{
     if(m_input_private->is_empty() && m_output_private->is_empty())
         return true;
     else
         return false;
 }
 
-template <typename _Tp, typename _V>
-inline bool Door<_Tp, _V>::is_empty() const{
+template <typename _Tp>
+inline bool Door<_Tp>::is_empty() const{
     bool result;
     omp_set_lock(&m_lock_read);
     if(m_input_public.is_empty() && m_output_public.is_empty())
@@ -403,8 +386,8 @@ inline bool Door<_Tp, _V>::is_empty() const{
     return result;
 }
 
-template <typename _Tp, typename _V>
-inline bool Door<_Tp, _V>::is_empty_output() const{
+template <typename _Tp>
+inline bool Door<_Tp>::is_empty_output() const{
     bool result;
     omp_set_lock(&m_lock_read);
     if(m_output_public.is_empty())
@@ -415,8 +398,8 @@ inline bool Door<_Tp, _V>::is_empty_output() const{
     return result;
 }
 
-template <typename _Tp, typename _V>
-inline bool Door<_Tp, _V>::is_empty_input() const{
+template <typename _Tp>
+inline bool Door<_Tp>::is_empty_input() const{
     bool result;
     omp_set_lock(&m_lock_read);
     if(m_input_public.is_empty())
@@ -427,8 +410,8 @@ inline bool Door<_Tp, _V>::is_empty_input() const{
     return result;
 }
 
-template <typename _Tp, typename _V>
-inline void Door<_Tp, _V>::set_empty_private(){
+template <typename _Tp>
+inline void Door<_Tp>::set_empty_private(){
     set_empty_private_input();
     set_empty_private_output();
 }
@@ -460,7 +443,7 @@ inline bool is_subset(const ppl::C_Polyhedron &p1, const ppl::C_Polyhedron &p2){
 inline void union_widening(ppl::C_Polyhedron* p1, const ppl::C_Polyhedron& p2){
 //    if(!p1->is_empty()){
         ppl::C_Polyhedron p_result(p2);
-        p_result.poly_hull_assign(*p1);
+//        p_result.poly_hull_assign(*p1);
         p_result.BHRZ03_widening_assign(*p1);
         *p1 = p_result;
 //    }

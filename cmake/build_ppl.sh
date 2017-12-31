@@ -29,7 +29,7 @@ if [ ! -e "$HOME/ppl/lib/libppl.so" ]; then
   echo 'Installing PPL-lib...';
 
   if [ ! -e "ppl" ]; then
-    git clone git://git.cs.unipr.it/ppl/ppl.git*
+    git clone git://git.cs.unipr.it/ppl/ppl.git
     cd ppl
     git pull
     git checkout devel

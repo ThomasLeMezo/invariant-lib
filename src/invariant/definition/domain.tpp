@@ -2,19 +2,19 @@
 
 namespace invariant {
 
-template<typename _Tp, typename _V>
-Domain<_Tp, _V>::Domain(SmartSubPaving<_Tp, _V> *paving, DOMAIN_INITIALIZATION domain_init){
+template<typename _Tp>
+Domain<_Tp>::Domain(SmartSubPaving<_Tp> *paving, DOMAIN_INITIALIZATION domain_init){
     m_subpaving = paving;
     m_domain_init = domain_init;
 }
 
-template<typename _Tp, typename _V>
-void Domain<_Tp, _V>::contract_domain(Maze<_Tp, _V> *maze, std::vector<Room<_Tp, _V>*> &list_room_deque){
+template<typename _Tp>
+void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque){
     // ********** Initialize the maze ********** //
 #pragma omp parallel for
     for(size_t i=0; i<m_subpaving->get_paves().size(); i++){
-        Pave<_Tp, _V> *p = m_subpaving->get_paves()[i];
-        Room<_Tp, _V> *r = p->get_rooms()[maze];
+        Pave<_Tp> *p = m_subpaving->get_paves()[i];
+        Room<_Tp> *r = p->get_rooms()[maze];
         if(!r->is_removed()){
             if(m_domain_init == FULL_DOOR)
                 r->set_full_private();
@@ -52,8 +52,8 @@ void Domain<_Tp, _V>::contract_domain(Maze<_Tp, _V> *maze, std::vector<Room<_Tp,
     }
 }
 
-template<typename _Tp, typename _V>
-void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V> *pave_node, std::vector<Room<_Tp, _V>*> &list_room_deque, bool output, DOMAIN_SEP accelerator){
+template<typename _Tp>
+void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, std::vector<Room<_Tp>*> &list_room_deque, bool output, DOMAIN_SEP accelerator){
 //    ibex::IntervalVector test(2);
 //    test[0] = ibex::Interval(0, 2);
 //    test[1] = ibex::Interval(-3.5, -1.125);
@@ -66,8 +66,8 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
     case SEP_INSIDE:{
         if(!pave_node->get_fullness()[maze] || m_domain_init==FULL_WALL){
             if(pave_node->is_leaf()){
-                Pave<_Tp, _V>* p = pave_node->get_pave();
-                Room<_Tp, _V> *r = p->get_rooms()[maze];
+                Pave<_Tp>* p = pave_node->get_pave();
+                Room<_Tp> *r = p->get_rooms()[maze];
                 if(!r->is_removed()){
                     if(output){
                         if(m_domain_init == FULL_WALL)
@@ -97,8 +97,8 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
     case SEP_OUTSIDE:{
         if(!pave_node->get_emptyness()[maze] || m_domain_init==FULL_DOOR){
             if(pave_node->is_leaf()){
-                Pave<_Tp, _V>* p = pave_node->get_pave();
-                Room<_Tp, _V> *r = p->get_rooms()[maze];
+                Pave<_Tp>* p = pave_node->get_pave();
+                Room<_Tp> *r = p->get_rooms()[maze];
                 if(!r->is_removed()){
                     if(output)
                         r->set_empty_private_output();
@@ -123,8 +123,8 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
             m_sep_input->separate(x_in, x_out);
 
         if(pave_node->is_leaf()){
-            Pave<_Tp, _V> *p = pave_node->get_pave();
-            Room<_Tp, _V> *r = p->get_rooms()[maze];
+            Pave<_Tp> *p = pave_node->get_pave();
+            Room<_Tp> *r = p->get_rooms()[maze];
             if(!r->is_removed()){
                 if(x_in.is_empty()){ // Inside the constraint
                     if(output){
@@ -199,22 +199,22 @@ void Domain<_Tp, _V>::contract_separator(Maze<_Tp, _V> *maze, Pave_node<_Tp, _V>
     }
 }
 
-template<typename _Tp, typename _V>
-void Domain<_Tp, _V>::contract_border(Maze<_Tp, _V> *maze, std::vector<Room<_Tp, _V>*> &list_room_deque){
+template<typename _Tp>
+void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque){
     if(m_subpaving->size()==1 && m_domain_init == FULL_DOOR)
         return;
 
-    std::vector<Pave<_Tp, _V>*> pave_border_list;
+    std::vector<Pave<_Tp>*> pave_border_list;
     m_subpaving->get_tree()->get_border_paves(pave_border_list);
 
 #pragma omp parallel for
     for(size_t i=0; i<pave_border_list.size(); i++){
-        Pave<_Tp, _V> *p = pave_border_list[i];
-        Room<_Tp, _V> *r = p->get_rooms()[maze];
+        Pave<_Tp> *p = pave_border_list[i];
+        Room<_Tp> *r = p->get_rooms()[maze];
         if(!r->is_removed()){
-            for(Face<_Tp, _V> *f:p->get_faces_vector()){
+            for(Face<_Tp> *f:p->get_faces_vector()){
                 if(f->is_border()){
-                    Door<_Tp, _V> *d = f->get_doors()[maze];
+                    Door<_Tp> *d = f->get_doors()[maze];
                     if(m_border_path_in)
                         d->set_full_private_input();
                     else{
@@ -252,20 +252,20 @@ void Domain<_Tp, _V>::contract_border(Maze<_Tp, _V> *maze, std::vector<Room<_Tp,
     }
 }
 
-template<typename _Tp, typename _V>
-void Domain<_Tp, _V>::contract_inter_maze(Maze<_Tp, _V> *maze){
+template<typename _Tp>
+void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
     if(m_maze_list_inter.empty() || maze->is_escape_trajectories())
         return;
-    std::vector<Room<_Tp, _V> *> room_list;
+    std::vector<Room<_Tp> *> room_list;
     m_subpaving->get_tree()->get_all_child_rooms_not_empty(room_list, maze);
 
-    for(Maze<_Tp, _V> *maze_inter:m_maze_list_inter){
+    for(Maze<_Tp> *maze_inter:m_maze_list_inter){
         if(!maze_inter->is_escape_trajectories()){
 #pragma omp parallel for
             for(size_t i=0; i<room_list.size(); i++){
-                Room<_Tp, _V> *r = room_list[i];
-                Pave<_Tp, _V> *p = r->get_pave();
-                Room<_Tp, _V> *r_inter = p->get_rooms()[maze_inter];
+                Room<_Tp> *r = room_list[i];
+                Pave<_Tp> *p = r->get_pave();
+                Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
                 *r &= *r_inter;
                 r->synchronize();
             }
@@ -273,29 +273,29 @@ void Domain<_Tp, _V>::contract_inter_maze(Maze<_Tp, _V> *maze){
     }
 }
 
-template<typename _Tp, typename _V>
-void Domain<_Tp, _V>::contract_union_maze(Maze<_Tp, _V> *maze){
+template<typename _Tp>
+void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
     if(m_maze_list_union.empty())
         return;
-    std::vector<Room<_Tp, _V> *> room_list;
+    std::vector<Room<_Tp> *> room_list;
     m_subpaving->get_tree()->get_all_child_rooms_not_full(room_list, maze);
 
-    for(Maze<_Tp, _V> *maze_union:m_maze_list_union){
+    for(Maze<_Tp> *maze_union:m_maze_list_union){
 #pragma omp parallel for
         for(size_t i=0; i<room_list.size(); i++){
-            Room<_Tp, _V> *r = room_list[i];
-            Pave<_Tp, _V> *p = r->get_pave();
-            Room<_Tp, _V> *r_inter = p->get_rooms()[maze_union];
+            Room<_Tp> *r = room_list[i];
+            Pave<_Tp> *p = r->get_pave();
+            Room<_Tp> *r_inter = p->get_rooms()[maze_union];
             *r |= *r_inter;
             r->synchronize();
         }
     }
 }
 
-template<typename _Tp, typename _V>
-void Domain<_Tp, _V>::contract_box(Room<_Tp, _V> *room, const ibex::IntervalVector& initial_condition, DOOR_SELECTOR doorSelector){
-    for(Face<_Tp, _V> *f:room->get_pave()->get_faces_vector()){
-        Door<_Tp, _V> *d = f->get_doors()[room->get_maze()];
+template<typename _Tp>
+void Domain<_Tp>::contract_box(Room<_Tp> *room, const ibex::IntervalVector& initial_condition, DOOR_SELECTOR doorSelector){
+    for(Face<_Tp> *f:room->get_pave()->get_faces_vector()){
+        Door<_Tp> *d = f->get_doors()[room->get_maze()];
             if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
                 d->set_output_private(convert<_Tp>(initial_condition & convert<ibex::IntervalVector>(d->get_output_private())));
             if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)

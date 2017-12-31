@@ -60,7 +60,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                         std::vector<double> coord;
                         for(size_t i=0; i<3; i++){
                             ppl::Variable x(i);
-                            coord.push_back(g.coefficient(x).get_d()/(g.divisor().get_d()*IBEX_PPL_PRECISION));
+                            coord.push_back(g.coefficient(x).get_d()/(g.divisor().get_d()));
                         }
                         points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }

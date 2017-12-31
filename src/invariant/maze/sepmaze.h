@@ -8,13 +8,13 @@
 
 namespace invariant {
 
-template <typename _Tp, typename _V> class Maze;
+template <typename _Tp> class Maze;
 
-template <typename _Tp, typename _V> class SepMaze;
-using SepMazePPL = SepMaze<Parma_Polyhedra_Library::C_Polyhedron, Parma_Polyhedra_Library::Generator_System>;
-using SepMazeIBEX = SepMaze<ibex::IntervalVector, ibex::IntervalVector>;
+template <typename _Tp> class SepMaze;
+using SepMazePPL = SepMaze<Parma_Polyhedra_Library::C_Polyhedron>;
+using SepMazeIBEX = SepMaze<ibex::IntervalVector>;
 
-template <typename _Tp=ibex::IntervalVector, typename _V=ibex::IntervalVector>
+template <typename _Tp=ibex::IntervalVector>
 class SepMaze : public ibex::Sep
 {
 public:
@@ -23,7 +23,7 @@ public:
      * @brief Constructor of the Maze separator
      * @param maze
      */
-    SepMaze(Maze<_Tp, _V> *maze);
+    SepMaze(Maze<_Tp> *maze);
 
     /**
      * @brief Separator to the maze polygon
@@ -32,7 +32,7 @@ public:
     virtual void separate(ibex::IntervalVector& x_in, ibex::IntervalVector& x_out);
 
 private:
-    Maze<_Tp, _V> *m_maze;
+    Maze<_Tp> *m_maze;
 };
 
 }
