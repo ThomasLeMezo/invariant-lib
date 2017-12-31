@@ -129,7 +129,7 @@ public:
      * @brief Return the two child Paves after calling bisection
      * @return
      */
-    const std::array<Pave<_Tp> *, 2> &get_result_bisected();
+//    const std::array<Pave<_Tp> *, 2> &get_result_bisected();
 
     /**
      * @brief Return all the Faces of the Pave in a vector
@@ -226,7 +226,7 @@ private:
     mutable SmartSubPaving<_Tp>*                            m_subpaving = NULL;
     mutable Pave_node<_Tp>*                                 m_tree = NULL;
     mutable size_t                                          m_dim = 0;
-    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
+//    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
     std::map<Maze<_Tp>*, Room<_Tp>*>                        m_rooms;
     bool                                                    m_infinite_pave = false;
     size_t                                                  m_serialization_id=0;
@@ -294,10 +294,10 @@ inline const std::array<Face<_Tp>*, 2>& Pave<_Tp>::operator[](const std::size_t&
     return m_faces[i];
 }
 
-template <typename _Tp>
-inline const std::array<Pave<_Tp> *, 2>& Pave<_Tp>::get_result_bisected(){
-    return m_result_bisected;
-}
+//template <typename _Tp>
+//inline const std::array<Pave<_Tp> *, 2>& Pave<_Tp>::get_result_bisected(){
+//    return m_result_bisected;
+//}
 
 template <typename _Tp>
 inline const std::vector<Face<_Tp> *> &Pave<_Tp>::get_faces_vector(){

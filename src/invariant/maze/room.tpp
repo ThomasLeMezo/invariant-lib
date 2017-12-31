@@ -894,10 +894,15 @@ void Room<_Tp>::set_removed(){
         Door<_Tp> *d = f->get_doors()[m_maze];
         d->set_removed();
     }
-    m_initial_condition_input = false;
-    m_initial_condition_output = false;
-    delete(m_initial_door_input);
-    delete(m_initial_door_output);
+
+//    if(m_initial_condition_input)
+//        delete(m_initial_door_input);
+//    if(m_initial_condition_output)
+//        delete(m_initial_door_output);
+//    m_initial_condition_input = false;
+//    m_initial_condition_output = false;
+//    m_initial_door_input=NULL;
+//    m_initial_door_output=NULL;
 }
 
 template<typename _Tp>

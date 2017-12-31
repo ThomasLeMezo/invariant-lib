@@ -157,6 +157,11 @@ int Maze<_Tp>::contract(size_t nb_operations){
     return nb_operations;
 }
 
+template<typename _Tp>
+void Maze<_Tp>::reset_nb_operations(){
+    m_nb_operations = 0;
+}
+
 //template<typename _Tp>
 //void Maze<_Tp>::contract_inter(Maze* maze_inter){
 //    // Intersect this maze with other mazes

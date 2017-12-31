@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     for(int i=0; i<10; i++){
         paving.bisect();
         cout << i << endl;
-        maze.contract();
+        maze.contract(paving.size()*10);
         cout << "=> " << paving.size() << endl;
         vtkMazePPL.show_maze(&maze);
     }

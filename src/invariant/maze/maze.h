@@ -120,6 +120,11 @@ public:
      */
     void set_widening_limit(size_t limit);
 
+    /**
+     * @brief Set nb_operation to 0
+     */
+    void reset_nb_operations();
+
 private:
     invariant::Domain<_Tp> *    m_domain = NULL;
     SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze

@@ -3,6 +3,7 @@
 #include <ppl.hh>
 #include <ibex.h>
 #include <iostream>
+#include <omp.h>
 
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -116,7 +117,7 @@ void write_VTK(const std::vector<Parma_Polyhedra_Library::C_Polyhedron> &ph_list
                             coord.push_back(0.0);
                         }
                     }
-//                 cout << "coord=" << coord[0] << ", " << coord[1] << ", " << coord[2] << endl;
+                    //                 cout << "coord=" << coord[0] << ", " << coord[1] << ", " << coord[2] << endl;
                     points->InsertNextPoint(coord[0], coord[1], coord[2]);
                 }
             }
@@ -162,25 +163,29 @@ int main(){
     face_in[1] = ibex::Interval(-1, 1);
     face_in[2] = ibex::Interval(-1);
     C_Polyhedron ph_in(iv_2_box(face_in));
-
     C_Polyhedron ph_projection = add_ray(vec, ph_in);
-
     IntervalVector face_out(3);
     face_out[0] = ibex::Interval(-1, 1);
     face_out[1] = ibex::Interval(-1, 1);
     face_out[2] = ibex::Interval(1);
     C_Polyhedron ph_out(iv_2_box(face_out));
-    ph_out.intersection_assign(ph_projection);
 
-    cout << ph_out.space_dimension() << endl;
-    cout << ph_out.affine_dimension() << endl;
-    cout << ph_out.is_discrete() << endl;
-    cout << ph_out.is_empty() << endl;
-    cout << ph_out.is_topologically_closed() << endl;
+#pragma omp parallel for
+    for(int i=0; i<1000; i++){
+        PPL::C_Polyhedron ph1(3);
+        PPL::C_Polyhedron ph2(3);
+        ph1.intersection_assign(ph2);
+    }
 
-    write_VTK(ph_in, "ph_in");
-    write_VTK(ph_out, "ph_out");
-    write_VTK(ph_projection, "ph_projection");
+    //    cout << ph_out.space_dimension() << endl;
+    //    cout << ph_out.affine_dimension() << endl;
+    //    cout << ph_out.is_discrete() << endl;
+    //    cout << ph_out.is_empty() << endl;
+    //    cout << ph_out.is_topologically_closed() << endl;
+
+    //    write_VTK(ph_in, "ph_in");
+    //    write_VTK(ph_out, "ph_out");
+    //    write_VTK(ph_projection, "ph_projection");
 
     return 0;
 }

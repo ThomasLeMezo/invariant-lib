@@ -240,13 +240,11 @@ void Pave<_Tp>::bisect(){
             r_first->synchronize();
             r_second->synchronize();
         }
-
-
     }
 
-    // Save results in this pave
-    m_result_bisected[0] = pave_result[0];
-    m_result_bisected[1] = pave_result[1];
+//    // Save results in this pave
+//    m_result_bisected[0] = pave_result[0];
+//    m_result_bisected[1] = pave_result[1];
 }
 
 template<typename _Tp>

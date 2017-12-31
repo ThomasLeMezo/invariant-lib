@@ -29,12 +29,18 @@ public:
 
     DYNAMICS_SENS get_sens() const;
 
+    void set_sens(DYNAMICS_SENS sens);
+
 private:
     DYNAMICS_SENS m_dynamics_sens;
 };
 
 inline DYNAMICS_SENS Dynamics::get_sens() const{
     return m_dynamics_sens;
+}
+
+inline void Dynamics::set_sens(DYNAMICS_SENS sens){
+    m_dynamics_sens = sens;
 }
 
 }

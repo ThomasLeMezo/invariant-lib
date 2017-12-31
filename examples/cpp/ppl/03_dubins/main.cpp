@@ -64,10 +64,18 @@ int main(int argc, char *argv[])
     for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << endl;
-//        maze_outer.get_domain()->set_init(FULL_WALL);
+
+        dyn_outer.set_sens(FWD);
+        maze_outer.get_domain()->set_init(FULL_WALL);
         maze_outer.contract();
-//        maze_outer.get_domain()->set_init(FULL_DOOR);
-//        maze_outer.contract(1e6);
+
+        if(i>1){
+            dyn_outer.set_sens(FWD);
+            maze_outer.reset_nb_operations();
+            maze_outer.get_domain()->set_init(FULL_DOOR);
+            maze_outer.contract(1e3);
+        }
+
         cout << " - paving = " << paving.size() << endl;
         vtkMazePPL.show_maze(&maze_outer);
     }

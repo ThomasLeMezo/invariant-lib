@@ -112,37 +112,28 @@ const bool SmartSubPaving<_Tp>::is_equal(const SmartSubPaving<_Tp>& g) const{
 
 template<typename _Tp>
 void SmartSubPaving<_Tp>::bisect(){
-    std::vector<Pave<_Tp>*> m_bisectable_paves = m_paves;
-    std::vector<Pave<_Tp>*> m_bisected_paves;
+    std::vector<Pave<_Tp>*> bisectable_paves = m_paves;
     m_paves.clear();
 
     /// Bisect the graph ///
-    while(m_bisectable_paves.size()>0){
-        Pave<_Tp> *p = m_bisectable_paves.back();
-        m_bisectable_paves.pop_back();
+    while(bisectable_paves.size()>0){
+        Pave<_Tp> *p = bisectable_paves.back();
+        bisectable_paves.pop_back();
 
         if(p->request_bisection()){
             p->bisect(); // bisected added to m_paves & update mazes
             delete(p);
         }
         else{
-            // I
-//            for(Maze *maze:m_mazes){
-//                if(maze->get_type() == MAZE_WALL){
-//                    Room *r = p->get_rooms()[maze];
-//                    r->set_empty_private();
-//                    r->synchronize();
-//                }
-//            }
             // Store not bisectable paves
             p->set_removed_rooms();
             m_paves_not_bisectable.push_back(p);
         }
     }
 
-    /// Delete parent of bisected paves ///
-    for(Pave<_Tp>* p:m_bisected_paves)
-        delete(p);
+    // Reset maze
+    for(Maze<_Tp> *maze:m_mazes)
+        maze->reset_nb_operations();
 }
 
 template<typename _Tp>
