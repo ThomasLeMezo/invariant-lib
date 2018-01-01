@@ -104,6 +104,12 @@ public:
     const size_t size() const;
 
     /**
+     * @brief size active
+     * @return
+     */
+    const size_t size_active() const;
+
+    /**
      * @brief Get the list of all paves that are not bisectable
      * @return
      */
@@ -197,6 +203,11 @@ inline const std::vector<Pave<_Tp> *> &SmartSubPaving<_Tp>::get_paves_not_bisect
 template<typename _Tp>
 inline const size_t SmartSubPaving<_Tp>::size() const{
     return m_paves.size() + m_paves_not_bisectable.size();
+}
+
+template<typename _Tp>
+inline const size_t SmartSubPaving<_Tp>::size_active() const{
+    return m_paves.size();
 }
 
 template<typename _Tp>

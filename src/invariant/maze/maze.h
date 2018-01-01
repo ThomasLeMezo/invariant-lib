@@ -125,25 +125,28 @@ public:
      */
     void reset_nb_operations();
 
+    /**
+     * @brief Set enable contract domain variable
+     * @param val
+     */
+    void set_enable_contract_domain(bool val);
+
 private:
     invariant::Domain<_Tp> *    m_domain = NULL;
     SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
     Dynamics *  m_dynamics = NULL;
 
     std::deque<Room<_Tp> *> m_deque_rooms;
-
     omp_lock_t  m_deque_access;
 
     bool    m_espace_trajectories = true;
-
     bool    m_contract_once = false;
-
     bool m_empty = false;
     int m_contraction_step = 0;
 
     size_t m_nb_operations=0;
-
     size_t m_widening_limit=1000;
+    bool m_enable_contract_domain = true;
 };
 }
 
@@ -152,6 +155,11 @@ namespace invariant{
 template <typename _Tp>
 inline void Maze<_Tp>::set_widening_limit(size_t limit){
     m_widening_limit = limit;
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::set_enable_contract_domain(bool val){
+    m_enable_contract_domain = val;
 }
 
 template <typename _Tp>

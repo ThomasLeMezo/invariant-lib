@@ -286,7 +286,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
             Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
             Door<_Tp>* door_in = f_in->get_doors()[m_maze];
 
-            if(!(domain_init == FULL_DOOR && door_in->is_collinear()[n_vf])){ // avoid sliding mode on face in
+            if(!(domain_init == FULL_DOOR && door_in->is_collinear()[n_vf])){ // avoid sliding mode on face in when Full_Door
                 const _Tp in(door_in->get_input_private());
 
                 for(int face_out=0; face_out<dim; face_out++){
@@ -688,7 +688,7 @@ bool Room<_Tp>::contract(){
             return false;
         }
 
-        get_private_doors_info("before");
+//        get_private_doors_info("before");
         change |= contract_continuity();
 //        get_private_doors_info("continuity");
 

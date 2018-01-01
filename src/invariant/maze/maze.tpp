@@ -37,7 +37,11 @@ int Maze<_Tp>::contract(size_t nb_operations){
     if(m_nb_operations == 0){
         std::vector<Room<_Tp> *> list_room_to_contract;
         invariant::Domain<_Tp> *d = m_domain;
-        d->contract_domain(this, list_room_to_contract);
+        if(m_enable_contract_domain)
+            d->contract_domain(this, list_room_to_contract);
+        else{
+            m_subpaving->get_tree()->get_all_child_rooms(list_room_to_contract, this);
+        }
 
         // Add Room to the Deque
         for(Room<_Tp> *r:list_room_to_contract){
