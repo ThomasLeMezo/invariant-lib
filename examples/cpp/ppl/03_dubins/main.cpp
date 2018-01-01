@@ -39,9 +39,10 @@ int main(int argc, char *argv[])
     y_c = 0.0;
     theta_c = 0.5;
     r = 1;
+//    r = 0.0;
 
     Function f_sep_outer(x, y, theta, pow(x-x_c, 2)+pow(y-y_c, 2) + pow(theta-theta_c, 2) - pow(r, 2));
-    SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
+    SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT
     dom_outer.set_sep(&s_outer);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << endl;
 
@@ -78,7 +79,12 @@ int main(int argc, char *argv[])
         vtkMazePPL.show_maze(&maze_outer);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
-
     cout << paving << endl;
 
+    IntervalVector position_info(3);
+    position_info[0] = ibex::Interval(0.0);
+    position_info[1] = ibex::Interval(0.0);
+    position_info[2] = ibex::Interval(0.5);
+    vtkMazePPL.show_room_info(&maze_outer, position_info);
 }
+

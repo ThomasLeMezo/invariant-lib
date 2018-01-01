@@ -20,6 +20,13 @@ public:
      */
     void show_maze(invariant::MazePPL *maze, std::string comment="");
 
+    /**
+     * @brief show room info
+     * @param maze
+     * @param position
+     */
+    void show_room_info(invariant::MazePPL *maze, ibex::IntervalVector position);
+
 private:
 
     std::string         m_file_name = "";

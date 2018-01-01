@@ -24,6 +24,8 @@ _Tp get_empty_door_container(int dim);
 #include "door.h"
 #include "../smartSubPaving/face.h"
 
+#include "ppl.hh"
+
 namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
@@ -389,6 +391,8 @@ public:
     void set_full_initial_door_output();
 
     void set_father_hull(const _Tp &hull);
+    bool is_father_hull() const;
+    const _Tp& get_father_hull() const;
 
 protected:
     Pave<_Tp>*   m_pave = NULL; // pointer to the associated face
@@ -568,6 +572,16 @@ inline void Room<_Tp>::set_father_hull(const _Tp &hull){
 }
 
 template <typename _Tp>
+inline bool Room<_Tp>::is_father_hull() const{
+    return m_is_father_hull;
+}
+
+template <typename _Tp>
+inline const _Tp& Room<_Tp>::get_father_hull() const{
+    return *m_father_hull;
+}
+
+template <typename _Tp>
 inline Maze<_Tp>* Room<_Tp>::get_maze() const{
     return m_maze;
 }
@@ -679,7 +693,7 @@ inline std::string print(const ibex::IntervalVector &iv){
 
 inline std::string print(const ppl::C_Polyhedron &p){
     std::ostringstream stream;
-    p.print();
+    ppl::IO_Operators::operator <<(stream, p);
     return stream.str();
 }
 

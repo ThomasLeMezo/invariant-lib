@@ -422,8 +422,7 @@ void Room<_Tp>::contract_consistency(){
                     }
                     if(!one_possible) // For Kernel
                         set_empty<_Tp>(door_out_iv);
-
-                    if(m_is_father_hull)
+                    else if(m_is_father_hull) // For father hull
                         door_out_iv &= *m_father_hull;
 
                     if(domain_init == FULL_DOOR)
@@ -442,8 +441,7 @@ void Room<_Tp>::contract_consistency(){
                     }
                     if(!one_possible) // For Kernel
                         set_empty<_Tp>(door_in_iv);
-
-                    if(m_is_father_hull)
+                    else if(m_is_father_hull) // For father hull
                         door_in_iv &= *m_father_hull;
 
                     if(domain_init == FULL_DOOR)
@@ -856,10 +854,10 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r) {
     stream << " => initial door (input/output) = " << (r.is_initial_door_input()?"true":"false") << "/" << (r.is_initial_door_output()?"true":"false") << std::endl;
 
     if(r.is_initial_door_input()){
-        stream << "    |=> input = " << r.get_initial_door_input() << std::endl;
+        stream << "    |=> input = " << print(r.get_initial_door_input()) << std::endl;
     }
     if(r.is_initial_door_output()){
-        stream << "    |=> output = " << r.get_initial_door_output() << std::endl;
+        stream << "    |=> output = " << print(r.get_initial_door_output()) << std::endl;
     }
 
     for(Face<_Tp> *f:r.get_pave()->get_faces_vector()){
@@ -908,14 +906,8 @@ void Room<_Tp>::set_removed(){
         m_father_hull = NULL;
         m_is_father_hull = false;
     }
-//    if(m_is_initial_door_input)
-//        delete(m_initial_door_input);
-//    if(m_is_initial_door_output)
-//        delete(m_initial_door_output);
-//    m_is_initial_door_input = false;
-//    m_is_initial_door_output = false;
-//    m_initial_door_input=NULL;
-//    m_initial_door_output=NULL;
+
+    // Do not remove initial condition => needed for hull when bisecting
 }
 
 template<typename _Tp>

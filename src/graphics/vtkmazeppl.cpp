@@ -50,6 +50,11 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                 DoorPPL *d = f->get_doors()[maze];
                 ph_union |= d->get_hull();
             }
+            if(r->is_initial_door_input())
+                ph_union |= r->get_initial_door_input();
+            if(r->is_initial_door_output())
+                ph_union |= r->get_initial_door_output();
+
             ph_union.minimized_constraints();
 
             if(ph_union.space_dimension()==3){
@@ -112,4 +117,8 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
 
 }
 
+void VtkMazePPL::show_room_info(invariant::MazePPL *maze, ibex::IntervalVector position){
+    std::vector<invariant::Pave<Parma_Polyhedra_Library::C_Polyhedron>*> pave_list;
+    maze->get_subpaving()->get_room_info(maze, position, pave_list);
+}
 

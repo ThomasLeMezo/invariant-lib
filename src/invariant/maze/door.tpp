@@ -189,6 +189,9 @@ bool Door<_Tp>::contract_continuity_private(){
             door_input |= d->get_output();
         }
 
+        if(m_room->is_father_hull() && domain_init == FULL_DOOR)
+            door_input &= m_room->get_father_hull();
+
         if(domain_init == FULL_DOOR && !is_subset(*m_input_private,door_input)){
             (*m_input_private) &= door_input;
             change = true;
@@ -209,6 +212,9 @@ bool Door<_Tp>::contract_continuity_private(){
             Door<_Tp> *d = f->get_doors()[m_room->get_maze()];
             door_output |= d->get_input();
         }
+
+        if(m_room->is_father_hull() && domain_init == FULL_DOOR)
+            door_output &= m_room->get_father_hull();
 
         if(domain_init == FULL_DOOR && !is_subset(*m_output_private,door_output)){
             *m_output_private &= door_output;
