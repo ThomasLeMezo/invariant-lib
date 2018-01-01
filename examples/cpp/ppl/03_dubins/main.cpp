@@ -54,14 +54,14 @@ int main(int argc, char *argv[])
 
     // ******* Mazes ********* //
     MazePPL maze_outer(&dom_outer, &dyn_outer);
-    maze_outer.set_widening_limit(100);
+    maze_outer.set_widening_limit(50);
 
     VtkMazePPL vtkMazePPL("DubinsPPL");
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         paving.bisect();
         cout << i << endl;
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         maze_outer.get_domain()->set_init(FULL_DOOR);
         maze_outer.reset_nb_operations();
         maze_outer.set_enable_contract_domain(false);
-        maze_outer.contract(10*maze_outer.get_subpaving()->size_active());
+        maze_outer.contract(30000);
 
         cout << " - paving = " << paving.size() << endl;
         vtkMazePPL.show_maze(&maze_outer);

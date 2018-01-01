@@ -70,6 +70,8 @@ Room<_Tp>::~Room(){
         delete(m_initial_door_output);
     if(m_initial_door_input != NULL)
         delete(m_initial_door_input);
+    if(m_father_hull != NULL)
+        delete(m_father_hull);
 }
 
 template<typename _Tp>
@@ -328,13 +330,13 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
     }
 
     // Initial condition
-    if(m_initial_condition_input || m_initial_condition_output){
+    if(m_is_initial_door_input || m_is_initial_door_output){
         for(int face=0; face<dim; face++){
             for(int sens =0 ; sens <2; sens++){
                 Face<_Tp>* f = m_pave->get_faces()[face][sens];
                 Door<_Tp>* door = f->get_doors()[m_maze];
 
-                if(m_initial_condition_input && !m_initial_door_input->is_empty() && (dynamics_sens == FWD || dynamics_sens == FWD_BWD) && door->is_possible_out()[n_vf]){
+                if(m_is_initial_door_input && !m_initial_door_input->is_empty() && (dynamics_sens == FWD || dynamics_sens == FWD_BWD) && door->is_possible_out()[n_vf]){
                     _Tp in_tmp(*m_initial_door_input);
                     _Tp out_tmp(door->get_output_private());
                     if(domain_init == FULL_WALL)
@@ -344,7 +346,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
                     out_results[n_vf][face][sens] |= out_tmp;
                 }
 
-                if(m_initial_condition_output && !m_initial_door_output->is_empty() && (dynamics_sens == BWD || dynamics_sens == FWD_BWD) && door->is_possible_in()[n_vf]){
+                if(m_is_initial_door_output && !m_initial_door_output->is_empty() && (dynamics_sens == BWD || dynamics_sens == FWD_BWD) && door->is_possible_in()[n_vf]){
                     _Tp out_tmp(*m_initial_door_output);
                     _Tp in_tmp(door->get_input_private());
                     if(domain_init == FULL_WALL)
@@ -392,7 +394,7 @@ void Room<_Tp>::contract_consistency(){
     bool global_compute = false;
     for(int n_vf=0; n_vf<nb_vec; n_vf++){
         if(m_vector_field_zero[n_vf]){ // Case Zero in f
-            if(domain_init == FULL_WALL && (!is_empty_private() || (m_initial_condition_input || m_initial_condition_output)))
+            if(domain_init == FULL_WALL && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output)))
                 this->set_full_possible();
         }
         else{
@@ -421,10 +423,13 @@ void Room<_Tp>::contract_consistency(){
                     if(!one_possible) // For Kernel
                         set_empty<_Tp>(door_out_iv);
 
+                    if(m_is_father_hull)
+                        door_out_iv &= *m_father_hull;
+
                     if(domain_init == FULL_DOOR)
                         door->set_output_private(door_out_iv & door->get_output_private());
                     else
-                        door->set_output_private(door->get_output_private() | door_out_iv);
+                        door->set_output_private(door_out_iv | door->get_output_private());
                 }
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
                     _Tp door_in_iv(door->get_face()->get_position_typed());
@@ -438,10 +443,13 @@ void Room<_Tp>::contract_consistency(){
                     if(!one_possible) // For Kernel
                         set_empty<_Tp>(door_in_iv);
 
+                    if(m_is_father_hull)
+                        door_in_iv &= *m_father_hull;
+
                     if(domain_init == FULL_DOOR)
                         door->set_input_private(door_in_iv & door->get_input_private());
                     else
-                        door->set_input_private(door->get_input_private() | door_in_iv);
+                        door->set_input_private(door_in_iv | door->get_input_private());
                 }
             }
         }
@@ -693,7 +701,7 @@ bool Room<_Tp>::contract(){
 //        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
-                && (!is_empty_private() || (m_initial_condition_input || m_initial_condition_output))){
+                && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))){
             contract_consistency();
 //            get_private_doors_info("consistency");
         }
@@ -895,12 +903,17 @@ void Room<_Tp>::set_removed(){
         d->set_removed();
     }
 
-//    if(m_initial_condition_input)
+    if(m_is_father_hull){
+        delete(m_father_hull);
+        m_father_hull = NULL;
+        m_is_father_hull = false;
+    }
+//    if(m_is_initial_door_input)
 //        delete(m_initial_door_input);
-//    if(m_initial_condition_output)
+//    if(m_is_initial_door_output)
 //        delete(m_initial_door_output);
-//    m_initial_condition_input = false;
-//    m_initial_condition_output = false;
+//    m_is_initial_door_input = false;
+//    m_is_initial_door_output = false;
 //    m_initial_door_input=NULL;
 //    m_initial_door_output=NULL;
 }

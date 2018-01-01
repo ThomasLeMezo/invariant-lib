@@ -170,6 +170,20 @@ const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull() const{
     return result;
 }
 
+template <>
+const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull_typed() const{
+    ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
+    for(FaceIBEX *f:get_pave()->get_faces_vector()){
+        DoorIBEX *d = f->get_doors()[m_maze];
+        result |= d->get_hull();
+    }
+    if(m_is_initial_door_input)
+        result |= *m_initial_door_input;
+    if(m_is_initial_door_output)
+        result |= *m_initial_door_output;
+    return result;
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
@@ -234,6 +248,20 @@ const ibex::IntervalVector Room<ppl::C_Polyhedron>::get_hull() const{
         DoorPPL *d = f->get_doors()[m_maze];
         result |= polyhedron_2_iv(d->get_hull());
     }
+    return result;
+}
+
+template <>
+const ppl::C_Polyhedron Room<ppl::C_Polyhedron>::get_hull_typed() const{
+    C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
+    for(FacePPL *f:get_pave()->get_faces_vector()){
+        DoorPPL *d = f->get_doors()[m_maze];
+        result |= d->get_hull();
+    }
+    if(m_is_initial_door_input)
+        result |= *m_initial_door_input;
+    if(m_is_initial_door_output)
+        result |= *m_initial_door_output;
     return result;
 }
 

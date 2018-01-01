@@ -232,6 +232,7 @@ public:
      * @return
      */
     const ibex::IntervalVector get_hull() const;
+    const _Tp get_hull_typed() const;
 
     /**
      * @brief Get the complementary box convex hull of the polygon
@@ -387,6 +388,8 @@ public:
     void set_full_initial_door_input();
     void set_full_initial_door_output();
 
+    void set_father_hull(const _Tp &hull);
+
 protected:
     Pave<_Tp>*   m_pave = NULL; // pointer to the associated face
     Maze<_Tp>*   m_maze = NULL; // pointer to the associated maze
@@ -414,10 +417,15 @@ protected:
     bool    m_in_deque = false;
     bool    m_removed = false;
 
-    bool    m_initial_condition_input = false;
-    bool    m_initial_condition_output = false;
+    // Initial condition
+    bool    m_is_initial_door_input = false;
+    bool    m_is_initial_door_output = false;
     _Tp* m_initial_door_input = NULL;
     _Tp* m_initial_door_output = NULL;
+
+    // Valid hull
+    bool m_is_father_hull = false;
+    _Tp* m_father_hull = NULL;
 
     // To Be Removed
     size_t     m_nb_contract = 0;
@@ -486,17 +494,17 @@ inline Pave<_Tp>* Room<_Tp>::get_pave() const{
 
 template <typename _Tp>
 inline bool Room<_Tp>::is_initial_door_input() const{
-    return m_initial_condition_input;
+    return m_is_initial_door_input;
 }
 
 template <typename _Tp>
 inline bool Room<_Tp>::is_initial_door_output() const{
-    return m_initial_condition_output;
+    return m_is_initial_door_output;
 }
 
 template <typename _Tp>
 inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
-    m_initial_condition_input = true;
+    m_is_initial_door_input = true;
     if(m_initial_door_input == NULL){
         m_initial_door_input = new _Tp(door);
     }
@@ -507,7 +515,7 @@ inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
 
 template <typename _Tp>
 inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
-    m_initial_condition_output = true;
+    m_is_initial_door_output = true;
     if(m_initial_door_output == NULL){
         m_initial_door_output = new _Tp(door);
     }
@@ -528,7 +536,7 @@ inline const _Tp& Room<_Tp>::get_initial_door_output() const{
 
 template <typename _Tp>
 inline void Room<_Tp>::set_full_initial_door_input(){
-    m_initial_condition_input = true;
+    m_is_initial_door_input = true;
     if(m_initial_door_input == NULL){
         m_initial_door_input = new _Tp(m_pave->get_position_typed());
     }
@@ -539,12 +547,23 @@ inline void Room<_Tp>::set_full_initial_door_input(){
 
 template <typename _Tp>
 inline void Room<_Tp>::set_full_initial_door_output(){
-    m_initial_condition_output = true;
+    m_is_initial_door_output = true;
     if(m_initial_door_output == NULL){
         m_initial_door_output = new _Tp(m_pave->get_position_typed());
     }
     else{
         *m_initial_door_output = m_pave->get_position_typed();
+    }
+}
+
+template <typename _Tp>
+inline void Room<_Tp>::set_father_hull(const _Tp &hull){
+    m_is_father_hull = true;
+    if(m_father_hull == NULL){
+        m_father_hull = new _Tp(hull);
+    }
+    else{
+        *m_father_hull = hull;
     }
 }
 

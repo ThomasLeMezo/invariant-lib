@@ -201,6 +201,12 @@ void Pave<_Tp>::bisect(){
         Room<_Tp> *r_first = new Room<_Tp>(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
         Room<_Tp> *r_second = new Room<_Tp>(pave_result[1],r->get_maze(), r->get_maze()->get_dynamics());
 
+        // Store father hull (improve efficiency when widening ?)
+        _Tp hull = r->get_hull_typed();
+
+        r_first->set_father_hull(hull & r_first->get_pave()->get_position_typed());
+        r_second->set_father_hull(hull & r_second->get_pave()->get_position_typed());
+
         // ToDo : add a contraction of Room(s) according to father
 
         pave_result[0]->add_room(r_first);
