@@ -131,6 +131,11 @@ public:
     void set_full_private();
 
     /**
+     * @brief set full private but taking in account father
+     */
+    void set_full_private_with_father();
+
+    /**
      * @brief Set full all input & output private doors according to
      * vector field possibility
      */

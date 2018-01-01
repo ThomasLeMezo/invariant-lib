@@ -218,14 +218,14 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                     if(m_border_path_in)
                         d->set_full_private_input();
                     else{
-                        if(m_domain_init != FULL_WALL)
+                        if(m_domain_init != FULL_WALL && !r->get_contain_zero())
                             d->set_empty_private_input();
                     }
 
                     if(m_border_path_out)
                         d->set_full_private_output();
                     else{
-                        if(m_domain_init != FULL_WALL)
+                        if(m_domain_init != FULL_WALL && !r->get_contain_zero())
                             d->set_empty_private_output();
                     }
                     d->synchronize();

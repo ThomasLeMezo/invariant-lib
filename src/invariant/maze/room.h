@@ -105,6 +105,11 @@ public:
     void set_full_private();
 
     /**
+     * @brief set full private but taking in account father
+     */
+    void set_full_private_with_father();
+
+    /**
      * @brief Set full the room according to vector field possibilities
      * @return
      */

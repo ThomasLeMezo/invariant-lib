@@ -66,14 +66,14 @@ int main(int argc, char *argv[])
         paving.bisect();
         cout << i << endl;
 
-        maze_outer.get_domain()->set_init(FULL_WALL);
-        maze_outer.set_enable_contract_domain(true);
+//        maze_outer.get_domain()->set_init(FULL_WALL);
+//        maze_outer.set_enable_contract_domain(true);
         maze_outer.contract();
 
-        maze_outer.get_domain()->set_init(FULL_DOOR);
-        maze_outer.reset_nb_operations();
-        maze_outer.set_enable_contract_domain(false);
-        maze_outer.contract(30000);
+//        maze_outer.get_domain()->set_init(FULL_DOOR);
+//        maze_outer.reset_nb_operations();
+//        maze_outer.set_enable_contract_domain(false);
+//        maze_outer.contract(30000);
 
         cout << " - paving = " << paving.size() << endl;
         vtkMazePPL.show_maze(&maze_outer);
@@ -81,10 +81,10 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
     cout << paving << endl;
 
-    IntervalVector position_info(3);
-    position_info[0] = ibex::Interval(0.0);
-    position_info[1] = ibex::Interval(0.0);
-    position_info[2] = ibex::Interval(0.5);
-    vtkMazePPL.show_room_info(&maze_outer, position_info);
+//    IntervalVector position_info(3);
+//    position_info[0] = ibex::Interval(0.0);
+//    position_info[1] = ibex::Interval(0.0);
+//    position_info[2] = ibex::Interval(0.5);
+//    vtkMazePPL.show_room_info(&maze_outer, position_info);
 }
 

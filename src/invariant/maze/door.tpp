@@ -97,6 +97,18 @@ void Door<_Tp>::set_full_private(){
 }
 
 template <typename _Tp>
+void Door<_Tp>::set_full_private_with_father(){
+    if(m_room->is_father_hull()){
+        (*m_output_private) = m_face->get_position_typed() & m_room->get_father_hull();
+        (*m_input_private) = m_face->get_position_typed() & m_room->get_father_hull();
+    }
+    else{
+        (*m_output_private) = m_face->get_position_typed();
+        (*m_input_private) = m_face->get_position_typed();
+    }
+}
+
+template <typename _Tp>
 void Door<_Tp>::set_full_possible_private(){
     for(size_t i=0; i<m_possible_in.size(); i++){
         if(m_possible_in[i])
@@ -189,9 +201,6 @@ bool Door<_Tp>::contract_continuity_private(){
             door_input |= d->get_output();
         }
 
-        if(m_room->is_father_hull() && domain_init == FULL_DOOR)
-            door_input &= m_room->get_father_hull();
-
         if(domain_init == FULL_DOOR && !is_subset(*m_input_private,door_input)){
             (*m_input_private) &= door_input;
             change = true;
@@ -204,6 +213,9 @@ bool Door<_Tp>::contract_continuity_private(){
             *m_input_private &= m_face->get_position_typed();
             change = true;
         }
+
+        if(m_room->is_father_hull())
+            *m_input_private &= m_room->get_father_hull();
     }
 
     if((dynamics_sens == BWD || dynamics_sens == FWD_BWD) && m_possible_out_union){
@@ -212,9 +224,6 @@ bool Door<_Tp>::contract_continuity_private(){
             Door<_Tp> *d = f->get_doors()[m_room->get_maze()];
             door_output |= d->get_input();
         }
-
-        if(m_room->is_father_hull() && domain_init == FULL_DOOR)
-            door_output &= m_room->get_father_hull();
 
         if(domain_init == FULL_DOOR && !is_subset(*m_output_private,door_output)){
             *m_output_private &= door_output;
@@ -228,6 +237,9 @@ bool Door<_Tp>::contract_continuity_private(){
             *m_output_private &= m_face->get_position_typed();
             change = true;
         }
+
+        if(m_room->is_father_hull())
+            *m_output_private &= m_room->get_father_hull();
     }
     return change;
 }

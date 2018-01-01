@@ -144,6 +144,13 @@ void Room<_Tp>::set_full_private(){
 }
 
 template<typename _Tp>
+void Room<_Tp>::set_full_private_with_father(){
+    for(Face<_Tp> *f:m_pave->get_faces_vector()){
+        f->get_doors()[m_maze]->set_full_private_with_father();
+    }
+}
+
+template<typename _Tp>
 void Room<_Tp>::contract_vector_field(){
     int dim = m_pave->get_dim();
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
@@ -422,13 +429,16 @@ void Room<_Tp>::contract_consistency(){
                     }
                     if(!one_possible) // For Kernel
                         set_empty<_Tp>(door_out_iv);
-                    else if(m_is_father_hull) // For father hull
-                        door_out_iv &= *m_father_hull;
 
                     if(domain_init == FULL_DOOR)
-                        door->set_output_private(door_out_iv & door->get_output_private());
+                        door_out_iv &= door->get_output_private();
                     else
-                        door->set_output_private(door_out_iv | door->get_output_private());
+                        door_out_iv |= door->get_output_private();
+
+                    if(m_is_father_hull) // For father hull
+                        door_out_iv &= *m_father_hull;
+
+                    door->set_output_private(door_out_iv);
                 }
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
                     _Tp door_in_iv(door->get_face()->get_position_typed());
@@ -441,13 +451,16 @@ void Room<_Tp>::contract_consistency(){
                     }
                     if(!one_possible) // For Kernel
                         set_empty<_Tp>(door_in_iv);
-                    else if(m_is_father_hull) // For father hull
-                        door_in_iv &= *m_father_hull;
 
                     if(domain_init == FULL_DOOR)
-                        door->set_input_private(door_in_iv & door->get_input_private());
+                        door_in_iv &= door->get_input_private();
                     else
-                        door->set_input_private(door_in_iv | door->get_input_private());
+                        door_in_iv |= door->get_input_private();
+
+                    if(m_is_father_hull) // For father hull
+                        door_in_iv &= *m_father_hull;
+
+                    door->set_input_private(door_in_iv);
                 }
             }
         }

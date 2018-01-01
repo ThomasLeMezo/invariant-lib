@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    
-    omp_set_num_threads(1);
+//    omp_set_num_threads(1);
     for(int i=0; i<12; i++){
         paving.bisect();
         cout << i << " - ";
@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
     v_maze.show();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(0);
+//    position_info[0] = ibex::Interval(-1.5);
 //    position_info[1] = ibex::Interval(1);
-//    v_maze.get_room_info(&maze, position_info);
+//    v_maze.show_room_info(&maze, position_info);
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(-1);
