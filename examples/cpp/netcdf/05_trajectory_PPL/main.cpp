@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     search_space = pm3d.get_search_space();
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
