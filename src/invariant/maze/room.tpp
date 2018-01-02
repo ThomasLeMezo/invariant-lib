@@ -146,7 +146,8 @@ void Room<_Tp>::set_full_private(){
 template<typename _Tp>
 void Room<_Tp>::set_full_private_with_father(){
     for(Face<_Tp> *f:m_pave->get_faces_vector()){
-        f->get_doors()[m_maze]->set_full_private_with_father();
+        Door<_Tp> *d = f->get_doors()[m_maze];
+        d->set_full_private_with_father();
     }
 }
 

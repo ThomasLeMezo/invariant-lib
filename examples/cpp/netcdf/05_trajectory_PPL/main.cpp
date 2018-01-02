@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     t_c = 0 * pm3d.get_grid_conversion(0);
     x_c = 130 * pm3d.get_grid_conversion(1);
     y_c = 460 * pm3d.get_grid_conversion(2);
-    r = 50.0;
+    r = 0.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
     ibex::Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 
     // ******* Maze *********
     invariant::MazePPL maze(&dom, &pm3d);
+    maze.set_widening_limit(20);
 
     cout << "Domain = " << search_space << endl;
 

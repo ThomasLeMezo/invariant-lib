@@ -17,7 +17,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
         Room<_Tp> *r = p->get_rooms()[maze];
         if(!r->is_removed()){
             if(m_domain_init == FULL_DOOR)
-                r->set_full_private();
+                r->set_full_private_with_father();
             else if(m_domain_init == FULL_WALL)
                 r->set_empty_private();
             r->synchronize();

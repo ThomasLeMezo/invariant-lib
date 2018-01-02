@@ -12,8 +12,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <math.h>
 
 using namespace invariant;
+namespace PPL = Parma_Polyhedra_Library;
+using namespace Parma_Polyhedra_Library::IO_Operators;
 
 VtkMazePPL::VtkMazePPL(const string &file_name)
 {
@@ -33,11 +36,11 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     int min_generator=1e5;
     int nb_pave_not_empty=0;
 
-//#pragma omp parallel for schedule(dynamic)
+    //#pragma omp parallel for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
         PavePPL *p = maze->get_subpaving()->get_paves()[pave_id];
         RoomPPL *r = p->get_rooms()[maze];
-//#pragma omp atomic
+        //#pragma omp atomic
         step ++;
 
         if(!r->is_empty()){
@@ -55,6 +58,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
             if(r->is_initial_door_output())
                 ph_union |= r->get_initial_door_output();
 
+            //            ph_union &= p->get_position_typed();
             ph_union.minimized_constraints();
 
             if(ph_union.space_dimension()==3){
@@ -62,41 +66,48 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                 for(auto &g:ph_union.generators()){
                     nb_generator++;
                     if(g.is_point() && g.space_dimension()==3){
-                        std::vector<double> coord;
+                        bool valid = true;
+                        std::array<double, 3> coord;
+                        double divisor = g.divisor().get_d();
+                        if(isinf(divisor))
+                            valid = false;
                         for(size_t i=0; i<3; i++){
                             ppl::Variable x(i);
-                            coord.push_back(g.coefficient(x).get_d()/(g.divisor().get_d()));
+                            if(isinf(g.coefficient(x).get_d()))
+                                valid = false;
+                            coord[i] = g.coefficient(x).get_d()/divisor;
                         }
-                        points->InsertNextPoint(coord[0], coord[1], coord[2]);
+                        if(valid) // ToDo : to change !!!
+                            points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
                 if(max_generator<nb_generator)
                     max_generator = nb_generator;
                 if(min_generator>nb_generator)
                     min_generator = nb_generator;
-//                cout << nb_points << endl;
-            }
+                //                cout << nb_points << endl;
 
-            if(points->GetNumberOfPoints()>0){
-                vtkSmartPointer< vtkPolyData> polydata_points = vtkSmartPointer<vtkPolyData>::New();
-                  polydata_points->SetPoints(points);
+                if(points->GetNumberOfPoints()>3){
+                    vtkSmartPointer< vtkPolyData> polydata_points = vtkSmartPointer<vtkPolyData>::New();
+                    polydata_points->SetPoints(points);
 
-                // ********** Surface **************
-                // Create the convex hull of the pointcloud (delaunay + outer surface)
-                vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-                delaunay->SetInputData(polydata_points);
-                delaunay->Update();
+                    // ********** Surface **************
+                    // Create the convex hull of the pointcloud (delaunay + outer surface)
+                    vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+                    delaunay->SetInputData(polydata_points);
+                    delaunay->Update();
 
-                vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-                surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
-                surfaceFilter->Update();
+                    vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+                    surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+                    surfaceFilter->Update();
 
 
-//#pragma omp critical(add_polygon)
-                {
-                    polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-                    if(step%1000==0)
-                        cout << "step = " << step << " /" << dim_paves_list << endl;
+                    //#pragma omp critical(add_polygon)
+                    {
+                        polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                        if(step%1000==0)
+                            cout << "step = " << step << " /" << dim_paves_list << endl;
+                    }
                 }
             }
         }

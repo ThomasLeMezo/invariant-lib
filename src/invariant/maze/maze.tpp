@@ -91,7 +91,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                     if(!m_deque_rooms.empty()){
                         // To improve the efficiency, we start half of the thread on the back of the deque
                         // and the other on the front
-                        if(omp_get_thread_num()%2==0){
+                        if(omp_get_thread_num()%2==1){
                             r = m_deque_rooms.back();
                             m_deque_rooms.pop_back();
                         }
