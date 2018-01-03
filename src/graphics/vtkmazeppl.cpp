@@ -36,7 +36,10 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
     int min_generator=1e5;
     int nb_pave_not_empty=0;
 
-    //#pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel
+    {
+        //Parma_Polyhedra_Library::Thread_Init thread_init;
+#pragma omp for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
         PavePPL *p = maze->get_subpaving()->get_paves()[pave_id];
         RoomPPL *r = p->get_rooms()[maze];
@@ -66,19 +69,13 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                 for(auto &g:ph_union.generators()){
                     nb_generator++;
                     if(g.is_point() && g.space_dimension()==3){
-                        bool valid = true;
                         std::array<double, 3> coord;
-                        double divisor = g.divisor().get_d();
-                        if(isinf(divisor))
-                            valid = false;
                         for(size_t i=0; i<3; i++){
                             ppl::Variable x(i);
-                            if(isinf(g.coefficient(x).get_d()))
-                                valid = false;
-                            coord[i] = g.coefficient(x).get_d()/divisor;
+                            mpq_class number(g.coefficient(x), g.divisor());
+                            coord[i] = number.get_d();
                         }
-                        if(valid) // ToDo : to change !!!
-                            points->InsertNextPoint(coord[0], coord[1], coord[2]);
+                        points->InsertNextPoint(coord[0], coord[1], coord[2]);
                     }
                 }
                 if(max_generator<nb_generator)
@@ -102,7 +99,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                     surfaceFilter->Update();
 
 
-                    //#pragma omp critical(add_polygon)
+                    #pragma omp critical(add_polygon)
                     {
                         polyData_polygon->AddInputData(surfaceFilter->GetOutput());
                         if(step%1000==0)
@@ -111,6 +108,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                 }
             }
         }
+    }
     }
 
     polyData_polygon->Update();

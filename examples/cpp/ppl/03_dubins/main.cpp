@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     x_c = 0.0;
     y_c = 0.0;
     theta_c = 0.5;
-    r = 1;
+    r = 1.0;
 //    r = 0.0;
 
     Function f_sep_outer(x, y, theta, pow(x-x_c, 2)+pow(y-y_c, 2) + pow(theta-theta_c, 2) - pow(r, 2));
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         paving.bisect();
         cout << i << endl;
 

@@ -93,15 +93,24 @@ void Door<ppl::C_Polyhedron>::synchronize(){
 
 /// ******************  Other functions ****************** ///
 
-#define IBEX_PPL_PRECISION 1e10
 ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv){
-    Rational_Box box(iv.size());
-    for(size_t i=0; i<box.space_dimension(); i++){
-        ppl::Variable x(i);
-        if(!iv[i].is_empty()){
-            box.add_constraint(IBEX_PPL_PRECISION*x >= floor(iv[i].lb()*IBEX_PPL_PRECISION));
-            box.add_constraint(IBEX_PPL_PRECISION*x <= ceil(iv[i].ub()*IBEX_PPL_PRECISION));
+    size_t iv_size = (size_t) iv.size();
+    ppl::Rational_Box box(iv_size);
+    if(!iv.is_empty()){
+        for(size_t i=0; i<iv_size; i++){
+            ppl::Variable x(i);
+            if(!isinf(iv[i].lb())){
+                mpq_class lb(iv[i].lb());
+                box.add_constraint(x*lb.get_den() >= lb.get_num());
+            }
+            if(!isinf(iv[i].ub())){
+                mpq_class ub(iv[i].ub());
+                box.add_constraint(x*ub.get_den() <= ub.get_num());
+            }
         }
+    }
+    else{
+        box = ppl::Rational_Box(iv.size(), Parma_Polyhedra_Library::Degenerate_Element::UNIVERSE);
     }
     return ppl::C_Polyhedron(box);
 }

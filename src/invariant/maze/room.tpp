@@ -847,7 +847,7 @@ bool Room<_Tp>::is_full_union() const{
 
 template<typename _Tp>
 bool Room<_Tp>::request_bisection(){
-    return !(is_empty());
+    return !(is_empty()) || m_first_contract;
 }
 
 template<typename _Tp>

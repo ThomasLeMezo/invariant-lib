@@ -151,32 +151,54 @@ void write_VTK(PPL::C_Polyhedron &ph, string filename){
 }
 
 int main(){
-    int dimension = 3;
+//    int dimension = 3;
 
-    IntervalVector vec(dimension);
-    vec[0] = ibex::Interval(-0.3, 0.3);
-    vec[1] = ibex::Interval(-0.3, 0.3);
-    vec[2] = ibex::Interval(1);
+//    IntervalVector vec(dimension);
+//    vec[0] = ibex::Interval(-0.3, 0.3);
+//    vec[1] = ibex::Interval(-0.3, 0.3);
+//    vec[2] = ibex::Interval(1);
 
-    IntervalVector face_in(3);
-    face_in[0] = ibex::Interval(-1, 1);
-    face_in[1] = ibex::Interval(-1, 1);
-    face_in[2] = ibex::Interval(-1);
-    C_Polyhedron ph_in(iv_2_box(face_in));
-    C_Polyhedron ph_projection = add_ray(vec, ph_in);
-    IntervalVector face_out(3);
-    face_out[0] = ibex::Interval(-1, 1);
-    face_out[1] = ibex::Interval(-1, 1);
-    face_out[2] = ibex::Interval(1);
-    C_Polyhedron ph_out(iv_2_box(face_out));
+//    IntervalVector face_in(3);
+//    face_in[0] = ibex::Interval(-1, 1);
+//    face_in[1] = ibex::Interval(-1, 1);
+//    face_in[2] = ibex::Interval(-1);
+//    C_Polyhedron ph_in(iv_2_box(face_in));
+//    C_Polyhedron ph_projection = add_ray(vec, ph_in);
+//    IntervalVector face_out(3);
+//    face_out[0] = ibex::Interval(-1, 1);
+//    face_out[1] = ibex::Interval(-1, 1);
+//    face_out[2] = ibex::Interval(1);
+//    C_Polyhedron ph_out(iv_2_box(face_out));
 
-#pragma omp parallel for
-    for(int i=0; i<1000; i++){
-        PPL::C_Polyhedron ph1(3);
-        PPL::C_Polyhedron ph2(3);
-        ph1.intersection_assign(ph2);
-    }
+//    omp_lock_t  test_access;
+//    omp_init_lock(&test_access);
+//    PPL::C_Polyhedron ph1(3);
+//    PPL::C_Polyhedron ph2(3);
 
+//#pragma omp parallel
+//    {
+//        PPL::Thread_Init thread_init;
+//#pragma omp for
+//        for(int i=0; i<1000; i++){
+//            PPL::C_Polyhedron ph3(3);
+//            ph3.intersection_assign(ph2);
+//            omp_set_lock(&test_access);
+//            cout << ph1 << endl;
+//            omp_unset_lock(&test_access);
+//        }
+//    }
+
+    std::cout.precision(30);
+    mpq_class t(500.123540000000000);
+    cout << t.get_d() << endl;
+    cout << t.get_num().get_d() << endl;
+    cout << t.get_den().get_d() << endl;
+    cout << t.get_num().get_d() / t.get_den().get_d() << endl;
+    mpq_class t1(500.12354);
+    cout << t1.get_d() << endl;
+    cout << t1.get_num().get_d() << endl;
+    cout << t1.get_den().get_d() << endl;
+    cout << t.get_num().get_d() / t.get_den().get_d() << endl;
     //    cout << ph_out.space_dimension() << endl;
     //    cout << ph_out.affine_dimension() << endl;
     //    cout << ph_out.is_discrete() << endl;

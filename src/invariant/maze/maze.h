@@ -131,6 +131,12 @@ public:
      */
     void set_enable_contract_domain(bool val);
 
+public:
+    /**
+     * @brief initialize thread (action to be done once for each thread : for PPL mainly)
+     */
+    void initialize_thread();
+
 private:
     invariant::Domain<_Tp> *    m_domain = NULL;
     SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze

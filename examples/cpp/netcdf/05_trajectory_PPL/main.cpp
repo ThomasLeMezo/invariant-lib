@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics *******
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     search_space = pm3d.get_search_space();
     cout << "TIME load PreviMer = " << omp_get_wtime() - time_start_PM << endl << endl;
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     t_c = 0 * pm3d.get_grid_conversion(0);
     x_c = 130 * pm3d.get_grid_conversion(1);
     y_c = 460 * pm3d.get_grid_conversion(2);
-    r = 0.0;
+    r = 50.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
     ibex::Variable t, x, y;
     Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
@@ -63,7 +63,8 @@ int main(int argc, char *argv[])
 
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("PrevimerPPL");
-    omp_set_num_threads(1);
+//    omp_set_num_threads(1);
+
     for(int i=0; i<20; i++){
         cout << i << endl;
         paving.bisect();
@@ -88,11 +89,11 @@ int main(int argc, char *argv[])
 ////    vtkMaze3D.show_maze(&maze);
 //    vtkMaze3D.serialize_maze("current.maze", &maze);
 
-//    IntervalVector position(3);
-//    position[0] = ibex::Interval(t_c); // 450, 900
-//    position[1] = ibex::Interval(x_c); // 37304, 37980
-//    position[2] = ibex::Interval(y_c); // 119766, 120469
-//    vtkMaze3D.show_room_info(&maze, position);
+    IntervalVector position(3);
+    position[0] = ibex::Interval(t_c); // 450, 900
+    position[1] = ibex::Interval(x_c); // 37304, 37980
+    position[2] = ibex::Interval(y_c); // 119766, 120469
+    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;
 }

@@ -78,6 +78,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
 
 #pragma omp parallel
     {
+        //Parma_Polyhedra_Library::Thread_Init thread_init;
 #pragma omp single
         {
             while(!stop_contraction){

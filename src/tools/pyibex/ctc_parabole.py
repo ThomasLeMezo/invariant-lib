@@ -34,7 +34,7 @@ vibes.drawCircle(s_x, s_y, 0.01, "red[red]")
 
 a1 = a
 b1 = 2*b
-c1 = 3*b**2/(4*a)+c
+c1 = 3*b*v *2/(4*a)+c
 x1 = x + b/(2*a)
 
 drawPolygone(a1.mid(), b1.mid(), c1.mid(), x1)
