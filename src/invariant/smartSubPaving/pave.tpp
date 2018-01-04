@@ -1,6 +1,3 @@
-using namespace std;
-using namespace ibex;
-
 #include "pave.h"
 
 namespace invariant {

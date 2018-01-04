@@ -10,6 +10,8 @@ namespace invariant{
 
 #include <ibex_IntervalVector.h>
 #include <ibex_Sep.h>
+#include <ppl.hh>
+
 #include <utility>
 
 #include "smartSubPaving.h"
@@ -295,7 +297,7 @@ template <typename _Tp>
 _Tp convert(const ppl::C_Polyhedron &p);
 
 
-ppl::Thread_Init* initialize_thread();
+Parma_Polyhedra_Library::Thread_Init* initialize_thread();
 void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
 
 }

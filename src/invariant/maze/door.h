@@ -2,20 +2,20 @@
 #define DOOR_H
 
 #include <ibex_IntervalVector.h>
-
-#include "ppl.hh"
+#include <ppl.hh>
 
 #include <omp.h>
+
 #include <iostream>
 #include <sstream>      // std::ostringstream
-#include <iomanip>
+#include <map>
 
-#include "../definition/domain.h"
-#include "../smartSubPaving/face.h"
+#include "domain.h"
+#include "face.h"
 #include "room.h"
 #include "maze.h"
-#include "../smartSubPaving/pave.h"
-#include <map>
+#include "pave.h"
+
 
 namespace ppl=Parma_Polyhedra_Library;
 

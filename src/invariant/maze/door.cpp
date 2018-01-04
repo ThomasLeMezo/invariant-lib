@@ -1,6 +1,8 @@
 #include "door.h"
 
 namespace ppl=Parma_Polyhedra_Library;
+using namespace ibex;
+using namespace std;
 
 namespace invariant{
 

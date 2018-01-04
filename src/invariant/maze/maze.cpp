@@ -1,4 +1,3 @@
-
 #include "maze.h"
 
 namespace invariant{
@@ -24,3 +23,4 @@ void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init){
 }
 
 }
+

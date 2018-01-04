@@ -5,11 +5,12 @@
 
 #include <ibex_IntervalVector.h>
 #include <ibex_Ctc.h>
+#include <ppl.hh>
 
 #include "pave.h"
 #include "face.h"
-#include "../maze/maze.h"
-#include "../maze/room.h"
+#include "maze.h"
+#include "room.h"
 
 #include "pave_node.h"
 #include "room.h"

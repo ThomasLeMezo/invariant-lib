@@ -1,6 +1,6 @@
 #include "face.h"
 #include "ibex_IntervalVector.h"
-/// ******************  Sepcialized ****************** ///
+
 namespace invariant{
 
 /// ******************  ibex::IntervalVector ****************** ///

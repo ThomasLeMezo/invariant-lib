@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("LorenzPPL");
 
-    omp_set_num_threads(1);
+//    omp_set_num_threads(1);
     for(int i=0; i<10; i++){
         paving.bisect();
         cout << i << endl;

@@ -1,8 +1,7 @@
 #include "room.h"
-#include "ibex_IntervalVector.h"
-#include "ibex_CtcFwdBwd.h"
-#include "ibex_Function.h"
-#include "door.h"
+
+using namespace std;
+using namespace ibex;
 
 namespace invariant{
 

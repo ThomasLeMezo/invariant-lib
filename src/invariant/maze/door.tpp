@@ -1,13 +1,4 @@
 #include "door.h"
-#include <iostream>
-#include "omp.h"
-
-#include "../definition/domain.h"
-
-#include "../smartSubPaving/face.h"
-#include "../smartSubPaving/pave.h"
-#include "room.h"
-#include "maze.h"
 
 namespace invariant {
 

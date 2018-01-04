@@ -2,6 +2,7 @@
 #define PAVE_H
 
 #include <ibex_IntervalVector.h>
+#include <ppl.hh>
 
 #include <map>
 #include <fstream>
@@ -11,11 +12,11 @@
 #include "face.h"
 #include "pave_node.h"
 
-#include "../maze/room.h"
-#include "../maze/maze.h"
-#include "../definition/domain.h"
+#include "room.h"
+#include "maze.h"
+#include "domain.h"
 
-#include "../serialization/ibex_serialization.h"
+#include "ibex_serialization.h"
 
 namespace invariant {
 

@@ -1,6 +1,9 @@
 #include "pave.h"
 #include "room.h"
 
+using namespace std;
+using namespace ibex;
+
 namespace invariant{
 
 /// ******************  ibex::IntervalVector ****************** ///

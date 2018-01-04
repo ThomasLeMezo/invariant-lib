@@ -2,9 +2,12 @@
 #define MAZE_H
 
 #include <ibex_IntervalVector.h>
+#include <ppl.hh>
+
 #include <deque>
-#include <omp.h>
 #include <iostream>
+
+#include <omp.h>
 
 #include "dynamics.h"
 #include "domain.h"

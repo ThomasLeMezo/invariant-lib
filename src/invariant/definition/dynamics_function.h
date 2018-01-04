@@ -2,9 +2,11 @@
 #define DYNAMICS_FUNCTION_H
 
 #include "dynamics.h"
+
 #include <ibex_IntervalVector.h>
 #include <ibex_Function.h>
-#include "omp.h"
+
+#include <omp.h>
 
 namespace invariant {
 class Dynamics_Function: public Dynamics

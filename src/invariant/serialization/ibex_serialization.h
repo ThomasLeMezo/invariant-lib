@@ -14,9 +14,9 @@
 #define IBEX_SERIALIZATION_HEADER
 
 #include <fstream>
-#include "ibex_Interval.h"
-#include "ibex_IntervalVector.h"
-#include <fstream>
+
+#include <ibex_Interval.h>
+#include <ibex_IntervalVector.h>
 
   /**
    * \brief Write an Interval object into a binary file.

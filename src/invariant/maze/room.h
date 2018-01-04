@@ -15,16 +15,16 @@ _Tp get_empty_door_container(int dim);
 #include <ibex_Function.h>
 #include <ibex_CtcFwdBwd.h>
 
+#include <ppl.hh>
+
 #include <omp.h>
 
-#include "../definition/dynamics.h"
-#include "../definition/domain.h"
+#include "dynamics.h"
+#include "domain.h"
 #include "pave.h"
 #include "maze.h"
 #include "door.h"
-#include "../smartSubPaving/face.h"
-
-#include "ppl.hh"
+#include "face.h"
 
 namespace ppl=Parma_Polyhedra_Library;
 

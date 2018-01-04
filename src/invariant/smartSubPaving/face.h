@@ -2,18 +2,19 @@
 #define FACE_H
 
 #include <ibex_IntervalVector.h>
+#include <ppl.hh>
 
+#include <iostream>
 #include <fstream>
 #include <map>
 
 #include "pave.h"
-#include "../maze/door.h"
-#include "../maze/room.h"
-#include "../maze/maze.h"
+#include "door.h"
+#include "room.h"
+#include "maze.h"
 
 #include "face.h"
-#include "../serialization/ibex_serialization.h"
-#include <iostream>
+#include "ibex_serialization.h"
 
 namespace invariant {
 

@@ -1,12 +1,4 @@
-#include "iostream"
-
-#include "ibex_IntervalVector.h"
-#include "../definition/dynamics.h"
-#include "../definition/domain.h"
-#include "pave.h"
-#include "maze.h"
-#include "door.h"
-#include "../smartSubPaving/face.h"
+#include "room.h" // only for ide
 
 namespace invariant {
 

@@ -2,16 +2,16 @@
 #define GRAPH_H
 
 #include <fstream>
+#include <stdexcept>
 
 #include <ibex_IntervalVector.h>
+#include <ppl.hh>
 
 #include "pave.h"
 #include "pave_node.h"
-#include "../maze/maze.h"
+#include "maze.h"
 
-#include "../serialization/ibex_serialization.h"
-#include <stdexcept>
-#include <fstream>
+#include "ibex_serialization.h"
 
 namespace invariant {
 

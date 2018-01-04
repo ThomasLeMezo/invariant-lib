@@ -2,9 +2,6 @@
 #define DYNAMICSINCLUSIONFUNCTION_H
 
 #include "dynamics_function.h"
-#include <ibex_IntervalVector.h>
-#include <ibex_Function.h>
-#include "omp.h"
 
 namespace invariant {
 class DynamicsInclusionFunction: public Dynamics_Function
