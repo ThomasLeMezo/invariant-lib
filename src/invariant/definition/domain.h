@@ -294,6 +294,10 @@ _Tp convert(const ibex::IntervalVector &iv);
 template <typename _Tp>
 _Tp convert(const ppl::C_Polyhedron &p);
 
+
+ppl::Thread_Init* initialize_thread();
+void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
+
 }
 
 #include "domain.tpp"

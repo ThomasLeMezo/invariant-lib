@@ -144,7 +144,6 @@ void Pave<_Tp>::bisect(){
     }
 
     // Create new Paves
-    //Parma_Polyhedra_Library::Thread_Init thread_init;
     Pave<_Tp> *pave0 = new Pave<_Tp>(result_boxes.first, m_subpaving); // lb
     Pave<_Tp> *pave1 = new Pave<_Tp>(result_boxes.second, m_subpaving); // ub
     std::array<Pave<_Tp>*, 2> pave_result = {pave0, pave1};

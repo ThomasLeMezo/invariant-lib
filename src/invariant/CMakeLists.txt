@@ -41,6 +41,12 @@ include_directories(maze)
   set(HEADERS
     serialization/ibex_serialization.h
 
+    definition/domain.h
+    definition/domain.tpp
+    definition/dynamics.h
+    definition/dynamics_function.h
+    definition/dynamicsinclusionfunction.h
+
     maze/maze.h
     maze/room.h
     maze/door.h
@@ -67,11 +73,7 @@ include_directories(maze)
     maze/door.tpp
     maze/sepmaze.tpp
 
-    definition/domain.h
-    definition/domain.tpp
-    definition/dynamics.h
-    definition/dynamics_function.h
-    definition/dynamicsinclusionfunction.h
+
   )
 
   if(WITH_NETCDF)

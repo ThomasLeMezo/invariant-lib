@@ -150,6 +150,39 @@ void write_VTK(PPL::C_Polyhedron &ph, string filename){
     write_VTK(ph_list, filename);
 }
 
+int test(){
+    PPL::C_Polyhedron ph1(3);
+    PPL::C_Polyhedron ph2(3);
+
+#pragma omp parallel
+    {
+        PPL::Thread_Init *thread_init = NULL;
+        bool thread_init_valid = true;
+#pragma omp master
+{
+    thread_init_valid = false;
+}
+    if(thread_init_valid)
+        thread_init = new PPL::Thread_Init;
+#pragma omp for
+        for(int i=0; i<4; i++){
+            PPL::C_Polyhedron ph3(3);
+            ph3.intersection_assign(ph2);
+        }
+    if(thread_init_valid)
+        delete(thread_init);
+    }
+    cout << omp_get_thread_num() << endl;
+    return 0;
+}
+
+int test2(){
+    PPL::C_Polyhedron ph3(3);
+    PPL::C_Polyhedron ph4(3);
+    ph3.intersection_assign(ph4);
+    return 0;
+}
+
 int main(){
 //    int dimension = 3;
 
@@ -169,36 +202,25 @@ int main(){
 //    face_out[1] = ibex::Interval(-1, 1);
 //    face_out[2] = ibex::Interval(1);
 //    C_Polyhedron ph_out(iv_2_box(face_out));
+    test();
+    test2();
+    PPL::C_Polyhedron ph3(3);
+    PPL::C_Polyhedron ph4(3);
+    ph3.intersection_assign(ph4);
 
-//    omp_lock_t  test_access;
-//    omp_init_lock(&test_access);
-//    PPL::C_Polyhedron ph1(3);
-//    PPL::C_Polyhedron ph2(3);
+//    std::cout.precision(30);
+//    mpq_class t(500.123540000000000);
+//    cout << t.get_d() << endl;
+//    cout << t.get_num().get_d() << endl;
+//    cout << t.get_den().get_d() << endl;
+//    cout << t.get_num().get_d() / t.get_den().get_d() << endl;
+//    mpq_class t1(500.12354);
+//    cout << t1.get_d() << endl;
+//    cout << t1.get_num().get_d() << endl;
+//    cout << t1.get_den().get_d() << endl;
+//    cout << t.get_num().get_d() / t.get_den().get_d() << endl;
 
-//#pragma omp parallel
-//    {
-//        PPL::Thread_Init thread_init;
-//#pragma omp for
-//        for(int i=0; i<1000; i++){
-//            PPL::C_Polyhedron ph3(3);
-//            ph3.intersection_assign(ph2);
-//            omp_set_lock(&test_access);
-//            cout << ph1 << endl;
-//            omp_unset_lock(&test_access);
-//        }
-//    }
 
-    std::cout.precision(30);
-    mpq_class t(500.123540000000000);
-    cout << t.get_d() << endl;
-    cout << t.get_num().get_d() << endl;
-    cout << t.get_den().get_d() << endl;
-    cout << t.get_num().get_d() / t.get_den().get_d() << endl;
-    mpq_class t1(500.12354);
-    cout << t1.get_d() << endl;
-    cout << t1.get_num().get_d() << endl;
-    cout << t1.get_den().get_d() << endl;
-    cout << t.get_num().get_d() / t.get_den().get_d() << endl;
     //    cout << ph_out.space_dimension() << endl;
     //    cout << ph_out.affine_dimension() << endl;
     //    cout << ph_out.is_discrete() << endl;

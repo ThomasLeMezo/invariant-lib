@@ -6,10 +6,10 @@
 #include <omp.h>
 #include <iostream>
 
-#include "../definition/dynamics.h"
-#include "../definition/domain.h"
+#include "dynamics.h"
+#include "domain.h"
 #include "room.h"
-#include "../smartSubPaving/smartSubPaving.h"
+#include "smartSubPaving.h"
 #include "pave.h"
 
 namespace invariant {
@@ -131,12 +131,6 @@ public:
      */
     void set_enable_contract_domain(bool val);
 
-public:
-    /**
-     * @brief initialize thread (action to be done once for each thread : for PPL mainly)
-     */
-    void initialize_thread();
-
 private:
     invariant::Domain<_Tp> *    m_domain = NULL;
     SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
@@ -194,6 +188,9 @@ inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
     m_deque_rooms.push_back(r);
     omp_unset_lock(&m_deque_access);
 }
+
+Parma_Polyhedra_Library::Thread_Init* initialize_thread();
+void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
 
 }
 
