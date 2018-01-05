@@ -161,6 +161,12 @@ public:
      */
     void set_limit_bisection(const std::vector<double> &limit_bisection);
 
+    /**
+     * @brief Set the ratio choice between dimension when bisecting
+     * @param ratio_bisection
+     */
+    void set_ratio_bisection(const std::vector<double> &ratio_bisection);
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
@@ -256,6 +262,14 @@ inline void SmartSubPaving<_Tp>::set_limit_bisection(const std::vector<double> &
         throw std::runtime_error("in [paving.cpp/set_limit_bisection] dimensions doesn't match");
     else
         m_limit_bisection = limit_bisection;
+}
+
+template<typename _Tp>
+inline void SmartSubPaving<_Tp>::set_ratio_bisection(const std::vector<double> &ratio_bisection){
+    if(ratio_bisection.size() != m_dim)
+        throw std::runtime_error("in [paving.cpp/set_limit_bisection] dimensions doesn't match");
+    else
+        m_ratio_dimension = ratio_bisection;
 }
 
 }

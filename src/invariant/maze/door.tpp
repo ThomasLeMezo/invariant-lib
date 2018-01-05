@@ -103,7 +103,7 @@ template <typename _Tp>
 void Door<_Tp>::set_full_possible_private(){
     for(size_t i=0; i<m_possible_in.size(); i++){
         if(m_possible_in[i])
-            (*m_input_private) = m_face->get_position_typed();
+            (*m_input_private) = m_face->get_position_typed(); // Set at least full for one vector field
         if(m_possible_out[i])
             (*m_output_private) = m_face->get_position_typed();
     }

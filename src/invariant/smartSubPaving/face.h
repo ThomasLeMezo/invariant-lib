@@ -62,7 +62,7 @@ public:
      * @brief Return the position of the Face (templated)
      * @return
      */
-    const _Tp &get_position_typed() const;
+    const _Tp get_position_typed() const;
 
     /**
      * @brief Face serialization
@@ -191,7 +191,7 @@ const ibex::IntervalVector& Face<_Tp>::get_position() const{
 }
 
 template <typename _Tp>
-const _Tp& Face<_Tp>::get_position_typed() const{
+const _Tp Face<_Tp>::get_position_typed() const{ // Copy of the face because of bug in multiprocessing using ppl (?)
     return m_position_typed;
 }
 
