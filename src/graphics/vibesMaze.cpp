@@ -1,9 +1,6 @@
-
 #include "vibesMaze.h"
-#include <ibex_IntervalVector.h>
-#include "ostream"
-#include "smartSubPaving.h"
-#include "maze.h"
+
+#include <ostream>
 
 using namespace invariant;
 using namespace ibex;

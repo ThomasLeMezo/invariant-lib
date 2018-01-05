@@ -13,7 +13,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
     // ********** Initialize the maze ********** //
 #pragma omp parallel
     {
-        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread();
+        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
         for(size_t i=0; i<m_subpaving->get_paves().size(); i++){
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
@@ -27,7 +27,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                 //            r->reset_update_neighbors();
             }
         }
-        delete_thread_init(thread_init);
+        delete_thread_init<_Tp>(thread_init);
     }
 
     // ********** Separator contraction ********** //
@@ -214,7 +214,7 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
 
 #pragma omp parallel
     {
-        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread();
+        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
         for(size_t i=0; i<pave_border_list.size(); i++){
             Pave<_Tp> *p = pave_border_list[i];
@@ -258,7 +258,7 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                 }
             }
         }
-        delete_thread_init(thread_init);
+        delete_thread_init<_Tp>(thread_init);
     }
 }
 
@@ -273,7 +273,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
         if(!maze_inter->is_escape_trajectories()){
 #pragma omp parallel
             {
-                Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread();
+                Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
                 for(size_t i=0; i<room_list.size(); i++){
                     Room<_Tp> *r = room_list[i];
@@ -282,7 +282,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
                     *r &= *r_inter;
                     r->synchronize();
                 }
-                delete_thread_init(thread_init);
+                delete_thread_init<_Tp>(thread_init);
             }
         }
     }
@@ -298,7 +298,7 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
     for(Maze<_Tp> *maze_union:m_maze_list_union){
 #pragma omp parallel
         {
-            Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread();
+            Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
             for(size_t i=0; i<room_list.size(); i++){
                 Room<_Tp> *r = room_list[i];
@@ -307,7 +307,7 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
                 *r |= *r_inter;
                 r->synchronize();
             }
-            delete_thread_init(thread_init);
+            delete_thread_init<_Tp>(thread_init);
         }
     }
 }

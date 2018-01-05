@@ -163,7 +163,7 @@ int test(){
     thread_init_valid = false;
 }
     if(thread_init_valid)
-        thread_init = new PPL::Thread_Init;
+        thread_init = new PPL::Thread_Init();
 #pragma omp for
         for(int i=0; i<4; i++){
             PPL::C_Polyhedron ph3(3);

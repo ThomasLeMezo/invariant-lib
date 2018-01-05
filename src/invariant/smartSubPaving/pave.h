@@ -16,7 +16,7 @@
 #include "maze.h"
 #include "domain.h"
 
-#include "ibex_serialization.h"
+#include "../serialization/ibex_serialization.h"
 
 namespace invariant {
 

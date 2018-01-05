@@ -11,7 +11,7 @@
 #include "pave_node.h"
 #include "maze.h"
 
-#include "ibex_serialization.h"
+#include "../serialization/ibex_serialization.h"
 
 namespace invariant {
 

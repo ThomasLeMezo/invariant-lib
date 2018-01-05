@@ -2,23 +2,17 @@
 #define VibesMaze_H
 
 #include <ibex_IntervalVector.h>
+#include <ppl.hh>
+
 #include "smartSubPaving.h"
 #include "maze.h"
 #include "pave.h"
 #include "domain.h"
 #include "face.h"
 #include "door.h"
+
 #include "VibesFigure.h"
 #include "vibes/vibes.h"
-
-//namespace invariant{
-//template <> class PaveIBEX;
-//template <> class SmartSubPavingIBEX;
-//template <> class MazeIBEX;
-//template <> class RoomIBEX;
-//template <> class DomainIBEX;
-//template <> class FaceIBEX;
-//}
 
 class VibesMaze: public VibesFigure
 {

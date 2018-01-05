@@ -78,7 +78,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
 
 #pragma omp parallel
     {
-        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread();
+        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp single
         {
             while(!stop_contraction){
@@ -153,7 +153,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                 }
             }
         }
-        delete_thread_init(thread_init);
+        delete_thread_init<_Tp>(thread_init);
     }
 
     std::cout << " => contractions : " << omp_get_wtime() - t_start << " s, with " << m_nb_operations << "/" << nb_deque << " operations" <<  std::endl;

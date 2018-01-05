@@ -25,7 +25,7 @@ if(WITH_3D)
         vtkmazeppl.h
     )
 
-    add_library(invariant-graphics-3D #SHARED
+    add_library(invariant-graphics-3D
         ${SRC_3D}
         ${HEADERS_3D}
     )
@@ -62,13 +62,13 @@ if(WITH_GRAPHIZ)
     target_link_libraries(invariant-graphics-graphiz
         ${LIBS}
         ${LIBS_GRAPHIZ}
+        invariant-core
     )
 
     target_include_directories(invariant-graphics-graphiz
         PUBLIC ${IBEX_INCLUDE_DIRS}
         PUBLIC ${LIBGVC_INCLUDE_DIRS}
     )
-
 
     install(FILES ${HEADERS_graphiz} DESTINATION "include/invariant-lib")
     install(TARGETS invariant-graphics-graphiz DESTINATION lib)
@@ -79,6 +79,7 @@ endif()
 
   set(SRC
     vibes/vibes.cpp
+
     VibesFigure.cpp
     vibesMaze.cpp
   )
@@ -88,7 +89,6 @@ endif()
 
     VibesFigure.h
     vibesMaze.h
-
   )
 
   file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
@@ -99,6 +99,7 @@ endif()
   )
   target_link_libraries(invariant-graphics
       ${LIBS}
+      invariant-core
   )
 
     target_include_directories(invariant-graphics

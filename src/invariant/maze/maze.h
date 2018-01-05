@@ -192,8 +192,11 @@ inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
     omp_unset_lock(&m_deque_access);
 }
 
-Parma_Polyhedra_Library::Thread_Init* initialize_thread();
-void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
+template <typename _Tp>
+inline Parma_Polyhedra_Library::Thread_Init* initialize_thread();
+
+template <typename _Tp>
+inline void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
 
 }
 

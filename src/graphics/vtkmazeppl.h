@@ -3,7 +3,6 @@
 
 #include "maze.h"
 
-
 class VtkMazePPL
 {
 public:

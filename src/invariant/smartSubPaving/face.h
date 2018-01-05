@@ -8,13 +8,14 @@
 #include <fstream>
 #include <map>
 
+#include "../serialization/ibex_serialization.h"
+
 #include "pave.h"
 #include "door.h"
 #include "room.h"
 #include "maze.h"
 
 #include "face.h"
-#include "ibex_serialization.h"
 
 namespace invariant {
 

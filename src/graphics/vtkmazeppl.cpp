@@ -17,6 +17,7 @@
 using namespace invariant;
 namespace PPL = Parma_Polyhedra_Library;
 using namespace Parma_Polyhedra_Library::IO_Operators;
+using namespace std;
 
 VtkMazePPL::VtkMazePPL(const string &file_name)
 {
@@ -38,7 +39,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
 
     #pragma omp parallel
     {
-        PPL::Thread_Init *thread_init = initialize_thread();
+        PPL::Thread_Init *thread_init = initialize_thread<_Tp>();
 #pragma omp for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
         PavePPL *p = maze->get_subpaving()->get_paves()[pave_id];
@@ -109,7 +110,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
             }
         }
     }
-    delete_thread_init(thread_init);
+    delete_thread_init<_Tp>(thread_init);
     }
 
     polyData_polygon->Update();

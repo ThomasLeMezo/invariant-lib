@@ -1,8 +1,11 @@
 #include "vtkMaze3D.h"
 
 #include <string>
-#include "ibex_IntervalVector.h"
-#include "smartSubPaving.h"
+#include <fstream>
+#include <ostream>
+#include <iostream>
+
+#include <ibex_IntervalVector.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkAppendPolyData.h>
@@ -12,14 +15,8 @@
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkDelaunay3D.h>
 #include <vtkDataSetSurfaceFilter.h>
-#include <vtkCleanPolyData.h>
-
-#include <vtkSurfaceReconstructionFilter.h>
-#include <vtkContourFilter.h>
-#include <vtkReverseSense.h>
 
 #include <vtkUnstructuredGrid.h>
-#include <ostream>
 
 #include <vtkFloatArray.h>
 #include <vtkVertexGlyphFilter.h>
@@ -29,11 +26,10 @@
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 
-#include <fstream>
-#include "ibex_serialization.h"
-#include <iostream>
-
+#include "smartSubPaving.h"
 #include "previmer3d.h"
+
+#include "../serialization/ibex_serialization.h"
 
 using namespace invariant;
 using namespace std;
@@ -416,46 +412,6 @@ void VtkMaze3D::show_maze(invariant::MazeIBEX *maze, std::string comment){
                 vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
                 surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
                 surfaceFilter->Update();
-
-                // Sometimes the contouring algorithm can create a volume whose gradient
-                // vector and ordering of polygon (using the right hand rule) are
-                // inconsistent. vtkReverseSense cures this problem.
-                //            vtkSmartPointer<vtkReverseSense> reverse = vtkSmartPointer<vtkReverseSense>::New();
-                //            reverse->SetInputConnection(cf->GetOutputPort());
-                //            reverse->ReverseCellsOn();
-                //            reverse->ReverseNormalsOn();
-                //            reverse->Update();
-
-                // ********** Append results **************
-
-                // Vector field work
-
-                //                field->SetNumberOfComponents(3);
-                //                field->SetName("Glyph");
-
-                //                IntervalVector position(p->get_position());
-                //                IntervalVector vec_field = r->get_vector_fields()[0];
-                //                if(!vec_field.is_empty()){
-                //                    double vec_field_point[3][2] = {{vec_field[0].lb(), vec_field[0].ub()},
-                //                                                    {vec_field[1].lb(), vec_field[1].ub()},
-                //                                                    {vec_field[2].lb(), vec_field[2].ub()}};
-                //                    field->InsertNextTuple3(vec_field[0].mid(),
-                //                            vec_field[1].mid(),
-                //                            vec_field[2].mid());
-                //                    for(int x=0; x<2; x++){
-                //                        for(int y=0; y<2; y++){
-                //                            for(int z=0; z<2; z++){
-                //#pragma omp critical(add_field)
-                //                                {
-                //                                    vec_field_points->InsertNextPoint(position[0].mid(), position[1].mid(), position[2].mid());
-                //                                    field->InsertNextTuple3(vec_field_point[0][x],
-                //                                            vec_field_point[1][y],
-                //                                            vec_field_point[2][z]);
-                //                                }
-                //                            }
-                //                        }
-                //                    }
-                //                }
 
 #pragma omp critical(add_polygon)
                 {

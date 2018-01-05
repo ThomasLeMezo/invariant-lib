@@ -17,7 +17,7 @@
 
 #include <fstream>
 
-#include "ibex_serialization.h"
+#include "../serialization/ibex_serialization.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>

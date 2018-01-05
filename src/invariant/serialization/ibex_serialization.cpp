@@ -10,7 +10,7 @@
  *  Created   : 2016
  * ---------------------------------------------------------------------------- */
 
-#include "ibex_serialization.h"
+#include "../serialization/ibex_serialization.h"
 
 using namespace std;
 using namespace ibex;

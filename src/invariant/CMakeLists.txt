@@ -4,20 +4,20 @@
 
 
 # Sources
-include_directories(serialization)
 include_directories(definition)
 include_directories(definition/netcdf)
 include_directories(definition/dataSet)
 include_directories(smartSubPaving)
 include_directories(maze)
+include_directories(serialization)
 
   set(SRC
+    serialization/ibex_serialization.cpp
+
     definition/dynamics.cpp
     definition/dynamics_function.cpp
     definition/dynamicsinclusionfunction.cpp
     definition/domain.cpp
-
-    serialization/ibex_serialization.cpp
 
     maze/room.cpp
     maze/door.cpp
@@ -72,8 +72,6 @@ include_directories(maze)
     maze/room.tpp
     maze/door.tpp
     maze/sepmaze.tpp
-
-
   )
 
   if(WITH_NETCDF)

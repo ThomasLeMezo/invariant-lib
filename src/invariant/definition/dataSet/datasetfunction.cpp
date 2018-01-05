@@ -1,6 +1,6 @@
 #include "datasetfunction.h"
 #include "datasetnode.h"
-#include "ibex_serialization.h"
+#include "../serialization/ibex_serialization.h"
 #include "ibex_IntervalVector.h"
 
 #include "omp.h"
