@@ -31,8 +31,8 @@ DataSetNode<_Tp, _n>::DataSetNode(const std::vector<std::array<int, 2> > &positi
     if(limit_reach){
         // One pixel size
         m_bisection_axis = -1;
-        m_children_first = NULL;
-        m_children_second = NULL;
+        m_children_first = nullptr;
+        m_children_second = nullptr;
         std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2> > > pair(this, position);
         leaf_list.push_back(pair);
     }
@@ -51,9 +51,9 @@ DataSetNode<_Tp, _n>::DataSetNode(const std::vector<std::array<int, 2> > &positi
 template<typename _Tp, size_t _n>
 DataSetNode<_Tp, _n>::~DataSetNode(){
     if(!is_leaf()){
-        if(m_children_first!=NULL)
+        if(m_children_first!=nullptr)
             delete(m_children_first);
-        if(m_children_second!=NULL)
+        if(m_children_second!=nullptr)
             delete(m_children_second);
     }
 }
@@ -115,8 +115,8 @@ bool DataSetNode<_Tp, _n>::fill_tree(){
                 delete(m_children_first);
                 delete(m_children_second);
 
-                m_children_first = NULL;
-                m_children_second = NULL;
+                m_children_first = nullptr;
+                m_children_second = nullptr;
             }
         }
 
@@ -148,9 +148,9 @@ void DataSetNode<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, c
 
             std::vector<std::array<int, 2>> p1, p2;
             bisector(position, p1, p2);
-            if(m_children_first != NULL)
+            if(m_children_first != nullptr)
                 m_children_first->eval(target, p1, data);
-            if(m_children_second != NULL)
+            if(m_children_second != nullptr)
                 m_children_second->eval(target, p2, data);
         }
     }
@@ -200,7 +200,7 @@ void DataSetNode<_Tp, _n>::serialize(std::ofstream& binFile) const{
     bool val_true = true;
     bool val_false = false;
 
-    if(m_children_first != NULL){
+    if(m_children_first != nullptr){
         binFile.write((const char*) &val_true, sizeof(bool));
         m_children_first->serialize(binFile);
     }
@@ -208,7 +208,7 @@ void DataSetNode<_Tp, _n>::serialize(std::ofstream& binFile) const{
         binFile.write((const char*) &val_false, sizeof(bool));
     }
 
-    if(m_children_second != NULL){
+    if(m_children_second != nullptr){
         binFile.write((const char*) &val_true, sizeof(bool));
         m_children_second->serialize(binFile);
     }

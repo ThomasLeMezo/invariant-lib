@@ -238,7 +238,7 @@ public:
 
 private:
     bool                                m_leaf = true;
-    mutable Pave<_Tp>*                       m_pave = NULL;
+    mutable Pave<_Tp>*                       m_pave = nullptr;
     std::pair<Pave_node<_Tp> *, Pave_node<_Tp> *> m_children;
     const ibex::IntervalVector          m_position;
 
@@ -262,7 +262,7 @@ inline Pave<_Tp>* Pave_node<_Tp>::get_pave() const{
         return m_pave;
     else{
         throw std::runtime_error("in [pave_node.cpp/get_pave] this Pave_node is not a leaf");
-        return NULL;
+        return nullptr;
     }
 }
 

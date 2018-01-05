@@ -1,12 +1,12 @@
 #include "vtkmazeppl.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkPoints.h"
-#include "vtkPolyData.h"
-#include "vtkAppendPolyData.h"
-#include "vtkDelaunay3D.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkXMLPolyDataWriter.h"
+#include <vtkSmartPointer.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkAppendPolyData.h>
+#include <vtkDelaunay3D.h>
+#include <vtkDataSetSurfaceFilter.h>
+#include <vtkXMLPolyDataWriter.h>
 
 #include <ostream>
 #include <iostream>

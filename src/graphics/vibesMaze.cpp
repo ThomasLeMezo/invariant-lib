@@ -37,11 +37,11 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer,
 
 void VibesMaze::show() const{
     show_graph();
-    if(m_maze_outer != NULL && m_maze_inner == NULL)
+    if(m_maze_outer != nullptr && m_maze_inner == nullptr)
         show_maze_outer();
-    if(m_maze_outer == NULL && m_maze_inner != NULL)
+    if(m_maze_outer == nullptr && m_maze_inner != nullptr)
         show_maze_inner();
-    else if(m_maze_outer != NULL && m_maze_inner != NULL)
+    else if(m_maze_outer != nullptr && m_maze_inner != nullptr)
         show_maze_outer_inner();
 
 }
@@ -439,10 +439,10 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
 //        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave
-        if(m_maze_inner != NULL){ //maze->get_domain()->get_init() == FULL_WALL){
+        if(m_maze_inner != nullptr){ //maze->get_domain()->get_init() == FULL_WALL){
             draw_room_inner(p);
         }
-        if(m_maze_outer != NULL){//maze->get_domain()->get_init() == FULL_DOOR){
+        if(m_maze_outer != nullptr){//maze->get_domain()->get_init() == FULL_DOOR){
             draw_room_outer(p);
         }
 //        else{

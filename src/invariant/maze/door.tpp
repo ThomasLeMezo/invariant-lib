@@ -18,9 +18,9 @@ namespace invariant {
 template <typename _Tp>
 Door<_Tp>::~Door(){
     omp_destroy_lock(&m_lock_read);
-    if(m_input_private != NULL)
+    if(m_input_private != nullptr)
         delete(m_input_private);
-    if(m_output_private != NULL)
+    if(m_output_private != nullptr)
         delete(m_output_private);
 }
 
@@ -29,8 +29,8 @@ void Door<_Tp>::set_removed(){
     delete(m_output_private);
     delete(m_input_private);
 
-    m_output_private = NULL;
-    m_input_private = NULL;
+    m_output_private = nullptr;
+    m_input_private = nullptr;
 }
 
 //template <typename _Tp>

@@ -155,7 +155,7 @@ private:
     mutable ibex::IntervalVector      m_orientation; // Orientation of the Face : [1], [0] or [0,1]
     mutable ibex::IntervalVector      m_normal; // Normal vector of the face
     // for each dimension according to the position of the Face in the Pave
-    mutable Pave<_Tp>*                m_pave = NULL;
+    mutable Pave<_Tp>*                m_pave = nullptr;
     std::vector<Face<_Tp> *>          m_neighbors;
     bool                              m_border = false;
 

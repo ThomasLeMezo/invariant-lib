@@ -58,11 +58,11 @@ Room<_Tp>::~Room(){
     omp_destroy_lock(&m_lock_vector_field);
     delete(m_ctc);
     delete(m_contract_function);
-    if(m_initial_door_output != NULL)
+    if(m_initial_door_output != nullptr)
         delete(m_initial_door_output);
-    if(m_initial_door_input != NULL)
+    if(m_initial_door_input != nullptr)
         delete(m_initial_door_input);
-    if(m_father_hull != NULL)
+    if(m_father_hull != nullptr)
         delete(m_father_hull);
 }
 
@@ -909,7 +909,7 @@ void Room<_Tp>::set_removed(){
 
     if(m_is_father_hull){
         delete(m_father_hull);
-        m_father_hull = NULL;
+        m_father_hull = nullptr;
         m_is_father_hull = false;
     }
 

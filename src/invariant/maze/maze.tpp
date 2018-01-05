@@ -33,8 +33,10 @@ int Maze<_Tp>::contract(size_t nb_operations){
         return 0;
     }
     double t_start = omp_get_wtime();
+
     // Domain contraction
     if(m_nb_operations == 0){
+        m_deque_rooms.clear();
         std::vector<Room<_Tp> *> list_room_to_contract;
         invariant::Domain<_Tp> *d = m_domain;
         if(m_enable_contract_domain)
@@ -84,10 +86,8 @@ int Maze<_Tp>::contract(size_t nb_operations){
             while(!stop_contraction){
 #pragma omp task
                 {
-#pragma omp atomic
-                    nb_deque++;
                     // Take one Room
-                    Room<_Tp> *r = NULL;
+                    Room<_Tp> *r = nullptr;
                     omp_set_lock(&m_deque_access);
                     if(!m_deque_rooms.empty()){
                         // To improve the efficiency, we start half of the thread on the back of the deque
@@ -98,13 +98,16 @@ int Maze<_Tp>::contract(size_t nb_operations){
                         }
                         else{
                             r = m_deque_rooms.front();
+                            if(r->get_pave()->get_position().size()>3)
+                                std::cout << "ERROR" << std::endl;
                             m_deque_rooms.pop_front();
                         }
                         r->reset_deque(); // Room can be added again to the deque
+                        nb_deque++;
                     }
                     omp_unset_lock(&m_deque_access);
 
-                    if(r!=NULL){ // Room can be empty (because m_deque_rooms need lock)
+                    if(r!=nullptr){ // Room can be empty (because m_deque_rooms need lock)
                         r->lock_contraction();
                         // Contract
                         bool change = false;
@@ -160,6 +163,8 @@ int Maze<_Tp>::contract(size_t nb_operations){
     m_contraction_step++;
     if(m_deque_rooms.empty())
         m_nb_operations = 0;
+    else
+        std::cout << " => limit number of operation reached (" << nb_operations << ")" << std::endl;
     return nb_operations;
 }
 

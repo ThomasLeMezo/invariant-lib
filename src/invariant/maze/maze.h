@@ -135,9 +135,9 @@ public:
     void set_enable_contract_domain(bool val);
 
 private:
-    invariant::Domain<_Tp> *    m_domain = NULL;
-    SmartSubPaving<_Tp>  *    m_subpaving = NULL; // SmartSubPaving associated with this maze
-    Dynamics *  m_dynamics = NULL;
+    invariant::Domain<_Tp> *    m_domain = nullptr;
+    SmartSubPaving<_Tp>  *    m_subpaving = nullptr; // SmartSubPaving associated with this maze
+    Dynamics *  m_dynamics = nullptr;
 
     std::deque<Room<_Tp> *> m_deque_rooms;
     omp_lock_t  m_deque_access;
@@ -193,10 +193,10 @@ inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
 }
 
 template <typename _Tp>
-inline Parma_Polyhedra_Library::Thread_Init* initialize_thread();
+Parma_Polyhedra_Library::Thread_Init* initialize_thread();
 
 template <typename _Tp>
-inline void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
+void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
 
 }
 

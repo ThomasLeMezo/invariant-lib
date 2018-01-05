@@ -400,8 +400,8 @@ public:
     const _Tp& get_father_hull() const;
 
 protected:
-    Pave<_Tp>*   m_pave = NULL; // pointer to the associated face
-    Maze<_Tp>*   m_maze = NULL; // pointer to the associated maze
+    Pave<_Tp>*   m_pave = nullptr; // pointer to the associated face
+    Maze<_Tp>*   m_maze = nullptr; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
     std::vector<ibex::IntervalMatrix> m_vector_fields_d1; // Vector field of the Room
 
@@ -429,20 +429,20 @@ protected:
     // Initial condition
     bool    m_is_initial_door_input = false;
     bool    m_is_initial_door_output = false;
-    _Tp* m_initial_door_input = NULL;
-    _Tp* m_initial_door_output = NULL;
+    _Tp* m_initial_door_input = nullptr;
+    _Tp* m_initial_door_output = nullptr;
 
     // Valid hull
     bool m_is_father_hull = false;
-    _Tp* m_father_hull = NULL;
+    _Tp* m_father_hull = nullptr;
 
     // To Be Removed
     size_t     m_nb_contract = 0;
     bool m_debug_room = false;
     int m_time_debug = 0;
 
-    ibex::Function *m_contract_function;
-    ibex::CtcFwdBwd *m_ctc;
+    ibex::Function *m_contract_function = nullptr;
+    ibex::CtcFwdBwd *m_ctc = nullptr;
 
     // For PPL
 //    std::vector<std::vector<ppl::Generator>> *m_ray_vector_field;
@@ -514,7 +514,7 @@ inline bool Room<_Tp>::is_initial_door_output() const{
 template <typename _Tp>
 inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
     m_is_initial_door_input = true;
-    if(m_initial_door_input == NULL){
+    if(m_initial_door_input == nullptr){
         m_initial_door_input = new _Tp(door);
     }
     else{
@@ -525,7 +525,7 @@ inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
 template <typename _Tp>
 inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
     m_is_initial_door_output = true;
-    if(m_initial_door_output == NULL){
+    if(m_initial_door_output == nullptr){
         m_initial_door_output = new _Tp(door);
     }
     else{
@@ -546,7 +546,7 @@ inline const _Tp& Room<_Tp>::get_initial_door_output() const{
 template <typename _Tp>
 inline void Room<_Tp>::set_full_initial_door_input(){
     m_is_initial_door_input = true;
-    if(m_initial_door_input == NULL){
+    if(m_initial_door_input == nullptr){
         m_initial_door_input = new _Tp(m_pave->get_position_typed());
     }
     else{
@@ -557,7 +557,7 @@ inline void Room<_Tp>::set_full_initial_door_input(){
 template <typename _Tp>
 inline void Room<_Tp>::set_full_initial_door_output(){
     m_is_initial_door_output = true;
-    if(m_initial_door_output == NULL){
+    if(m_initial_door_output == nullptr){
         m_initial_door_output = new _Tp(m_pave->get_position_typed());
     }
     else{
@@ -568,7 +568,7 @@ inline void Room<_Tp>::set_full_initial_door_output(){
 template <typename _Tp>
 inline void Room<_Tp>::set_father_hull(const _Tp &hull){
     m_is_father_hull = true;
-    if(m_father_hull == NULL){
+    if(m_father_hull == nullptr){
         m_father_hull = new _Tp(hull);
     }
     else{

@@ -224,8 +224,8 @@ private:
     mutable _Tp                                             *m_position_typed; // Pave position
     mutable std::vector< std::array<Face<_Tp>*, 2>>         m_faces; // Faces of the Pave
     mutable std::vector<invariant::Face<_Tp> *>             m_faces_vector; // Faces of the Pave
-    mutable SmartSubPaving<_Tp>*                            m_subpaving = NULL;
-    mutable Pave_node<_Tp>*                                 m_tree = NULL;
+    mutable SmartSubPaving<_Tp>*                            m_subpaving = nullptr;
+    mutable Pave_node<_Tp>*                                 m_tree = nullptr;
     mutable size_t                                          m_dim = 0;
 //    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
     std::map<Maze<_Tp>*, Room<_Tp>*>                        m_rooms;

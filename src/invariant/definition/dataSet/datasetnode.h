@@ -115,8 +115,8 @@ private:
     signed char m_bisection_axis = -1; // -1 if leaf
     bool m_valid_data = true;
 
-    DataSetNode<_Tp, _n> * m_children_first = NULL;
-    DataSetNode<_Tp, _n> * m_children_second = NULL;
+    DataSetNode<_Tp, _n> * m_children_first = nullptr;
+    DataSetNode<_Tp, _n> * m_children_second = nullptr;
 
 };
 

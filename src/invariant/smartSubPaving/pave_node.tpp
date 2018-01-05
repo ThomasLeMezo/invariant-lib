@@ -12,7 +12,7 @@ Pave_node<_Tp>::Pave_node(Pave<_Tp> *p):m_position(p->get_position())
 template<typename _Tp>
 void Pave_node<_Tp>::add_child(Pave<_Tp> *p1, Pave<_Tp> *p2){
     m_leaf = false;
-    m_pave = NULL;
+    m_pave = nullptr;
     Pave_node<_Tp>* pn1 = new Pave_node<_Tp>(p1);
     Pave_node<_Tp>* pn2 = new Pave_node<_Tp>(p2);
     m_children = std::make_pair(pn1, pn2);

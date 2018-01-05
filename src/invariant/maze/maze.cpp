@@ -7,7 +7,7 @@ template class Maze<ibex::IntervalVector>;
 
 template<>
 Parma_Polyhedra_Library::Thread_Init* initialize_thread<ppl::C_Polyhedron>(){
-    Parma_Polyhedra_Library::Thread_Init *thread_init = NULL;
+    Parma_Polyhedra_Library::Thread_Init *thread_init = nullptr;
     bool thread_init_valid = true;
     #pragma omp master
     {
@@ -20,17 +20,17 @@ Parma_Polyhedra_Library::Thread_Init* initialize_thread<ppl::C_Polyhedron>(){
 
 template<>
 Parma_Polyhedra_Library::Thread_Init* initialize_thread<ibex::IntervalVector>(){
-    return NULL;
+    return nullptr;
 }
 
 template <>
-inline void delete_thread_init<ppl::C_Polyhedron>(Parma_Polyhedra_Library::Thread_Init* thread_init){
-    if(thread_init!=NULL)
+void delete_thread_init<ppl::C_Polyhedron>(Parma_Polyhedra_Library::Thread_Init* thread_init){
+    if(thread_init!=nullptr)
         delete(thread_init);
 }
 
 template <>
-inline void delete_thread_init<ibex::IntervalVector>(Parma_Polyhedra_Library::Thread_Init* thread_init){
+void delete_thread_init<ibex::IntervalVector>(Parma_Polyhedra_Library::Thread_Init* thread_init){
 }
 
 }

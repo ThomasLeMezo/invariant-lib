@@ -31,9 +31,9 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
     }
 
     // ********** Separator contraction ********** //
-    if(m_sep_output != NULL)
+    if(m_sep_output != nullptr)
         contract_separator(maze, m_subpaving->get_tree(), list_room_deque, true, SEP_UNKNOWN); // Output
-    if(m_sep_input != NULL)
+    if(m_sep_input != nullptr)
         contract_separator(maze, m_subpaving->get_tree(), list_room_deque, false, SEP_UNKNOWN); // Input
 
     // ********** Border contraction ********** //

@@ -72,11 +72,11 @@ private:
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
-    invariant::SmartSubPavingIBEX*   m_subpaving = NULL;
+    invariant::SmartSubPavingIBEX*   m_subpaving = nullptr;
     double              m_overhead_factor;
 
-    invariant::MazeIBEX*    m_maze_outer = NULL;
-    invariant::MazeIBEX*    m_maze_inner = NULL;
+    invariant::MazeIBEX*    m_maze_outer = nullptr;
+    invariant::MazeIBEX*    m_maze_inner = nullptr;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;
 

@@ -42,7 +42,7 @@ SmartSubPaving<_Tp>::SmartSubPaving(const ibex::IntervalVector &space):
 template<typename _Tp>
 SmartSubPaving<_Tp>::~SmartSubPaving(){
     for(Pave<_Tp> *p:m_paves){
-        if(p!=NULL)
+        if(p!=nullptr)
             delete(p);
     }
     delete(m_tree);
@@ -51,7 +51,7 @@ SmartSubPaving<_Tp>::~SmartSubPaving(){
 template<typename _Tp>
 void SmartSubPaving<_Tp>::delete_pave(int id){
     delete(m_paves[id]);
-    m_paves[id] = NULL;
+    m_paves[id] = nullptr;
 }
 
 template<typename _Tp>

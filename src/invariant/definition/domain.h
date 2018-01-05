@@ -215,8 +215,8 @@ private:
 private:
     SmartSubPaving<_Tp> * m_subpaving;
 
-    ibex::Sep* m_sep_input = NULL;
-    ibex::Sep* m_sep_output = NULL;
+    ibex::Sep* m_sep_input = nullptr;
+    ibex::Sep* m_sep_output = nullptr;
 
     bool m_border_path_in = true;
     bool m_border_path_out = true;
@@ -297,7 +297,7 @@ template <typename _Tp>
 _Tp convert(const ppl::C_Polyhedron &p);
 
 template <typename _Tp>
-inline Parma_Polyhedra_Library::Thread_Init* initialize_thread();
+Parma_Polyhedra_Library::Thread_Init* initialize_thread();
 
 template <typename _Tp>
 void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);

@@ -270,8 +270,8 @@ protected:
     _Tp m_output_public; //input and output doors public
     _Tp *m_input_private;
     _Tp *m_output_private; //input and output doors private (for contraction)
-    Face<_Tp> *               m_face = NULL; // pointer to the associated face
-    Room<_Tp> *               m_room = NULL; // pointer to the associated face
+    Face<_Tp> *               m_face = nullptr; // pointer to the associated face
+    Room<_Tp> *               m_room = nullptr; // pointer to the associated face
     mutable omp_lock_t   m_lock_read;
 
     std::vector<bool>    m_possible_out;

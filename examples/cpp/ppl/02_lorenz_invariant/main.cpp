@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
     VtkMazePPL vtkMazePPL("LorenzPPL");
 
 //    omp_set_num_threads(1);
-    for(int i=0; i<10; i++){
+    for(int i=0; i<15; i++){
+        std::time_t t_now = std::time(nullptr);
+        cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
-        cout << i << endl;
-        maze.contract(paving.size()*10);
-        cout << "=> " << paving.size() << endl;
+        maze.contract(paving.size_active()*15);
         vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;

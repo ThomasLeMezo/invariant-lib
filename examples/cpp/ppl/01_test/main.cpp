@@ -156,7 +156,7 @@ int test(){
 
 #pragma omp parallel
     {
-        PPL::Thread_Init *thread_init = NULL;
+        PPL::Thread_Init *thread_init = nullptr;
         bool thread_init_valid = true;
 #pragma omp master
 {

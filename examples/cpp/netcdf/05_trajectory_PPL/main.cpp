@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
 ////    vtkMaze3D.show_maze(&maze);
 //    vtkMaze3D.serialize_maze("current.maze", &maze);
 
-    IntervalVector position(3);
-    position[0] = ibex::Interval(t_c); // 450, 900
-    position[1] = ibex::Interval(x_c); // 37304, 37980
-    position[2] = ibex::Interval(y_c); // 119766, 120469
-    vtkMazePPL.show_room_info(&maze, position);
+//    IntervalVector position(3);
+//    position[0] = ibex::Interval(t_c); // 450, 900
+//    position[1] = ibex::Interval(x_c); // 37304, 37980
+//    position[2] = ibex::Interval(y_c); // 119766, 120469
+//    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;
 }

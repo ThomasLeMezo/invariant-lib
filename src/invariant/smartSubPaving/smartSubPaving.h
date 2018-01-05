@@ -167,7 +167,7 @@ protected:
     std::vector<Pave<_Tp>*>              m_paves; // Paves of the SmartSubPaving
     std::vector<Pave<_Tp>*>              m_paves_not_bisectable; // Paves of the SmartSubPaving
     mutable unsigned char           m_dim = 0; // Dimension of the space
-    mutable Pave_node<_Tp>*              m_tree = NULL; // Root of the pave node tree
+    mutable Pave_node<_Tp>*              m_tree = nullptr; // Root of the pave node tree
 
     std::vector<Maze<_Tp>*>              m_mazes;
 
