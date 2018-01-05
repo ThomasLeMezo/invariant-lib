@@ -839,7 +839,7 @@ bool Room<_Tp>::is_full_union() const{
 
 template<typename _Tp>
 bool Room<_Tp>::request_bisection(){
-    return !(is_empty()) || m_first_contract;
+    return !(is_empty()) || (m_first_contract && m_maze->get_domain()->get_init()==FULL_WALL);
 }
 
 template<typename _Tp>

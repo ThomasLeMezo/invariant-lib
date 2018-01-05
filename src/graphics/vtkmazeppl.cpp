@@ -39,7 +39,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
 
     #pragma omp parallel
     {
-        PPL::Thread_Init *thread_init = initialize_thread<_Tp>();
+        PPL::Thread_Init *thread_init = initialize_thread<ppl::C_Polyhedron>();
 #pragma omp for schedule(dynamic)
     for(int pave_id=0; pave_id<dim_paves_list; pave_id++){
         PavePPL *p = maze->get_subpaving()->get_paves()[pave_id];
@@ -110,7 +110,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
             }
         }
     }
-    delete_thread_init<_Tp>(thread_init);
+    delete_thread_init<ppl::C_Polyhedron>(thread_init);
     }
 
     polyData_polygon->Update();
