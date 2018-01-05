@@ -52,13 +52,13 @@ bool Door<_Tp>::analyze_change(std::vector<Room<_Tp> *>&list_rooms){
 
     if((sens_bwd && ( (dom_door && !is_subset(get_input(), *m_input_private))
                       || (dom_wall && !is_subset(*m_input_private, get_input()))))
-            || (sens_fwd && ( (dom_door && !is_subset(get_output(), *m_output_private))
-                              || (dom_wall && !is_subset(*m_output_private, get_output()))))){ // operator != is generic for iv & polyhedron
+       || (sens_fwd && ( (dom_door && !is_subset(get_output(), *m_output_private))
+                         || (dom_wall && !is_subset(*m_output_private, get_output()))))){ // operator != is generic for iv & polyhedron
         std::vector<Face<_Tp> *> l_face = m_face->get_neighbors();
         for(Face<_Tp>* f_n:l_face){
             Door *d_n = f_n->get_doors()[m_room->get_maze()];
             if((domain_init == FULL_DOOR && ((sens_fwd && !d_n->is_empty_input()) || (sens_bwd && !d_n->is_empty_output())))
-                    || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
+               || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
                 list_rooms.push_back(f_n->get_pave()->get_rooms()[m_room->get_maze()]);
         }
         return true;
@@ -193,8 +193,10 @@ bool Door<_Tp>::contract_continuity_private(){
         }
 
         if(domain_init == FULL_DOOR && !is_subset(*m_input_private,door_input)){
-            (*m_input_private) &= door_input;
-            change = true;
+            if(!m_room->get_maze()->get_limit_contraction_door() || m_room->get_nb_contractions()<=m_room->get_maze()->get_widening_limit()){
+                (*m_input_private) &= door_input;
+                change = true;
+            }
         }
         else if(domain_init == FULL_WALL && !is_subset(door_input,*m_input_private)){
             if(m_room->get_nb_contractions()>m_room->get_maze()->get_widening_limit())
@@ -217,8 +219,10 @@ bool Door<_Tp>::contract_continuity_private(){
         }
 
         if(domain_init == FULL_DOOR && !is_subset(*m_output_private,door_output)){
-            *m_output_private &= door_output;
-            change = true;
+            if(!m_room->get_maze()->get_limit_contraction_door() || m_room->get_nb_contractions()<=m_room->get_maze()->get_widening_limit()){
+                *m_output_private &= door_output;
+                change = true;
+            }
         }
         else if(domain_init == FULL_WALL && !is_subset(door_output,*m_output_private)){
             if(m_room->get_nb_contractions()>m_room->get_maze()->get_widening_limit())

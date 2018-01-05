@@ -38,14 +38,16 @@ int main(int argc, char *argv[])
     ibex::Interval pt_xy = sqrt(beta*(rho-1.0));
     ibex::Interval pt_z = rho-1.0;
     double r = 3.0;
+    double r2 = 5.0;
 
     // Remove zeros
-    Function f_sep1(x1, x2, x3, pow(x1, 2)+pow(x2, 2)+pow(x3, 2)-pow(r, 2));
-    SepFwdBwd s1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT
     Function f_sep2(x1, x2, x3, pow(x1-pt_xy, 2)+pow(x2-pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));
     SepFwdBwd s2(f_sep2, GEQ); // LT, LEQ, EQ, GEQ, GT
     Function f_sep3(x1, x2, x3, pow(x1+pt_xy, 2)+pow(x2+pt_xy, 2)+pow(x3-pt_z, 2)-pow(r, 2));
     SepFwdBwd s3(f_sep3, GEQ); // LT, LEQ, EQ, GEQ, GT
+
+    Function f_sep1(x1, x2, x3, pow(x1, 2)+pow(x2, 2)+pow(x3, 2)-pow(r2, 2));
+    SepFwdBwd s1(f_sep1, GEQ); // LT, LEQ, EQ, GEQ, GT
 
     Array<Sep> array_sep;
     array_sep.add(s1);
@@ -71,11 +73,15 @@ int main(int argc, char *argv[])
     VtkMazePPL vtkMazePPL("LorenzPPL");
 
 //    omp_set_num_threads(1);
+
+    maze.set_limit_contraction_door(true);
+    maze.set_widening_limit(5);
+
     for(int i=0; i<15; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
-        maze.contract(paving.size_active()*15);
+        maze.contract(paving.size_active()*5);
         vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
