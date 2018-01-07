@@ -92,11 +92,11 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
     cout << paving << endl;
 
-//    IntervalVector position(3);
-//    position[0] = ibex::Interval(t_c); // 450, 900
-//    position[1] = ibex::Interval(x_c); // 37304, 37980
-//    position[2] = ibex::Interval(125000); // 119766, 120469
-//    vtkMazePPL.show_room_info(&maze, position);
+    IntervalVector position(3);
+    position[0] = ibex::Interval(5350); // 450, 900
+    position[1] = ibex::Interval(34200); // 37304, 37980
+    position[2] = ibex::Interval(126600); // 119766, 120469
+    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;
 }
