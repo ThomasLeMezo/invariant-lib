@@ -433,9 +433,9 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorIBEX&
 
 inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorPPL& d){
     stream << "input = ";
-    ppl::IO_Operators::operator <<(stream, d.get_output());
-    stream << " output = ";
     ppl::IO_Operators::operator <<(stream, d.get_input());
+    stream << " output = ";
+    ppl::IO_Operators::operator <<(stream, d.get_output());
     return stream;
 }
 

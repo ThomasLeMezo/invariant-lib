@@ -118,6 +118,12 @@ public:
     size_t get_widening_limit() const;
 
     /**
+     * @brief get contraction limit
+     * @return
+     */
+    size_t get_contraction_limit() const;
+
+    /**
      * @brief get limit contraction door
      * @return
      */
@@ -130,10 +136,16 @@ public:
     void set_widening_limit(size_t limit);
 
     /**
-     * @brief set limit contraction door (equivalent widening)
+     * @brief set contraction limit
+     * @param limit
+     */
+    void set_contraction_limit(size_t limit);
+
+    /**
+     * @brief set a limit to door contraction (equivalent widening)
      * @param val
      */
-    void set_limit_contraction_door(bool val);
+    void set_enable_contraction_limit(bool val);
 
     /**
      * @brief Set nb_operation to 0
@@ -161,6 +173,7 @@ private:
 
     size_t m_nb_operations=0;
     size_t m_widening_limit=1000;
+    size_t m_contraction_limit=1000;
     bool m_enable_contract_domain = true;
     bool m_limit_contraction_door = false;
 };
@@ -174,7 +187,12 @@ inline void Maze<_Tp>::set_widening_limit(size_t limit){
 }
 
 template <typename _Tp>
-inline void Maze<_Tp>::set_limit_contraction_door(bool val){
+inline void Maze<_Tp>::set_contraction_limit(size_t limit){
+    m_contraction_limit = limit;
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::set_enable_contraction_limit(bool val){
     m_limit_contraction_door = val;
 }
 
@@ -186,6 +204,11 @@ inline void Maze<_Tp>::set_enable_contract_domain(bool val){
 template <typename _Tp>
 inline size_t Maze<_Tp>::get_widening_limit() const{
     return m_widening_limit;
+}
+
+template <typename _Tp>
+inline size_t Maze<_Tp>::get_contraction_limit() const{
+    return m_contraction_limit;
 }
 
 template <typename _Tp>

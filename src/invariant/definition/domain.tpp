@@ -314,6 +314,7 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
 
 template<typename _Tp>
 void Domain<_Tp>::contract_box(Room<_Tp> *room, const ibex::IntervalVector& initial_condition, DOOR_SELECTOR doorSelector){
+    // Warning : no inversion of constraint (output=>input) because this is not a propagation as in the case of FULL_WALL
     for(Face<_Tp> *f:room->get_pave()->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[room->get_maze()];
         if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)

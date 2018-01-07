@@ -18,13 +18,13 @@ public:
      * @brief PreviMer constructor
      * @param file_name
      */
-    PreviMer3D(const std::string &file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits);
+    PreviMer3D(const std::string &file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief PreviMer3D deserialization
      * @param file_name
      */
-    PreviMer3D(const std::string& file_name);
+    PreviMer3D(const std::string& file_name, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief PreviMer destructor

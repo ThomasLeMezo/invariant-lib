@@ -78,7 +78,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
         return 0;
     }
 
-#pragma omp parallel
+#pragma omp parallel shared(stop_contraction)
     {
         Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp single
@@ -88,7 +88,10 @@ int Maze<_Tp>::contract(size_t nb_operations){
                 {
                     // Take one Room
                     Room<_Tp> *r = nullptr;
-                    omp_set_lock(&m_deque_access);
+                    while(!omp_test_lock(&m_deque_access)){
+                        #pragma omp taskyield
+                    }
+
                     if(!m_deque_rooms.empty()){
                         // To improve the efficiency, we start half of the thread on the back of the deque
                         // and the other on the front

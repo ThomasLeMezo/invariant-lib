@@ -141,8 +141,8 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
     m_search_space[2] = Interval(m_offset_j*m_grid_conversion[2], (m_offset_j+j_max_save)*m_grid_conversion[2]);
 }
 
-PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits):
-    Dynamics(FWD), m_search_space(3)
+PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits, const DYNAMICS_SENS sens):
+    Dynamics(sens), m_search_space(3)
 {
     int ram_init = getRAM()/1000;
     cout << "Mem 0 = " << ram_init << " Mo" << endl;
@@ -217,8 +217,8 @@ void PreviMer3D::serialize(const string &file_name){
     binFile.close();
 }
 
-PreviMer3D::PreviMer3D(const std::string& file_name):
-    Dynamics(FWD), m_search_space(3)
+PreviMer3D::PreviMer3D(const std::string& file_name, const DYNAMICS_SENS sens):
+    Dynamics(sens), m_search_space(3)
 {
     int ram_init = getRAM()/1000;
     std::ifstream binFile(file_name.c_str(), std::ifstream::in);
@@ -274,7 +274,10 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec[2] = Interval(data[1][0] * m_scale_factor, data[1][1] * m_scale_factor); // in m
     }
 
-    vector_fields.push_back(vec);
+    if(m_dynamics_sens==FWD)
+        vector_fields.push_back(vec);
+    else
+        vector_fields.push_back(-vec);
     return vector_fields;
 }
 

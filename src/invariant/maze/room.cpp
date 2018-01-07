@@ -187,13 +187,10 @@ const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull_typed() const{
 
 template <>
 void Room<ppl::C_Polyhedron>::compute_vector_field_typed(){
-    std::vector<ppl::C_Polyhedron> p_list_fwd, p_list_bwd;
     for(ibex::IntervalVector &vect:m_vector_fields){
-        p_list_fwd.push_back(iv_2_polyhedron(vect));
-        p_list_bwd.push_back(iv_2_polyhedron(-vect));
+        m_vector_fields_typed_fwd.push_back(iv_2_polyhedron(vect));
+        m_vector_fields_typed_bwd.push_back(iv_2_polyhedron(-vect));
     }
-    m_vector_fields_typed_fwd = p_list_fwd;
-    m_vector_fields_typed_bwd = p_list_bwd;
 }
 
 template<>

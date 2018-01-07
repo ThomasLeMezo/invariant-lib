@@ -228,7 +228,7 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
                 contract_sliding_mode(n_vf, face, sens, out_return, in_return);
 
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
-                    door->set_input_private(in_return); // Write input
+                    //                    door->set_input_private(in_return); // Write input // Not a good idea here ? => To Check the impact !
                     in_results[n_vf][face][sens] = in_return;
 
                     /// Impact on other faces (OUT -> IN)
@@ -251,7 +251,7 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
                 }
                 if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
                     /// Write output here to improve standard mode efficency
-                    door->set_output_private(out_return); // Write output
+                    //                    door->set_output_private(out_return); // Write output ==> See remarks before
                     out_results[n_vf][face][sens] = out_return;
 
                     /// Impact on other faces (IN -> OUT)
@@ -336,24 +336,28 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
                 Face<_Tp>* f = m_pave->get_faces()[face][sens];
                 Door<_Tp>* door = f->get_doors()[m_maze];
 
-                if(m_is_initial_door_input && !m_initial_door_input->is_empty() && (dynamics_sens == FWD || dynamics_sens == FWD_BWD) && door->is_possible_out()[n_vf]){
+                if(m_is_initial_door_input && (dynamics_sens == FWD || dynamics_sens == FWD_BWD) && !m_initial_door_input->is_empty() && door->is_possible_out()[n_vf]){
                     _Tp in_tmp(*m_initial_door_input);
                     _Tp out_tmp(door->get_output_private());
                     if(domain_init == FULL_WALL)
                         out_tmp = f->get_position_typed();
 
-                    this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                    out_results[n_vf][face][sens] |= out_tmp;
+                    if(!out_tmp.is_empty()){
+                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD);
+                        out_results[n_vf][face][sens] |= out_tmp;
+                    }
                 }
 
-                if(m_is_initial_door_output && !m_initial_door_output->is_empty() && (dynamics_sens == BWD || dynamics_sens == FWD_BWD) && door->is_possible_in()[n_vf]){
+                if(m_is_initial_door_output && (dynamics_sens == BWD || dynamics_sens == FWD_BWD) && !m_initial_door_output->is_empty() && door->is_possible_in()[n_vf]){
                     _Tp out_tmp(*m_initial_door_output);
                     _Tp in_tmp(door->get_input_private());
                     if(domain_init == FULL_WALL)
                         in_tmp = f->get_position_typed();
 
-                    this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
-                    in_results[n_vf][face][sens] |= in_tmp;
+                    if(!in_tmp.is_empty()){
+                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
+                        in_results[n_vf][face][sens] |= in_tmp;
+                    }
 
                 }
             }
@@ -488,6 +492,12 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
     if(!input_full)
         input_global_door &= f_in->get_position_typed();
 
+    if(output_global_door.is_empty() || input_global_door.is_empty()){
+        in_return = in_return; // i.e. empty container (cf. before)
+        out_return = out_return;
+        return;
+    }
+
     /// ************* Find adjacent paves *************
     /// --> In the direction of the zeros
 
@@ -538,12 +548,39 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
     /// For each Pave, propagate OUT -> IN
 
     _Tp vec_field_typed_neighbors_fwd = convert_vec_field<_Tp>(vec_field_neighbors);
+    _Tp vec_field_typed_neighbors_bwd = convert_vec_field<_Tp>(-vec_field_neighbors);
 
     for(Pave<_Tp> *pave_adj:adjacent_paves_valid){
         bool local_pave = false;
         if(pave_adj == m_pave)
             local_pave = true;
 
+        // ******** INITIAL CONDITION ******** //
+        Room<_Tp> *r_adj = pave_adj->get_rooms()[m_maze];
+        if(r_adj->is_initial_door_output()){
+            _Tp in_tmp_IN(input_global_door);
+            _Tp out_tmp_IN(r_adj->get_initial_door_output());
+            if(!out_tmp_IN.is_empty()){
+                if(local_pave)
+                    contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_bwd(n_vf), BWD); // The vector is fwd but we need to contract the input
+                else
+                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_bwd, BWD);
+                in_return |= in_tmp_IN ;
+            }
+        }
+        if(r_adj->is_initial_door_input()){
+            _Tp out_tmp_OUT(output_global_door);
+            _Tp in_tmp_OUT(r_adj->get_initial_door_input());
+            if(!in_tmp_OUT.is_empty()){
+                if(local_pave)
+                    contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_typed_fwd(n_vf), FWD);
+                else
+                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
+                out_return |= out_tmp_OUT;
+            }
+        }
+
+        // ******** STANDRAD ROOM ******** //
         for(int face_out_adj=0; face_out_adj<dim; face_out_adj++){
             for(int sens_out_adj = 0; sens_out_adj < 2; sens_out_adj ++){
                 Face<_Tp> *f_out_adj = pave_adj->get_faces()[face_out_adj][sens_out_adj];
@@ -552,7 +589,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
                 if(!(local_pave && face_out_adj==face_in && sens_out_adj==sens_in) || !local_pave){
 
                     if((!local_pave && !(d_out_adj->get_output().is_empty() && d_out_adj->get_input().is_empty()))
-                            || (local_pave && !(d_out_adj->get_output_private().is_empty() && d_out_adj->get_input_private().is_empty()))){
+                       || (local_pave && !(d_out_adj->get_output_private().is_empty() && d_out_adj->get_input_private().is_empty()))){
 
                         /// ************* Determine if the face is part of the hull *************
                         /// Test if the Face intersect another face of the neighbours ?
@@ -592,50 +629,45 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
                         /// ************* Compute the propagation *************
                         if(!own_surface.is_empty()){
                             // OUT -> IN
-                            if(!input_global_door.is_empty()){
-                                /// WARNING : do no set in_tmp_IN only to private door
-                                /// because only half part is taken into account => take the union with the IN of the neighbour
-                                _Tp in_tmp_IN(input_global_door);
+                            /// WARNING : do no set in_tmp_IN only to private door
+                            /// because only half part is taken into account => take the union with the IN of the neighbour
+                            _Tp in_tmp_IN(input_global_door);
 
-                                _Tp out_tmp_IN(own_surface);
+                            _Tp out_tmp_IN(own_surface);
+                            if(local_pave)
+                                out_tmp_IN &= d_out_adj->get_output_private();
+                            else
+                                out_tmp_IN &= d_out_adj->get_output(); // Do not use the private door here !
+
+                            // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
+                            if(get_nb_dim_flat(out_tmp_IN)==2)
+                                set_empty<_Tp>(out_tmp_IN);
+
+                            if(!out_tmp_IN.is_empty()){
                                 if(local_pave)
-                                    out_tmp_IN &= d_out_adj->get_output_private();
+                                    contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_bwd(n_vf), BWD); // The vector is fwd but we need to contract the input
                                 else
-                                    out_tmp_IN &= d_out_adj->get_output(); // Do not use the private door here !
-
-                                // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
-                                if(get_nb_dim_flat(out_tmp_IN)==2)
-                                    set_empty<_Tp>(out_tmp_IN);
-
-                                if(!out_tmp_IN.is_empty()){
-                                    if(local_pave)
-                                        contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_fwd(n_vf), BWD); // The vector is fwd but we need to contract the input
-                                    else
-                                        contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_fwd, BWD);
-
-                                    in_return |= in_tmp_IN ;
-                                }
+                                    contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_bwd, BWD);
+                                in_return |= in_tmp_IN ;
                             }
 
                             // IN -> OUT
-                            if(!output_global_door.is_empty()){
-                                _Tp out_tmp_OUT(output_global_door);
-                                _Tp in_tmp_OUT(own_surface);
+                            _Tp out_tmp_OUT(output_global_door);
+                            _Tp in_tmp_OUT(own_surface);
+                            if(local_pave)
+                                in_tmp_OUT &= d_out_adj->get_input_private();
+                            else
+                                in_tmp_OUT &= d_out_adj->get_input();
+
+                            if(get_nb_dim_flat(in_tmp_OUT)==2)
+                                set_empty<_Tp>(in_tmp_OUT);
+
+                            if(!in_tmp_OUT.is_empty()){
                                 if(local_pave)
-                                    in_tmp_OUT &= d_out_adj->get_input_private();
+                                    contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_typed_fwd(n_vf), FWD);
                                 else
-                                    in_tmp_OUT &= d_out_adj->get_input();
-
-                                if(get_nb_dim_flat(in_tmp_OUT)==2)
-                                    set_empty<_Tp>(in_tmp_OUT);
-
-                                if(!in_tmp_OUT.is_empty()){
-                                    if(local_pave)
-                                        contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                                    else
-                                        contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
-                                    out_return |= out_tmp_OUT;
-                                }
+                                    contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
+                                out_return |= out_tmp_OUT;
                             }
                         }
                     }
@@ -700,14 +732,14 @@ bool Room<_Tp>::contract(){
             return false;
         }
 
-//        get_private_doors_info("before");
+        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
-                && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))){
+           && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))){
             contract_consistency();
-//            get_private_doors_info("consistency");
+            get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -716,12 +748,13 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() != FULL_WALL)
-        return false;
+    //    if(m_maze->get_domain()->get_init() != FULL_WALL)
+    //        return false;
 
-    ibex::IntervalVector position(2);
-    position[0] = ibex::Interval(0, 2);
-    position[1] = ibex::Interval(-3.5, -1.125);
+    ibex::IntervalVector position(3);
+    position[0] = ibex::Interval(0, 1800);
+    position[1] = ibex::Interval(20000, 45000);
+    position[2] = ibex::Interval(120000, 145000);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
@@ -734,6 +767,11 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
                 std::cout << "position 1" << std::endl;
             else
                 std::cout << "position 2" << std::endl;
+
+            if(m_maze->get_domain()->get_init()==FULL_WALL)
+                std::cout << "FULL_WALL" << std::endl;
+            else
+                std::cout << "FULL_DOOR" << std::endl;
 
             std::cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << std::endl;
             for(Face<_Tp> *f:m_pave->get_faces_vector()){

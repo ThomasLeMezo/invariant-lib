@@ -31,7 +31,7 @@ public:
 
     void set_sens(DYNAMICS_SENS sens);
 
-private:
+protected:
     DYNAMICS_SENS m_dynamics_sens;
 };
 

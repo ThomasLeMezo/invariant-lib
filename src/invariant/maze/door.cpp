@@ -112,7 +112,7 @@ ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv){
         }
     }
     else{
-        box = ppl::Rational_Box(iv.size(), Parma_Polyhedra_Library::Degenerate_Element::UNIVERSE);
+        box = ppl::Rational_Box(iv.size(), Parma_Polyhedra_Library::Degenerate_Element::EMPTY);
     }
     return ppl::C_Polyhedron(box);
 }

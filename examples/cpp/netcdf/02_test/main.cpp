@@ -14,8 +14,8 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
-    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
+//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     IntervalVector search_space(3);
 
@@ -34,14 +34,14 @@ int main(int argc, char *argv[])
     cout << "Search_space = " << search_space << endl;
 
 /// **************** TEST 1 **************** ///
-    IntervalVector test_position(3);
-    test_position[0] = ibex::Interval(0, 14.0625);
-    test_position[1] = ibex::Interval(52468.8, 52611.3);
-    test_position[2] = ibex::Interval(99588.4, 99772.5);
-    vector<ibex::IntervalVector> result = pm3d.eval(test_position);
-    cout << "Result = " << endl;
-    for(IntervalVector &iv:result)
-        cout << iv << endl;
+//    IntervalVector test_position(3);
+//    test_position[0] = ibex::Interval(0, 14.0625);
+//    test_position[1] = ibex::Interval(52468.8, 52611.3);
+//    test_position[2] = ibex::Interval(99588.4, 99772.5);
+//    vector<ibex::IntervalVector> result = pm3d.eval(test_position);
+//    cout << "Result = " << endl;
+//    for(IntervalVector &iv:result)
+//        cout << iv << endl;
 
 /// **************** TEST 2 **************** ///
 
@@ -67,13 +67,17 @@ int main(int argc, char *argv[])
 
     double t_c, x_c, y_c, r;
     t_c = 0 * pm3d.get_grid_conversion(0);
-    x_c = 130 * pm3d.get_grid_conversion(1);
-    y_c = 460 * pm3d.get_grid_conversion(2);
+    x_c = 137 * pm3d.get_grid_conversion(1);
+    y_c = 477 * pm3d.get_grid_conversion(2);
     r = 50.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
+    IntervalVector initial_condition(3);
+    initial_condition[0] = ibex::Interval(t_c-r, t_c+r);
+    initial_condition[1] = ibex::Interval(x_c-r, x_c+r);
+    initial_condition[2] = ibex::Interval(y_c-r, y_c+r);
     ibex::Variable t, x, y;
-    Function f_sep(t, x, y, pow(t-t_c, 2)+pow(x-x_c, 2)+pow(y-y_c, 2)-pow(r, 2));
-    SepFwdBwd s(f_sep, LEQ); // LT, LEQ, EQ, GEQ, GT)
+    Function f_id(t, x, y, Return(t, x, y));
+    SepFwdBwd s(f_id, initial_condition);
     dom.set_sep(&s);
 
     // ******* Maze *********
@@ -86,7 +90,7 @@ int main(int argc, char *argv[])
 //    VtkMazePPL vtkMazePPL("PrevimerPPL");
     VtkMaze3D vtkMaze3D("PrevimerIBEX");
     omp_set_num_threads(1);
-    for(int i=0; i<20; i++){
+    for(int i=0; i<30; i++){
         cout << i << endl;
         double time_start_bisection = omp_get_wtime();
         paving.bisect();
