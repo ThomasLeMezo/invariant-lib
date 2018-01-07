@@ -732,14 +732,14 @@ bool Room<_Tp>::contract(){
             return false;
         }
 
-        get_private_doors_info("before");
+//        get_private_doors_info("before");
         change |= contract_continuity();
-        get_private_doors_info("continuity");
+//        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))){
             contract_consistency();
-            get_private_doors_info("consistency");
+//            get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;

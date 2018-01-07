@@ -68,17 +68,15 @@ int main(int argc, char *argv[])
     maze.set_widening_limit(15);
     maze.set_enable_contraction_limit(true);
     maze.set_contraction_limit(8);
-    int factor_door = 3;
+//    int factor_door = 3;
 
-    for(int i=0; i<10; i++){
+    paving.set_enable_bisection_strategy(0, true);
+    paving.set_bisection_strategy_slice(0, 900);
+
+    for(int i=0; i<30; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
-
-        if(i>=16){
-            maze.set_contraction_limit(15);
-            factor_door = 10;
-        }
 
         maze.get_domain()->set_init(FULL_WALL);
         maze.set_enable_contract_domain(true);

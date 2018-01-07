@@ -167,6 +167,20 @@ public:
      */
     void set_ratio_bisection(const std::vector<double> &ratio_bisection);
 
+    /**
+     * @brief Enable a bisection strategy on a specific dimension
+     * @param dim
+     * @param enable
+     */
+    void set_enable_bisection_strategy(const int &dim, const bool &enable);
+
+    /**
+     * @brief Set the size of slice for bisection strategy [lb(), lb()+val] ; [lb()+val, ub()]
+     * @param dim
+     * @param val
+     */
+    void set_bisection_strategy_slice(const int &dim, const double &val);
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
@@ -179,6 +193,9 @@ protected:
 
     std::vector<double> m_ratio_dimension;
     std::vector<double> m_limit_bisection;
+
+    std::vector<bool> m_bisection_strategy;
+    std::vector<double> m_bisection_strategy_slice;
 
 };
 
@@ -270,6 +287,16 @@ inline void SmartSubPaving<_Tp>::set_ratio_bisection(const std::vector<double> &
         throw std::runtime_error("in [paving.cpp/set_limit_bisection] dimensions doesn't match");
     else
         m_ratio_dimension = ratio_bisection;
+}
+
+template<typename _Tp>
+inline void SmartSubPaving<_Tp>::set_enable_bisection_strategy(const int &dim, const bool &enable){
+    m_bisection_strategy[dim] = enable;
+}
+
+template<typename _Tp>
+inline void SmartSubPaving<_Tp>::set_bisection_strategy_slice(const int &dim, const double &val){
+    m_bisection_strategy_slice[dim] = val;
 }
 
 }
