@@ -466,9 +466,6 @@ void Room<_Tp>::contract_consistency(){
 
 template<typename _Tp>
 void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &out_return, _Tp &in_return){
-    if(m_debug_room)
-        std::cout << "debug" << std::endl;
-
     Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
     Door<_Tp>* door = f_in->get_doors()[m_maze];
     int dim = m_pave->get_dim();
@@ -724,7 +721,7 @@ bool Room<_Tp>::contract(){
             return false;
         }
 
-        get_private_doors_info("before");
+//        get_private_doors_info("before");
         change |= contract_continuity();
 //        get_private_doors_info("continuity");
 

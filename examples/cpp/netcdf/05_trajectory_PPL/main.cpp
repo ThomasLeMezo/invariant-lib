@@ -67,11 +67,11 @@ int main(int argc, char *argv[])
 
     maze.set_widening_limit(15);
     maze.set_enable_contraction_limit(true);
-    maze.set_contraction_limit(8);
-    int factor_door = 3;
+    maze.set_contraction_limit(20);
+    int factor_door = 5;
 
     paving.set_enable_bisection_strategy(0, true);
-    paving.set_bisection_strategy_slice(0, 900);
+    paving.set_bisection_strategy_slice(0, 900*3);
 
     for(int i=0; i<30; i++){
         std::time_t t_now = std::time(nullptr);

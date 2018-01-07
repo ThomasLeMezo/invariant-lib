@@ -438,8 +438,6 @@ protected:
 
     // To Be Removed
     size_t     m_nb_contract = 0;
-    bool m_debug_room = false;
-    int m_time_debug = 0;
 
     ibex::Function *m_contract_function = nullptr;
     ibex::CtcFwdBwd *m_ctc = nullptr;
