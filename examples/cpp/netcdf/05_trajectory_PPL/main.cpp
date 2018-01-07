@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     paving.set_enable_bisection_strategy(0, true);
     paving.set_bisection_strategy_slice(0, 900);
 
-    for(int i=0; i<30; i++){
+    for(int i=0; i<17; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
