@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     double x1_c, x2_c, x3_c, r;
     x1_c = 2.0;
     x2_c = 2.0;
-    x3_c = 1.0;
-    r = 0.0;
+    x3_c = 0.0;
+    r = 0.1;
     IntervalVector initial_condition(3);
     initial_condition[0] = ibex::Interval(x1_c-r, x1_c+r);
     initial_condition[1] = ibex::Interval(x2_c-r/2.0, x2_c+r/2.0);
@@ -84,8 +84,11 @@ int main(int argc, char *argv[])
         maze_outer.set_enable_contract_domain(false);
         maze_outer.contract(10000);
 
-        if(maze_outer.get_bounding_box().is_interior_subset(bounding_box))
+        if(maze_outer.get_bounding_box().is_interior_subset(bounding_box)){
             paving.set_ratio_bisection(ratio_bisection2);
+            paving.set_enable_bisection_strategy(2, true);
+            paving.set_bisection_strategy_slice(2, 0.1);
+        }
 
         cout << " - paving = " << paving.size() << endl;
         vtkMazePPL.show_maze(&maze_outer);
