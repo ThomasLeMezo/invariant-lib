@@ -410,7 +410,7 @@ protected:
 
     std::vector<bool>    m_vector_field_zero;
     bool            m_contain_zero_coordinate = false;
-    bool            m_contain_zero = false;
+    bool            m_contain_zero = false; // if a zero in one of the list vect
 
     mutable bool    m_empty = false;
     mutable bool    m_full = false;

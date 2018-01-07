@@ -109,7 +109,7 @@ script:
         -DWITH_PYIBEX_VERSION=ON \
         -DWITH_PPL=ON \
         -DWITH_EXAMPLES=OFF \
-        $TRAVIS_BUILD_DIR
+        ${TRAVIS_BUILD_DIR}
 - make -j2
 - make pip_package
 

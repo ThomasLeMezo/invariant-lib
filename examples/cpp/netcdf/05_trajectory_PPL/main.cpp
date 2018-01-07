@@ -68,12 +68,12 @@ int main(int argc, char *argv[])
     maze.set_widening_limit(15);
     maze.set_enable_contraction_limit(true);
     maze.set_contraction_limit(8);
-//    int factor_door = 3;
+    int factor_door = 3;
 
     paving.set_enable_bisection_strategy(0, true);
     paving.set_bisection_strategy_slice(0, 900);
 
-    for(int i=0; i<17; i++){
+    for(int i=0; i<30; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
@@ -82,21 +82,21 @@ int main(int argc, char *argv[])
         maze.set_enable_contract_domain(true);
         maze.contract();
 
-//        maze.get_domain()->set_init(FULL_DOOR);
-//        maze.reset_nb_operations();
-//        maze.set_enable_contract_domain(false);
-//        maze.contract(paving.size_active()*factor_door);
+        maze.get_domain()->set_init(FULL_DOOR);
+        maze.reset_nb_operations();
+        maze.set_enable_contract_domain(false);
+        maze.contract(paving.size_active()*factor_door);
 
         vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
     cout << paving << endl;
 
-    IntervalVector position(3);
-    position[0] = ibex::Interval(5350); // 450, 900
-    position[1] = ibex::Interval(34200); // 37304, 37980
-    position[2] = ibex::Interval(126600); // 119766, 120469
-    vtkMazePPL.show_room_info(&maze, position);
+//    IntervalVector position(3);
+//    position[0] = ibex::Interval(5405); // 450, 900
+//    position[1] = ibex::Interval(34200); // 37304, 37980
+//    position[2] = ibex::Interval(126600); // 119766, 120469
+//    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;
 }

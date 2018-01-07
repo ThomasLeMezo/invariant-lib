@@ -24,101 +24,32 @@ inline ibex::Interval taylor(const ibex::Interval &t, const ibex::Interval &x_do
 template<>
 void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     // Contraction with Taylor 1 order
-    if(m_pave->get_dim()==2 && m_vector_fields_d1.size()!=0){
-        IntervalVector vect_d1(in.size());
-        vect_d1[0] = m_vector_fields_d1[0][0][0]*vect[0] + m_vector_fields_d1[0][0][1]*vect[1];
-        vect_d1[1] = m_vector_fields_d1[0][1][1]*vect[1] + m_vector_fields_d1[0][1][0]*vect[0];
-
-        /// **************** FWD ****************
-        if(sens==FWD || sens==FWD_BWD){
-            IntervalVector vect_in = m_maze->get_dynamics()->eval(in)[0];
-            IntervalVector out_result(2, ibex::Interval::EMPTY_SET);
-
-            ibex::IntervalVector c(9);
-            c[0] = vect_d1[0] & ibex::Interval::NEG_REALS;
-            c[1] = vect_d1[1] & ibex::Interval::NEG_REALS;
-            c[2] = vect_in[0];
-            c[3] = vect_in[1];
-            c[4] = in[0];
-            c[5] = in[1];
-            c[6] = out[0];
-            c[7] = out[1];
-            c[8] = ibex::Interval::POS_REALS;
-            m_ctc->contract(c);
-            out_result[0] |= c[6];
-            out_result[1] |= c[7];
-
-            c[0] = vect_d1[0] & ibex::Interval::POS_REALS;
-            c[1] = vect_d1[1] & ibex::Interval::POS_REALS;
-            c[2] = vect_in[0];
-            c[3] = vect_in[1];
-            c[4] = in[0];
-            c[5] = in[1];
-            c[6] = out[0];
-            c[7] = out[1];
-            c[8] = ibex::Interval::POS_REALS;
-            m_ctc->contract(c);
-            out_result[0] |= c[6];
-            out_result[1] |= c[7];
-
-            out &= out_result;
-        }
-
-        /// **************** BWD ****************
-        if(sens==BWD || sens==FWD_BWD){
-            IntervalVector vect_in = -m_maze->get_dynamics()->eval(out)[0];
-            IntervalVector in_result(2, ibex::Interval::EMPTY_SET);
-
-            ibex::IntervalVector c(9);
-            c[0] = vect_d1[0] & ibex::Interval::NEG_REALS;
-            c[1] = vect_d1[1] & ibex::Interval::NEG_REALS;
-            c[2] = vect_in[0];
-            c[3] = vect_in[1];
-            c[4] = out[0];
-            c[5] = out[1];
-            c[6] = in[0];
-            c[7] = in[1];
-            c[8] = ibex::Interval::POS_REALS;
-            m_ctc->contract(c);
-            in_result[0] |= c[4];
-            in_result[1] |= c[5];
-
-            c[0] = vect_d1[0] & ibex::Interval::POS_REALS;
-            c[1] = vect_d1[1] & ibex::Interval::POS_REALS;
-            c[2] = vect_in[0];
-            c[3] = vect_in[1];
-            c[4] = out[0];
-            c[5] = out[1];
-            c[6] = in[0];
-            c[7] = in[1];
-            c[8] = ibex::Interval::POS_REALS;
-            m_ctc->contract(c);
-            in_result[0] |= c[6];
-            in_result[1] |= c[7];
-
-            in &= in_result;
-        }
-    }
+    // ToDo
 
     // Contraction with Taylor 0 order
     // assert 0 not in v.
 
-    ibex::IntervalVector c(out-in);
-    ibex::IntervalVector v(vect);
+    // out = in + alpha*v => c=out-in
+    // in = out - alpha*v => c=in-out
+    ibex::IntervalVector c(out.size());
     ibex::Interval alpha(ibex::Interval::POS_REALS);
+    if(sens==FWD)
+        c=out-in;
+    else if(sens==BWD)
+        c=in-out;
 
-    for(int i=0; i<v.size(); i++){
-        if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(v[i])))
-            alpha &= ((c[i]/(v[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(v[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
+    for(int i=0; i<vect.size(); i++){
+        if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(vect[i])))
+            alpha &= ((c[i]/(vect[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(vect[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
     }
-    if(alpha==ibex::Interval::ZERO && m_maze->get_domain()->get_init()==FULL_DOOR) // To check ?
+    if(m_maze->get_domain()->get_init()==FULL_DOOR && alpha==ibex::Interval::ZERO) // To check ?
         alpha.set_empty();
 
-    c &= alpha*v;
-    if(sens==FWD || sens==FWD_BWD)
+    c &= alpha*vect;
+    if(sens==FWD)
         out &= (c+in);
-    if(sens==BWD || sens==FWD_BWD)
-        in &= (out-c);
+    else if(sens==BWD)
+        in &= (c+out);
 }
 
 template <>
@@ -156,7 +87,9 @@ int get_nb_dim_flat(const ibex::IntervalVector &iv){
 template <>
 void Room<ibex::IntervalVector>::compute_vector_field_typed(){
     m_vector_fields_typed_fwd = m_vector_fields;
-    m_vector_fields_typed_bwd = m_vector_fields;
+    for(ibex::IntervalVector &vect:m_vector_fields){
+        m_vector_fields_typed_bwd.push_back(-vect);
+    }
 }
 
 template <>
@@ -196,19 +129,16 @@ void Room<ppl::C_Polyhedron>::compute_vector_field_typed(){
 template<>
 void Room<ppl::C_Polyhedron>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ppl::C_Polyhedron &vect, const DYNAMICS_SENS &sens){
     if(sens == FWD){
-        if(vect.is_empty() || in.is_empty()){
+        if(vect.is_empty() || in.is_empty())
             out = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
-        }
         else{
             in.time_elapse_assign(vect);
             out &= in;
         }
     }
-
-    if(sens == BWD){
-        if(vect.is_empty() || out.is_empty()){
+    else if(sens == BWD){
+        if(vect.is_empty() || out.is_empty())
             in = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
-        }
         else{
             out.time_elapse_assign(vect);
             in &= out;
@@ -249,16 +179,18 @@ const ibex::IntervalVector Room<ppl::C_Polyhedron>::get_hull() const{
 
 template <>
 const ppl::C_Polyhedron Room<ppl::C_Polyhedron>::get_hull_typed() const{
-    C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
-    for(FacePPL *f:get_pave()->get_faces_vector()){
-        DoorPPL *d = f->get_doors()[m_maze];
-        result |= d->get_hull();
-    }
-    if(m_is_initial_door_input)
-        result |= *m_initial_door_input;
-    if(m_is_initial_door_output)
-        result |= *m_initial_door_output;
-    return result;
+//    if(m_contain_zero)
+        return m_pave->get_position_typed();
+//    C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
+//    for(FacePPL *f:get_pave()->get_faces_vector()){
+//        DoorPPL *d = f->get_doors()[m_maze];
+//        result |= d->get_hull();
+//    }
+//    if(m_is_initial_door_input)
+//        result |= *m_initial_door_input;
+//    if(m_is_initial_door_output)
+//        result |= *m_initial_door_output;
+//    return result;
 }
 
 /// ******************  Other functions ****************** ///

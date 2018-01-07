@@ -2,19 +2,6 @@
 
 namespace invariant {
 
-//template <typename _Tp>
-//Door<_Tp>::Door(invariant::Face<_Tp> *face, invariant::Room<_Tp> *room):
-//    m_input_public(0),
-//    m_output_public(0)
-//{
-//    m_input_private = new _Tp(face->get_position());
-//    m_output_private = new _Tp(face->get_position());
-
-//    m_face = face;
-//    m_room = room;
-//    omp_init_lock(&m_lock_read);
-//}
-
 template <typename _Tp>
 Door<_Tp>::~Door(){
     omp_destroy_lock(&m_lock_read);
@@ -32,14 +19,6 @@ void Door<_Tp>::set_removed(){
     m_output_private = nullptr;
     m_input_private = nullptr;
 }
-
-//template <typename _Tp>
-//void Door<_Tp>::synchronize(){
-//    omp_set_lock(&m_lock_read);
-//    m_input_public = *m_input_private;
-//    m_output_public = *m_output_private;
-//    omp_unset_lock(&m_lock_read);
-//}
 
 template <typename _Tp>
 bool Door<_Tp>::analyze_change(std::vector<Room<_Tp> *>&list_rooms){
@@ -238,32 +217,6 @@ bool Door<_Tp>::contract_continuity_private(){
     }
     return change;
 }
-
-//template <typename _Tp>
-//size_t Door<_Tp>::get_update_output() const{
-//    size_t result;
-//    omp_set_lock(&m_lock_read);
-//    result = m_update_output;
-//    omp_unset_lock(&m_lock_read);
-//    return result;
-//}
-
-//template <typename _Tp>
-//size_t Door<_Tp>::get_update_input() const{
-//    size_t result;
-//    omp_set_lock(&m_lock_read);
-//    result = m_update_input;
-//    omp_unset_lock(&m_lock_read);
-//    return result;
-//}
-
-//template <typename _Tp>
-//void Door<_Tp>::reset_update_neighbors(){
-//    m_update_neighbors_input.clear();
-//    m_update_neighbors_output.clear();
-//}
-
-/// ******************  Sepcialized ****************** ///
 
 }
 

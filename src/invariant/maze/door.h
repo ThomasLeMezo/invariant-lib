@@ -448,14 +448,9 @@ inline bool is_subset(const ppl::C_Polyhedron &p1, const ppl::C_Polyhedron &p2){
 }
 
 inline void union_widening(ppl::C_Polyhedron* p1, const ppl::C_Polyhedron& p2){
-//    if(!p1->is_empty()){
-        ppl::C_Polyhedron p_result(p2);
-//        p_result.poly_hull_assign(*p1);
-        p_result.BHRZ03_widening_assign(*p1);
-        *p1 = p_result;
-//    }
-//    else
-//        *p1 = p2;
+    ppl::C_Polyhedron p_result(p2);
+    p_result.BHRZ03_widening_assign(*p1);
+    *p1 = p_result;
 }
 
 inline void union_widening(ibex::IntervalVector* iv1, const ibex::IntervalVector& iv2){

@@ -241,7 +241,7 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
                                     _Tp out_tmp(out_return);
                                     _Tp in_tmp(door_in->get_input_private());
                                     if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
-                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), BWD); // ToDo : check _fwd ?
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD); // ToDo : check _fwd ?
                                         in_results[n_vf][face_in][sens_in] |= in_tmp;
                                     }
                                 }
@@ -562,7 +562,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
             _Tp out_tmp_IN(r_adj->get_initial_door_output());
             if(!out_tmp_IN.is_empty()){
                 if(local_pave)
-                    contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_bwd(n_vf), BWD); // The vector is fwd but we need to contract the input
+                    contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_bwd(n_vf), BWD);
                 else
                     contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_bwd, BWD);
                 in_return |= in_tmp_IN ;
@@ -710,14 +710,6 @@ bool Room<_Tp>::contract_continuity(){
     return change;
 }
 
-//template <typename _Tp>
-//void Room<_Tp>::reset_update_neighbors(){
-//    for(Face<_Tp> *f:m_pave->get_faces_vector()){
-//            Door<_Tp> *d = f->get_doors()[m_maze];
-//            d->reset_update_neighbors();
-//    }
-//}
-
 template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
@@ -732,7 +724,7 @@ bool Room<_Tp>::contract(){
             return false;
         }
 
-//        get_private_doors_info("before");
+        get_private_doors_info("before");
         change |= contract_continuity();
 //        get_private_doors_info("continuity");
 
@@ -752,9 +744,9 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     //        return false;
 
     ibex::IntervalVector position(3);
-    position[0] = ibex::Interval(0, 1800);
-    position[1] = ibex::Interval(20000, 45000);
-    position[2] = ibex::Interval(120000, 145000);
+    position[0] = ibex::Interval(5400, 6300);
+    position[1] = ibex::Interval(34062.5, 35625);
+    position[2] = ibex::Interval(126250, 127812.5);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
