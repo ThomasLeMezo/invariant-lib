@@ -90,9 +90,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                 {
                     // Take one Room
                     Room<_Tp> *r = nullptr;
-                    while(!omp_test_lock(&m_deque_access)){
-#pragma omp taskyield
-                    }
+                    omp_set_lock(&m_deque_access);
 
                     if(!m_deque_rooms.empty()){
                         // To improve the efficiency, we start half of the thread on the back of the deque

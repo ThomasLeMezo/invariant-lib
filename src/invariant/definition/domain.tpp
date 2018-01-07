@@ -31,6 +31,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
     }
 
     // ********** Separator contraction ********** //
+    // ==> ToDo : multithread !
     if(m_sep_output != nullptr)
         contract_separator(maze, m_subpaving->get_tree(), list_room_deque, true, SEP_UNKNOWN); // Output
     if(m_sep_input != nullptr)
@@ -113,8 +114,10 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                 }
             }
             else{
-                contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_OUTSIDE);
-                contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_OUTSIDE);
+                if(m_domain_init != FULL_WALL){
+                    contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_OUTSIDE);
+                    contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_OUTSIDE);
+                }
             }
         }
     }

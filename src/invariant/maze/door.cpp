@@ -85,9 +85,9 @@ void Door<ppl::C_Polyhedron>::set_output_private(const Parma_Polyhedra_Library::
 
 template <>
 void Door<ppl::C_Polyhedron>::synchronize(){
-    omp_set_lock(&m_lock_read);
     m_input_private->minimized_constraints();
     m_output_private->minimized_constraints();
+    omp_set_lock(&m_lock_read);
     m_input_public = *m_input_private;
     m_output_public = *m_output_private;
     omp_unset_lock(&m_lock_read);
