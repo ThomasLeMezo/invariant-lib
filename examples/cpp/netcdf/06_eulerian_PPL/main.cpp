@@ -15,8 +15,8 @@ using namespace ibex;
 int main(int argc, char *argv[])
 {
     // ****** Dynamics *******
-//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
-    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
+//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     array<array<size_t, 2>, 2> grid_limits; // X, Y limit data loading
     grid_limits[0][0] = 80; grid_limits[0][1] = 280; // max = 584
@@ -55,19 +55,17 @@ int main(int argc, char *argv[])
     ibex::Variable t, x, y;
     Function f_id(t, x, y, Return(t, x, y));
     SepFwdBwd s(f_id, initial_condition);
-    dom.set_sep_input(&s);
+    dom.set_sep(&s);
 
     // ******* Maze *********
     invariant::MazePPL maze(&dom, &pm3d);
+    maze.set_widening_limit(5);
+
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("PrevimerPPL");
 //    omp_set_num_threads(1);
-
-    maze.set_widening_limit(3);
-    maze.set_contraction_limit(7);
-    maze.set_enable_contraction_limit(true);
 
     for(int i=0; i<30; i++){
         std::time_t t_now = std::time(nullptr);
@@ -76,22 +74,28 @@ int main(int argc, char *argv[])
 
         maze.get_domain()->set_init(FULL_WALL);
         maze.set_enable_contract_domain(true);
-        maze.contract(paving.size_active()*10);
+        maze.contract(paving.size_active()*15);
 
         maze.get_domain()->set_init(FULL_DOOR);
         maze.reset_nb_operations();
         maze.set_enable_contract_domain(false);
-        maze.contract(paving.size_active()*3);
+        maze.contract(30000);
 
         vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
+
     cout << paving << endl;
+
+//    VtkMaze3D vtkMaze3D("Previmer", true);
+////     vtkMaze3D.show_graph(&paving);
+////    vtkMaze3D.show_maze(&maze);
+//    vtkMaze3D.serialize_maze("current.maze", &maze);
 
 //    IntervalVector position(3);
 //    position[0] = ibex::Interval(t_c); // 450, 900
 //    position[1] = ibex::Interval(x_c); // 37304, 37980
-//    position[2] = ibex::Interval(125000); // 119766, 120469
+//    position[2] = ibex::Interval(y_c); // 119766, 120469
 //    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;

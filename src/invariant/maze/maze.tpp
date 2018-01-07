@@ -77,6 +77,8 @@ int Maze<_Tp>::contract(size_t nb_operations){
         m_empty = true;
         return 0;
     }
+    omp_lock_t lock_nb_operations;
+    omp_init_lock(&lock_nb_operations);
 
 #pragma omp parallel shared(stop_contraction)
     {
@@ -89,7 +91,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                     // Take one Room
                     Room<_Tp> *r = nullptr;
                     while(!omp_test_lock(&m_deque_access)){
-                        #pragma omp taskyield
+#pragma omp taskyield
                     }
 
                     if(!m_deque_rooms.empty()){
@@ -131,10 +133,10 @@ int Maze<_Tp>::contract(size_t nb_operations){
                             add_rooms(rooms_to_update);
 
                             // Increment operations
-#pragma omp critical (nb_operation)
-                            {
-                                m_nb_operations++;
-                            }
+
+                            omp_set_lock(&lock_nb_operations);
+                            m_nb_operations++;
+                            omp_unset_lock(&lock_nb_operations);
                         }
 
                         r->unlock_contraction();
@@ -142,25 +144,25 @@ int Maze<_Tp>::contract(size_t nb_operations){
                 }
 
                 omp_set_lock(&m_deque_access);
-#pragma omp critical (nb_operation)
-                {
-                    stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations);
-                }
+                omp_set_lock(&lock_nb_operations);
+                stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations);
+                omp_unset_lock(&lock_nb_operations);
                 omp_unset_lock(&m_deque_access);
 
                 if(stop_contraction){
-#pragma omp taskwait
+                    #pragma omp taskwait
                     omp_set_lock(&m_deque_access);
-#pragma omp critical (nb_operation)
-                    {
-                        stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations) ; // New Rooms could have been added to the deque meanwhile taskwait
-                    }
+                    omp_set_lock(&lock_nb_operations);
+                    // Evaluate a second time to verify if no new rooms where added after all thread have finish (taskwait)
+                    stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations) ; // New Rooms could have been added to the deque meanwhile taskwait
+                    omp_unset_lock(&lock_nb_operations);
                     omp_unset_lock(&m_deque_access);
                 }
             }
         }
         delete_thread_init<_Tp>(thread_init);
     }
+    omp_destroy_lock(&lock_nb_operations);
 
     std::cout << " => contractions : " << omp_get_wtime() - t_start << " s, with " << m_nb_operations << "/" << nb_deque << " operations" <<  std::endl;
     m_contraction_step++;
