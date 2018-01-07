@@ -65,12 +65,12 @@ int main(int argc, char *argv[])
     VtkMazePPL vtkMazePPL("PrevimerPPL");
 //    omp_set_num_threads(1);
 
-    maze.set_widening_limit(4);
+    maze.set_widening_limit(15);
     maze.set_enable_contraction_limit(true);
     maze.set_contraction_limit(8);
     int factor_door = 3;
 
-    for(int i=0; i<21; i++){
+    for(int i=0; i<10; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
@@ -84,10 +84,10 @@ int main(int argc, char *argv[])
         maze.set_enable_contract_domain(true);
         maze.contract();
 
-        maze.get_domain()->set_init(FULL_DOOR);
-        maze.reset_nb_operations();
-        maze.set_enable_contract_domain(false);
-        maze.contract(paving.size_active()*factor_door);
+//        maze.get_domain()->set_init(FULL_DOOR);
+//        maze.reset_nb_operations();
+//        maze.set_enable_contract_domain(false);
+//        maze.contract(paving.size_active()*factor_door);
 
         vtkMazePPL.show_maze(&maze);
     }

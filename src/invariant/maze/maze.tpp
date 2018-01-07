@@ -131,7 +131,6 @@ int Maze<_Tp>::contract(size_t nb_operations){
                             add_rooms(rooms_to_update);
 
                             // Increment operations
-
                             omp_set_lock(&lock_nb_operations);
                             m_nb_operations++;
                             omp_unset_lock(&lock_nb_operations);
