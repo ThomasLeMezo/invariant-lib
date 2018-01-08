@@ -190,7 +190,8 @@ const ppl::C_Polyhedron Room<ppl::C_Polyhedron>::get_hull_typed() const{
 //        result |= *m_initial_door_input;
 //    if(m_is_initial_door_output)
 //        result |= *m_initial_door_output;
-//    return result;
+//    ppl::Rational_Box rb(result);
+//    return ppl::C_Polyhedron(rb);
 }
 
 /// ******************  Other functions ****************** ///

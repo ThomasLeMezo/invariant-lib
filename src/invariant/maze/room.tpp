@@ -434,6 +434,7 @@ void Room<_Tp>::contract_consistency(){
 
                     if(m_is_father_hull) // For father hull
                         door_out_iv &= *m_father_hull;
+//                    door_out_iv &= door->get_face()->get_position_typed();
 
                     door->set_output_private(door_out_iv);
                 }
@@ -456,6 +457,7 @@ void Room<_Tp>::contract_consistency(){
 
                     if(m_is_father_hull) // For father hull
                         door_in_iv &= *m_father_hull;
+//                    door_in_iv &= door->get_face()->get_position_typed();
 
                     door->set_input_private(door_in_iv);
                 }
