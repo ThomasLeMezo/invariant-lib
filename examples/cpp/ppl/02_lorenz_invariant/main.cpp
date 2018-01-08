@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     IntervalVector space(3);
     space[0] = ibex::Interval(-30,30);
     space[1] = ibex::Interval(-20,20);
-    space[2] = ibex::Interval(0,50);
+    space[2] = ibex::Interval(-4,50);
 
     ibex::Interval rho = ibex::Interval(28.0);
     ibex::Interval sigma = ibex::Interval(10.0);
@@ -75,13 +75,15 @@ int main(int argc, char *argv[])
 //    omp_set_num_threads(1);
 
     maze.set_enable_contraction_limit(true);
-    maze.set_contraction_limit(25);
+    maze.set_contraction_limit(5);
 
-    for(int i=0; i<20; i++){
+    for(int i=0; i<18; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
         maze.contract(paving.size_active()*5);
+        if(i>16)
+            maze.set_contraction_limit(15);
         vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;

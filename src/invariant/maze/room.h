@@ -116,11 +116,6 @@ public:
     void set_full_possible();
 
     /**
-     * @brief Function call after Pave bisection to update Room & Doors
-     */
-    void bisect();
-
-    /**
      * @brief Test if this room is in the deque of the maze
      * @return
      */

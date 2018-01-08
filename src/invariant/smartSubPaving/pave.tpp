@@ -252,26 +252,13 @@ void Pave<_Tp>::bisect(){
 
 template<typename _Tp>
 const bool Pave<_Tp>::request_bisection(){
-    bool request_wall = false;
-    bool one_wall = false;
-
-    bool request_door = false;
-    bool one_door = false;
-
+    bool result = true;
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp> *r = it->second;
-        Maze<_Tp> *maze = it->first;
-        if(maze->get_domain()->get_init()==FULL_WALL){
-            request_wall |= r->request_bisection();
-            one_wall = true;
-        }
-        else{
-            request_door |= r->request_bisection();
-            one_door = true;
-        }
+//        Maze<_Tp> *maze = it->first;
+        result &= r->request_bisection();
     }
-
-    return (!one_wall | request_wall) & (!one_door | request_door);
+    return result;
 }
 
 template<typename _Tp>

@@ -18,6 +18,8 @@ namespace invariant {
 using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron>;
 using SmartSubPavingIBEX = SmartSubPaving<ibex::IntervalVector>;
 
+enum BISECTION_STRATEGY{BISECTION_STANDARD, BISECTION_LB, BISECTION_UB};
+
 template <typename _Tp> class Pave;
 template <typename _Tp> class Pave_node;
 template <typename _Tp> class Maze;
@@ -172,7 +174,7 @@ public:
      * @param dim
      * @param enable
      */
-    void set_enable_bisection_strategy(const int &dim, const bool &enable);
+    void set_enable_bisection_strategy(const int &dim, const BISECTION_STRATEGY &bisection_type);
 
     /**
      * @brief Set the size of slice for bisection strategy [lb(), lb()+val] ; [lb()+val, ub()]
@@ -194,7 +196,7 @@ protected:
     std::vector<double> m_ratio_dimension;
     std::vector<double> m_limit_bisection;
 
-    std::vector<bool> m_bisection_strategy;
+    std::vector<BISECTION_STRATEGY> m_bisection_strategy;
     std::vector<double> m_bisection_strategy_slice;
 
 };
@@ -290,8 +292,8 @@ inline void SmartSubPaving<_Tp>::set_ratio_bisection(const std::vector<double> &
 }
 
 template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_enable_bisection_strategy(const int &dim, const bool &enable){
-    m_bisection_strategy[dim] = enable;
+inline void SmartSubPaving<_Tp>::set_enable_bisection_strategy(const int &dim, const BISECTION_STRATEGY &bisection_type){
+    m_bisection_strategy[dim] = bisection_type;
 }
 
 template<typename _Tp>

@@ -1,4 +1,5 @@
 #include "ibex_SepFwdBwd.h"
+#include "ibex_SepNot.h"
 #include "smartSubPaving.h"
 #include "domain.h"
 #include "dynamics_function.h"
@@ -34,37 +35,56 @@ int main(int argc, char *argv[])
     // ****** Domain Outer ******* //
     DomainPPL dom_outer(&paving, FULL_WALL);
 
-    double x_c, y_c, theta_c, r;
-    x_c = 0.0;
-    y_c = 0.0;
-    theta_c = 0.5;
-    r = 1.0;
-//    r = 0.0;
+//    double x_c, y_c, theta_c, r;
+//    x_c = 0.0;
+//    y_c = 0.0;
+//    theta_c = 0.5;
+//    r = 1.0;
+////    r = 0.0;
+//    Function f_sep_outer(x, y, theta, pow(x-x_c, 2)+pow(y-y_c, 2) + pow(theta-theta_c, 2) - pow(r, 2));
+//    SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT
+//    dom_outer.set_sep(&s_outer);
 
-    Function f_sep_outer(x, y, theta, pow(x-x_c, 2)+pow(y-y_c, 2) + pow(theta-theta_c, 2) - pow(r, 2));
-    SepFwdBwd s_outer(f_sep_outer, LEQ); // LT, LEQ, EQ, GEQ, GT
-    dom_outer.set_sep(&s_outer);
+    IntervalVector initial_condition(3);
+    initial_condition[0] = ibex::Interval(-0.5, 0.5);
+    initial_condition[1] = ibex::Interval(-0.5, 0.5);
+    initial_condition[2] = ibex::Interval(0, 0.5);
+    Function f_id(x, y, theta, Return(x, y, theta));
+    SepFwdBwd s_outer(f_id, initial_condition);
+    dom_outer.set_sep_input(&s_outer);
+
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
+
+    DomainPPL dom_inner(&paving, FULL_DOOR);
+    dom_inner.set_border_path_in(true);
+    dom_inner.set_border_path_out(true);
+    SepNot s_inner(s_outer);
+    dom_inner.set_sep(&s_inner);
 
     // ****** Dynamics Outer & Inner ******* //
     ibex::Function f(x, y, theta, Return(v*cos(theta),
                                             v*sin(theta),
                                             u));
-    Dynamics_Function dyn_outer(&f, FWD);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //
-    MazePPL maze_outer(&dom_outer, &dyn_outer);
+    MazePPL maze_outer(&dom_outer, &dyn);
     maze_outer.set_widening_limit(50);
 
-    VtkMazePPL vtkMazePPL("DubinsPPL");
+//    MazePPL maze_inner(&dom_inner, &dyn);
+//    maze_inner.set_enable_contraction_limit(true);
+//    maze_inner.set_contraction_limit(25);
+
+    VtkMazePPL vtkMazePPL_outer("DubinsPPL_outer");
+//    VtkMazePPL vtkMazePPL_inner("DubinsPPL_inner");
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
     for(int i=0; i<20; i++){
-        paving.bisect();
         cout << i << endl;
+        paving.bisect();
 
         maze_outer.get_domain()->set_init(FULL_WALL);
         maze_outer.set_enable_contract_domain(true);
@@ -74,9 +94,10 @@ int main(int argc, char *argv[])
         maze_outer.reset_nb_operations();
         maze_outer.set_enable_contract_domain(false);
         maze_outer.contract(30000);
+        vtkMazePPL_outer.show_maze(&maze_outer);
 
-        cout << " - paving = " << paving.size() << endl;
-        vtkMazePPL.show_maze(&maze_outer);
+//        maze_inner.contract(paving.size_active()*10);
+//        vtkMazePPL_inner.show_maze(&maze_inner);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
     cout << paving << endl;

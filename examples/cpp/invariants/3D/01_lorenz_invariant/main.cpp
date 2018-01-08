@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     space[0] = ibex::Interval(-30,30);
     space[1] = ibex::Interval(-20,20);
-    space[2] = ibex::Interval(0,50);
+    space[2] = ibex::Interval(-4,50);
 
     ibex::Interval rho = ibex::Interval(28.0);
     ibex::Interval sigma = ibex::Interval(10.0);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<18; i++){
         cout << "-----" << i << "-----" << endl;
         paving.bisect();
         cout << "nb contractions = " << maze.contract() << " - " << "paving size = " << paving.size() << endl;

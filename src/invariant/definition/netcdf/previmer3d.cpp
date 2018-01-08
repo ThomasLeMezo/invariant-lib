@@ -142,8 +142,9 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
 }
 
 PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits, const DYNAMICS_SENS sens):
-    Dynamics(sens), m_search_space(3)
+    Dynamics(FWD), m_search_space(3)
 {
+    m_sens_previmer = sens;
     int ram_init = getRAM()/1000;
     cout << "Mem 0 = " << ram_init << " Mo" << endl;
 
@@ -274,7 +275,7 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec[2] = Interval(data[1][0] * m_scale_factor, data[1][1] * m_scale_factor); // in m
     }
 
-    if(m_dynamics_sens==FWD)
+    if(m_sens_previmer==FWD)
         vector_fields.push_back(vec);
     else
         vector_fields.push_back(-vec);

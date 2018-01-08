@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits, FWD);
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits, BWD);
 //    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     // ****** Domain *******
@@ -41,18 +41,18 @@ int main(int argc, char *argv[])
     const std::vector<double> limit_bisection = {15*60-1, 250-1, 250-1};
     paving.set_limit_bisection(limit_bisection);
 
-    double t_c, x_c, y_c, r;
-    t_c = 0 * pm3d.get_grid_conversion(0);
-//    t_c = 30 * pm3d.get_grid_conversion(0);
+    double t_c, x_c, y_c, r_spatial, r_time;
+    t_c = search_space[0].ub();
     x_c = 137 * pm3d.get_grid_conversion(1);
     y_c = 477 * pm3d.get_grid_conversion(2);
-    r = 50.0;
+    r_spatial = 1000.0;
+    r_time = 5*60.0;
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
 
     IntervalVector initial_condition(3);
-    initial_condition[0] = ibex::Interval(t_c-r, t_c+r);
-    initial_condition[1] = ibex::Interval(x_c-r, x_c+r);
-    initial_condition[2] = ibex::Interval(y_c-r, y_c+r);
+    initial_condition[0] = ibex::Interval(t_c-r_time, t_c+r_time);
+    initial_condition[1] = ibex::Interval(x_c-r_spatial, x_c+r_spatial);
+    initial_condition[2] = ibex::Interval(y_c-r_spatial, y_c+r_spatial);
     ibex::Variable t, x, y;
     Function f_id(t, x, y, Return(t, x, y));
     SepFwdBwd s(f_id, initial_condition);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();
-    VtkMazePPL vtkMazePPL("PrevimerPPL");
+    VtkMazePPL vtkMazePPL("PrevimerPPL_bwd");
 //    omp_set_num_threads(1);
 
     maze.set_widening_limit(15);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     maze.set_contraction_limit(20);
     int factor_door = 2;
 
-    paving.set_enable_bisection_strategy(0, BISECTION_LB);
+    paving.set_enable_bisection_strategy(0, BISECTION_UB);
     paving.set_bisection_strategy_slice(0, 900*3);
 
     for(int i=0; i<30; i++){

@@ -131,6 +131,8 @@ private:
     DataSetNode<signed short, 2> *m_node_current;
     vector<pair<DataSetVirtualNode*, vector<array<int, 2>>>> m_leaf_list;
     std::vector<std::array<int, 2>> m_node_root_position;
+
+    DYNAMICS_SENS m_sens_previmer = FWD;
 };
 
 inline short PreviMer3D::get_fill_value(){

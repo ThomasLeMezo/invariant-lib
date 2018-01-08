@@ -283,6 +283,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
                     Pave<_Tp> *p = r->get_pave();
                     Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
                     *r &= *r_inter;
+                    // Add a contraction of the initial condition !
                     r->synchronize();
                 }
                 delete_thread_init<_Tp>(thread_init);
