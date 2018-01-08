@@ -41,18 +41,18 @@ int main(int argc, char *argv[])
     const std::vector<double> limit_bisection = {15*60-1, 250-1, 250-1};
     paving.set_limit_bisection(limit_bisection);
 
-    double t_c, x_c, y_c, r;
-    t_c = 0 * pm3d.get_grid_conversion(0);
-//    t_c = 30 * pm3d.get_grid_conversion(0);
+    double t_c, x_c, y_c, r_spatial, r_time;
+    t_c = search_space[0].lb();
     x_c = 137 * pm3d.get_grid_conversion(1);
     y_c = 477 * pm3d.get_grid_conversion(2);
-    r = 50.0;
+    r_spatial = 1000.0; // in m
+    r_time = 5*60.0; // in s
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
 
     IntervalVector initial_condition(3);
-    initial_condition[0] = ibex::Interval(t_c-r, t_c+r);
-    initial_condition[1] = ibex::Interval(x_c-r, x_c+r);
-    initial_condition[2] = ibex::Interval(y_c-r, y_c+r);
+    initial_condition[0] = ibex::Interval(t_c-r_time, t_c+r_time);
+    initial_condition[1] = ibex::Interval(x_c-r_spatial, x_c+r_spatial);
+    initial_condition[2] = ibex::Interval(y_c-r_spatial, y_c+r_spatial);
     ibex::Variable t, x, y;
     Function f_id(t, x, y, Return(t, x, y));
     SepFwdBwd s(f_id, initial_condition);
