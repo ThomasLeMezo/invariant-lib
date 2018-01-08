@@ -137,8 +137,9 @@ void SmartSubPaving<_Tp>::bisect(){
     }
 
     // Reset maze
-    for(Maze<_Tp> *maze:m_mazes)
+    for(Maze<_Tp> *maze:m_mazes){
         maze->reset_nb_operations();
+    }
 }
 
 template<typename _Tp>

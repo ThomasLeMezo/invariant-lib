@@ -33,6 +33,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
         return 0;
     }
     double t_start = omp_get_wtime();
+    m_contract_once = true;
 
     // Domain contraction
     if(m_nb_operations == 0){
@@ -174,6 +175,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
 template<typename _Tp>
 void Maze<_Tp>::reset_nb_operations(){
     m_nb_operations = 0;
+    m_contract_once = false;
 }
 
 //template<typename _Tp>

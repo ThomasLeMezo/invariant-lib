@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     int factor_door = 2;
 
     dom_B.add_maze_inter(&maze_A);
+    dom_A.add_maze_inter(&maze_B);
 
     paving.set_enable_bisection_strategy(0, BISECTION_STANDARD);
     paving.set_bisection_strategy_slice(0, 900*3);
@@ -98,6 +99,7 @@ int main(int argc, char *argv[])
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
 
+        // A
         maze_A.get_domain()->set_init(FULL_WALL);
         maze_A.set_enable_contract_domain(true);
         maze_A.contract();
@@ -107,6 +109,7 @@ int main(int argc, char *argv[])
         maze_A.set_enable_contract_domain(false);
         maze_A.contract(paving.size_active()*factor_door);
 
+        // B
         maze_B.get_domain()->set_init(FULL_WALL);
         maze_B.set_enable_contract_domain(true);
         maze_B.contract();
@@ -115,6 +118,16 @@ int main(int argc, char *argv[])
         maze_B.reset_nb_operations();
         maze_B.set_enable_contract_domain(false);
         maze_B.contract(paving.size_active()*factor_door);
+
+        // A
+        maze_A.get_domain()->set_init(FULL_WALL);
+        maze_A.set_enable_contract_domain(true);
+        maze_A.contract();
+
+        maze_A.get_domain()->set_init(FULL_DOOR);
+        maze_A.reset_nb_operations();
+        maze_A.set_enable_contract_domain(false);
+        maze_A.contract(paving.size_active()*factor_door);
 
         vtkMazePPL_A.show_maze(&maze_A);
         vtkMazePPL_B.show_maze(&maze_B);

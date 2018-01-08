@@ -175,6 +175,12 @@ public:
      */
     std::vector<Room<_Tp>*> get_initial_room_list();
 
+    /**
+     * @brief get_contract_once
+     * @return
+     */
+    bool get_contract_once() const;
+
 private:
     invariant::Domain<_Tp> *    m_domain = nullptr;
     SmartSubPaving<_Tp>  *    m_subpaving = nullptr; // SmartSubPaving associated with this maze
@@ -270,6 +276,11 @@ inline void Maze<_Tp>::reset_initial_room_list(){
 template <typename _Tp>
 inline std::vector<Room<_Tp>*> Maze<_Tp>::get_initial_room_list(){
     return m_initial_rooms_list;
+}
+
+template <typename _Tp>
+inline bool Maze<_Tp>::get_contract_once() const{
+    return m_contract_once;
 }
 
 template <typename _Tp>

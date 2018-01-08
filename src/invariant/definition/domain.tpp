@@ -50,11 +50,9 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
         m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
     }
     if(m_domain_init == FULL_WALL && m_subpaving->get_paves().size()>1){
-        // When initial condition is not link with active paves ?
-        // (OK ?) Wrong function -> need to add neighbours of full paves instead of not_empty
-        // TODO : correction of this method ?
-        //        m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze); // Wrong ?
-        m_subpaving->get_tree()->get_all_child_rooms(list_room_deque, maze); // ??
+        // When initial condition is not link with active paves, need to add all paves (case removed full pave in bracketing)
+//        list_room_deque.insert(list_room_deque.end(), get_initial_room_list().begin(), get_initial_room_list().end());
+        m_subpaving->get_tree()->get_all_child_rooms(list_room_deque, maze);
     }
 }
 
@@ -327,7 +325,12 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
                     if(!r->is_removed() && r->is_father_hull()){
                         Pave<_Tp> *p = r->get_pave();
                         Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-                        r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
+                        if(maze->get_contract_once())
+                            r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
+                        else{
+                            if(r_inter->is_father_hull())
+                                r->set_father_hull(r->get_father_hull() & r_inter->get_father_hull());
+                        }
                         // Add a contraction of the initial condition !
                         r->synchronize();
                     }
