@@ -141,10 +141,10 @@ void PreviMer3D::load_data(const std::string &file_xml, std::vector<std::vector<
     m_search_space[2] = Interval(m_offset_j*m_grid_conversion[2], (m_offset_j+j_max_save)*m_grid_conversion[2]);
 }
 
-PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits, const DYNAMICS_SENS sens):
-    Dynamics(FWD), m_search_space(3)
+PreviMer3D::PreviMer3D(const std::string& file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits):
+    m_search_space(3)
 {
-    m_sens_previmer = sens;
+//    m_sens_previmer = sens;
     int ram_init = getRAM()/1000;
     cout << "Mem 0 = " << ram_init << " Mo" << endl;
 
@@ -218,8 +218,8 @@ void PreviMer3D::serialize(const string &file_name){
     binFile.close();
 }
 
-PreviMer3D::PreviMer3D(const std::string& file_name, const DYNAMICS_SENS sens):
-    Dynamics(sens), m_search_space(3)
+PreviMer3D::PreviMer3D(const std::string& file_name):
+    m_search_space(3)
 {
     int ram_init = getRAM()/1000;
     std::ifstream binFile(file_name.c_str(), std::ifstream::in);
@@ -244,9 +244,7 @@ PreviMer3D::PreviMer3D(const std::string& file_name, const DYNAMICS_SENS sens):
     cout << "-> MEMORY = " << getRAM()/1000 - ram_init << " Mo" << endl;
 }
 
-const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& position){
-    vector<ibex::IntervalVector> vector_fields;
-
+ibex::IntervalVector PreviMer3D::eval_vector(const ibex::IntervalVector& position) const{
     // Apply function of conversion raster <--> Reality
     std::vector<std::array<int, 2>> target;
 
@@ -274,12 +272,7 @@ const vector<ibex::IntervalVector> PreviMer3D::eval(const ibex::IntervalVector& 
         vec[1] = Interval(data[0][0] * m_scale_factor, data[0][1] * m_scale_factor); // in m
         vec[2] = Interval(data[1][0] * m_scale_factor, data[1][1] * m_scale_factor); // in m
     }
-
-    if(m_sens_previmer==FWD)
-        vector_fields.push_back(vec);
-    else
-        vector_fields.push_back(-vec);
-    return vector_fields;
+    return vec;
 }
 
 void PreviMer3D::fill_leafs(const std::vector<std::vector<std::vector<short int> > > &raw_u_t, const std::vector<std::vector<std::vector<short int> > > &raw_v_t)

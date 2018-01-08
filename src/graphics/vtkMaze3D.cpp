@@ -471,19 +471,19 @@ void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0){
     vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     for(int t=0; t<search_space[0].ub()-15*60; t+=dt){
-        vector<ibex::IntervalVector> f1 = pm3d.eval(x);
+        ibex::IntervalVector f1 = pm3d.eval_vector(x);
         //        x[0] += dt;
         //        x[1] += dt*f1[0][1];
         //        x[2] += dt*f1[0][2];
 
         IntervalVector x2(x);
         x2[0] += lambda*dt;
-        x2[1] += lambda*dt*(f1[0][1].mid());
-        x2[2] += lambda*dt*(f1[0][2].mid());
-        vector<ibex::IntervalVector> f2 = pm3d.eval(x2);
+        x2[1] += lambda*dt*(f1[1].mid());
+        x2[2] += lambda*dt*(f1[2].mid());
+        ibex::IntervalVector f2 = pm3d.eval_vector(x2);
         x[0] += dt;
-        x[1] += dt*(a1*(f1[0][1]).mid()+a2*(f2[0][1]).mid());
-        x[2] += dt*(a1*f1[0][2].mid()+a2*f2[0][2].mid());
+        x[1] += dt*(a1*(f1[1]).mid()+a2*(f2[1]).mid());
+        x[2] += dt*(a1*f1[2].mid()+a2*f2[2].mid());
 
         bool Break = false;
         if(f1[0].is_empty()){

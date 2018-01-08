@@ -1,6 +1,7 @@
 #include "ibex_SepFwdBwd.h"
 #include <iostream>
 #include "previmer3d.h"
+#include "dynamics_function.h"
 #include "maze.h"
 #include <ibex.h>
 #include <math.h>
@@ -23,7 +24,8 @@ int main(int argc, char *argv[])
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits, BWD);
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    Dynamics_Function dyn = Dynamics_Function(&pm3d, BWD);
 //    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     // ****** Domain *******
@@ -56,10 +58,10 @@ int main(int argc, char *argv[])
     ibex::Variable t, x, y;
     Function f_id(t, x, y, Return(t, x, y));
     SepFwdBwd s(f_id, initial_condition);
-    dom.set_sep_input(&s);
+    dom.set_sep_output(&s);
 
     // ******* Maze *********
-    invariant::MazePPL maze(&dom, &pm3d);
+    invariant::MazePPL maze(&dom, &dyn);
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();

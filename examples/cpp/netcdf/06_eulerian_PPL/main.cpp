@@ -7,6 +7,7 @@
 
 #include "vtkMaze3D.h"
 #include "vtkmazeppl.h"
+#include "dynamics_function.h"
 
 using namespace std;
 using namespace invariant;
@@ -24,6 +25,7 @@ int main(int argc, char *argv[])
 
     double time_start_PM = omp_get_wtime();
     PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
 //    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     // ****** Domain *******
@@ -58,7 +60,7 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ******* Maze *********
-    invariant::MazePPL maze(&dom, &pm3d);
+    invariant::MazePPL maze(&dom, &dyn);
     maze.set_widening_limit(5);
 
     cout << "Domain = " << search_space << endl;

@@ -2,29 +2,35 @@
 #define PREVIMER3D_H
 
 #include <string>
+#include <omp.h>
+#include <ibex_Function.h>
 #include <ibex_IntervalVector.h>
-#include "dataSet/datasetnode.h"
-#include "dynamics.h"
+#include <ibex_IntervalMatrix.h>
+#include <ibex_Interval.h>
+
 #include <utility>
 #include <array>
+
+#include "dataSet/datasetnode.h"
+#include "dynamics.h"
 
 namespace invariant {
 
 class NodeCurrent3D; // Friendchip
-class PreviMer3D : public invariant::Dynamics
+class PreviMer3D : public ibex::Function
 {
 public:
     /**
      * @brief PreviMer constructor
      * @param file_name
      */
-    PreviMer3D(const std::string &file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits, const DYNAMICS_SENS sens=FWD);
+    PreviMer3D(const std::string &file_xml, const std::array<std::array<size_t, 2>, 2> &grid_limits);
 
     /**
      * @brief PreviMer3D deserialization
      * @param file_name
      */
-    PreviMer3D(const std::string& file_name, const DYNAMICS_SENS sens=FWD);
+    PreviMer3D(const std::string& file_name);
 
     /**
      * @brief PreviMer destructor
@@ -36,7 +42,10 @@ public:
      * @param position
      * @return
      */
-    const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector &position);
+    virtual ibex::IntervalVector eval_vector(const ibex::IntervalVector &position) const;
+
+    virtual ibex::Interval eval(const ibex::IntervalVector &position) const {return ibex::Interval::EMPTY_SET;}
+    virtual ibex::IntervalMatrix eval_matrix(const ibex::IntervalVector &position) const {return ibex::IntervalMatrix::empty(position.size(), position.size());}
 
     const std::vector<ibex::IntervalMatrix> eval_d1(const ibex::IntervalVector &position){
         std::vector<ibex::IntervalMatrix> empty;
@@ -131,8 +140,6 @@ private:
     DataSetNode<signed short, 2> *m_node_current;
     vector<pair<DataSetVirtualNode*, vector<array<int, 2>>>> m_leaf_list;
     std::vector<std::array<int, 2>> m_node_root_position;
-
-    DYNAMICS_SENS m_sens_previmer = FWD;
 };
 
 inline short PreviMer3D::get_fill_value(){

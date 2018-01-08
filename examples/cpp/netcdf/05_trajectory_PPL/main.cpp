@@ -8,6 +8,8 @@
 #include "vtkMaze3D.h"
 #include "vtkmazeppl.h"
 
+#include "dynamics_function.h"
+
 using namespace std;
 using namespace invariant;
 using namespace ibex;
@@ -23,8 +25,9 @@ int main(int argc, char *argv[])
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits, FWD);
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
 //    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+    Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
 
     // ****** Domain *******
     IntervalVector search_space(3);
@@ -59,7 +62,7 @@ int main(int argc, char *argv[])
     dom.set_sep_input(&s);
 
     // ******* Maze *********
-    invariant::MazePPL maze(&dom, &pm3d);
+    invariant::MazePPL maze(&dom, &dyn);
     cout << "Domain = " << search_space << endl;
 
     double time_start = omp_get_wtime();

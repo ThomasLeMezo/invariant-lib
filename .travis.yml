@@ -93,22 +93,22 @@ script:
 - echo ${TRAVIS_BUILD_DIR}
 - mkdir -p build/build-release
 - cd build/build-release
-- cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
-        -DIBEX_ROOT=${HOME}/ibex \
-        -DVTK_ROOT=${HOME}/vtk \
-        -DPPL_ROOT=${HOME}/ppl \
-        -DGMP_ROOT=${HOME}/gmp \
-        -DPYBIND11_PYTHON_VERSION=$PYTHON \
-        -DPYBIND11_CPP_STANDARD=$CPP_VERSION \
-        -DCMAKE_BUILD_TYPE=RELEASE \
-        -DBUILD_TESTS=OFF \
-        -DWITH_PYTHON=ON \
-        -DWITH_3D=ON \
-        -DWITH_GRAPHIZ=OFF \
-        -DWITH_NETCDF=OFF \
-        -DWITH_PYIBEX_VERSION=ON \
-        -DWITH_PPL=ON \
-        -DWITH_EXAMPLES=OFF \
+- cmake -DCMAKE_INSTALL_PREFIX=${HOME} 
+        -DIBEX_ROOT=${HOME}/ibex 
+        -DVTK_ROOT=${HOME}/vtk 
+        -DPPL_ROOT=${HOME}/ppl 
+        -DGMP_ROOT=${HOME}/gmp 
+        -DPYBIND11_PYTHON_VERSION=$PYTHON 
+        -DPYBIND11_CPP_STANDARD=$CPP_VERSION 
+        -DCMAKE_BUILD_TYPE=RELEASE 
+        -DBUILD_TESTS=OFF 
+        -DWITH_PYTHON=ON 
+        -DWITH_3D=ON 
+        -DWITH_GRAPHIZ=OFF 
+        -DWITH_NETCDF=OFF 
+        -DWITH_PYIBEX_VERSION=ON 
+        -DWITH_PPL=ON 
+        -DWITH_EXAMPLES=OFF 
         ${TRAVIS_BUILD_DIR}
 - make -j2
 - make pip_package
