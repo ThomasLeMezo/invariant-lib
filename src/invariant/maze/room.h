@@ -513,6 +513,8 @@ inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
     else{
         *m_initial_door_input = door;
     }
+    if(!m_is_initial_door_output)
+        m_maze->add_initial_room(this);
 }
 
 template <typename _Tp>
@@ -524,6 +526,8 @@ inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
     else{
         *m_initial_door_output = door;
     }
+    if(!m_is_initial_door_input)
+        m_maze->add_initial_room(this);
 }
 
 template <typename _Tp>

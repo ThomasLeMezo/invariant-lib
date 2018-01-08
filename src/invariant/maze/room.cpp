@@ -180,18 +180,17 @@ const ibex::IntervalVector Room<ppl::C_Polyhedron>::get_hull() const{
 template <>
 const ppl::C_Polyhedron Room<ppl::C_Polyhedron>::get_hull_typed() const{
 //    if(m_contain_zero)
-        return m_pave->get_position_typed();
-//    C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
-//    for(FacePPL *f:get_pave()->get_faces_vector()){
-//        DoorPPL *d = f->get_doors()[m_maze];
-//        result |= d->get_hull();
-//    }
-//    if(m_is_initial_door_input)
-//        result |= *m_initial_door_input;
-//    if(m_is_initial_door_output)
-//        result |= *m_initial_door_output;
-//    ppl::Rational_Box rb(result);
-//    return ppl::C_Polyhedron(rb);
+//        return m_pave->get_position_typed();
+    C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
+    for(FacePPL *f:get_pave()->get_faces_vector()){
+        DoorPPL *d = f->get_doors()[m_maze];
+        result |= d->get_hull();
+    }
+    if(m_is_initial_door_input)
+        result |= *m_initial_door_input;
+    if(m_is_initial_door_output)
+        result |= *m_initial_door_output;
+    return result;
 }
 
 /// ******************  Other functions ****************** ///

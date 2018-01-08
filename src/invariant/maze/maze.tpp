@@ -160,6 +160,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
         delete_thread_init<_Tp>(thread_init);
     }
     omp_destroy_lock(&lock_nb_operations);
+    reset_initial_room_list();
 
     std::cout << " => contractions : " << omp_get_wtime() - t_start << " s, with " << m_nb_operations << "/" << nb_deque << " operations" <<  std::endl;
     m_contraction_step++;

@@ -158,6 +158,23 @@ public:
      */
     void set_enable_contract_domain(bool val);
 
+    /**
+     * @brief add_initial_room
+     * @param room_pt
+     */
+    void add_initial_room(Room<_Tp>* room_pt);
+
+    /**
+     * @brief reset_initial_room_list
+     */
+    void reset_initial_room_list();
+
+    /**
+     * @brief get_initial_room_list
+     * @return
+     */
+    std::vector<Room<_Tp>*> get_initial_room_list();
+
 private:
     invariant::Domain<_Tp> *    m_domain = nullptr;
     SmartSubPaving<_Tp>  *    m_subpaving = nullptr; // SmartSubPaving associated with this maze
@@ -176,6 +193,8 @@ private:
     size_t m_contraction_limit=1000;
     bool m_enable_contract_domain = true;
     bool m_limit_contraction_door = false;
+
+    std::vector<Room<_Tp>*> m_initial_rooms_list;
 };
 }
 
@@ -236,6 +255,21 @@ inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
     omp_set_lock(&m_deque_access);
     m_deque_rooms.push_back(r);
     omp_unset_lock(&m_deque_access);
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::add_initial_room(Room<_Tp>* room_pt){
+    m_initial_rooms_list.push_back(room_pt);
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::reset_initial_room_list(){
+    m_initial_rooms_list.clear();
+}
+
+template <typename _Tp>
+inline std::vector<Room<_Tp>*> Maze<_Tp>::get_initial_room_list(){
+    return m_initial_rooms_list;
 }
 
 template <typename _Tp>

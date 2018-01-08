@@ -15,7 +15,7 @@ using namespace ibex;
 
 int main(int argc, char *argv[])
 {
-    // ****** Dynamics *******
+    // ****** Dynamics ******* //
 //    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
     string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
