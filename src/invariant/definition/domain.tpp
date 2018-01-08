@@ -325,7 +325,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
                     if(!r->is_removed() && r->is_father_hull()){
                         Pave<_Tp> *p = r->get_pave();
                         Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-                        if(maze->get_contract_once())
+                        if(maze_inter->get_contract_once())
                             r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
                         else{
                             if(r_inter->is_father_hull())
