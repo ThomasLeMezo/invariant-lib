@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
     grid_limits[0][0] = 80; grid_limits[0][1] = 280; // max = 584
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     Dynamics_Function dyn_A = Dynamics_Function(&pm3d, FWD);
     Dynamics_Function dyn_B = Dynamics_Function(&pm3d, BWD);
@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL_A("PrevimerPPL_eulerian_A");
     VtkMazePPL vtkMazePPL_B("PrevimerPPL_eulerian_B");
+    VtkMazePPL vtkMazePPL_A_bis("PrevimerPPL_eulerian_A_bis");
 //    omp_set_num_threads(1);
 
     maze_A.set_widening_limit(10);
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
     paving.set_enable_bisection_strategy(0, BISECTION_LB);
     paving.set_bisection_strategy_slice(0, 900*3);
 
-    for(int i=0; i<30; i++){
+    for(int i=0; i<2; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
@@ -109,6 +110,8 @@ int main(int argc, char *argv[])
         maze_A.set_enable_contract_domain(false);
         maze_A.contract(paving.size_active()*factor_door);
 
+        vtkMazePPL_A.show_maze(&maze_A);
+
         // B
         maze_B.get_domain()->set_init(FULL_WALL);
         maze_B.set_enable_contract_domain(true);
@@ -119,19 +122,21 @@ int main(int argc, char *argv[])
         maze_B.set_enable_contract_domain(false);
         maze_B.contract(paving.size_active()*factor_door);
 
-        // A
-//        maze_A.reset_nb_operations();
-//        maze_A.get_domain()->set_init(FULL_WALL);
-//        maze_A.set_enable_contract_domain(true);
-//        maze_A.contract();
-
-//        maze_A.get_domain()->set_init(FULL_DOOR);
-//        maze_A.reset_nb_operations();
-//        maze_A.set_enable_contract_domain(false);
-//        maze_A.contract(paving.size_active()*factor_door);
-
-        vtkMazePPL_A.show_maze(&maze_A);
         vtkMazePPL_B.show_maze(&maze_B);
+
+        // A
+        maze_A.reset_nb_operations();
+        maze_A.get_domain()->set_init(FULL_WALL);
+        maze_A.set_enable_contract_domain(true);
+        maze_A.contract();
+
+        maze_A.get_domain()->set_init(FULL_DOOR);
+        maze_A.reset_nb_operations();
+        maze_A.set_enable_contract_domain(false);
+        maze_A.contract(paving.size_active()*factor_door);
+
+        vtkMazePPL_A_bis.show_maze(&maze_A);
+
     }
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
     cout << paving << endl;

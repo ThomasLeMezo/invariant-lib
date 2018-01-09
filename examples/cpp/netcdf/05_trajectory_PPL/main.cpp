@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
     double time_start_PM = omp_get_wtime();
-    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
     Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
 
     // ****** Domain *******
@@ -69,9 +69,9 @@ int main(int argc, char *argv[])
     VtkMazePPL vtkMazePPL("PrevimerPPL");
 //    omp_set_num_threads(1);
 
-    maze.set_widening_limit(15);
+    maze.set_widening_limit(10);
     maze.set_enable_contraction_limit(true);
-    maze.set_contraction_limit(20);
+    maze.set_contraction_limit(10);
     int factor_door = 2;
 
     paving.set_enable_bisection_strategy(0, BISECTION_LB);
@@ -86,12 +86,14 @@ int main(int argc, char *argv[])
         maze.set_enable_contract_domain(true);
         maze.contract();
 
-        maze.get_domain()->set_init(FULL_DOOR);
-        maze.reset_nb_operations();
-        maze.set_enable_contract_domain(false);
-        maze.contract(paving.size_active()*factor_door);
-
         vtkMazePPL.show_maze(&maze);
+
+//        maze.get_domain()->set_init(FULL_DOOR);
+//        maze.reset_nb_operations();
+//        maze.set_enable_contract_domain(false);
+//        maze.contract(paving.size_active()*factor_door);
+
+//        vtkMazePPL.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
     cout << paving << endl;

@@ -268,6 +268,8 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
     if(m_maze_list_inter.empty())
         return;
     std::cout << " ==> contract inter maze" << std::endl;
+
+    /// ************************************ FULL_DOOR CASE ************************************ ///
     if(maze->get_domain()->get_init()==FULL_DOOR && !maze->is_escape_trajectories()){
         std::vector<Room<_Tp> *> room_list;
         m_subpaving->get_tree()->get_all_child_rooms_not_empty(room_list, maze);
@@ -290,30 +292,31 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
             }
         }
     }
+    /// ************************************ FULL_WALL CASE ************************************ ///
     else if(maze->get_domain()->get_init()==FULL_WALL){
         std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
         // Contract initial condition
-        for(Maze<_Tp> *maze_inter:m_maze_list_inter){
-            if(maze_inter->get_contract_once()){
-#pragma omp parallel
-                {
-                    Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
-#pragma omp for
-                    for(size_t i=0; i<room_list_initial.size(); i++){
-                        Room<_Tp> *r = room_list_initial[i];
-                        Pave<_Tp> *p = r->get_pave();
-                        Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-                        if(r->is_initial_door_input())
-                            r->set_initial_door_input(r->get_initial_door_input() & r_inter->get_hull_typed());
-                        if(r->is_initial_door_output())
-                            r->set_initial_door_output(r->get_initial_door_output() & r_inter->get_hull_typed());
-                        // Add a contraction of the initial condition !
-                        r->synchronize();
-                    }
-                    delete_thread_init<_Tp>(thread_init);
-                }
-            }
-        }
+//        for(Maze<_Tp> *maze_inter:m_maze_list_inter){
+//            if(maze_inter->get_contract_once()){
+//#pragma omp parallel
+//                {
+//                    Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
+//#pragma omp for
+//                    for(size_t i=0; i<room_list_initial.size(); i++){
+//                        Room<_Tp> *r = room_list_initial[i];
+//                        Pave<_Tp> *p = r->get_pave();
+//                        Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
+//                        if(r->is_initial_door_input())
+//                            r->set_initial_door_input(r->get_initial_door_input() & r_inter->get_hull_typed());
+//                        if(r->is_initial_door_output())
+//                            r->set_initial_door_output(r->get_initial_door_output() & r_inter->get_hull_typed());
+//                        // Add a contraction of the initial condition !
+//                        r->synchronize();
+//                    }
+//                    delete_thread_init<_Tp>(thread_init);
+//                }
+//            }
+//        }
 
         // Contract father_hull
         std::vector<Pave<_Tp> *> room_list = maze->get_subpaving()->get_paves();
