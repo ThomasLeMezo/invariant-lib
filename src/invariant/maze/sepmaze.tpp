@@ -9,7 +9,7 @@ SepMaze<_Tp>::SepMaze(Maze<_Tp> *maze) : Sep(maze->get_subpaving()->dim()){
 
 template <typename _Tp>
 void SepMaze<_Tp>::separate(ibex::IntervalVector &in, ibex::IntervalVector &out){
-    vector<Room<_Tp> *> list_room_not_empty, list_room_empty;
+    std::vector<Room<_Tp> *> list_room_not_empty, list_room_empty;
     m_maze->get_subpaving()->get_tree()->get_intersection_polygon_not_empty(list_room_not_empty, out, m_maze);
     m_maze->get_subpaving()->get_tree()->get_intersection_polygon_empty(list_room_empty, in, m_maze);
 
