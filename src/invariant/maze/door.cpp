@@ -101,11 +101,11 @@ ppl::C_Polyhedron iv_2_polyhedron(const ibex::IntervalVector& iv){
     if(!iv.is_empty()){
         for(size_t i=0; i<iv_size; i++){
             ppl::Variable x(i);
-            if(!isinf((double)iv[i].lb())){
+            if(!::isinf(iv[i].lb())){ // '::' To avoid bug with Travis
                 mpq_class lb(iv[i].lb());
                 box.add_constraint(x*lb.get_den() >= lb.get_num());
             }
-            if(!isinf((double)iv[i].ub())){
+            if(!::isinf(iv[i].ub())){
                 mpq_class ub(iv[i].ub());
                 box.add_constraint(x*ub.get_den() <= ub.get_num());
             }
