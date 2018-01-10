@@ -44,6 +44,11 @@ public:
      */
     Domain(SmartSubPaving<_Tp>* paving, DOMAIN_INITIALIZATION domain_init);
 
+    /**
+     * @brief Destructor of a domain
+     */
+    ~Domain();
+
     // *************** Intput & Output *********************
 
     /**
@@ -191,7 +196,7 @@ private:
      * @brief Contract the boarders according to the options
      * @param maze
      */
-    void contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque);
+    void contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque, std::vector<Pave<_Tp>*> &pave_border_list);
 
     /**
      * @brief Contract the domain by intersecting with maze list
@@ -225,6 +230,8 @@ private:
 
     std::vector<Maze<_Tp> *> m_maze_list_inter;
     std::vector<Maze<_Tp> *> m_maze_list_union;
+
+    omp_lock_t m_list_room_access;
 };
 }
 

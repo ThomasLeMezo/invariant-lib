@@ -144,6 +144,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                 omp_set_lock(&m_deque_access);
                 omp_set_lock(&lock_nb_operations);
                 stop_contraction = m_deque_rooms.empty() || (nb_operations!=0 && m_nb_operations>=nb_operations);
+                #pragma omp flush(stop_contraction)
                 omp_unset_lock(&lock_nb_operations);
                 omp_unset_lock(&m_deque_access);
 

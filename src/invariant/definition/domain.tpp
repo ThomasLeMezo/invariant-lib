@@ -6,14 +6,25 @@ template<typename _Tp>
 Domain<_Tp>::Domain(SmartSubPaving<_Tp> *paving, DOMAIN_INITIALIZATION domain_init){
     m_subpaving = paving;
     m_domain_init = domain_init;
+    omp_init_lock(&m_list_room_access);
+}
+
+template<typename _Tp>
+Domain<_Tp>::~Domain(){
+    omp_destroy_lock(&m_list_room_access);
 }
 
 template<typename _Tp>
 void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque){
     // ********** Initialize the maze ********** //
+    // Global variables for all thread
+    std::vector<Pave<_Tp>*> pave_border_list;
+    m_subpaving->get_tree()->get_border_paves(pave_border_list);
+
 #pragma omp parallel
     {
         Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
+        #pragma omp barrier
 #pragma omp for
         for(size_t i=0; i<m_subpaving->get_paves().size(); i++){
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
@@ -23,27 +34,41 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                     r->set_full_private_with_father();
                 else if(m_domain_init == FULL_WALL)
                     r->set_empty_private();
-                r->synchronize();
-                //            r->reset_update_neighbors();
             }
         }
-        delete_thread_init<_Tp>(thread_init);
-    }
 
     // ********** Separator contraction ********** //
     // ==> ToDo : multithread !
-    if(m_sep_output != nullptr)
-        contract_separator(maze, m_subpaving->get_tree(), list_room_deque, true, SEP_UNKNOWN); // Output
-    if(m_sep_input != nullptr)
-        contract_separator(maze, m_subpaving->get_tree(), list_room_deque, false, SEP_UNKNOWN); // Input
+        #pragma omp single
+        {
+            if(m_sep_output != nullptr){
+                contract_separator(maze, m_subpaving->get_tree(), list_room_deque, true, SEP_UNKNOWN); // Output
+            }
+            if(m_sep_input != nullptr){
+                contract_separator(maze, m_subpaving->get_tree(), list_room_deque, false, SEP_UNKNOWN); // Input
+            }
+        }
 
-    // ********** Border contraction ********** //
-    contract_border(maze, list_room_deque);
+            // ********** Border contraction ********** //
+        if(!(m_subpaving->size()==1 && m_domain_init == FULL_DOOR))
+            contract_border(maze, list_room_deque, pave_border_list); // (not in single because of omp for inside)
 
-    // ********** Intersection/Union contraction with other mazes ********** //
-    // => Proceed after initial set
-    contract_inter_maze(maze);
-    contract_union_maze(maze);
+            // ********** Intersection/Union contraction with other mazes ********** //
+            // => Proceed after initial set
+        #pragma omp single
+        {
+            contract_inter_maze(maze);
+            contract_union_maze(maze);
+        }
+
+        #pragma omp for
+        for(size_t i=0; i<m_subpaving->get_paves().size(); i++){
+            Pave<_Tp> *p = m_subpaving->get_paves()[i];
+            Room<_Tp> *r = p->get_rooms()[maze];
+            r->synchronize();
+        }
+        delete_thread_init<_Tp>(thread_init);
+    }
 
     // ********** Add additional rooms to deque ********** //
     if(m_domain_init == FULL_DOOR){
@@ -86,14 +111,18 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                             r->set_full_private_input();
                     }
                     if(m_domain_init == FULL_WALL){
+                        omp_set_lock(&m_list_room_access);
                         list_room_deque.push_back(r);
+                        omp_unset_lock(&m_list_room_access);
                     }
-                    r->synchronize();
                 }
             }
             else{
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_INSIDE);
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_INSIDE);
+#pragma omp taskwait
             }
         }
     }
@@ -108,13 +137,15 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                         r->set_empty_private_output();
                     else
                         r->set_empty_private_input();
-                    r->synchronize();
                 }
             }
             else{
                 if(m_domain_init != FULL_WALL){
+#pragma omp task shared(list_room_deque)
                     contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_OUTSIDE);
+#pragma omp task shared(list_room_deque)
                     contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_OUTSIDE);
+#pragma omp taskwait
                 }
             }
         }
@@ -146,7 +177,9 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                             r->set_full_private_input();
                     }
                     if(m_domain_init == FULL_WALL){
+                        omp_set_lock(&m_list_room_access);
                         list_room_deque.push_back(r);
+                        omp_unset_lock(&m_list_room_access);
                     }
                 }
                 else if(x_out.is_empty()){  // Outside the constraint
@@ -174,28 +207,38 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                     }
 
                     if(m_domain_init == FULL_WALL){
+                        omp_set_lock(&m_list_room_access);
                         list_room_deque.push_back(r);
+                        omp_unset_lock(&m_list_room_access);
                     }
                 }
-                r->synchronize();
             }
         }
         else{
             // Determine the accelerator
             if(x_in.is_empty()){
                 // Completly inside the constraint
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_INSIDE);
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_INSIDE);
+#pragma taskwait
             }
             else if(x_out.is_empty()){
                 // Completly outside the constraint
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_OUTSIDE);
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_OUTSIDE);
+#pragma omp taskwait
             }
             else{
                 // Mix area (outside & inside)
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze,pave_node->get_children().first, list_room_deque, output, SEP_UNKNOWN);
+#pragma omp task shared(list_room_deque)
                 contract_separator(maze,pave_node->get_children().second, list_room_deque, output, SEP_UNKNOWN);
+#pragma omp taskwait
             }
         }
     }
@@ -206,60 +249,46 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
 }
 
 template<typename _Tp>
-void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque){
-    if(m_subpaving->size()==1 && m_domain_init == FULL_DOOR)
-        return;
-
-    std::vector<Pave<_Tp>*> pave_border_list;
-    m_subpaving->get_tree()->get_border_paves(pave_border_list);
-
-#pragma omp parallel
-    {
-        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
+void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque, std::vector<Pave<_Tp>*> &pave_border_list){
 #pragma omp for
-        for(size_t i=0; i<pave_border_list.size(); i++){
-            Pave<_Tp> *p = pave_border_list[i];
-            Room<_Tp> *r = p->get_rooms()[maze];
-            if(!r->is_removed()){
-                for(Face<_Tp> *f:p->get_faces_vector()){
-                    if(f->is_border()){
-                        Door<_Tp> *d = f->get_doors()[maze];
-                        if(m_border_path_in)
-                            d->set_full_private_input();
-                        else{
-                            if(m_domain_init != FULL_WALL && !r->get_contain_zero())
-                                d->set_empty_private_input();
-                        }
-
-                        if(m_border_path_out)
-                            d->set_full_private_output();
-                        else{
-                            if(m_domain_init != FULL_WALL && !r->get_contain_zero())
-                                d->set_empty_private_output();
-                        }
-                        d->synchronize();
+    for(size_t i=0; i<pave_border_list.size(); i++){
+        Pave<_Tp> *p = pave_border_list[i];
+        Room<_Tp> *r = p->get_rooms()[maze];
+        if(!r->is_removed()){
+            for(Face<_Tp> *f:p->get_faces_vector()){
+                if(f->is_border()){
+                    Door<_Tp> *d = f->get_doors()[maze];
+                    if(m_border_path_in)
+                        d->set_full_private_input();
+                    else{
+                        if(m_domain_init != FULL_WALL && !r->get_contain_zero())
+                            d->set_empty_private_input();
                     }
-                }
 
-                if(m_domain_init == FULL_WALL && (m_border_path_in || m_border_path_out)){
-                    if(!p->get_rooms()[maze]->is_full()){
-#pragma omp critical(dqueue)
-                        {
-                            list_room_deque.push_back(p->get_rooms()[maze]);
-                        }
-                    }
-                }
-                if(m_domain_init == FULL_DOOR && (!m_border_path_in || !m_border_path_out)){
-                    if(!p->get_rooms()[maze]->is_empty()){
-#pragma omp critical(dqueue)
-                        {
-                            list_room_deque.push_back(p->get_rooms()[maze]);
-                        }
+                    if(m_border_path_out)
+                        d->set_full_private_output();
+                    else{
+                        if(m_domain_init != FULL_WALL && !r->get_contain_zero())
+                            d->set_empty_private_output();
                     }
                 }
             }
+
+            if(m_domain_init == FULL_WALL && (m_border_path_in || m_border_path_out)){
+                if(!p->get_rooms()[maze]->is_full()){
+                    omp_set_lock(&m_list_room_access);
+                    list_room_deque.push_back(p->get_rooms()[maze]);
+                    omp_unset_lock(&m_list_room_access);
+                }
+            }
+            if(m_domain_init == FULL_DOOR && (!m_border_path_in || !m_border_path_out)){
+                if(!p->get_rooms()[maze]->is_empty()){
+                    omp_set_lock(&m_list_room_access);
+                    list_room_deque.push_back(p->get_rooms()[maze]);
+                    omp_unset_lock(&m_list_room_access);
+                }
+            }
         }
-        delete_thread_init<_Tp>(thread_init);
     }
 }
 
@@ -275,19 +304,13 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
         m_subpaving->get_tree()->get_all_child_rooms_not_empty(room_list, maze);
         for(Maze<_Tp> *maze_inter:m_maze_list_inter){
             if(!maze_inter->is_escape_trajectories()){
-#pragma omp parallel
-                {
-                    Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
-                    for(size_t i=0; i<room_list.size(); i++){
-                        Room<_Tp> *r = room_list[i];
-                        Pave<_Tp> *p = r->get_pave();
-                        Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-                        *r &= *r_inter;
-                        // Add a contraction of the initial condition !
-                        r->synchronize();
-                    }
-                    delete_thread_init<_Tp>(thread_init);
+                for(size_t i=0; i<room_list.size(); i++){
+                    Room<_Tp> *r = room_list[i];
+                    Pave<_Tp> *p = r->get_pave();
+                    Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
+                    *r &= *r_inter;
+                    // Add a contraction of the initial condition !
                 }
             }
         }
@@ -296,52 +319,45 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
     else if(maze->get_domain()->get_init()==FULL_WALL){
         std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
         // Contract initial condition
-//        for(Maze<_Tp> *maze_inter:m_maze_list_inter){
-//            if(maze_inter->get_contract_once()){
-//#pragma omp parallel
-//                {
-//                    Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
-//#pragma omp for
-//                    for(size_t i=0; i<room_list_initial.size(); i++){
-//                        Room<_Tp> *r = room_list_initial[i];
-//                        Pave<_Tp> *p = r->get_pave();
-//                        Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-//                        if(r->is_initial_door_input())
-//                            r->set_initial_door_input(r->get_initial_door_input() & r_inter->get_hull_typed());
-//                        if(r->is_initial_door_output())
-//                            r->set_initial_door_output(r->get_initial_door_output() & r_inter->get_hull_typed());
-//                        // Add a contraction of the initial condition !
-//                        r->synchronize();
-//                    }
-//                    delete_thread_init<_Tp>(thread_init);
-//                }
-//            }
-//        }
+        //        for(Maze<_Tp> *maze_inter:m_maze_list_inter){
+        //            if(maze_inter->get_contract_once()){
+        //#pragma omp parallel
+        //                {
+        //                    Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
+        //#pragma omp for
+        //                    for(size_t i=0; i<room_list_initial.size(); i++){
+        //                        Room<_Tp> *r = room_list_initial[i];
+        //                        Pave<_Tp> *p = r->get_pave();
+        //                        Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
+        //                        if(r->is_initial_door_input())
+        //                            r->set_initial_door_input(r->get_initial_door_input() & r_inter->get_hull_typed());
+        //                        if(r->is_initial_door_output())
+        //                            r->set_initial_door_output(r->get_initial_door_output() & r_inter->get_hull_typed());
+        //                        // Add a contraction of the initial condition !
+        //                        r->synchronize();
+        //                    }
+        //                    delete_thread_init<_Tp>(thread_init);
+        //                }
+        //            }
+        //        }
 
         // Contract father_hull
         std::vector<Pave<_Tp> *> room_list = maze->get_subpaving()->get_paves();
         for(Maze<_Tp> *maze_inter:m_maze_list_inter){
-#pragma omp parallel
-            {
-                Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
-                for(size_t i=0; i<room_list.size(); i++){
-                    Room<_Tp> *r = room_list[i]->get_rooms()[maze];
-                    if(!r->is_removed() && r->is_father_hull()){
-                        Pave<_Tp> *p = r->get_pave();
-                        Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-                        if(maze_inter->get_contract_once()){
-                            r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
-                        }
-                        else{
-                            if(r_inter->is_father_hull())
-                                r->set_father_hull(r->get_father_hull() & r_inter->get_father_hull());
-                        }
-                        // Add a contraction of the initial condition !
-                        r->synchronize();
+            for(size_t i=0; i<room_list.size(); i++){
+                Room<_Tp> *r = room_list[i]->get_rooms()[maze];
+                if(!r->is_removed() && r->is_father_hull()){
+                    Pave<_Tp> *p = r->get_pave();
+                    Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
+                    if(maze_inter->get_contract_once()){
+                        r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
+                    }
+                    else{
+                        if(r_inter->is_father_hull())
+                            r->set_father_hull(r->get_father_hull() & r_inter->get_father_hull());
                     }
                 }
-                delete_thread_init<_Tp>(thread_init);
             }
         }
     }
@@ -355,18 +371,12 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
     m_subpaving->get_tree()->get_all_child_rooms_not_full(room_list, maze);
 
     for(Maze<_Tp> *maze_union:m_maze_list_union){
-#pragma omp parallel
-        {
-            Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
 #pragma omp for
-            for(size_t i=0; i<room_list.size(); i++){
-                Room<_Tp> *r = room_list[i];
-                Pave<_Tp> *p = r->get_pave();
-                Room<_Tp> *r_inter = p->get_rooms()[maze_union];
-                *r |= *r_inter;
-                r->synchronize();
-            }
-            delete_thread_init<_Tp>(thread_init);
+        for(size_t i=0; i<room_list.size(); i++){
+            Room<_Tp> *r = room_list[i];
+            Pave<_Tp> *p = r->get_pave();
+            Room<_Tp> *r_inter = p->get_rooms()[maze_union];
+            *r |= *r_inter;
         }
     }
 }
