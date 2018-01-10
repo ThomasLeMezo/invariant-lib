@@ -31,10 +31,20 @@ if [ ! -e "$HOME/vtk/lib/libvtkCommonCore-8.0.so" ]; then
   BUILD_DIR=$HOME/vtk
   mkdir -p "${BUILD_DIR}"
   cmake -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
-  					  -DCMAKE_BUILD_TYPE=Release \
-  					  -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP \
-              -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-              ../
+								-DCMAKE_BUILD_TYPE=Release \
+								-DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP \
+								-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+								-DBUILD_SHARED_LIBS=OFF \
+								-DVTK_Group_Rendering=OFF \
+								-VTK_Group_Imaging=OFF \
+								-VTK_Group_MPI=OFF \
+								-VTK_Group_Qt=OFF \
+								-VTK_Group_Rendering=OFF \
+								-VTK_Group_Tk=OFF \
+								-VTK_Group_Views=OFF \
+								-VTK_Group_Web=OFF \
+								-VTK_IOS_BUILD=OFF \
+								../
   make -j4
   make install
   # cd ../..
