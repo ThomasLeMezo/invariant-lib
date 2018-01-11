@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
     double time_start_PM = omp_get_wtime();
-//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
     Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
 
     // ****** Domain *******
@@ -69,15 +69,16 @@ int main(int argc, char *argv[])
     VtkMazePPL vtkMazePPL("PrevimerPPL");
 //    omp_set_num_threads(1);
 
-    maze.set_widening_limit(10);
+    maze.set_widening_limit(15);
     maze.set_enable_contraction_limit(true);
-    maze.set_contraction_limit(10);
+    maze.set_contraction_limit(15);
     int factor_door = 2;
+    maze.set_enable_contract_vector_field(true);
 
-    paving.set_enable_bisection_strategy(0, BISECTION_LB);
+    paving.set_enable_bisection_strategy(0, BISECTION_STANDARD);
     paving.set_bisection_strategy_slice(0, 900*3);
 
-    for(int i=0; i<30; i++){
+    for(int i=0; i<15; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
         paving.bisect();
@@ -86,7 +87,8 @@ int main(int argc, char *argv[])
         maze.set_enable_contract_domain(true);
         maze.contract();
 
-        vtkMazePPL.show_maze(&maze);
+        vtkMazePPL.show_maze(&maze, "without");
+        vtkMazePPL.show_subpaving(&maze, "without");
 
 //        maze.get_domain()->set_init(FULL_DOOR);
 //        maze.reset_nb_operations();

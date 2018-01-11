@@ -472,6 +472,9 @@ inline Parma_Polyhedra_Library::C_Polyhedron operator|(const Parma_Polyhedra_Lib
     return p_return;
 }
 
+ibex::IntervalVector convert_iv(const ibex::IntervalVector &iv);
+
+ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p);
 
 ///
 /// \brief Get the difference Hull a\b

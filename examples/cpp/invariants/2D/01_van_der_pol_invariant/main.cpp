@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);
+    maze.set_enable_contract_vector_field(true);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

@@ -99,7 +99,12 @@ void Room<_Tp>::compute_vector_field(){
     m_vector_field_zero.clear();
     m_vector_fields.clear();
     m_contain_zero = false;
-    const ibex::IntervalVector position(m_pave->get_position());
+    ibex::IntervalVector position(m_pave->get_position());
+
+    if(m_maze->get_contract_vector_field() && m_is_father_hull){
+        position &= convert_iv(*m_father_hull);
+    }
+
     std::vector<ibex::IntervalVector> vector_field_list = m_maze->get_dynamics()->eval(position);
     // Eval Vector field
     for(ibex::IntervalVector &vector_field:vector_field_list){

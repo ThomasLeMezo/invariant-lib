@@ -181,6 +181,19 @@ public:
      */
     bool get_contract_once() const;
 
+    /**
+     * @brief set_contract_vector_field
+     * @param val
+     * @return
+     */
+    void set_enable_contract_vector_field(bool val);
+
+    /**
+     * @brief get_contract_vector_field
+     * @return
+     */
+    bool get_contract_vector_field() const;
+
 private:
     invariant::Domain<_Tp> *    m_domain = nullptr;
     SmartSubPaving<_Tp>  *    m_subpaving = nullptr; // SmartSubPaving associated with this maze
@@ -199,6 +212,8 @@ private:
     size_t m_contraction_limit=1000;
     bool m_enable_contract_domain = true;
     bool m_limit_contraction_door = false;
+
+    bool m_contract_vector_field = false;
 
     std::vector<Room<_Tp>*> m_initial_rooms_list;
 };
@@ -281,6 +296,16 @@ inline std::vector<Room<_Tp>*> Maze<_Tp>::get_initial_room_list(){
 template <typename _Tp>
 inline bool Maze<_Tp>::get_contract_once() const{
     return m_contract_once;
+}
+
+template <typename _Tp>
+inline bool Maze<_Tp>::get_contract_vector_field() const{
+    return m_contract_vector_field;
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::set_enable_contract_vector_field(bool val){
+    m_contract_vector_field = val;
 }
 
 template <typename _Tp>

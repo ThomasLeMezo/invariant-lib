@@ -21,6 +21,14 @@ inline ibex::Interval taylor(const ibex::Interval &t, const ibex::Interval &x_do
     return 0.5*x_dot2*t*t+x0_dot*t+x0;
 }
 
+ibex::IntervalVector convert_iv(const ibex::IntervalVector &iv){
+    return iv;
+}
+
+ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p){
+    return polyhedron_2_iv(p);
+}
+
 template<>
 void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     // Contraction with Taylor 1 order
@@ -181,16 +189,18 @@ template <>
 const ppl::C_Polyhedron Room<ppl::C_Polyhedron>::get_hull_typed() const{
 //    if(m_contain_zero)
         return m_pave->get_position_typed();
-//    C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
-//    for(FacePPL *f:get_pave()->get_faces_vector()){
-//        DoorPPL *d = f->get_doors()[m_maze];
-//        result |= d->get_hull();
+//    else{
+//        C_Polyhedron result(m_pave->get_position().size(), ppl::EMPTY);
+//        for(FacePPL *f:get_pave()->get_faces_vector()){
+//            DoorPPL *d = f->get_doors()[m_maze];
+//            result |= d->get_hull();
+//        }
+//        if(m_is_initial_door_input)
+//            result |= *m_initial_door_input;
+//        if(m_is_initial_door_output)
+//            result |= *m_initial_door_output;
+//        return result;
 //    }
-//    if(m_is_initial_door_input)
-//        result |= *m_initial_door_input;
-//    if(m_is_initial_door_output)
-//        result |= *m_initial_door_output;
-//    return result;
 }
 
 /// ******************  Other functions ****************** ///
