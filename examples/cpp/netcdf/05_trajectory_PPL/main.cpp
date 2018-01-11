@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     t_c = search_space[0].lb();
     x_c = 137 * pm3d.get_grid_conversion(1);
     y_c = 477 * pm3d.get_grid_conversion(2);
-    r_spatial = 1000.0; // in m
+    r_spatial = 10.0; // in m
     r_time = 5*60.0; // in s
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
 

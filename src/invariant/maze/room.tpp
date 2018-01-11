@@ -45,10 +45,37 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics)
     //        m_door_collinearity.push_back(vect_temp);
     //    }
 
-    ibex::Variable v(9);
-    m_contract_function = new ibex::Function(v, ibex::Return(v[0]*pow(v[8],2)+v[2]*v[8]+v[4]-v[6], v[1]*pow(v[8],2)+v[3]*v[8]+v[5]-v[7]));
-    m_ctc = new ibex::CtcFwdBwd(*m_contract_function);
+//    ibex::Variable v(9);
+//    m_contract_function = new ibex::Function(v, ibex::Return(v[0]*pow(v[8],2)+v[2]*v[8]+v[4]-v[6], v[1]*pow(v[8],2)+v[3]*v[8]+v[5]-v[7]));
+//    m_ctc = new ibex::CtcFwdBwd(*m_contract_function);
 
+}
+
+template<typename _Tp>
+inline void Room<_Tp>::reset(){
+    m_full = true;
+    m_empty = false;
+    m_full_first_eval = true;
+    m_empty_first_eval = false;
+    m_removed = false;
+    m_in_deque = false;
+
+    m_is_initial_door_input = false;
+    m_is_initial_door_output = false;
+    if(m_initial_door_input!=nullptr){
+        delete(m_initial_door_input);
+        m_initial_door_input=nullptr;
+    }
+    if(m_initial_door_output!=nullptr){
+        delete(m_initial_door_output);
+        m_initial_door_output=nullptr;
+    }
+    m_nb_contract = 0;
+
+    for(Face<_Tp> *f:m_pave->get_faces_vector()){
+        Door<_Tp> *d = f->get_doors()[m_maze];
+        d->reset();
+    }
 }
 
 template<typename _Tp>
@@ -56,8 +83,8 @@ Room<_Tp>::~Room(){
     omp_destroy_lock(&m_lock_contraction);
     omp_destroy_lock(&m_lock_deque);
     omp_destroy_lock(&m_lock_vector_field);
-    delete(m_ctc);
-    delete(m_contract_function);
+//    delete(m_ctc);
+//    delete(m_contract_function);
     if(m_initial_door_output != nullptr)
         delete(m_initial_door_output);
     if(m_initial_door_input != nullptr)

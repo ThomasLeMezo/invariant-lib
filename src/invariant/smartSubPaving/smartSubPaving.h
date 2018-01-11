@@ -183,6 +183,19 @@ public:
      */
     void set_bisection_strategy_slice(const int &dim, const double &val);
 
+    /**
+     * @brief get_limit_bisection
+     * @return
+     */
+    const std::vector<double>& get_limit_bisection() const;
+
+    /**
+     * @brief bisection_limit_reach
+     * @param position
+     * @return
+     */
+    bool bisection_limit_reach(const ibex::IntervalVector &position);
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
@@ -302,6 +315,11 @@ inline void SmartSubPaving<_Tp>::set_enable_bisection_strategy(const int &dim, c
 template<typename _Tp>
 inline void SmartSubPaving<_Tp>::set_bisection_strategy_slice(const int &dim, const double &val){
     m_bisection_strategy_slice[dim] = val;
+}
+
+template<typename _Tp>
+inline const std::vector<double>& SmartSubPaving<_Tp>::get_limit_bisection() const{
+    return m_limit_bisection;
 }
 
 }

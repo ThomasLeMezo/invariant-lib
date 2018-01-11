@@ -218,5 +218,21 @@ bool Door<_Tp>::contract_continuity_private(){
     return change;
 }
 
+template<typename _Tp>
+inline void Door<_Tp>::reset(){
+    m_input_public = m_face->get_position_typed();
+    m_output_public = m_face->get_position_typed();
+    if(m_input_private != nullptr)
+        *m_input_private = m_face->get_position_typed();
+    if(m_output_private != nullptr)
+        *m_output_private = m_face->get_position_typed();
+    m_possible_out.clear();
+    m_possible_in.clear();
+    m_possible_in_union = false;
+    m_possible_out_union = false;
+    m_collinear_vector_field.clear();
+    m_zeros_in_vector_fields.clear();
+}
+
 }
 

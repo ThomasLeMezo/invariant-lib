@@ -117,7 +117,7 @@ public:
      * - add the result to the SmartSubPaving
      * - upate neighbors
      */
-    void bisect();
+    bool bisect();
 
     /**
      * @brief Return true if the Pave have to be bisected

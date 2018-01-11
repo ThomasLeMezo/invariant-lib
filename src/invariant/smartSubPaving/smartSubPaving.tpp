@@ -121,8 +121,8 @@ void SmartSubPaving<_Tp>::bisect(){
         bisectable_paves.pop_back();
 
         if(p->request_bisection()){
-            p->bisect(); // bisected added to m_paves & update mazes
-            delete(p);
+            if(p->bisect()) // bisected added to m_paves & update mazes
+                delete(p);
         }
         else{
             // Store not bisectable paves
@@ -196,6 +196,15 @@ std::pair<ibex::IntervalVector, ibex::IntervalVector> SmartSubPaving<_Tp>::bisec
     }
 
     return std::make_pair(p1, p2);
+}
+
+template<typename _Tp>
+bool SmartSubPaving<_Tp>::bisection_limit_reach(const ibex::IntervalVector &position){
+    for(int dim = 0; dim<m_dim; dim++){
+        if(position[dim].diam() >= m_limit_bisection[dim])
+            return false;
+    }
+    return true;
 }
 
 }

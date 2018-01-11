@@ -58,6 +58,11 @@ public:
     ~Room();
 
     /**
+     * @brief reset
+     */
+    void reset();
+
+    /**
      * @brief contract the pave (continuity + consistency)
      */
     bool contract();
@@ -434,8 +439,8 @@ protected:
     // To Be Removed
     size_t     m_nb_contract = 0;
 
-    ibex::Function *m_contract_function = nullptr;
-    ibex::CtcFwdBwd *m_ctc = nullptr;
+//    ibex::Function *m_contract_function = nullptr;
+//    ibex::CtcFwdBwd *m_ctc = nullptr;
 
     // For PPL
 //    std::vector<std::vector<ppl::Generator>> *m_ray_vector_field;

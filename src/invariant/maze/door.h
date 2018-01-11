@@ -48,6 +48,11 @@ public:
     ~Door();
 
     /**
+     * @brief reset
+     */
+    void reset();
+
+    /**
      * @brief Get the public read input door
      * @return iv
      */
