@@ -160,7 +160,7 @@ public:
     /**
      * @brief Return true if the pave contain an infinite boundary
      */
-    bool is_infinite() const;
+//    bool is_infinite() const;
 
     /**
      * @brief Return the dimension of the maze
@@ -229,7 +229,7 @@ private:
     mutable size_t                                          m_dim = 0;
 //    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
     std::map<Maze<_Tp>*, Room<_Tp>*>                        m_rooms;
-    bool                                                    m_infinite_pave = false;
+//    bool                                                    m_infinite_pave = false;
     size_t                                                  m_serialization_id=0;
     bool                                                    m_border = false;
 
@@ -315,10 +315,10 @@ inline std::map<Maze<_Tp> *, Room<_Tp>*> Pave<_Tp>::get_rooms() const{
     return m_rooms;
 }
 
-template <typename _Tp>
-inline bool Pave<_Tp>::is_infinite() const{
-    return m_infinite_pave;
-}
+//template <typename _Tp>
+//inline bool Pave<_Tp>::is_infinite() const{
+//    return m_infinite_pave;
+//}
 
 template <typename _Tp>
 size_t& Pave<_Tp>::get_dim() const{

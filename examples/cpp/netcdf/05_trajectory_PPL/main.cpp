@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
-    const std::vector<double> limit_bisection = {15*60-1, 250-1, 250-1};
+    const std::vector<double> limit_bisection = {15*60/2.0, 250/2.0, 250/2.0};
     paving.set_limit_bisection(limit_bisection);
 
     double t_c, x_c, y_c, r_spatial, r_time;

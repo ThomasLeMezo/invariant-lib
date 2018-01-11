@@ -10,8 +10,8 @@ Pave<_Tp>::Pave(const ibex::IntervalVector &position, SmartSubPaving<_Tp> *g):
     m_serialization_id = 0;
     m_dim = g->dim();
 
-    if(position.is_unbounded())
-        m_infinite_pave = true;
+    //    if(position.is_unbounded())
+    //    m_infinite_pave = true;
     ibex::IntervalVector normal(m_dim, ibex::Interval(0));
 
     // Build the faces
@@ -127,7 +127,6 @@ const bool Pave<_Tp>::is_equal(const Pave<_Tp>& p) const{
 template<typename _Tp>
 bool Pave<_Tp>::bisect(){
     if(!m_subpaving->bisection_limit_reach(m_position)){
-
         std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
         const size_t dim = m_dim;
         // Find the axe of bissection
@@ -246,11 +245,13 @@ bool Pave<_Tp>::bisect(){
         return true;
     }
     else{
-        m_subpaving->add_paves(this);
         for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
             Room<_Tp> *r = (it->second);
-            r->reset();
+            if(!r->is_removed()){
+                r->reset();
+            }
         }
+        m_subpaving->add_paves(this);
         return false;
     }
 

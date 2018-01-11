@@ -56,9 +56,10 @@ inline void Room<_Tp>::reset(){
     m_full = true;
     m_empty = false;
     m_full_first_eval = true;
-    m_empty_first_eval = false;
+    m_empty_first_eval = true;
     m_removed = false;
     m_in_deque = false;
+    m_first_contract = true;
 
     m_is_initial_door_input = false;
     m_is_initial_door_output = false;
@@ -895,7 +896,7 @@ bool Room<_Tp>::is_full_union() const{
 
 template<typename _Tp>
 bool Room<_Tp>::request_bisection(){
-    return !(is_empty()) || (m_first_contract && m_maze->get_domain()->get_init()==FULL_WALL);
+    return !is_removed() && (!is_empty() || (m_first_contract && m_maze->get_domain()->get_init()==FULL_WALL));
 }
 
 template<typename _Tp>

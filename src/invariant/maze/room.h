@@ -416,7 +416,7 @@ protected:
     mutable bool    m_full = false;
 
     bool m_full_first_eval = true;
-    bool m_empty_first_eval = false;
+    bool m_empty_first_eval = true;
 
     bool    m_first_contract = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
