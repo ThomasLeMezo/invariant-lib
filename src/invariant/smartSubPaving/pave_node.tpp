@@ -167,12 +167,14 @@ void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, ibe
 
 template<typename _Tp>
 void Pave_node<_Tp>::get_all_child_rooms(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
-    if(is_leaf()){
+    if(is_leaf() && !m_pave->get_rooms()[maze]->is_removed()){
         list_room.push_back(m_pave->get_rooms()[maze]);
     }
     else{
-        m_children.first->get_all_child_rooms(list_room, maze);
-        m_children.second->get_all_child_rooms(list_room, maze);
+        if(!m_removed_rooms[maze]){
+            m_children.first->get_all_child_rooms(list_room, maze);
+            m_children.second->get_all_child_rooms(list_room, maze);
+        }
     }
 }
 
@@ -183,10 +185,6 @@ void Pave_node<_Tp>::get_all_child_rooms_not_empty(std::vector<Room<_Tp> *> &lis
         if(!r->is_empty() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
-    //    else if(this->get_fullness()[maze]){ // Not right because of contraction of the yellow area
-    //        m_children.first->get_all_child_rooms(list_room, maze);
-    //        m_children.second->get_all_child_rooms(list_room, maze);
-    //    }
     else{
         if(!this->get_removed()[maze] && !this->get_emptyness()[maze]){
             m_children.first->get_all_child_rooms_not_empty(list_room, maze);

@@ -42,25 +42,26 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
         #pragma omp single
         {
             if(m_sep_output != nullptr){
-                contract_separator(maze, m_subpaving->get_tree(), list_room_deque, true, SEP_UNKNOWN); // Output
+                contract_separator(maze, m_subpaving->get_tree(), true, SEP_UNKNOWN); // Output
             }
             if(m_sep_input != nullptr){
-                contract_separator(maze, m_subpaving->get_tree(), list_room_deque, false, SEP_UNKNOWN); // Input
+                contract_separator(maze, m_subpaving->get_tree(), false, SEP_UNKNOWN); // Input
             }
         }
 
-            // ********** Border contraction ********** //
+        // ********** Border contraction ********** //
         if(!(m_subpaving->size()==1 && m_domain_init == FULL_DOOR))
-            contract_border(maze, list_room_deque, pave_border_list); // (not in single because of omp for inside)
+            contract_border(maze, pave_border_list); // (not in single because of omp for inside)
 
-            // ********** Intersection/Union contraction with other mazes ********** //
-            // => Proceed after initial set
+        // ********** Intersection/Union contraction with other mazes ********** //
+        // => To proceed after initial set
         #pragma omp single
         {
             contract_inter_maze(maze);
             contract_union_maze(maze);
         }
 
+        // Sychronization of rooms
         #pragma omp for
         for(size_t i=0; i<m_subpaving->get_paves().size(); i++){
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
@@ -82,7 +83,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
 }
 
 template<typename _Tp>
-void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, std::vector<Room<_Tp>*> &list_room_deque, bool output, DOMAIN_SEP accelerator){
+void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, bool output, DOMAIN_SEP accelerator){
     //    ibex::IntervalVector test(2);
     //    test[0] = ibex::Interval(0, 2);
     //    test[1] = ibex::Interval(-3.5, -1.125);
@@ -110,18 +111,13 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                         else
                             r->set_full_private_input();
                     }
-                    if(m_domain_init == FULL_WALL){
-                        omp_set_lock(&m_list_room_access);
-                        list_room_deque.push_back(r);
-                        omp_unset_lock(&m_list_room_access);
-                    }
                 }
             }
             else{
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_INSIDE);
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_INSIDE);
+#pragma omp task
+                contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE);
+#pragma omp task
+                contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE);
 #pragma omp taskwait
             }
         }
@@ -141,10 +137,10 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
             }
             else{
                 if(m_domain_init != FULL_WALL){
-#pragma omp task shared(list_room_deque)
-                    contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_OUTSIDE);
-#pragma omp task shared(list_room_deque)
-                    contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_OUTSIDE);
+#pragma omp task
+                    contract_separator(maze, pave_node->get_children().first, output, SEP_OUTSIDE);
+#pragma omp task
+                    contract_separator(maze, pave_node->get_children().second, output, SEP_OUTSIDE);
 #pragma omp taskwait
                 }
             }
@@ -176,11 +172,6 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                         else
                             r->set_full_private_input();
                     }
-                    if(m_domain_init == FULL_WALL){
-                        omp_set_lock(&m_list_room_access);
-                        list_room_deque.push_back(r);
-                        omp_unset_lock(&m_list_room_access);
-                    }
                 }
                 else if(x_out.is_empty()){  // Outside the constraint
                     if(output)
@@ -205,12 +196,6 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
                             contract_box(r, x_out, DOOR_OUTPUT); // r->set_full_private_input();
                         }
                     }
-
-                    if(m_domain_init == FULL_WALL){
-                        omp_set_lock(&m_list_room_access);
-                        list_room_deque.push_back(r);
-                        omp_unset_lock(&m_list_room_access);
-                    }
                 }
             }
         }
@@ -218,26 +203,26 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
             // Determine the accelerator
             if(x_in.is_empty()){
                 // Completly inside the constraint
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_INSIDE);
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_INSIDE);
+#pragma omp task
+                contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE);
+#pragma omp task
+                contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE);
 #pragma taskwait
             }
             else if(x_out.is_empty()){
                 // Completly outside the constraint
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze, pave_node->get_children().first, list_room_deque, output, SEP_OUTSIDE);
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze, pave_node->get_children().second, list_room_deque, output, SEP_OUTSIDE);
+#pragma omp task
+                contract_separator(maze, pave_node->get_children().first, output, SEP_OUTSIDE);
+#pragma omp task
+                contract_separator(maze, pave_node->get_children().second, output, SEP_OUTSIDE);
 #pragma omp taskwait
             }
             else{
                 // Mix area (outside & inside)
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze,pave_node->get_children().first, list_room_deque, output, SEP_UNKNOWN);
-#pragma omp task shared(list_room_deque)
-                contract_separator(maze,pave_node->get_children().second, list_room_deque, output, SEP_UNKNOWN);
+#pragma omp task
+                contract_separator(maze,pave_node->get_children().first, output, SEP_UNKNOWN);
+#pragma omp task
+                contract_separator(maze,pave_node->get_children().second, output, SEP_UNKNOWN);
 #pragma omp taskwait
             }
         }
@@ -249,7 +234,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
 }
 
 template<typename _Tp>
-void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque, std::vector<Pave<_Tp>*> &pave_border_list){
+void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Pave<_Tp>*> &pave_border_list){
 #pragma omp for
     for(size_t i=0; i<pave_border_list.size(); i++){
         Pave<_Tp> *p = pave_border_list[i];
@@ -271,21 +256,6 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
                         if(m_domain_init != FULL_WALL && !r->get_contain_zero())
                             d->set_empty_private_output();
                     }
-                }
-            }
-
-            if(m_domain_init == FULL_WALL && (m_border_path_in || m_border_path_out)){
-                if(!p->get_rooms()[maze]->is_full()){
-                    omp_set_lock(&m_list_room_access);
-                    list_room_deque.push_back(p->get_rooms()[maze]);
-                    omp_unset_lock(&m_list_room_access);
-                }
-            }
-            if(m_domain_init == FULL_DOOR && (!m_border_path_in || !m_border_path_out)){
-                if(!p->get_rooms()[maze]->is_empty()){
-                    omp_set_lock(&m_list_room_access);
-                    list_room_deque.push_back(p->get_rooms()[maze]);
-                    omp_unset_lock(&m_list_room_access);
                 }
             }
         }

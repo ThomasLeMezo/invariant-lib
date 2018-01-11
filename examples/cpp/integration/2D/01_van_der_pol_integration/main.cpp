@@ -48,8 +48,7 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
-    maze.contract(); // To set first pave to be in
-    for(int i=0; i<3; i++){
+    for(int i=0; i<12; i++){
         paving.bisect();
         cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
     }

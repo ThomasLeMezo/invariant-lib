@@ -244,7 +244,7 @@ private:
 
     std::map<Maze<_Tp>*, bool>               m_empty_rooms;
     std::map<Maze<_Tp>*, bool>               m_full_rooms;
-    std::map<Maze<_Tp>*, bool>               m_removed_rooms;
+    mutable std::map<Maze<_Tp>*, bool>               m_removed_rooms;
     bool                                m_border_pave;
 };
 

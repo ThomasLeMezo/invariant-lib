@@ -190,13 +190,13 @@ private:
      * @param l
      * @param output : true => contract output, false => contract input
      */
-    void contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, std::vector<Room<_Tp> *> &list_room_deque, bool output, DOMAIN_SEP accelerator);
+    void contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, bool output, DOMAIN_SEP accelerator);
 
     /**
      * @brief Contract the boarders according to the options
      * @param maze
      */
-    void contract_border(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list_room_deque, std::vector<Pave<_Tp>*> &pave_border_list);
+    void contract_border(Maze<_Tp> *maze, std::vector<Pave<_Tp>*> &pave_border_list);
 
     /**
      * @brief Contract the domain by intersecting with maze list
