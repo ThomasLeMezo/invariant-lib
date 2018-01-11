@@ -232,6 +232,8 @@ private:
     std::vector<Maze<_Tp> *> m_maze_list_union;
 
     omp_lock_t m_list_room_access;
+    omp_lock_t m_lock_sep_input;
+    omp_lock_t m_lock_sep_output;
 };
 }
 

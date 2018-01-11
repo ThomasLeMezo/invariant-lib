@@ -186,12 +186,12 @@ public:
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
-    std::vector<Pave<_Tp>*>              m_paves; // Paves of the SmartSubPaving
-    std::vector<Pave<_Tp>*>              m_paves_not_bisectable; // Paves of the SmartSubPaving
+    std::vector<Pave<_Tp>*>         m_paves; // Paves of the SmartSubPaving
+    std::vector<Pave<_Tp>*>         m_paves_not_bisectable; // Paves of the SmartSubPaving
     mutable unsigned char           m_dim = 0; // Dimension of the space
-    mutable Pave_node<_Tp>*              m_tree = nullptr; // Root of the pave node tree
+    mutable Pave_node<_Tp>*         m_tree = nullptr; // Root of the pave node tree
 
-    std::vector<Maze<_Tp>*>              m_mazes;
+    std::vector<Maze<_Tp>*>         m_mazes;
 
     std::vector<double> m_ratio_dimension;
     std::vector<double> m_limit_bisection;
@@ -199,6 +199,7 @@ protected:
     std::vector<BISECTION_STRATEGY> m_bisection_strategy;
     std::vector<double> m_bisection_strategy_slice;
 
+    omp_lock_t m_write_add_pave;
 };
 
     /**
@@ -262,7 +263,9 @@ inline const std::vector<Pave<_Tp> *> &SmartSubPaving<_Tp>::get_paves() const{
 
 template<typename _Tp>
 inline void SmartSubPaving<_Tp>::add_paves(Pave<_Tp> *p){
+    omp_set_lock(&m_write_add_pave);
     m_paves.push_back(p);
+    omp_unset_lock(&m_write_add_pave);
 }
 
 template<typename _Tp>

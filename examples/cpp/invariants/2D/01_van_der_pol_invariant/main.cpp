@@ -43,10 +43,9 @@ int main(int argc, char *argv[])
 //    
 //    omp_set_num_threads(1);
     for(int i=0; i<12; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " - ";
         maze.contract();
-        cout << " - " << paving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

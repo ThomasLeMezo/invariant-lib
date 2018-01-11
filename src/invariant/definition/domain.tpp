@@ -7,11 +7,15 @@ Domain<_Tp>::Domain(SmartSubPaving<_Tp> *paving, DOMAIN_INITIALIZATION domain_in
     m_subpaving = paving;
     m_domain_init = domain_init;
     omp_init_lock(&m_list_room_access);
+    omp_init_lock(&m_lock_sep_output);
+    omp_init_lock(&m_lock_sep_input);
 }
 
 template<typename _Tp>
 Domain<_Tp>::~Domain(){
     omp_destroy_lock(&m_list_room_access);
+    omp_destroy_lock(&m_lock_sep_output);
+    omp_destroy_lock(&m_lock_sep_input);
 }
 
 template<typename _Tp>
@@ -150,10 +154,16 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
     case SEP_UNKNOWN:{
         ibex::IntervalVector x_in(pave_node->get_position());
         ibex::IntervalVector x_out(x_in);
-        if(output)
+        if(output){
+            omp_set_lock(&m_lock_sep_output);
             m_sep_output->separate(x_in, x_out);
-        else
+            omp_unset_lock(&m_lock_sep_output);
+        }
+        else{
+            omp_set_lock(&m_lock_sep_input);
             m_sep_input->separate(x_in, x_out);
+            omp_unset_lock(&m_lock_sep_input);
+        }
 
         if(pave_node->is_leaf()){
             Pave<_Tp> *p = pave_node->get_pave();

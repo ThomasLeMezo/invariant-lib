@@ -155,48 +155,48 @@ void Pave<_Tp>::bisect(){
                     f->add_neighbor(pave_result[sens]->get_faces()[face][sens]);
                 }
                 else{
-                    f->add_neighbor(pave_result[0]->get_faces()[face][sens]);
-                    f->add_neighbor(pave_result[1]->get_faces()[face][sens]);
+                    f->add_neighbor(pave0->get_faces()[face][sens]);
+                    f->add_neighbor(pave1->get_faces()[face][sens]);
                 }
             }
         }
     }
 
-    // 2) Copy brothers Pave (this) to pave1 and pave2
+    // 2) Copy neighbors of  Pave (this) to pave1 and pave2
     for(size_t face=0; face<dim; face++){
         for(size_t sens=0; sens<2; sens++){
             for(Face<_Tp> *f:m_faces[face][sens]->get_neighbors()){
                 if(!((face==bisect_axis) & (sens==1)))
-                    pave_result[0]->get_faces()[face][sens]->add_neighbor(f);
+                    pave0->get_faces()[face][sens]->add_neighbor(f);
                 if(!((face==bisect_axis) & (sens==0)))
-                    pave_result[1]->get_faces()[face][sens]->add_neighbor(f);
+                    pave1->get_faces()[face][sens]->add_neighbor(f);
             }
         }
     }
 
     // 3) Add inter link
-    pave_result[1]->get_faces()[bisect_axis][0]->add_neighbor(pave_result[0]->get_faces()[bisect_axis][1]);
-    pave_result[0]->get_faces()[bisect_axis][1]->add_neighbor(pave_result[1]->get_faces()[bisect_axis][0]);
+    pave1->get_faces()[bisect_axis][0]->add_neighbor(pave0->get_faces()[bisect_axis][1]);
+    pave0->get_faces()[bisect_axis][1]->add_neighbor(pave1->get_faces()[bisect_axis][0]);
 
     // 4) Add Paves to the paving
-    m_subpaving->add_paves(pave_result[0]);
-    m_subpaving->add_paves(pave_result[1]);
+    m_subpaving->add_paves(pave0);
+    m_subpaving->add_paves(pave1);
 
-    // 5) Analyze border
+    // 5) Analyze border // After Update
     if(this->is_border()){
-        pave_result[0]->analyze_border();
-        pave_result[1]->analyze_border();
+        pave0->analyze_border();
+        pave1->analyze_border();
     }
 
     // 6) Add new node to the tree
-    m_tree->add_child(pave_result[0], pave_result[1]);
+    m_tree->add_child(pave0, pave1);
 
     // Add Room to the Paves
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp> *r = (it->second);
 
-        Room<_Tp> *r_first = new Room<_Tp>(pave_result[0],r->get_maze(), r->get_maze()->get_dynamics());
-        Room<_Tp> *r_second = new Room<_Tp>(pave_result[1],r->get_maze(), r->get_maze()->get_dynamics());
+        Room<_Tp> *r_first = new Room<_Tp>(pave0,r->get_maze(), r->get_maze()->get_dynamics());
+        Room<_Tp> *r_second = new Room<_Tp>(pave1,r->get_maze(), r->get_maze()->get_dynamics());
 
         // Store father hull (improve efficiency when widening ?)
         _Tp hull = r->get_hull_typed();
@@ -206,8 +206,8 @@ void Pave<_Tp>::bisect(){
 
         // ToDo : add a contraction of Room(s) according to father
 
-        pave_result[0]->add_room(r_first);
-        pave_result[1]->add_room(r_second);
+        pave0->add_room(r_first);
+        pave1->add_room(r_second);
 
         if(r->is_empty()){
             m_tree->add_emptyness((it->first), true);
@@ -255,7 +255,6 @@ const bool Pave<_Tp>::request_bisection(){
     bool result = true;
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp> *r = it->second;
-//        Maze<_Tp> *maze = it->first;
         result &= r->request_bisection();
     }
     return result;

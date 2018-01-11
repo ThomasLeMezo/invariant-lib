@@ -6,20 +6,11 @@ SmartSubPaving<_Tp>::SmartSubPaving(const ibex::IntervalVector &space):
     m_position(space)
 {
     m_dim = (unsigned char) space.size();
+    omp_init_lock(&m_write_add_pave);
 
     // Create search space Pave
     invariant::Pave<_Tp>* p = new invariant::Pave<_Tp>(space, this);
     m_paves.push_back(p);
-
-    // Create infinity Paves around search space
-//    IntervalVector* result;
-//    int n=space.complementary(result);
-
-//    for (int i=0; i<n; i++) {
-//        Pave* p_infinity = new Pave(result[i], this);
-//        std::cout << result[i] << std::endl;
-//        m_paves_not_bisectable.push_back(p_infinity);
-//    }
 
     // Analyze faces (border)
     for(Pave<_Tp> *p:m_paves)
@@ -51,6 +42,7 @@ SmartSubPaving<_Tp>::~SmartSubPaving(){
             delete(p);
     }
     delete(m_tree);
+    omp_destroy_lock(&m_write_add_pave);
 }
 
 template<typename _Tp>
@@ -117,6 +109,9 @@ const bool SmartSubPaving<_Tp>::is_equal(const SmartSubPaving<_Tp>& g) const{
 
 template<typename _Tp>
 void SmartSubPaving<_Tp>::bisect(){
+    std::cout << " => bisecting ";
+    double time_start = omp_get_wtime();
+
     std::vector<Pave<_Tp>*> bisectable_paves = m_paves;
     m_paves.clear();
 
@@ -140,6 +135,8 @@ void SmartSubPaving<_Tp>::bisect(){
     for(Maze<_Tp> *maze:m_mazes){
         maze->reset_nb_operations();
     }
+
+    std::cout << omp_get_wtime() - time_start << "s" <<  std::endl;
 }
 
 template<typename _Tp>

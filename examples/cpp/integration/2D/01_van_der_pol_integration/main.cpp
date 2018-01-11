@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<12; i++){
+    for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
     }
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(3, 2, 0.3, "red[]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(2.7);
-//    position_info[1] = ibex::Interval(2.12);
+//    position_info[0] = ibex::Interval(3.1);
+//    position_info[1] = ibex::Interval(1.8);
 //    v_maze.show_room_info(&maze, position_info);
 
 //    IntervalVector pave_in(2);
