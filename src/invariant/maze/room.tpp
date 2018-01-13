@@ -918,6 +918,7 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r) {
     stream << std::endl;
     stream << " => nb_contractions = " << r.get_nb_contractions() << std::endl;
     stream << " => removed = " << (r.is_removed()?"true":"false") << std::endl;
+    stream << " => border = "  << (r.get_pave()->is_border()?"true":"false") << std::endl;
     stream << " => zero = " << (r.get_contain_zero()?"true":"false") << std::endl;
     stream << " => initial door (input/output) = " << (r.is_initial_door_input()?"true":"false") << "/" << (r.is_initial_door_output()?"true":"false") << std::endl;
 

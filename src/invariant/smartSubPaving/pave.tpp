@@ -151,9 +151,6 @@ bool Pave<_Tp>::bisect_step_one(){
         m_subpaving->add_paves(pave0);
         m_subpaving->add_paves(pave1);
 
-        // Add new node to the tree
-        m_tree->add_child(pave0, pave1);
-
         // Add Room to the Paves
         for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
             Room<_Tp> *r = (it->second);
@@ -235,13 +232,8 @@ void Pave<_Tp>::bisect_step_two(){
                 // Update neighbor in case of not bisected
                 if(!bisected_neighbor_pave){
                     f_n->remove_neighbor(m_faces[face][sens]);
-                    if(face==*m_bisection_axis){
-                        f_n->add_neighbor((*m_pave_children)[*m_bisection_axis]->get_faces()[face][sens]);
-                    }
-                    else{
-                        f_n->add_neighbor((*m_pave_children)[0]->get_faces()[face][sens]);
-                        f_n->add_neighbor((*m_pave_children)[1]->get_faces()[face][sens]);
-                    }
+                    f_n->add_neighbor((*m_pave_children)[0]->get_faces()[face][sens]);
+                    f_n->add_neighbor((*m_pave_children)[1]->get_faces()[face][sens]);
                 }
 
                 // Add
@@ -279,6 +271,8 @@ void Pave<_Tp>::bisect_step_two(){
         (*m_pave_children)[0]->analyze_border();
         (*m_pave_children)[1]->analyze_border();
     }
+    // 6) Add new node to the tree
+    m_tree->add_child((*m_pave_children)[0], (*m_pave_children)[1]);
 }
 
 template<typename _Tp>
