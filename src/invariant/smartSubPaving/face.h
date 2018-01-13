@@ -161,6 +161,8 @@ private:
 
     std::map<Maze<_Tp>*, Door<_Tp>*>  m_doors;
 
+    omp_lock_t m_write_neighbors;
+
 };
 
 /**

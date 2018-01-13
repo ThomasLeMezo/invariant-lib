@@ -26,6 +26,7 @@ Face<ibex::IntervalVector>::Face(const ibex::IntervalVector &position, const ibe
     m_position_typed(position)
 {
     m_pave = p;
+    omp_init_lock(&m_write_neighbors);
 }
 
 template <>
@@ -48,6 +49,7 @@ Face<ppl::C_Polyhedron>::Face(const ibex::IntervalVector &position, const ibex::
 {
     m_pave = p;
     m_position_typed = iv_2_polyhedron(position);
+    omp_init_lock(&m_write_neighbors);
 }
 
 template <>

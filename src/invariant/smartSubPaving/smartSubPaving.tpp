@@ -113,6 +113,61 @@ void SmartSubPaving<_Tp>::bisect(){
     double time_start = omp_get_wtime();
 
     std::vector<Pave<_Tp>*> bisectable_paves = m_paves;
+    std::vector<Pave<_Tp>*> bisected_paves;
+    m_paves.clear();
+
+#pragma omp parallel
+    {
+        Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
+#pragma omp for
+        for(size_t i = 0; i<bisectable_paves.size(); i++){
+            Pave<_Tp> *p = bisectable_paves[i];
+            if(p->request_bisection()){
+                if(p->bisect_step_one()){
+#pragma omp critical
+                    {
+                        bisected_paves.push_back(p);
+                    }
+                }
+            }
+            else{
+                // Store not bisectable paves
+                p->set_removed_rooms();
+#pragma omp critical
+                {
+                    m_paves_not_bisectable.push_back(p);
+                }
+            }
+        }
+
+#pragma omp for
+        for(size_t i = 0; i<bisected_paves.size(); i++){
+            Pave<_Tp> *p = bisected_paves[i];
+            p->bisect_step_two();
+        }
+
+#pragma omp for
+        for(size_t i = 0; i<bisected_paves.size(); i++){
+            Pave<_Tp> *p = bisected_paves[i];
+            delete(p);
+        }
+        delete_thread_init<_Tp>(thread_init);
+    }
+
+    // Reset maze
+    for(Maze<_Tp> *maze:m_mazes){
+        maze->reset_nb_operations();
+    }
+
+    std::cout << omp_get_wtime() - time_start << "s" <<  std::endl;
+}
+
+template<typename _Tp>
+void SmartSubPaving<_Tp>::bisect_monothread(){
+    std::cout << " => bisecting ";
+    double time_start = omp_get_wtime();
+
+    std::vector<Pave<_Tp>*> bisectable_paves = m_paves;
     m_paves.clear();
 
     /// Bisect the graph ///

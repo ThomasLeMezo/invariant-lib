@@ -92,6 +92,7 @@ public:
      * @brief bisect all the paves that ask to be bisected and update the paving
      */
     void bisect();
+    void bisect_monothread();
 
     /**
      * @brief Add Paves to the SmartSubPaving list
@@ -321,6 +322,12 @@ template<typename _Tp>
 inline const std::vector<double>& SmartSubPaving<_Tp>::get_limit_bisection() const{
     return m_limit_bisection;
 }
+
+template <typename _Tp>
+Parma_Polyhedra_Library::Thread_Init* initialize_thread();
+
+template <typename _Tp>
+void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
 
 }
 

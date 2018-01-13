@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <string>
 #include <sstream>
-#include <graph.h>
+#include <smartSubPaving.h>
 #include <map>
 
 
 using namespace std;
 using namespace invariant;
 
-Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
+Graphiz_Graph::Graphiz_Graph(const string &file_name, SmartSubPavingIBEX *g)
 {
     double d_1 = 30;
     double d_2 = 20;
@@ -21,40 +21,38 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
     Agraph_t *graphiz_graph; // Graph
     graphiz_graph = agopen((char*)"g", Agdirected, 0);
 
-    std::map<Pave*,Agnode_t *> map_node;
-    std::map<Face*,Agnode_t *> map_face;
+    std::map<PaveIBEX*,Agnode_t *> map_node;
+    std::map<FaceIBEX*,Agnode_t *> map_face;
 
     // Nodes
-    for(Pave* p:g->get_paves()){
-        if(!p->is_infinite()){
-            Agnode_t *n;
-            std::stringstream node_param;
-            node_param << p->get_position() << endl;
-            node_param << p << endl;
-            n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
-
-            std::stringstream node_pos;
-            node_pos << p->get_position().mid()[0]*d_1 << ","
-                                                       << -(p->get_position().mid()[1]*d_1) << "!";
-            char* def = new char;
-            agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
-
-            map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
-        }
-    }
-
-    for(Pave* p:g->get_paves_not_bisectable()){
+    for(PaveIBEX* p:g->get_paves()){
         Agnode_t *n;
         std::stringstream node_param;
         node_param << p->get_position() << endl;
         node_param << p << endl;
         n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
-        map_node.insert(std::pair<Pave*,Agnode_t *>(p, n));
+
+        std::stringstream node_pos;
+        node_pos << p->get_position().mid()[0]*d_1 << ","
+                                                   << -(p->get_position().mid()[1]*d_1) << "!";
+        char* def = new char;
+        agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
+
+        map_node.insert(std::pair<PaveIBEX*,Agnode_t *>(p, n));
+    }
+
+    for(PaveIBEX* p:g->get_paves_not_bisectable()){
+        Agnode_t *n;
+        std::stringstream node_param;
+        node_param << p->get_position() << endl;
+        node_param << p << endl;
+        n = agnode(graphiz_graph, (char*)(node_param.str().c_str()), true);
+        map_node.insert(std::pair<PaveIBEX*,Agnode_t *>(p, n));
     }
 
 
-    for(Pave* p:g->get_paves()){
-        for(Face *f:p->get_faces_vector()){
+    for(PaveIBEX* p:g->get_paves()){
+        for(FaceIBEX *f:p->get_faces_vector()){
             Agnode_t *n;
             std::stringstream face_param;
             face_param << f->get_position() << endl;
@@ -71,7 +69,7 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
             agsafeset(n, (char*)"pos", (char*)(node_pos.str().c_str()), def);
             agedge(graphiz_graph, map_node[p], n, (char*)"t", 1);
 
-            map_face.insert(std::pair<Face*,Agnode_t *>(f, n));
+            map_face.insert(std::pair<FaceIBEX*,Agnode_t *>(f, n));
         }
     }
 
@@ -92,9 +90,9 @@ Graphiz_Graph::Graphiz_Graph(const string &file_name, Graph *g)
     //        }
     //    }
 
-    for(Pave* p:g->get_paves()){
-        for(Face *f:p->get_faces_vector()){
-            for(Face *f_n:f->get_neighbors()){
+    for(PaveIBEX* p:g->get_paves()){
+        for(FaceIBEX *f:p->get_faces_vector()){
+            for(FaceIBEX *f_n:f->get_neighbors()){
                 Agedge_t *e;
                 e = agedge(graphiz_graph, map_face[f], map_face[f_n], (char*)"t", 1);
                 agsafeset(e, (char*)"color", (char*)"blue", (char*)"");

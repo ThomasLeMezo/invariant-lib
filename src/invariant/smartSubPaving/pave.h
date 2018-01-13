@@ -119,6 +119,10 @@ public:
      */
     bool bisect();
 
+    bool bisect_step_one();
+
+    void bisect_step_two();
+
     /**
      * @brief Return true if the Pave have to be bisected
      * (temporary : need to implement strategy of bisection)
@@ -211,6 +215,18 @@ public:
      */
     int get_dim_inter_boundary(const ibex::IntervalVector &box);
 
+    /**
+     * @brief get_pave_children
+     * @return
+     */
+    std::array<Pave<_Tp>*, 2>& get_pave_children() const;
+
+    /**
+     * @brief getBisection_axis
+     * @return
+     */
+    size_t* get_bisection_axis() const;
+
 private:
     /**
      * @brief compute typed position
@@ -227,11 +243,13 @@ private:
     mutable SmartSubPaving<_Tp>*                            m_subpaving = nullptr;
     mutable Pave_node<_Tp>*                                 m_tree = nullptr;
     mutable size_t                                          m_dim = 0;
-//    std::array<Pave<_Tp>*, 2>                               m_result_bisected;
     std::map<Maze<_Tp>*, Room<_Tp>*>                        m_rooms;
 //    bool                                                    m_infinite_pave = false;
     size_t                                                  m_serialization_id=0;
     bool                                                    m_border = false;
+
+    std::array<Pave<_Tp>*, 2> *m_pave_children = nullptr;
+    size_t *m_bisection_axis = nullptr;
 
     //    std::map<Maze*, Door*>                      m_initial_condition_door;
     //    std::map<Maze*, Door*>                      m_hybrid_door;

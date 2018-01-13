@@ -125,6 +125,163 @@ const bool Pave<_Tp>::is_equal(const Pave<_Tp>& p) const{
 }
 
 template<typename _Tp>
+bool Pave<_Tp>::bisect_step_one(){
+    if(!m_subpaving->bisection_limit_reach(m_position)){
+        std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
+        const size_t dim = m_dim;
+        // Find the axe of bissection
+        m_bisection_axis = new size_t(0);
+        for(size_t i=0; i<dim; i++){
+            if(result_boxes.first[i] != m_position[i]){
+                *m_bisection_axis= (size_t)i;
+                break;
+            }
+        }
+
+        // Create new Paves
+        Pave<_Tp> *pave0 = new Pave<_Tp>(result_boxes.first, m_subpaving); // lb
+        Pave<_Tp> *pave1 = new Pave<_Tp>(result_boxes.second, m_subpaving); // ub
+        m_pave_children = new std::array<Pave<_Tp>*, 2>({pave0, pave1});
+
+        // Add inter link
+        pave1->get_faces()[*m_bisection_axis][0]->add_neighbor(pave0->get_faces()[*m_bisection_axis][1]);
+        pave0->get_faces()[*m_bisection_axis][1]->add_neighbor(pave1->get_faces()[*m_bisection_axis][0]);
+
+        // Add Paves to the paving
+        m_subpaving->add_paves(pave0);
+        m_subpaving->add_paves(pave1);
+
+        // Add new node to the tree
+        m_tree->add_child(pave0, pave1);
+
+        // Add Room to the Paves
+        for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+            Room<_Tp> *r = (it->second);
+
+            Room<_Tp> *r_first = new Room<_Tp>(pave0,r->get_maze(), r->get_maze()->get_dynamics());
+            Room<_Tp> *r_second = new Room<_Tp>(pave1,r->get_maze(), r->get_maze()->get_dynamics());
+
+            // Store father hull (improve efficiency when widening ?)
+            _Tp hull = r->get_hull_typed();
+
+            r_first->set_father_hull(hull & r_first->get_pave()->get_position_typed());
+            r_second->set_father_hull(hull & r_second->get_pave()->get_position_typed());
+
+            // ToDo : add a contraction of Room(s) according to father
+
+            pave0->add_room(r_first);
+            pave1->add_room(r_second);
+
+            if(r->is_empty()){
+                m_tree->add_emptyness((it->first), true);
+            }
+            else
+                m_tree->add_emptyness((it->first), false);
+
+            if(r->is_full()){
+                m_tree->add_fullness((it->first), true);
+                // Child cannot be set to full because of overapproximation
+                // in the case of FULL_WALL & FULL_DOOR is already full
+            }
+            else
+                m_tree->add_fullness((it->first), false);
+
+            if(r->is_removed()){
+                m_tree->add_removed((it->first), true);
+                if(r->is_full()){
+                    r_first->set_empty_private();
+                    r_second->set_full_private();
+                }
+                if(r->is_empty()){
+                    r_first->set_empty_private();
+                    r_second->set_empty_private();
+                }
+                r_first->synchronize();
+                r_first->set_removed();
+                r_second->synchronize();
+                r_second->set_removed();
+            }
+            else{
+                m_tree->add_removed((it->first), false);
+                r_first->synchronize();
+                r_second->synchronize();
+            }
+        }
+        return true;
+    }
+    else{
+        for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
+            Room<_Tp> *r = (it->second);
+            if(!r->is_removed()){
+                r->reset();
+            }
+        }
+        m_subpaving->add_paves(this);
+        return false;
+    }
+}
+
+template<typename _Tp>
+void Pave<_Tp>::bisect_step_two(){
+    // pave is bisected
+
+    // 1) Update neighbors not bisected with the new two paves
+    for(size_t face=0; face<m_dim; face++){
+        for(int sens=0; sens<2; sens++){
+            for(Face<_Tp> *f_n:m_faces[face][sens]->get_neighbors()){
+                Pave<_Tp> *p = f_n->get_pave();
+                bool bisected_neighbor_pave = (p->get_bisection_axis()!=nullptr)?true:false;
+
+                // Update neighbor in case of not bisected
+                if(!bisected_neighbor_pave){
+                    f_n->remove_neighbor(m_faces[face][sens]);
+                    if(face==*m_bisection_axis){
+                        f_n->add_neighbor((*m_pave_children)[*m_bisection_axis]->get_faces()[face][sens]);
+                    }
+                    else{
+                        f_n->add_neighbor((*m_pave_children)[0]->get_faces()[face][sens]);
+                        f_n->add_neighbor((*m_pave_children)[1]->get_faces()[face][sens]);
+                    }
+                }
+
+                // Add
+                if(face==*m_bisection_axis){
+                    if(bisected_neighbor_pave){
+                        Face<_Tp> *f0 = p->get_pave_children()[0]->get_faces()[face][(sens+1)%2];
+                        Face<_Tp> *f1 = p->get_pave_children()[1]->get_faces()[face][(sens+1)%2];
+                        (*m_pave_children)[sens]->get_faces()[face][sens]->add_neighbor(f0);
+                        (*m_pave_children)[sens]->get_faces()[face][sens]->add_neighbor(f1);
+                    }
+                    else{
+                        (*m_pave_children)[sens]->get_faces()[face][sens]->add_neighbor(f_n);
+                    }
+                }
+                else{
+                    if(bisected_neighbor_pave){
+                        Face<_Tp> *f0 = p->get_pave_children()[0]->get_faces()[face][(sens+1)%2];
+                        Face<_Tp> *f1 = p->get_pave_children()[1]->get_faces()[face][(sens+1)%2];
+                        (*m_pave_children)[0]->get_faces()[face][sens]->add_neighbor(f0);
+                        (*m_pave_children)[0]->get_faces()[face][sens]->add_neighbor(f1);
+                        (*m_pave_children)[1]->get_faces()[face][sens]->add_neighbor(f0);
+                        (*m_pave_children)[1]->get_faces()[face][sens]->add_neighbor(f1);
+                    }
+                    else{
+                        (*m_pave_children)[0]->get_faces()[face][sens]->add_neighbor(f_n);
+                        (*m_pave_children)[1]->get_faces()[face][sens]->add_neighbor(f_n);
+                    }
+                }
+            }
+        }
+    }
+
+    // 5) Analyze border // After Update
+    if(this->is_border()){
+        (*m_pave_children)[0]->analyze_border();
+        (*m_pave_children)[1]->analyze_border();
+    }
+}
+
+template<typename _Tp>
 bool Pave<_Tp>::bisect(){
     if(!m_subpaving->bisection_limit_reach(m_position)){
         std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
@@ -316,6 +473,16 @@ void Pave<_Tp>::get_neighbors_room(Maze<_Tp> *maze, std::vector<Room<_Tp>*>& roo
 template<typename _Tp>
 int Pave<_Tp>::get_dim_inter_boundary(const ibex::IntervalVector &box){
     return 0;
+}
+
+template<typename _Tp>
+std::array<Pave<_Tp>*, 2>& Pave<_Tp>::get_pave_children() const{
+    return *m_pave_children;
+}
+
+template<typename _Tp>
+size_t* Pave<_Tp>::get_bisection_axis() const{
+    return m_bisection_axis;
 }
 
 }

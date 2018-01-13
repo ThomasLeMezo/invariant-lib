@@ -16,6 +16,7 @@ Face<_Tp>::~Face(){
     for(typename std::map<Maze<_Tp>*,Door<_Tp>*>::iterator it=m_doors.begin(); it!=m_doors.end(); ++it){
         delete(it->second);
     }
+    omp_destroy_lock(&m_write_neighbors);
 }
 
 template <typename _Tp>
@@ -29,18 +30,23 @@ void Face<_Tp>::add_neighbor(Face<_Tp> *f){
                 return;
         }
     }
+    omp_set_lock(&m_write_neighbors);
     m_neighbors.push_back(f);
+    omp_unset_lock(&m_write_neighbors);
 }
 
 template <typename _Tp>
 void Face<_Tp>::remove_neighbor(const Face<_Tp> *f){
+    omp_set_lock(&m_write_neighbors);
     const size_t nb_neighbor = m_neighbors.size();
     for(size_t i=0; i<nb_neighbor; i++){
         if(m_neighbors[i] == f){ // pointer test
             m_neighbors.erase(m_neighbors.begin()+i);
+            omp_unset_lock(&m_write_neighbors);
             return;
         }
     }
+    omp_unset_lock(&m_write_neighbors);
     throw std::runtime_error("in [face.cpp/remove_neighobr] neighbor face was not found which is not expected");
 }
 

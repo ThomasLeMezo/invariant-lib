@@ -8,7 +8,7 @@
 class Graphiz_Graph
 {
 public:
-    Graphiz_Graph(const std::string &file_name, invariant::SmartSubPaving<ibex::IntervalVector> *g);
+    Graphiz_Graph(const std::string &file_name, invariant::SmartSubPavingIBEX *g);
 };
 
 #endif // GRAPHIZ_GRAPH_H
