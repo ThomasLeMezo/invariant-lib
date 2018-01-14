@@ -11,10 +11,13 @@
 #include "graphiz_graph.h"
 #include <omp.h>
 #include "vtkMaze3D.h"
+#include "vtkmazeppl.h"
 
 using namespace std;
 using namespace ibex;
 using namespace invariant;
+
+using VtkMazeIBEX = VtkMaze3D;
 
 int main(int argc, char *argv[])
 {
@@ -26,8 +29,8 @@ int main(int argc, char *argv[])
     space[2] = ibex::Interval(-10, 10);
 
     // ****** Domain ******* //
-    invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, FULL_DOOR);
+    invariant::SmartSubPavingIBEX paving(space);
+    invariant::DomainIBEX dom(&paving, FULL_DOOR);
 
     Function f_sep(x, y, z, pow(x, 2)+pow(y, 2)+pow(z, 2)-pow(0.5, 2));
     SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
@@ -43,28 +46,30 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze(&dom, &dyn);
+    invariant::MazeIBEX maze(&dom, &dyn);
+    maze.set_widening_limit(5);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
+    VtkMazeIBEX vtkMazeIBEX("torus");
+
     for(int i=0; i<28; i++){
-        cout << "-----" << i << "-----" << endl;
+        cout << i << endl;
         paving.bisect();
-        cout << "nb contractions = " << maze.contract() << " - ";
-        cout << "paving size = " << paving.size() << endl;
+        maze.contract(3*paving.size_active());
+        vtkMazeIBEX.show_maze(&maze);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    VtkMaze3D vtkMaze3D("torus", false);
-    vtkMaze3D.show_graph(&paving);
-    vtkMaze3D.show_maze(&maze);
+//    VtkMaze3D vtkMaze3D("torus", false);
+//    vtkMaze3D.show_graph(&paving);
+//    vtkMaze3D.show_maze(&maze);
 
 //    IntervalVector position_info(3);
 //    position_info[0] = ibex::Interval(0.5);
 //    position_info[1] = ibex::Interval(0.5);
 //    position_info[2] = ibex::Interval(0.2);
 //    vtkMaze3D.show_room_info(&maze, position_info);
-
 }
