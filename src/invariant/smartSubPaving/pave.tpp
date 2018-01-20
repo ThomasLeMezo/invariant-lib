@@ -276,7 +276,7 @@ void Pave<_Tp>::bisect_step_two(){
 }
 
 template<typename _Tp>
-bool Pave<_Tp>::bisect(){
+bool Pave<_Tp>::bisect_monothread(){
     if(!m_subpaving->bisection_limit_reach(m_position)){
         std::pair<ibex::IntervalVector, ibex::IntervalVector> result_boxes = m_subpaving->bisect_largest_first(m_position);
         const size_t dim = m_dim;

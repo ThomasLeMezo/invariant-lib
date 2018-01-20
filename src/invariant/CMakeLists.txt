@@ -8,6 +8,7 @@ include_directories(definition)
 include_directories(definition/netcdf)
 include_directories(definition/dataSet)
 include_directories(smartSubPaving)
+include_directories(smartSubPaving/bisectionTree)
 include_directories(maze)
 include_directories(serialization)
 
@@ -23,7 +24,6 @@ include_directories(serialization)
     maze/door.cpp
     maze/maze.cpp
     smartSubPaving/face.cpp
-
     smartSubPaving/pave.cpp
 
     definition/dataSet/datasetfunction.cpp
@@ -56,6 +56,9 @@ include_directories(serialization)
     smartSubPaving/pave.h
     smartSubPaving/face.h
     smartSubPaving/pave_node.h
+    smartSubPaving/bisectionTree/bisectiontree.h
+    smartSubPaving/bisectionTree/bisectiontreeunion.h
+    smartSubPaving/bisectionTree/bisectiontreeinter.h
 
     definition/dataSet/datasetnode.h
     definition/dataSet/datasetnode.tpp
@@ -67,6 +70,9 @@ include_directories(serialization)
     smartSubPaving/pave.tpp
     smartSubPaving/face.tpp
     smartSubPaving/pave_node.tpp
+    smartSubPaving/bisectionTree/bisectiontree.tpp
+    smartSubPaving/bisectionTree/bisectiontreeunion.tpp
+    smartSubPaving/bisectionTree/bisectiontreeinter.tpp
 
     maze/maze.tpp
     maze/room.tpp
@@ -97,9 +103,9 @@ include_directories(serialization)
 
     target_include_directories(invariant-core
         PUBLIC ${PPL_INCLUDES}
-        PUBLIC ${GMP_INCLUDES}
-        PUBLIC ${IBEX_INCLUDE_DIRS}
-    )
+            PUBLIC ${GMP_INCLUDES}
+            PUBLIC ${IBEX_INCLUDE_DIRS}
+        )
 
   install(FILES ${HEADERS} DESTINATION "include/invariant-lib")
   install(TARGETS invariant-core DESTINATION lib)

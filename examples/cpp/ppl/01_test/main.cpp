@@ -202,11 +202,11 @@ int main(){
 //    face_out[1] = ibex::Interval(-1, 1);
 //    face_out[2] = ibex::Interval(1);
 //    C_Polyhedron ph_out(iv_2_box(face_out));
-    test();
-    test2();
-    PPL::C_Polyhedron ph3(3);
-    PPL::C_Polyhedron ph4(3);
-    ph3.intersection_assign(ph4);
+//    test();
+//    test2();
+//    PPL::C_Polyhedron ph3(3);
+//    PPL::C_Polyhedron ph4(3);
+//    ph3.intersection_assign(ph4);
 
 //    std::cout.precision(30);
 //    mpq_class t(500.123540000000000);
@@ -231,6 +231,21 @@ int main(){
     //    write_VTK(ph_out, "ph_out");
     //    write_VTK(ph_projection, "ph_projection");
 
+
+    ibex::Variable x(2), a, b, c;
+    Function f= Function(x, a, b, c, a*pow(x[0], 2)+b*x[0]+c-x[1]);
+    IntervalVector test(5);
+    test[0] = ibex::Interval(-10, 10);
+    test[1] = ibex::Interval(-10, 10);
+    test[2] = ibex::Interval(1);
+    test[3] = ibex::Interval(1);
+    test[4] = ibex::Interval(1);
+    cout << "test = " << test << endl;
+    ibex::CtcFwdBwd ctc(f);
+    ctc.contract(test);
+    cout << "test = " << test << endl;
+
     return 0;
 }
+
 

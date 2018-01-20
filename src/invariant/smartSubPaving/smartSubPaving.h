@@ -11,6 +11,8 @@
 #include "pave_node.h"
 #include "maze.h"
 
+#include "bisectionTree/bisectiontree.h"
+
 #include "../serialization/ibex_serialization.h"
 
 namespace invariant {
@@ -197,6 +199,18 @@ public:
      */
     bool bisection_limit_reach(const ibex::IntervalVector &position);
 
+    /**
+     * @brief set the bisection tree
+     * @param bisect_tree
+     */
+    void set_bisection_tree(BisectionTree<_Tp> *bisect_tree);
+
+    /**
+     * @brief get bisect tree
+     * @return
+     */
+    BisectionTree<_Tp>* get_bisect_tree() const;
+
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
@@ -214,6 +228,8 @@ protected:
     std::vector<double> m_bisection_strategy_slice;
 
     omp_lock_t m_write_add_pave;
+
+    BisectionTree<_Tp> *m_bisection_tree = nullptr;
 };
 
     /**
@@ -321,6 +337,16 @@ inline void SmartSubPaving<_Tp>::set_bisection_strategy_slice(const int &dim, co
 template<typename _Tp>
 inline const std::vector<double>& SmartSubPaving<_Tp>::get_limit_bisection() const{
     return m_limit_bisection;
+}
+
+template<typename _Tp>
+inline void SmartSubPaving<_Tp>::set_bisection_tree(BisectionTree<_Tp> *bisect_tree){
+    m_bisection_tree = bisect_tree;
+}
+
+template<typename _Tp>
+inline BisectionTree<_Tp>* SmartSubPaving<_Tp>::get_bisect_tree() const{
+    return m_bisection_tree;
 }
 
 template <typename _Tp>

@@ -15,8 +15,6 @@
 #include "room.h"
 #include "maze.h"
 
-#include "face.h"
-
 namespace invariant {
 
 using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron>;

@@ -3,6 +3,7 @@
 #include "dynamics_function.h"
 #include "maze.h"
 #include "vibesMaze.h"
+#include "bisectiontreeinter.h"
 
 #include "ibex_SepFwdBwd.h"
 
@@ -62,6 +63,9 @@ int main(int argc, char *argv[])
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
     invariant::Maze<> maze_inner(&dom_inner, &dyn);
+
+    invariant::BisectionTreeInterIBEX bisection_tree(&maze_outer, &maze_inner);
+    paving.set_bisection_tree(&bisection_tree);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

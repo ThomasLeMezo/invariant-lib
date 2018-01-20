@@ -117,7 +117,7 @@ public:
      * - add the result to the SmartSubPaving
      * - upate neighbors
      */
-    bool bisect();
+    bool bisect_monothread();
 
     bool bisect_step_one();
 
