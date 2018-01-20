@@ -399,6 +399,11 @@ public:
     bool is_father_hull() const;
     const _Tp& get_father_hull() const;
 
+    /**
+     * @brief reset first contract
+     */
+    void reset_first_contract();
+
 protected:
     Pave<_Tp>*   m_pave = nullptr; // pointer to the associated face
     Maze<_Tp>*   m_maze = nullptr; // pointer to the associated maze
@@ -418,7 +423,8 @@ protected:
     bool m_full_first_eval = true;
     bool m_empty_first_eval = true;
 
-    bool    m_first_contract = true; // Use to contract according to the vector_field
+    bool    m_first_contract = true; // First contract
+    bool    m_contract_vector_field = false; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
     omp_lock_t   m_lock_deque; // Lock in_deque variable access
     omp_lock_t   m_lock_vector_field; // Lock m_vector_fields variable access
@@ -503,6 +509,11 @@ inline Pave<_Tp>* Room<_Tp>::get_pave() const{
 }
 
 template <typename _Tp>
+inline void Room<_Tp>::reset_first_contract(){
+    m_first_contract = true;
+}
+
+template <typename _Tp>
 inline bool Room<_Tp>::is_initial_door_input() const{
     return m_is_initial_door_input;
 }
@@ -521,7 +532,7 @@ inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
     else{
         *m_initial_door_input = door;
     }
-    if(!m_is_initial_door_output)
+    if(!m_is_initial_door_output || !m_is_initial_door_input)
         m_maze->add_initial_room(this);
 }
 
@@ -534,7 +545,7 @@ inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
     else{
         *m_initial_door_output = door;
     }
-    if(!m_is_initial_door_input)
+    if(!m_is_initial_door_output || !m_is_initial_door_input)
         m_maze->add_initial_room(this);
 }
 

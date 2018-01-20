@@ -35,16 +35,6 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics)
 
     compute_vector_field_typed();
 
-    //    for(int face_in=0; face_in<dim; face_in++){
-    //        std::vector< std::vector<bool>> vect_temp;
-    //        for(int sens_in = 0; sens_in < 2; sens_in++){
-    //            Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
-    //            Door<_Tp>* door_in = f_in->get_doors()[m_maze];
-    //            vect_temp.push_back(door_in->is_collinear());
-    //        }
-    //        m_door_collinearity.push_back(vect_temp);
-    //    }
-
 //    ibex::Variable v(9);
 //    m_contract_function = new ibex::Function(v, ibex::Return(v[0]*pow(v[8],2)+v[2]*v[8]+v[4]-v[6], v[1]*pow(v[8],2)+v[3]*v[8]+v[5]-v[7]));
 //    m_ctc = new ibex::CtcFwdBwd(*m_contract_function);
@@ -748,21 +738,21 @@ bool Room<_Tp>::contract(){
     bool change = false;
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
-        if(m_first_contract){
+        if(!m_contract_vector_field){
             contract_vector_field();
-            change = true;
+            m_contract_vector_field = true;
         }
-        else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty())){
+        else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty()))
             return false;
-        }
 
 //        get_private_doors_info("before");
         change |= contract_continuity();
 //        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
-           && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))){
+           && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
             contract_consistency();
+            change = true;
 //            get_private_doors_info("consistency");
         }
     }
@@ -775,10 +765,10 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     //    if(m_maze->get_domain()->get_init() != FULL_WALL)
     //        return false;
 
-    ibex::IntervalVector position(3);
-    position[0] = ibex::Interval(5400, 6300);
-    position[1] = ibex::Interval(34062.5, 35625);
-    position[2] = ibex::Interval(126250, 127812.5);
+    ibex::IntervalVector position(2);
+    position[0] = ibex::Interval(-1.25, -1);
+    position[1] = ibex::Interval(1.75, 2);
+//    position[2] = ibex::Interval(126250, 127812.5);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
@@ -787,17 +777,22 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if((m_pave->get_position() == position || m_pave->get_position() == position2)){
         if(cout_message){
             std::cout << message << std::endl;
-            if(m_pave->get_position() == position)
-                std::cout << "position 1" << std::endl;
-            else
-                std::cout << "position 2" << std::endl;
+//            if(m_pave->get_position() == position)
+//                std::cout << "position 1" << std::endl;
+//            else
+//                std::cout << "position 2" << std::endl;
 
             if(m_maze->get_domain()->get_init()==FULL_WALL)
                 std::cout << "FULL_WALL" << std::endl;
             else
                 std::cout << "FULL_DOOR" << std::endl;
 
-            std::cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << std::endl;
+            std::cout << "Room = " << m_pave->get_position() << " - " << m_pave->get_faces_vector().size() << " faces" << " - removed = ";
+            if(m_removed)
+                std::cout  << "true" << std::endl;
+            else
+                std::cout  << "false" << std::endl;
+
             for(Face<_Tp> *f:m_pave->get_faces_vector()){
                 Door<_Tp> *d = f->get_doors()[m_maze];
                 std::cout << " Face : ";
@@ -860,6 +855,8 @@ const bool Room<_Tp>::is_empty(){
         return true;
     else{
         m_empty_first_eval = false;
+        if(m_is_initial_door_input || m_is_initial_door_output)
+            return false;
         for(Face<_Tp> *f:m_pave->get_faces_vector()){
             if(!f->get_doors()[m_maze]->is_empty()){
                 return false;

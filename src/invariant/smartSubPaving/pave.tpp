@@ -422,7 +422,8 @@ const bool Pave<_Tp>::request_bisection(){
 }
 
 template<typename _Tp>
-void Pave<_Tp>::set_removed_rooms(){
+bool Pave<_Tp>::set_removed_rooms(){
+    bool all_removed = true;
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp>* r = it->second;
         //        if(r->is_empty()) //?
@@ -430,7 +431,10 @@ void Pave<_Tp>::set_removed_rooms(){
             r->set_removed();
             m_tree->set_removed(it->first);
         }
+        else
+            all_removed = false;
     }
+    return all_removed;
 }
 
 template<typename _Tp>

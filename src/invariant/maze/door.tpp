@@ -36,7 +36,8 @@ bool Door<_Tp>::analyze_change(std::vector<Room<_Tp> *>&list_rooms){
         std::vector<Face<_Tp> *> l_face = m_face->get_neighbors();
         for(Face<_Tp>* f_n:l_face){
             Door *d_n = f_n->get_doors()[m_room->get_maze()];
-            if((domain_init == FULL_DOOR && ((sens_fwd && !d_n->is_empty_input()) || (sens_bwd && !d_n->is_empty_output())))
+            if((domain_init == FULL_DOOR && ((sens_fwd && !d_n->is_empty_input()) || (sens_bwd && !d_n->is_empty_output()))
+                                         && !d_n->get_hull().is_empty()) // Todo : Check issue with sliding mode ?
                || (domain_init == FULL_WALL && ((sens_fwd && !d_n->is_full_input()) || (sens_bwd && !d_n->is_full_output()))))
                 list_rooms.push_back(f_n->get_pave()->get_rooms()[m_room->get_maze()]);
         }
@@ -47,7 +48,12 @@ bool Door<_Tp>::analyze_change(std::vector<Room<_Tp> *>&list_rooms){
 
 template <typename _Tp>
 const _Tp Door<_Tp>::get_hull() const{
-    return m_input_public | m_output_public;
+    _Tp result = get_empty_door_container<_Tp>(m_face->get_pave()->get_dim());
+    omp_set_lock(&m_lock_read);
+    result |= m_input_public;
+    result |= m_output_public;
+    omp_unset_lock(&m_lock_read);
+    return result;
 }
 
 template <typename _Tp>

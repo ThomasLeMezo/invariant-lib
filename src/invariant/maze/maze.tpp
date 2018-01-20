@@ -10,6 +10,7 @@ Maze<_Tp>::Maze(invariant::Domain<_Tp> *domain, Dynamics *dynamics)
 
     m_subpaving = domain->get_subpaving();
     omp_init_lock(&m_deque_access);
+    omp_init_lock(&m_initial_rooms_access);
 
     SmartSubPaving<_Tp> *g = domain->get_subpaving();
     for(Pave<_Tp>*p:g->get_paves()){
@@ -24,6 +25,7 @@ Maze<_Tp>::Maze(invariant::Domain<_Tp> *domain, Dynamics *dynamics)
 template<typename _Tp>
 Maze<_Tp>::~Maze(){
     omp_destroy_lock(&m_deque_access);
+    omp_destroy_lock(&m_initial_rooms_access);
 }
 
 template<typename _Tp>
@@ -33,7 +35,6 @@ int Maze<_Tp>::contract(size_t nb_operations){
         return 0;
     }
     double t_start = omp_get_wtime();
-    m_contract_once = true;
 
     // Domain contraction
     if(m_nb_operations == 0){
@@ -166,6 +167,8 @@ int Maze<_Tp>::contract(size_t nb_operations){
 
     std::cout << " => contractions : " << omp_get_wtime() - t_start << " s, with " << m_nb_operations << "/" << nb_deque << " operations" <<  std::endl;
     m_contraction_step++;
+    m_contract_once = true;
+
     if(m_deque_rooms.empty())
         m_nb_operations = 0;
     else
@@ -178,30 +181,6 @@ void Maze<_Tp>::reset_nb_operations(){
     m_nb_operations = 0;
     m_contract_once = false;
 }
-
-//template<typename _Tp>
-//void Maze<_Tp>::contract_inter(Maze* maze_inter){
-//    // Intersect this maze with other mazes
-//    //    invariant::Domain *d = m_domain;
-//    //    d->inter_maze(this);
-//    if(is_escape_trajectories() && maze_inter->is_escape_trajectories()){
-
-//        std::vector<Room *> room_list;
-//        m_subpaving->get_tree()->get_all_child_rooms_not_empty(room_list, this);
-
-//#pragma omp parallel for
-//        for(size_t i=0; i<room_list.size(); i++){
-//            Room *r = room_list[i];
-//            Pave *p = r->get_pave();
-//            Room *r_inter = p->get_rooms()[maze_inter];
-//            if(r_inter->is_empty()){
-//                r->set_empty_private();
-//                r->synchronize();
-//                r->set_removed();
-//            }
-//        }
-//    }
-//}
 
 template<typename _Tp>
 bool Maze<_Tp>::is_escape_trajectories(){

@@ -201,6 +201,7 @@ private:
 
     std::deque<Room<_Tp> *> m_deque_rooms;
     omp_lock_t  m_deque_access;
+    omp_lock_t  m_initial_rooms_access;
 
     bool    m_espace_trajectories = true;
     bool    m_contract_once = false;
@@ -280,7 +281,9 @@ inline void Maze<_Tp>::add_to_deque(Room<_Tp> *r){
 
 template <typename _Tp>
 inline void Maze<_Tp>::add_initial_room(Room<_Tp>* room_pt){
+    omp_set_lock(&m_initial_rooms_access);
     m_initial_rooms_list.push_back(room_pt);
+    omp_unset_lock(&m_initial_rooms_access);
 }
 
 template <typename _Tp>

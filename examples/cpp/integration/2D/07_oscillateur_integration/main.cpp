@@ -6,6 +6,8 @@
 
 #include "ibex_SepFwdBwd.h"
 
+#include "ibex_SepNot.h"
+
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
@@ -44,34 +46,28 @@ int main(int argc, char *argv[])
 
     // ****** Domain Inner ******* //
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
-
-    Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom_inner.set_sep(&s_inner);
+    SepNot s_inner(s_outer);
+    dom_inner.set_sep_input(&s_inner);
 
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    ibex::Function f_outer(x1, x2, Return(x2,
-                                    -x1-0.5*x2));
-    Dynamics_Function dyn_outer(&f_outer, FWD);
-
-    ibex::Function f_inner(x1, x2, Return(-x2,
-                                    -(-x1-0.5*x2)));
-    Dynamics_Function dyn_inner(&f_inner, BWD);
+    ibex::Function f(x1, x2, Return(x2,
+                                    (-x1-0.5*x2)));
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_outer.contract();
     for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
-        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
+        maze_inner.contract();
+        maze_outer.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

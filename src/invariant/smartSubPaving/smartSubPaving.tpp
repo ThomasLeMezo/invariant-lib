@@ -132,11 +132,15 @@ void SmartSubPaving<_Tp>::bisect(){
                 }
             }
             else{
-                // Store not bisectable paves
-                p->set_removed_rooms();
+                bool all_removed = p->set_removed_rooms();
+                if(all_removed){ // Store not bisectable paves (for all mazes)
 #pragma omp critical
-                {
-                    m_paves_not_bisectable.push_back(p);
+                    {
+                        m_paves_not_bisectable.push_back(p);
+                    }
+                }
+                else{
+                    this->add_paves(p);
                 }
             }
         }

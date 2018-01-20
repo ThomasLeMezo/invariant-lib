@@ -205,7 +205,7 @@ public:
     /**
      * @brief Set all the rooms attached to this pave to removed state
      */
-    void set_removed_rooms();
+    bool set_removed_rooms();
 
     /**
      * @brief Get the dimension of the result of the intersection of a box
