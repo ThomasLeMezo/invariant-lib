@@ -517,6 +517,14 @@ inline Pave<_Tp>* Room<_Tp>::get_pave() const{
 template <typename _Tp>
 inline void Room<_Tp>::reset_first_contract(){
     m_first_contract = true;
+    if(m_is_initial_door_input){
+        delete(m_initial_door_input);
+        m_initial_door_input = nullptr;
+    }
+    if(m_is_initial_door_output){
+        delete(m_initial_door_output);
+        m_initial_door_output = nullptr;
+    }
 }
 
 template <typename _Tp>

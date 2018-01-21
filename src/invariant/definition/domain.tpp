@@ -80,7 +80,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
 
     // ********** Add additional rooms to deque ********** //
     if(m_domain_init == FULL_DOOR){
-        m_subpaving->get_tree()->get_all_child_rooms_not_empty(list_room_deque, maze);
+        m_subpaving->get_tree()->get_all_child_rooms(list_room_deque, maze); // ToDo: correction of not empty function
     }
     if(m_domain_init == FULL_WALL && m_subpaving->get_paves().size()>1){
         // When initial condition is not link with active paves, need to add all paves (case removed full pave in bracketing)
@@ -308,10 +308,11 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
                     Room<_Tp> *r = room_list_initial[i];
                     Pave<_Tp> *p = r->get_pave();
                     Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
+                    _Tp hull = r_inter->get_hull_typed();
                     if(r->is_initial_door_input())
-                        r->set_initial_door_input(r->get_initial_door_input() & r_inter->get_hull_typed());
+                        r->set_initial_door_input(r->get_initial_door_input() & hull);
                     if(r->is_initial_door_output())
-                        r->set_initial_door_output(r->get_initial_door_output() & r_inter->get_hull_typed());
+                        r->set_initial_door_output(r->get_initial_door_output() & hull);
                 }
             }
         }
@@ -345,16 +346,18 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
 
     if(maze->get_domain()->get_init()==FULL_DOOR){
         std::vector<Room<_Tp> *> room_list;
-    //    m_subpaving->get_tree()->get_all_child_rooms_not_full_private(room_list, maze);
-        m_subpaving->get_tree()->get_all_child_rooms(room_list, maze);
+            m_subpaving->get_tree()->get_all_child_rooms_not_empty_private(room_list, maze);
+//        m_subpaving->get_tree()->get_all_child_rooms(room_list, maze);
         for(Maze<_Tp> *maze_union:m_maze_list_union){
-            for(size_t i=0; i<room_list.size(); i++){
-                Room<_Tp> *r = room_list[i];
-                Pave<_Tp> *p = r->get_pave();
-                Room<_Tp> *r_union = p->get_rooms()[maze_union];
-                _Tp hull = r_union->get_hull_typed();
-                if(!hull.is_empty())
-                    r->set_union_hull(r_union->get_hull_typed());
+            if(maze_union->get_contract_once()){
+                for(size_t i=0; i<room_list.size(); i++){
+                    Room<_Tp> *r = room_list[i];
+                    Pave<_Tp> *p = r->get_pave();
+                    Room<_Tp> *r_union = p->get_rooms()[maze_union];
+                    _Tp hull = r_union->get_hull_typed();
+                    if(!hull.is_empty())
+                        r->set_union_hull(r_union->get_hull_typed());
+                }
             }
         }
     }

@@ -48,8 +48,8 @@ void VibesMaze::show() const{
 
 void VibesMaze::draw_room_inner(PaveIBEX *p) const{
     // Draw backward
-//    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
-//        vibes::drawBox(p->get_position(), "black[]");
+    //    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
+    //        vibes::drawBox(p->get_position(), "black[]");
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
@@ -143,12 +143,12 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
         if(pt_x.size()>2)
             vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
 
-//        if(r->is_initial_door_input()){
-//            vibes::drawBox(r->get_initial_door_input(), "black[red]");
-//        }
-//        if(r->is_initial_door_output()){
-//            vibes::drawBox(r->get_initial_door_output(), "black[red]");
-//        }
+        //        if(r->is_initial_door_input()){
+        //            vibes::drawBox(r->get_initial_door_input(), "black[red]");
+        //        }
+        //        if(r->is_initial_door_output()){
+        //            vibes::drawBox(r->get_initial_door_output(), "black[red]");
+        //        }
     }
 
     // Draw Cone
@@ -157,8 +157,8 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
 
 void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     // Draw backward
-//    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
-//        vibes::drawBox(p->get_position(), "black[]");
+    //    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
+    //        vibes::drawBox(p->get_position(), "black[]");
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
@@ -250,14 +250,14 @@ void VibesMaze::show_maze_outer() const{
         draw_room_outer(p);
     }
     for(PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
-//        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-            invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
-            //            if(!r->is_removed()){
-            draw_room_outer(p);
-            //            }
-            if(r->is_empty())
-                vibes::drawBox(p->get_position(), "[blue]");
-//        }
+        //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
+        invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
+        //            if(!r->is_removed()){
+        draw_room_outer(p);
+        //            }
+        if(r->is_empty())
+            vibes::drawBox(p->get_position(), "[blue]");
+        //        }
     }
 }
 
@@ -266,14 +266,14 @@ void VibesMaze::show_maze_inner() const{
         draw_room_inner(p);
     }
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
-//        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-            invariant::RoomIBEX *r = p->get_rooms()[m_maze_inner];
-            //            if(!r->is_removed()){
-            draw_room_inner(p);
-            //            }
-            if(r->is_empty())
-                vibes::drawBox(p->get_position(), "[#FF00FF]");
-//        }
+        //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
+        invariant::RoomIBEX *r = p->get_rooms()[m_maze_inner];
+        //            if(!r->is_removed()){
+        draw_room_inner(p);
+        //            }
+        if(r->is_empty())
+            vibes::drawBox(p->get_position(), "[#FF00FF]");
+        //        }
     }
 }
 
@@ -291,25 +291,30 @@ void VibesMaze::show_maze_outer_inner() const{
             draw_room_outer(p);
         }
 
-        if(r_outer->is_initial_door_input())
-            vibes::drawBox(r_outer->get_initial_door_input(), "[#FF8C8C]");
-        if(r_outer->is_initial_door_output())
-            vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
-        if(r_inner->is_initial_door_input())
-            vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
-        if(r_inner->is_initial_door_output())
-            vibes::drawBox(r_inner->get_initial_door_output(), "[#FF8C8C]");
+//        if(!r_outer->is_removed() && !r_outer->is_empty()){
+//            if(r_outer->is_initial_door_input())
+//                vibes::drawBox(r_outer->get_initial_door_input(), "[#FF8C8C]");
+//            if(r_outer->is_initial_door_output())
+//                vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
+//        }
+
+//        if(!r_inner->is_removed() && !r_inner->is_empty()){
+//            if(r_inner->is_initial_door_input())
+//                vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
+//            if(r_inner->is_initial_door_output())
+//                vibes::drawBox(r_inner->get_initial_door_output(), "[#FF8C8C]");
+//        }
     }
 
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
-//        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-            invariant::RoomIBEX *r_outer = p->get_rooms()[m_maze_outer];
-            invariant::RoomIBEX *r_inner = p->get_rooms()[m_maze_inner];
-            if(r_outer->is_empty())
-                vibes::drawBox(p->get_position(), "black[blue]");
-            if(r_inner->is_empty())
-                vibes::drawBox(p->get_position(), "black[#FF00FF]");
-//        }
+        //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
+        invariant::RoomIBEX *r_outer = p->get_rooms()[m_maze_outer];
+        invariant::RoomIBEX *r_inner = p->get_rooms()[m_maze_inner];
+        if(r_outer->is_empty())
+            vibes::drawBox(p->get_position(), "black[blue]");
+        if(r_inner->is_empty())
+            vibes::drawBox(p->get_position(), "black[#FF00FF]");
+        //        }
     }
 }
 
@@ -375,21 +380,21 @@ std::vector<ibex::Interval> VibesMaze::compute_theta(ibex::Interval dx, ibex::In
 
 void VibesMaze::show_graph() const{
     IntervalVector bounding_box(m_subpaving->dim(), ibex::Interval::EMPTY_SET);
-//    vibes::newGroup("graph_bisectable", "gray[gray]", vibesParams("figure", m_name));
-//    vibes::newGroup("graph_not_bisectable", "lightGray[lightGray]", vibesParams("figure", m_name));
+    //    vibes::newGroup("graph_bisectable", "gray[gray]", vibesParams("figure", m_name));
+    //    vibes::newGroup("graph_not_bisectable", "lightGray[lightGray]", vibesParams("figure", m_name));
 
-//    vibes::Params params_bisectable, params_not_bisectable;
-//    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
-//    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
+    //    vibes::Params params_bisectable, params_not_bisectable;
+    //    params_bisectable = vibesParams("figure", m_name, "group", "graph_bisectable", "FaceColor","none","EdgeColor","gray");
+    //    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
     for(PaveIBEX*p:m_subpaving->get_paves()){
         ibex::IntervalVector box(p->get_position());
-//        vibes::drawBox(box, params_bisectable);
+        //        vibes::drawBox(box, params_bisectable);
         bounding_box |= box;
     }
     for(PaveIBEX*p:m_subpaving->get_paves_not_bisectable()){
         if(!p->get_position().is_unbounded()){
-//            vibes::drawBox(p->get_position(), params_not_bisectable);
+            //            vibes::drawBox(p->get_position(), params_not_bisectable);
             bounding_box |= p->get_position();
         }
     }
@@ -436,7 +441,7 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         name << p_position;
         vibes::newFigure(name.str());
         vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height, "x", m_x,"y", m_y));
-//        setProperties(m_x+m_width, m_y, m_width, m_height);
+        //        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave
         if(m_maze_inner != nullptr){ //maze->get_domain()->get_init() == FULL_WALL){
@@ -445,10 +450,10 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         if(m_maze_outer != nullptr){//maze->get_domain()->get_init() == FULL_DOOR){
             draw_room_outer(p);
         }
-//        else{
-//            draw_room_outer(p);
-//            draw_room_inner(p);
-//        }
+        //        else{
+        //            draw_room_outer(p);
+        //            draw_room_inner(p);
+        //        }
 
 
         // Draw Doors

@@ -167,8 +167,9 @@ void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, ibe
 
 template<typename _Tp>
 void Pave_node<_Tp>::get_all_child_rooms(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
-    if(is_leaf() && !m_pave->get_rooms()[maze]->is_removed()){
-        list_room.push_back(m_pave->get_rooms()[maze]);
+    if(is_leaf()){
+        if(!m_pave->get_rooms()[maze]->is_removed())
+            list_room.push_back(m_pave->get_rooms()[maze]);
     }
     else{
         if(!m_removed_rooms[maze]){

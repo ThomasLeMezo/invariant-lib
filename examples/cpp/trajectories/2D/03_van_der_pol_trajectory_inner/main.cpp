@@ -92,10 +92,11 @@ int main(int argc, char *argv[])
     maze_B_inner.set_boolean_tree_removing(&tree_removing_inner);
 
     double time_start = omp_get_wtime();
+//    omp_set_num_threads(1);
     for(int i=0; i<17; i++){
         cout << i << endl;
         paving.bisect();
-        for(size_t j=0; j<2; j++){
+        for(size_t j=0; j<1; j++){
             maze_A.contract();
             maze_A_inner.contract();
             maze_B.contract();
@@ -118,10 +119,10 @@ int main(int argc, char *argv[])
     v_mazeB.drawBox(box_B, "r[]");
     v_mazeB.drawCircle(xc_1, yc_1, r_1, "g[]");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-2);
-//    position_info[1] = ibex::Interval(4);
-//    v_maze.get_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(1.01);
+    position_info[1] = ibex::Interval(1.265);
+    v_mazeA.get_room_info(&maze_A_inner, position_info);
 
     vibes::endDrawing();
 }
