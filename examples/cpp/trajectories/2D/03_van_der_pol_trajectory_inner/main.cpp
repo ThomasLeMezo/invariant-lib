@@ -104,7 +104,9 @@ int main(int argc, char *argv[])
         maze_A_inner.contract();
         maze_B.contract();
         maze_B_inner.contract();
+
         maze_A.contract();
+        maze_A_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

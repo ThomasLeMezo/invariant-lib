@@ -19,7 +19,7 @@ public:
     /**
      * @brief BooleanTree constructor
      */
-    BooleanTree(std::vector<Maze<_Tp>*> maze_list);
+    BooleanTree(const std::vector<Maze<_Tp>*> &maze_list);
     BooleanTree(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B);
     BooleanTree(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B, Maze<_Tp>* maze_C);
 

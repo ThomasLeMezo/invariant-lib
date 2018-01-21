@@ -52,6 +52,8 @@ include_directories(serialization)
     maze/door.h
     maze/sepmaze.h
 
+    maze/eulerianmaze.h
+
     smartSubPaving/smartSubPaving.h
     smartSubPaving/pave.h
     smartSubPaving/face.h
@@ -78,6 +80,8 @@ include_directories(serialization)
     maze/room.tpp
     maze/door.tpp
     maze/sepmaze.tpp
+
+    maze/eulerianmaze.tpp
   )
 
   if(WITH_NETCDF)

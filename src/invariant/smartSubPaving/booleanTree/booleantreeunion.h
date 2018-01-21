@@ -15,7 +15,7 @@ class BooleanTreeUnion : public BooleanTree<_Tp>
 {
 public:
 
-    BooleanTreeUnion(std::vector<Maze<_Tp>*> maze_list):BooleanTree<_Tp>(maze_list){}
+    BooleanTreeUnion(const std::vector<Maze<_Tp>*> &maze_list):BooleanTree<_Tp>(maze_list){}
     BooleanTreeUnion(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B):BooleanTree<_Tp>(maze_A, maze_B){}
     BooleanTreeUnion(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B, Maze<_Tp>* maze_C):BooleanTree<_Tp>(maze_A, maze_B, maze_C){}
 

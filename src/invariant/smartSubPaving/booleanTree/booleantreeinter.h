@@ -14,7 +14,7 @@ template <typename _Tp=ibex::IntervalVector>
 class BooleanTreeInter : public BooleanTree<_Tp>
 {
 public:
-    BooleanTreeInter(std::vector<Maze<_Tp>*> maze_list):BooleanTree<_Tp>(maze_list){}
+    BooleanTreeInter(const std::vector<Maze<_Tp>*> &maze_list):BooleanTree<_Tp>(maze_list){}
     BooleanTreeInter(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B):BooleanTree<_Tp>(maze_A, maze_B){}
     BooleanTreeInter(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B, Maze<_Tp>* maze_C):BooleanTree<_Tp>(maze_A, maze_B, maze_C){}
 

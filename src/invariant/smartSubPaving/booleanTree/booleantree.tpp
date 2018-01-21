@@ -3,7 +3,7 @@
 namespace invariant {
 
 template<typename _Tp>
-BooleanTree<_Tp>::BooleanTree(std::vector<Maze<_Tp>*> maze_list){
+BooleanTree<_Tp>::BooleanTree(const std::vector<Maze<_Tp>*> &maze_list){
     m_maze_list = maze_list;
 }
 
