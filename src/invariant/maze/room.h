@@ -168,6 +168,7 @@ public:
      * @return
      */
     const bool is_full();
+    const bool is_full_private();
 
     /**
      * @brief Return true if the Union of outer & inner for each doors is full
@@ -264,6 +265,11 @@ public:
      */
     void compute_vector_field_typed();
 
+    /**
+     * @brief Set the union of all the doors and the hull
+     * @param hull
+     */
+    void set_union_hull(const _Tp &hull);
 
     /**
      * @brief operator &=
@@ -704,6 +710,14 @@ inline const _Tp& Room<_Tp>::get_one_vector_fields_typed_bwd(int n_vf) const{
 template <typename _Tp>
 inline ibex::IntervalVector Room<_Tp>::get_one_vector_fields(int n_vf) const{
     return m_vector_fields[n_vf];
+}
+
+template <typename _Tp>
+inline void Room<_Tp>::set_union_hull(const _Tp &hull){
+    for(Face<_Tp> *f:m_pave->get_faces_vector()){
+        Door<_Tp> *d = f->get_doors()[m_maze];
+        d->set_union_hull(hull);
+    }
 }
 
 inline std::string print(const ibex::IntervalVector &iv){

@@ -3,9 +3,10 @@
 #include "dynamics_function.h"
 #include "maze.h"
 #include "vibesMaze.h"
-#include "bisectiontreeinter.h"
+#include "booleantreeinter.h"
 
 #include "ibex_SepFwdBwd.h"
+#include "ibex_SepNot.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -29,14 +30,10 @@ int main(int argc, char *argv[])
 
     // ****** Domain Outer ******* //
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
-
     double x1_c, x2_c, r;
-//    x1_c = 3.0;
-//    x2_c = 2.0;
     x1_c = -2.0;
     x2_c = 4;
     r = 0.3;
-
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
     dom_outer.set_sep_input(&s_outer);
@@ -45,42 +42,34 @@ int main(int argc, char *argv[])
 
     // ****** Domain Inner ******* //
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
-
-    Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
-    SepFwdBwd s_inner(f_sep_inner, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom_inner.set_sep(&s_inner);
-
+    SepNot s_inner(s_outer); // LT, LEQ, EQ, GEQ, GT
+    dom_inner.set_sep_input(&s_inner);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    ibex::Function f(x1, x2, Return(x2,
-                                        (1.0*(1.0-pow(x1, 2))*x2-x1)));
-//    ibex::Function f(x1, x2, Return(x2,
-//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+Interval(-0.3, 0.3)));
+    ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
     invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
-    invariant::BisectionTreeInterIBEX bisection_tree(&maze_outer, &maze_inner);
+    invariant::BooleanTreeInterIBEX bisection_tree(&maze_outer, &maze_inner);
     paving.set_bisection_tree(&bisection_tree);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
     for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
-        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
+        maze_outer.contract();
+        maze_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    cout << paving << endl;
-
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-//    VibesMaze v_maze("SmartSubPaving", &maze_inner);
     v_maze.setProperties(0, 0, 1048, 1048);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "red[]");
@@ -90,7 +79,5 @@ int main(int argc, char *argv[])
 //    position_info[1] = ibex::Interval(3.66, 3.74);
 //    v_maze.show_room_info(&maze_inner, position_info);
 
-
     vibes::endDrawing();
-
 }

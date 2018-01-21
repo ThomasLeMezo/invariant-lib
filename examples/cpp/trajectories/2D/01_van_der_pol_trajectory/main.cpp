@@ -5,8 +5,8 @@
 #include "maze.h"
 #include "vibesMaze.h"
 
-#include "bisectiontreeinter.h"
-#include "bisectiontreeunion.h"
+#include "booleantreeinter.h"
+#include "booleantreeunion.h"
 
 #include <iostream>
 #include "vibes/vibes.h"
@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     invariant::Maze<> mazeA(&dom_A, &dyn_A);
     invariant::Maze<> mazeB(&dom_B, &dyn_B);
 
-    //    invariant::BisectionTreeUnionIBEX bisect_graph(&mazeA, &mazeB);
-    invariant::BisectionTreeInterIBEX bisect_graph(&mazeA, &mazeB);
+    //    invariant::BooleanTreeUnionIBEX bisect_graph(&mazeA, &mazeB);
+    invariant::BooleanTreeInterIBEX bisect_graph(&mazeA, &mazeB);
     paving.set_bisection_tree(&bisect_graph);
 
     dom_B.add_maze_inter(&mazeA);

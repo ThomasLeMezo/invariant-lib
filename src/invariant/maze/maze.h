@@ -14,6 +14,7 @@
 #include "room.h"
 #include "smartSubPaving.h"
 #include "pave.h"
+#include "booleantree.h"
 
 namespace invariant {
 
@@ -194,6 +195,17 @@ public:
      */
     bool get_contract_vector_field() const;
 
+    /**
+     * @brief get_boolean_tree_removing
+     * @return
+     */
+    BooleanTree<_Tp> * get_boolean_tree_removing() const;
+
+    /**
+     * @brief set_boolean_tree_removing
+     */
+    void set_boolean_tree_removing(BooleanTree<_Tp> *);
+
 private:
     invariant::Domain<_Tp> *    m_domain = nullptr;
     SmartSubPaving<_Tp>  *    m_subpaving = nullptr; // SmartSubPaving associated with this maze
@@ -216,11 +228,23 @@ private:
 
     bool m_contract_vector_field = false;
 
+    BooleanTree<_Tp> *m_boolean_tree_removing = nullptr;
+
     std::vector<Room<_Tp>*> m_initial_rooms_list;
 };
 }
 
 namespace invariant{
+
+template <typename _Tp>
+inline BooleanTree<_Tp> * Maze<_Tp>::get_boolean_tree_removing() const{
+    return m_boolean_tree_removing;
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::set_boolean_tree_removing(BooleanTree<_Tp> * tree){
+    m_boolean_tree_removing = tree;
+}
 
 template <typename _Tp>
 inline void Maze<_Tp>::set_widening_limit(size_t limit){

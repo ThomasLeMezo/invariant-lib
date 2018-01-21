@@ -5,7 +5,7 @@
 # Sources
 
 include_directories(../invariant/smartSubPaving)
-include_directories(../invariant/smartSubPaving/bisectionTree)
+include_directories(../invariant/smartSubPaving/booleanTree)
 include_directories(../invariant/maze)
 include_directories(../invariant/definition)
 include_directories(../invariant/definition/netcdf)

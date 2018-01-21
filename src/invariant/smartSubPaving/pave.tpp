@@ -1,4 +1,5 @@
 #include "pave.h"
+#include "booleantree.h"
 
 namespace invariant {
 
@@ -426,8 +427,12 @@ bool Pave<_Tp>::set_removed_rooms(){
     bool all_removed = true;
     for(typename std::map<Maze<_Tp>*,Room<_Tp>*>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it){
         Room<_Tp>* r = it->second;
-        //        if(r->is_empty()) //?
-        if(r->is_empty() || r->get_maze()->get_domain()->get_init()!=FULL_WALL){
+        Maze<_Tp>* maze = it->first;
+
+        BooleanTree<_Tp> * tree = maze->get_boolean_tree_removing();
+
+        if( (tree==nullptr && (r->is_empty() || r->get_maze()->get_domain()->get_init()!=FULL_WALL))
+          ||(tree!=nullptr && tree->eval_set_empty(this))){
             r->set_removed();
             m_tree->set_removed(it->first);
         }

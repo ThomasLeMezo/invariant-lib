@@ -11,7 +11,7 @@
 #include "pave_node.h"
 #include "maze.h"
 
-#include "bisectionTree/bisectiontree.h"
+#include "booleanTree/booleantree.h"
 
 #include "../serialization/ibex_serialization.h"
 
@@ -203,13 +203,13 @@ public:
      * @brief set the bisection tree
      * @param bisect_tree
      */
-    void set_bisection_tree(BisectionTree<_Tp> *bisect_tree);
+    void set_bisection_tree(BooleanTree<_Tp> *bisect_tree);
 
     /**
      * @brief get bisect tree
      * @return
      */
-    BisectionTree<_Tp>* get_bisect_tree() const;
+    BooleanTree<_Tp>* get_bisect_tree() const;
 
 protected:
     /** Class Variable **/
@@ -229,7 +229,7 @@ protected:
 
     omp_lock_t m_write_add_pave;
 
-    BisectionTree<_Tp> *m_bisection_tree = nullptr;
+    BooleanTree<_Tp> *m_bisection_tree = nullptr;
 };
 
     /**
@@ -340,12 +340,12 @@ inline const std::vector<double>& SmartSubPaving<_Tp>::get_limit_bisection() con
 }
 
 template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_bisection_tree(BisectionTree<_Tp> *bisect_tree){
+inline void SmartSubPaving<_Tp>::set_bisection_tree(BooleanTree<_Tp> *bisect_tree){
     m_bisection_tree = bisect_tree;
 }
 
 template<typename _Tp>
-inline BisectionTree<_Tp>* SmartSubPaving<_Tp>::get_bisect_tree() const{
+inline BooleanTree<_Tp>* SmartSubPaving<_Tp>::get_bisect_tree() const{
     return m_bisection_tree;
 }
 

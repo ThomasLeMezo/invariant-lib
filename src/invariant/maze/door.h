@@ -77,6 +77,12 @@ public:
     void set_output_private(const _Tp& iv_output);
 
     /**
+     * @brief set union hull
+     * @param hull
+     */
+    void set_union_hull(const _Tp& hull);
+
+    /**
      * @brief Get the input door
      * @return iv
      */
@@ -425,6 +431,14 @@ inline void Door<_Tp>::set_empty_private(){
     set_empty_private_input();
     set_empty_private_output();
 }
+
+template <typename _Tp>
+inline void Door<_Tp>::set_union_hull(const _Tp& hull){
+    *m_input_private |= hull & m_face->get_position_typed();
+    *m_output_private |= hull & m_face->get_position_typed();
+}
+
+
 
 /// ******************  Other functions ****************** ///
 

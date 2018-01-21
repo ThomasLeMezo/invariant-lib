@@ -869,6 +869,16 @@ const bool Room<_Tp>::is_empty(){
 }
 
 template<typename _Tp>
+const bool Room<_Tp>::is_full_private(){
+    for(Face<_Tp> *f:m_pave->get_faces_vector()){
+        if(!f->get_doors()[m_maze]->is_full_private()){
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename _Tp>
 const bool Room<_Tp>::is_full(){
     if(!m_full && !m_full_first_eval)
         return false;

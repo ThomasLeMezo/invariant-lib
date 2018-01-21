@@ -194,10 +194,44 @@ void Pave_node<_Tp>::get_all_child_rooms_not_empty(std::vector<Room<_Tp> *> &lis
 }
 
 template<typename _Tp>
+void Pave_node<_Tp>::get_all_child_rooms_not_empty_private(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+    if(is_leaf()){
+        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        if(!r->is_empty_private() && !r->is_removed())
+            list_room.push_back(m_pave->get_rooms()[maze]);
+    }
+    else{
+        if(!this->get_removed()[maze] && !this->get_emptyness()[maze]){
+            m_children.first->get_all_child_rooms_not_empty(list_room, maze);
+            m_children.second->get_all_child_rooms_not_empty(list_room, maze);
+        }
+    }
+}
+
+template<typename _Tp>
 void Pave_node<_Tp>::get_all_child_rooms_not_full(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
     if(is_leaf()){
         Room<_Tp> *r = m_pave->get_rooms()[maze];
         if(!r->is_full() && !r->is_removed())
+            list_room.push_back(m_pave->get_rooms()[maze]);
+    }
+    else if(this->get_emptyness()[maze]){
+        m_children.first->get_all_child_rooms(list_room, maze);
+        m_children.second->get_all_child_rooms(list_room, maze);
+    }
+    else{
+        if(!this->get_fullness()[maze] && !this->get_removed()[maze]){
+            m_children.first->get_all_child_rooms_not_full(list_room, maze);
+            m_children.second->get_all_child_rooms_not_full(list_room, maze);
+        }
+    }
+}
+
+template<typename _Tp>
+void Pave_node<_Tp>::get_all_child_rooms_not_full_private(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+    if(is_leaf()){
+        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        if(!r->is_full_private() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
     else if(this->get_emptyness()[maze]){

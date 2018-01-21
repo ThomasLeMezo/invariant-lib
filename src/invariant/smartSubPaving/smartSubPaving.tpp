@@ -111,7 +111,7 @@ template<typename _Tp>
 void SmartSubPaving<_Tp>::bisect(){
     std::cout << " => bisecting ";
     double time_start = omp_get_wtime();
-
+    std::cout << " (from " << m_paves.size();
     std::vector<Pave<_Tp>*> bisectable_paves = m_paves;
     std::vector<Pave<_Tp>*> bisected_paves;
     m_paves.clear();
@@ -123,7 +123,7 @@ void SmartSubPaving<_Tp>::bisect(){
         for(size_t i = 0; i<bisectable_paves.size(); i++){
             Pave<_Tp> *p = bisectable_paves[i];
             if((m_bisection_tree==nullptr && p->request_bisection())
-               || (m_bisection_tree!=nullptr && m_bisection_tree->eval(p))){
+               || (m_bisection_tree!=nullptr && m_bisection_tree->eval_bisection(p))){
                 if(p->bisect_step_one()){
 #pragma omp critical
                     {
@@ -164,6 +164,7 @@ void SmartSubPaving<_Tp>::bisect(){
         maze->reset_nb_operations();
     }
 
+    std::cout << " to " << m_paves.size() << ") - ";
     std::cout << omp_get_wtime() - time_start << "s" <<  std::endl;
 }
 

@@ -8,7 +8,7 @@ include_directories(definition)
 include_directories(definition/netcdf)
 include_directories(definition/dataSet)
 include_directories(smartSubPaving)
-include_directories(smartSubPaving/bisectionTree)
+include_directories(smartSubPaving/booleanTree)
 include_directories(maze)
 include_directories(serialization)
 
@@ -56,9 +56,9 @@ include_directories(serialization)
     smartSubPaving/pave.h
     smartSubPaving/face.h
     smartSubPaving/pave_node.h
-    smartSubPaving/bisectionTree/bisectiontree.h
-    smartSubPaving/bisectionTree/bisectiontreeunion.h
-    smartSubPaving/bisectionTree/bisectiontreeinter.h
+    smartSubPaving/booleanTree/booleantree.h
+    smartSubPaving/booleanTree/booleantreeunion.h
+    smartSubPaving/booleanTree/booleantreeinter.h
 
     definition/dataSet/datasetnode.h
     definition/dataSet/datasetnode.tpp
@@ -70,9 +70,9 @@ include_directories(serialization)
     smartSubPaving/pave.tpp
     smartSubPaving/face.tpp
     smartSubPaving/pave_node.tpp
-    smartSubPaving/bisectionTree/bisectiontree.tpp
-    smartSubPaving/bisectionTree/bisectiontreeunion.tpp
-    smartSubPaving/bisectionTree/bisectiontreeinter.tpp
+    smartSubPaving/booleanTree/booleantree.tpp
+    smartSubPaving/booleanTree/booleantreeunion.tpp
+    smartSubPaving/booleanTree/booleantreeinter.tpp
 
     maze/maze.tpp
     maze/room.tpp

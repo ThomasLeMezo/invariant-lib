@@ -135,6 +135,7 @@ public:
      * @param maze
      */
     void get_all_child_rooms_not_empty(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const;
+    void get_all_child_rooms_not_empty_private(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const;
 
     /**
      * @brief Get all non full room of the children of this pave_node
@@ -142,6 +143,7 @@ public:
      * @param maze
      */
     void get_all_child_rooms_not_full(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const;
+    void get_all_child_rooms_not_full_private(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const;
 
     /**
      * @brief Get all outside rooms that are on the border of the set
