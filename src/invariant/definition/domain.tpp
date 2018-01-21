@@ -34,9 +34,9 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
             Room<_Tp> *r = p->get_rooms()[maze];
             if(!r->is_removed()){
-                if(m_domain_init == FULL_DOOR)
-                    r->set_full_private_with_father();
-                else if(m_domain_init == FULL_WALL)
+//                if(m_domain_init == FULL_DOOR) // Not necessary
+//                    r->set_full_private_with_father();
+                if(m_domain_init == FULL_WALL)
                     r->set_empty_private();
                 r->reset_first_contract();
             }
@@ -302,17 +302,31 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
     else if(maze->get_domain()->get_init()==FULL_WALL){
         std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
         // Contract the initial condition (input & output)
+
         for(Maze<_Tp> *maze_inter:m_maze_list_inter){
             if(maze_inter->get_contract_once()){
                 for(size_t i=0; i<room_list_initial.size(); i++){
                     Room<_Tp> *r = room_list_initial[i];
                     Pave<_Tp> *p = r->get_pave();
                     Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
+
                     _Tp hull = r_inter->get_hull_typed();
-                    if(r->is_initial_door_input())
-                        r->set_initial_door_input(r->get_initial_door_input() & hull);
-                    if(r->is_initial_door_output())
-                        r->set_initial_door_output(r->get_initial_door_output() & hull);
+                    if(r->is_initial_door_input()){
+                        _Tp init_door_input = r->get_initial_door_input() & hull;
+                        if(init_door_input.is_empty()){
+                            r->reset_init_door_input();
+                        }
+                        else
+                            r->set_initial_door_input(init_door_input);
+                    }
+                    if(r->is_initial_door_output()){
+                        _Tp init_door_output = r->get_initial_door_output() & hull;
+                        if(init_door_output.is_empty()){
+                            r->reset_init_door_output();
+                        }
+                        else
+                            r->set_initial_door_output(init_door_output);
+                    }
                 }
             }
         }

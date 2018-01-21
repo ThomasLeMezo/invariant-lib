@@ -16,6 +16,7 @@ configure_file(
 
 include_directories(.)
 include_directories(../src/invariant/smartSubPaving)
+include_directories(../src/invariant/smartSubPaving/booleanTree)
 include_directories(../src/invariant/maze)
 include_directories(../src/invariant/definition)
 include_directories(../src/invariant/definition/netcdf)

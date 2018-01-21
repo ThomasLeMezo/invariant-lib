@@ -75,8 +75,8 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(x1_c, x2_c, r, "red[]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-2.18);
-//    position_info[1] = ibex::Interval(3.66, 3.74);
+//    position_info[0] = ibex::Interval(-2);
+//    position_info[1] = ibex::Interval(3.4);
 //    v_maze.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();

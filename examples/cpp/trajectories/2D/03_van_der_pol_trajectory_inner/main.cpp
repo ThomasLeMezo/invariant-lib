@@ -91,17 +91,20 @@ int main(int argc, char *argv[])
     maze_A_inner.set_boolean_tree_removing(&tree_removing_inner);
     maze_B_inner.set_boolean_tree_removing(&tree_removing_inner);
 
+    BooleanTreeUnion<> tree_removing_outer(&maze_A, &maze_B);
+    maze_A.set_boolean_tree_removing(&tree_removing_outer);
+    maze_B.set_boolean_tree_removing(&tree_removing_outer);
+
     double time_start = omp_get_wtime();
-//    omp_set_num_threads(1);
-    for(int i=0; i<17; i++){
+    //    omp_set_num_threads(1);
+    for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
-        for(size_t j=0; j<1; j++){
-            maze_A.contract();
-            maze_A_inner.contract();
-            maze_B.contract();
-            maze_B_inner.contract();
-        }
+        maze_A.contract();
+        maze_A_inner.contract();
+        maze_B.contract();
+        maze_B_inner.contract();
+        maze_A.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -119,10 +122,11 @@ int main(int argc, char *argv[])
     v_mazeB.drawBox(box_B, "r[]");
     v_mazeB.drawCircle(xc_1, yc_1, r_1, "g[]");
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(1.01);
-    position_info[1] = ibex::Interval(1.265);
-    v_mazeA.get_room_info(&maze_A_inner, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(1.26);
+//    position_info[1] = ibex::Interval(-0.09);
+//    v_mazeB.show_room_info(&maze_B, position_info);
+//    v_mazeB.show_room_info(&maze_A, position_info);
 
     vibes::endDrawing();
 }

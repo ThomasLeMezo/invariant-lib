@@ -291,12 +291,12 @@ void VibesMaze::show_maze_outer_inner() const{
             draw_room_outer(p);
         }
 
-//        if(!r_outer->is_removed() && !r_outer->is_empty()){
-//            if(r_outer->is_initial_door_input())
-//                vibes::drawBox(r_outer->get_initial_door_input(), "[#FF8C8C]");
-//            if(r_outer->is_initial_door_output())
-//                vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
-//        }
+        if(!r_outer->is_removed() && !r_outer->is_empty()){
+            if(r_outer->is_initial_door_input())
+                vibes::drawBox(r_outer->get_initial_door_input(), "[#FF8C8C]");
+            if(r_outer->is_initial_door_output())
+                vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
+        }
 
 //        if(!r_inner->is_removed() && !r_inner->is_empty()){
 //            if(r_inner->is_initial_door_input())

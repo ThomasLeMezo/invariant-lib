@@ -35,9 +35,9 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics)
 
     compute_vector_field_typed();
 
-//    ibex::Variable v(9);
-//    m_contract_function = new ibex::Function(v, ibex::Return(v[0]*pow(v[8],2)+v[2]*v[8]+v[4]-v[6], v[1]*pow(v[8],2)+v[3]*v[8]+v[5]-v[7]));
-//    m_ctc = new ibex::CtcFwdBwd(*m_contract_function);
+    //    ibex::Variable v(9);
+    //    m_contract_function = new ibex::Function(v, ibex::Return(v[0]*pow(v[8],2)+v[2]*v[8]+v[4]-v[6], v[1]*pow(v[8],2)+v[3]*v[8]+v[5]-v[7]));
+    //    m_ctc = new ibex::CtcFwdBwd(*m_contract_function);
 
 }
 
@@ -74,8 +74,7 @@ Room<_Tp>::~Room(){
     omp_destroy_lock(&m_lock_contraction);
     omp_destroy_lock(&m_lock_deque);
     omp_destroy_lock(&m_lock_vector_field);
-//    delete(m_ctc);
-//    delete(m_contract_function);
+
     if(m_initial_door_output != nullptr)
         delete(m_initial_door_output);
     if(m_initial_door_input != nullptr)
@@ -165,6 +164,22 @@ void Room<_Tp>::set_full_private_with_father(){
         d->set_full_private_with_father();
     }
 }
+
+template<typename _Tp>
+void Room<_Tp>::contract_according_to_vector_field(){
+    if(m_maze->get_domain()->get_init()==FULL_DOOR){
+        for(Face<_Tp> *f:m_pave->get_faces_vector()){
+            Door<_Tp> *d = f->get_doors()[m_maze];
+            for(size_t n_vf=0; n_vf<d->is_possible_in().size(); n_vf++){
+                if(!d->is_possible_in()[n_vf])
+                    d->set_empty_private_input();
+                if(!d->is_possible_out()[n_vf])
+                    d->set_empty_private_output();
+            }
+        }
+    }
+}
+
 
 template<typename _Tp>
 void Room<_Tp>::contract_vector_field(){
@@ -457,7 +472,7 @@ void Room<_Tp>::contract_consistency(){
 
                     if(m_is_father_hull) // For father hull
                         door_out_iv &= *m_father_hull;
-//                    door_out_iv &= door->get_face()->get_position_typed();
+                    //                    door_out_iv &= door->get_face()->get_position_typed();
 
                     door->set_output_private(door_out_iv);
                 }
@@ -480,7 +495,7 @@ void Room<_Tp>::contract_consistency(){
 
                     if(m_is_father_hull) // For father hull
                         door_in_iv &= *m_father_hull;
-//                    door_in_iv &= door->get_face()->get_position_typed();
+                    //                    door_in_iv &= door->get_face()->get_position_typed();
 
                     door->set_input_private(door_in_iv);
                 }
@@ -738,9 +753,12 @@ bool Room<_Tp>::contract(){
     bool change = false;
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
-        if(!m_contract_vector_field){
+        if(m_contract_vector_field){
             contract_vector_field();
-            m_contract_vector_field = true;
+            m_contract_vector_field = false;
+        }
+        else if(!m_contract_vector_field && m_first_contract){ // 2nd bisection
+            contract_according_to_vector_field();
         }
         else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty()))
             return false;
@@ -762,13 +780,13 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    //    if(m_maze->get_domain()->get_init() != FULL_WALL)
-    //        return false;
+    if(m_maze->get_domain()->get_init() != FULL_DOOR)
+        return false;
 
     ibex::IntervalVector position(2);
-    position[0] = ibex::Interval(-1.25, -1);
-    position[1] = ibex::Interval(1.75, 2);
-//    position[2] = ibex::Interval(126250, 127812.5);
+    position[0] = ibex::Interval(-2.078125, -1.78125);
+    position[1] = ibex::Interval(3.328125, 3.625);
+    //    position[2] = ibex::Interval(126250, 127812.5);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
     //    position2[1] = Interval(1.5750000000000002, 3.1);
@@ -777,10 +795,10 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if((m_pave->get_position() == position || m_pave->get_position() == position2)){
         if(cout_message){
             std::cout << message << std::endl;
-//            if(m_pave->get_position() == position)
-//                std::cout << "position 1" << std::endl;
-//            else
-//                std::cout << "position 2" << std::endl;
+            //            if(m_pave->get_position() == position)
+            //                std::cout << "position 1" << std::endl;
+            //            else
+            //                std::cout << "position 2" << std::endl;
 
             if(m_maze->get_domain()->get_init()==FULL_WALL)
                 std::cout << "FULL_WALL" << std::endl;
@@ -983,7 +1001,17 @@ void Room<_Tp>::set_removed(){
         m_is_father_hull = false;
     }
 
-    // Do not remove initial condition => needed for hull when bisecting
+    // Do not remove initial condition => needed for hull when bisecting (?? ToDo: test ?)
+    if(m_is_initial_door_input){
+        delete(m_initial_door_input);
+        m_initial_door_input=nullptr;
+        m_is_initial_door_input=false;
+    }
+    if(m_is_initial_door_output){
+        delete(m_initial_door_output);
+        m_initial_door_output=nullptr;
+        m_is_initial_door_output=false;
+    }
 }
 
 template<typename _Tp>

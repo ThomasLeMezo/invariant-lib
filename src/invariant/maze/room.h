@@ -318,6 +318,12 @@ protected:
     void contract_vector_field();
 
     /**
+     * @brief contract according to vector field (similar to contract_vector_field but used only when vector field possibilities
+     * has been already compute)
+     */
+    void contract_according_to_vector_field();
+
+    /**
      * @brief Basic contraction between [in] and [out] according to a [vect].
      * @param in
      * @param out
@@ -410,6 +416,9 @@ public:
      */
     void reset_first_contract();
 
+    void reset_init_door_input();
+    void reset_init_door_output();
+
 protected:
     Pave<_Tp>*   m_pave = nullptr; // pointer to the associated face
     Maze<_Tp>*   m_maze = nullptr; // pointer to the associated maze
@@ -430,7 +439,7 @@ protected:
     bool m_empty_first_eval = true;
 
     bool    m_first_contract = true; // First contract
-    bool    m_contract_vector_field = false; // Use to contract according to the vector_field
+    bool    m_contract_vector_field = true; // Use to contract according to the vector_field
     omp_lock_t   m_lock_contraction; // Lock the Room when contractor function is called
     omp_lock_t   m_lock_deque; // Lock in_deque variable access
     omp_lock_t   m_lock_vector_field; // Lock m_vector_fields variable access
@@ -517,13 +526,29 @@ inline Pave<_Tp>* Room<_Tp>::get_pave() const{
 template <typename _Tp>
 inline void Room<_Tp>::reset_first_contract(){
     m_first_contract = true;
+    m_full=true;
+    m_full_first_eval=true;
+    m_empty=false;
+    m_empty_first_eval=true;
+    reset_init_door_input();
+    reset_init_door_output();
+}
+
+template <typename _Tp>
+inline void Room<_Tp>::reset_init_door_input(){
     if(m_is_initial_door_input){
         delete(m_initial_door_input);
         m_initial_door_input = nullptr;
+        m_is_initial_door_input = false;
     }
+}
+
+template <typename _Tp>
+inline void Room<_Tp>::reset_init_door_output(){
     if(m_is_initial_door_output){
         delete(m_initial_door_output);
         m_initial_door_output = nullptr;
+        m_is_initial_door_output = false;
     }
 }
 
@@ -539,6 +564,9 @@ inline bool Room<_Tp>::is_initial_door_output() const{
 
 template <typename _Tp>
 inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
+    if(!m_is_initial_door_output || !m_is_initial_door_input)
+        m_maze->add_initial_room(this);
+
     m_is_initial_door_input = true;
     if(m_initial_door_input == nullptr){
         m_initial_door_input = new _Tp(door);
@@ -546,12 +574,13 @@ inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
     else{
         *m_initial_door_input = door;
     }
-    if(!m_is_initial_door_output || !m_is_initial_door_input)
-        m_maze->add_initial_room(this);
 }
 
 template <typename _Tp>
 inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
+    if(!m_is_initial_door_output || !m_is_initial_door_input)
+        m_maze->add_initial_room(this);
+
     m_is_initial_door_output = true;
     if(m_initial_door_output == nullptr){
         m_initial_door_output = new _Tp(door);
@@ -559,8 +588,6 @@ inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
     else{
         *m_initial_door_output = door;
     }
-    if(!m_is_initial_door_output || !m_is_initial_door_input)
-        m_maze->add_initial_room(this);
 }
 
 template <typename _Tp>
@@ -575,6 +602,9 @@ inline const _Tp& Room<_Tp>::get_initial_door_output() const{
 
 template <typename _Tp>
 inline void Room<_Tp>::set_full_initial_door_input(){
+    if(!m_is_initial_door_output || !m_is_initial_door_input)
+        m_maze->add_initial_room(this);
+
     m_is_initial_door_input = true;
     if(m_initial_door_input == nullptr){
         m_initial_door_input = new _Tp(m_pave->get_position_typed());
@@ -586,6 +616,9 @@ inline void Room<_Tp>::set_full_initial_door_input(){
 
 template <typename _Tp>
 inline void Room<_Tp>::set_full_initial_door_output(){
+    if(!m_is_initial_door_output || !m_is_initial_door_input)
+        m_maze->add_initial_room(this);
+
     m_is_initial_door_output = true;
     if(m_initial_door_output == nullptr){
         m_initial_door_output = new _Tp(m_pave->get_position_typed());
