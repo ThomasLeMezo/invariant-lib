@@ -77,27 +77,30 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_B(&dom_B, &dyn_bwd);
     invariant::Maze<> maze_B_inner(&dom_B_inner, &dyn_bwd);
 
+    std::vector<Maze<>*> maze_outer_list{&maze_A, &maze_B};
+    std::vector<Maze<>*> maze_inner_list{&maze_A_inner, &maze_B_inner};
+
     dom_B.add_maze_inter(&maze_A);
     dom_A.add_maze_inter(&maze_B);
     dom_B_inner.add_maze_union(&maze_A_inner);
     dom_A_inner.add_maze_union(&maze_B_inner);
 
-    BooleanTreeInter<> bisection_outer(&maze_A, &maze_B);
-    BooleanTreeUnion<> bisection_inner(&maze_A_inner, &maze_B_inner);
+    BooleanTreeInter<> bisection_outer(maze_outer_list);
+    BooleanTreeUnion<> bisection_inner(maze_inner_list);
     BooleanTreeInter<> bisection_total(&bisection_outer, &bisection_inner);
     paving.set_bisection_tree(&bisection_total);
 
-    BooleanTreeInter<> tree_removing_inner(&maze_A_inner, &maze_B_inner);
+    BooleanTreeInter<> tree_removing_inner(maze_inner_list);
     maze_A_inner.set_boolean_tree_removing(&tree_removing_inner);
     maze_B_inner.set_boolean_tree_removing(&tree_removing_inner);
 
-    BooleanTreeUnion<> tree_removing_outer(&maze_A, &maze_B);
+    BooleanTreeUnion<> tree_removing_outer(maze_outer_list);
     maze_A.set_boolean_tree_removing(&tree_removing_outer);
     maze_B.set_boolean_tree_removing(&tree_removing_outer);
 
     double time_start = omp_get_wtime();
     //    omp_set_num_threads(1);
-    for(int i=0; i<18; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
         maze_A.contract();

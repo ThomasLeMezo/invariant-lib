@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     for(int i=0; i<15; i++){
         cout << i << endl;
         eulerian_maze.bisect();
-        eulerian_maze.contract(2);
+        eulerian_maze.contract(1);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

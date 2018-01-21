@@ -69,7 +69,7 @@ private:
     std::vector<ibex::Sep*> m_separator_list;
 
     SmartSubPaving<_Tp> *m_paving=nullptr;
-    std::array<Dynamics_Function*, 2> m_dyn_array;
+    std::vector<Dynamics_Function*> m_dyn_list;
 
     std::vector<Domain<_Tp>*> m_dom_list;
 
