@@ -103,7 +103,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
         }
 
     /// ************** BWD ************** ///
-    for(size_t i=1; i<nb_sep; i++){
+    for(size_t i=nb_sep-1; i>0; i--){
             // Outer
             invariant::Domain<> *dom_outer = new invariant::Domain<>(m_paving, FULL_WALL);
             dom_outer->set_border_path_in(false);
@@ -139,12 +139,12 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     for(size_t i=1; i<m_dom_outer_fwd_list.size(); i++){
         m_dom_outer_fwd_list[i]->add_maze_inter(m_maze_outer_fwd_list[i-1]);
     }
-    for(int i=0; i<(int)(m_dom_outer_bwd_list.size())-1; i++){
-        m_dom_outer_bwd_list[i]->add_maze_inter(m_maze_outer_bwd_list[i+1]);
+    for(size_t i=1; i<m_dom_outer_bwd_list.size(); i++){
+        m_dom_outer_bwd_list[i]->add_maze_inter(m_maze_outer_bwd_list[i-1]);
     }
     if(nb_sep>1){
-        m_dom_outer_bwd_list[nb_sep-2]->add_maze_inter(m_maze_outer_fwd_list[nb_sep-2]);
-        m_dom_outer_fwd_list[0]->add_maze_inter(m_maze_outer_bwd_list[0]);
+        m_dom_outer_bwd_list[0]->add_maze_inter(m_maze_outer_fwd_list[nb_sep-2]);
+        m_dom_outer_fwd_list[0]->add_maze_inter(m_maze_outer_bwd_list[nb_sep-2]);
     }
 
     /// ****** Inner Domain ******
@@ -160,7 +160,14 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
         }
     }
 
-    BooleanTreeInter<_Tp> *bisection_outer = new BooleanTreeInter<_Tp>(m_maze_outer_list);
+    std::vector<BooleanTree<_Tp> *> bisection_outer_binome;
+    size_t nb_maze_outer_fwd = m_dom_outer_fwd_list.size();
+    for(size_t i=0; i<nb_maze_outer_fwd; i++){
+        BooleanTreeInter<_Tp> *bisection_outer = new BooleanTreeInter<_Tp>(m_maze_outer_fwd_list[i], m_maze_outer_bwd_list[nb_maze_outer_fwd-i-1]); // Union of binome intersection
+        bisection_outer_binome.push_back(bisection_outer);
+    }
+
+    BooleanTreeUnion<_Tp> *bisection_outer = new BooleanTreeUnion<_Tp>(bisection_outer_binome);
     BooleanTreeUnion<_Tp> *bisection_inner = new BooleanTreeUnion<_Tp>(m_maze_inner_list);
     BooleanTreeInter<_Tp> *bisection_total = new BooleanTreeInter<_Tp>(bisection_outer, bisection_inner);
     m_paving->set_bisection_tree(bisection_total);
@@ -168,6 +175,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     m_boolean_tree_list.push_back(bisection_outer);
     m_boolean_tree_list.push_back(bisection_inner);
     m_boolean_tree_list.push_back(bisection_total);
+    m_boolean_tree_list.insert(m_boolean_tree_list.begin(), bisection_outer_binome.begin(), bisection_outer_binome.end());
 
     BooleanTreeInter<_Tp> *tree_removing_inner = new BooleanTreeInter<_Tp>(m_maze_inner_list);
     for(Maze<_Tp> *maze_inner:m_maze_inner_list)
@@ -188,17 +196,19 @@ void EulerianMaze<_Tp>::bisect(){
 
 template <typename _Tp>
 void EulerianMaze<_Tp>::contract(size_t nb_step){
-    for(size_t k=0; k<nb_step; k++){
         std::cout << " Outer Maze" << std::endl;
+        for(size_t k=0; k<nb_step; k++){
         for(Maze<_Tp> *maze_outer:m_maze_outer_list)
             maze_outer->contract();
+        }
         m_maze_outer_list[0]->contract(); // Loop constraint
 
         std::cout << " Inner Maze" << std::endl;
+        for(size_t k=0; k<nb_step; k++){
         for(Maze<_Tp> *maze_inner:m_maze_inner_list)
             maze_inner->contract();
+        }
         m_maze_inner_list[0]->contract(); // Loop constraint (?)
-    }
 }
 
 template <typename _Tp>

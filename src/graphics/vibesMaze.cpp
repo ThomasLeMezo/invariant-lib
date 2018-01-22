@@ -322,12 +322,15 @@ void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) co
     IntervalVector position(p->get_position());
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.0;
     invariant::RoomIBEX *r = p->get_rooms()[maze];
+    invariant::DYNAMICS_SENS sens = r->get_maze()->get_dynamics()->get_sens();
 
     const vector<IntervalVector> vector_fields = r->get_vector_fields();
     IntervalVector empty(2, ibex::Interval::EMPTY_SET);
 
     if(vector_fields.size()>0){
         for(IntervalVector r:vector_fields){
+//            if(sens == invariant::BWD)
+//                r=-r;
             if(r == empty)
                 vibes::drawBox(position[0].mid()+ibex::Interval(-size, +size), position[1].mid()+ibex::Interval(-size, +size), "black[gray]");
             else{

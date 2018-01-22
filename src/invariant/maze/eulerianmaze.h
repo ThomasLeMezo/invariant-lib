@@ -65,6 +65,12 @@ public:
      */
     Maze<_Tp> * get_maze_inner(size_t id);
 
+    /**
+     * @brief get_number_separators
+     * @return
+     */
+    size_t get_number_maze() const;
+
 private:
     std::vector<ibex::Sep*> m_separator_list;
 
@@ -90,6 +96,11 @@ private:
 
     std::vector<BooleanTree<_Tp>*> m_boolean_tree_list;
 };
+
+template<typename _Tp>
+size_t EulerianMaze<_Tp>::get_number_maze() const{
+    return m_maze_outer_list.size();
+}
 
 }
 
