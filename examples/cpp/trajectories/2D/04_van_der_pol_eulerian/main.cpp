@@ -30,24 +30,24 @@ int main(int argc, char *argv[])
 
     // Sep B
     IntervalVector box_B(2);
-    box_B[0] = ibex::Interval(1.0, 1.6);
+    box_B[0] = ibex::Interval(1.0, 1.45);
     box_B[1] = ibex::Interval(-0.2, 0);
     Function f_sep_B(x1, x2, Return(x1, x2));
     SepFwdBwd sep_B(f_sep_B, box_B);
 
     // Sep C
     IntervalVector box_C(2);
-    box_C[0] = ibex::Interval(0.6, 1.2);
-    box_C[1] = ibex::Interval(-1.6, -1);
+    box_C[0] = ibex::Interval(0.8, 1.2);
+    box_C[1] = ibex::Interval(-1.5, -1.1);
     Function f_sep_C(x1, x2, Return(x1, x2));
     SepFwdBwd sep_C(f_sep_C, box_C);
 
     // Eulerian
-    EulerianMaze<> eulerian_maze(space, &f, &sep_A, &sep_B, &sep_C);
+    EulerianMaze<> eulerian_maze(space, &f, &sep_A, &sep_B/*, &sep_C*/);
 
     double time_start = omp_get_wtime();
     //    omp_set_num_threads(1);
-    for(int i=0; i<11; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         eulerian_maze.bisect();
         eulerian_maze.contract(1);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     for(size_t i=0; i<eulerian_maze.get_number_maze(); i++){
         ostringstream name;
         name << "graph_" << i;
-        VibesMaze v_maze(name.str(), eulerian_maze.get_maze_outer(i), eulerian_maze.get_maze_inner(i));
+        VibesMaze v_maze(name.str()/*, eulerian_maze.get_maze_outer(i)*/, eulerian_maze.get_maze_inner(i));
         v_maze.setProperties(0, 0, 512, 512);
         v_maze.show();
 
