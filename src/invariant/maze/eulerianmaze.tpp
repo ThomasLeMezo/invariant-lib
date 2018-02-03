@@ -7,29 +7,33 @@
 namespace invariant {
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, bool copy_function){
     m_separator_list.push_back(sepA);
+    m_copy_function = copy_function;
     init_mazes(space, f_dyn);
 }
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, bool copy_function){
     m_separator_list.push_back(sepA);
     m_separator_list.push_back(sepB);
+    m_copy_function = copy_function;
     init_mazes(space, f_dyn);
 }
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC, bool copy_function){
     m_separator_list.push_back(sepA);
     m_separator_list.push_back(sepB);
     m_separator_list.push_back(sepC);
+    m_copy_function = copy_function;
     init_mazes(space, f_dyn);
 }
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list, bool copy_function){
     m_separator_list.insert(m_separator_list.end(), separator_list.begin(), separator_list.end());
+    m_copy_function = copy_function;
     init_mazes(space, f_dyn);
 }
 
@@ -72,13 +76,17 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     /// ************** FWD ************** ///
     for(size_t i=0; i<(size_t)std::max((int)nb_sep-1, 1); i++){
             // Outer
-            invariant::Domain<> *dom_outer = new invariant::Domain<>(m_paving, FULL_WALL);
+            invariant::Domain<_Tp> *dom_outer = new invariant::Domain<_Tp>(m_paving, FULL_WALL);
             dom_outer->set_border_path_in(false);
             dom_outer->set_border_path_out(false);
             dom_outer->set_sep_input(m_separator_list[i]);
             m_dom_list.push_back(dom_outer);
             m_dom_outer_fwd_list.push_back(dom_outer);
-            ibex::Function *f1 = new ibex::Function(*f_dyn);
+            ibex::Function *f1;
+            if(m_copy_function)
+                f1 = new ibex::Function(*f_dyn);
+            else
+                f1=f_dyn;
             Dynamics_Function *dyn1 = new Dynamics_Function(f1, FWD);
             m_dyn_list.push_back(dyn1);
             invariant::Maze<_Tp> *maze_outer_fwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
@@ -86,7 +94,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             m_maze_outer_fwd_list.push_back(maze_outer_fwd);
 
             // Inner
-            invariant::Domain<> *dom_inner = new invariant::Domain<>(m_paving, FULL_DOOR);
+            invariant::Domain<_Tp> *dom_inner = new invariant::Domain<_Tp>(m_paving, FULL_DOOR);
             dom_inner->set_border_path_in(true);
             dom_inner->set_border_path_out(true);
             ibex::SepNot *sepNot = new ibex::SepNot(*m_separator_list[i]);
@@ -94,7 +102,11 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             dom_inner->set_sep_input(sepNot);
             m_dom_list.push_back(dom_inner);
             m_dom_inner_fwd_list.push_back(dom_inner);
-            ibex::Function *f2 = new ibex::Function(*f_dyn);
+            ibex::Function *f2;
+            if(m_copy_function)
+                f2 = new ibex::Function(*f_dyn);
+            else
+                f2=f_dyn;
             Dynamics_Function *dyn2 = new Dynamics_Function(f2, FWD);
             m_dyn_list.push_back(dyn2);
             invariant::Maze<_Tp> *maze_inner_fwd = new invariant::Maze<_Tp>(dom_inner, dyn2);
@@ -105,13 +117,17 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     /// ************** BWD ************** ///
     for(size_t i=nb_sep-1; i>0; i--){
             // Outer
-            invariant::Domain<> *dom_outer = new invariant::Domain<>(m_paving, FULL_WALL);
+            invariant::Domain<_Tp> *dom_outer = new invariant::Domain<_Tp>(m_paving, FULL_WALL);
             dom_outer->set_border_path_in(false);
             dom_outer->set_border_path_out(false);
             dom_outer->set_sep_output(m_separator_list[i]);
             m_dom_list.push_back(dom_outer);
             m_dom_outer_bwd_list.push_back(dom_outer);
-            ibex::Function *f1 = new ibex::Function(*f_dyn);
+            ibex::Function *f1;
+            if(m_copy_function)
+                f1 = new ibex::Function(*f_dyn);
+            else
+                f1=f_dyn;
             Dynamics_Function *dyn1 = new Dynamics_Function(f1, BWD);
             m_dyn_list.push_back(dyn1);
             invariant::Maze<_Tp> *maze_outer_bwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
@@ -119,7 +135,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             m_maze_outer_bwd_list.push_back(maze_outer_bwd);
 
             // Inner
-            invariant::Domain<> *dom_inner = new invariant::Domain<>(m_paving, FULL_DOOR);
+            invariant::Domain<_Tp> *dom_inner = new invariant::Domain<_Tp>(m_paving, FULL_DOOR);
             dom_inner->set_border_path_in(true);
             dom_inner->set_border_path_out(true);
             ibex::SepNot *sepNot = new ibex::SepNot(*(m_separator_list[i]));
@@ -127,7 +143,11 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             dom_inner->set_sep_output(sepNot);
             m_dom_list.push_back(dom_inner);
             m_dom_inner_bwd_list.push_back(dom_inner);
-            ibex::Function *f2 = new ibex::Function(*f_dyn);
+            ibex::Function *f2;
+            if(m_copy_function)
+                f2 = new ibex::Function(*f_dyn);
+            else
+                f2=f_dyn;
             Dynamics_Function *dyn2 = new Dynamics_Function(f2, BWD);
             m_dyn_list.push_back(dyn2);
             invariant::Maze<_Tp> *maze_inner_bwd = new invariant::Maze<_Tp>(dom_inner, dyn2);

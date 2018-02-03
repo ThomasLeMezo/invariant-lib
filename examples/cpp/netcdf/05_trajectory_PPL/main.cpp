@@ -17,17 +17,17 @@ using namespace ibex;
 int main(int argc, char *argv[])
 {
     // ****** Dynamics *******
-//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
 //    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
-    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_15_01_18.xml");
+//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_15_01_18.xml");
 
     array<array<size_t, 2>, 2> grid_limits; // X, Y limit data loading
     grid_limits[0][0] = 80; grid_limits[0][1] = 280; // max = 584
     grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
 
     double time_start_PM = omp_get_wtime();
-//    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
+    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
+//    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
     Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
 
     // ****** Domain *******
@@ -77,8 +77,8 @@ int main(int argc, char *argv[])
     int factor_door = 2;
     maze.set_enable_contract_vector_field(true);
 
-    paving.set_enable_bisection_strategy(0, BISECTION_LB);
-    paving.set_bisection_strategy_slice(0, 900*3);
+//    paving.set_enable_bisection_strategy(0, BISECTION_LB);
+//    paving.set_bisection_strategy_slice(0, 900*3);
 
     for(int i=0; i<30; i++){
         std::time_t t_now = std::time(nullptr);

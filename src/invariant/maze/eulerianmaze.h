@@ -34,10 +34,10 @@ public:
      * @param f_dyn
      * @param sepA
      */
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA);
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB);
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC);
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list, bool copy_function=true);
 
     ~EulerianMaze();
 
@@ -66,10 +66,28 @@ public:
     Maze<_Tp> * get_maze_inner(size_t id);
 
     /**
+     * @brief get_maze_inner
+     * @return
+     */
+    std::vector<Maze<_Tp>*> get_maze_inner();
+
+    /**
+     * @brief get_maze_outer
+     * @return
+     */
+    std::vector<Maze<_Tp>*> get_maze_outer();
+
+    /**
      * @brief get_number_separators
      * @return
      */
     size_t get_number_maze() const;
+
+    /**
+     * @brief get_paving
+     * @return
+     */
+    SmartSubPaving<_Tp> * get_paving();
 
 private:
     std::vector<ibex::Sep*> m_separator_list;
@@ -95,11 +113,28 @@ private:
     std::vector<ibex::Sep*> m_sep_not_list;
 
     std::vector<BooleanTree<_Tp>*> m_boolean_tree_list;
+
+    bool m_copy_function = true;
 };
 
 template<typename _Tp>
 size_t EulerianMaze<_Tp>::get_number_maze() const{
     return m_maze_outer_list.size();
+}
+
+template<typename _Tp>
+SmartSubPaving<_Tp>* EulerianMaze<_Tp>::get_paving(){
+    return m_paving;
+}
+
+template<typename _Tp>
+std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer(){
+    return m_maze_outer_list;
+}
+
+template<typename _Tp>
+std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_inner(){
+    return m_maze_inner_list;
 }
 
 }

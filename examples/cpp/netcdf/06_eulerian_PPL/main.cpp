@@ -5,6 +5,7 @@
 #include "maze.h"
 #include <ibex.h>
 #include <math.h>
+#include "eulerianmaze.h"
 
 #include "vtkMaze3D.h"
 #include "vtkmazeppl.h"
@@ -29,23 +30,12 @@ int main(int argc, char *argv[])
 //    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
     PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
-    Dynamics_Function dyn_A = Dynamics_Function(&pm3d, FWD);
-    Dynamics_Function dyn_B = Dynamics_Function(&pm3d, BWD);
-
     // ****** Domain ******* //
     IntervalVector search_space(3);
     search_space = pm3d.get_search_space();
     cout << "Search_space = " << search_space << endl;
 
-    invariant::SmartSubPavingPPL paving(search_space);
-    const std::vector<double> limit_bisection = {15*60-1, 250-1, 250-1};
-    paving.set_limit_bisection(limit_bisection);
-
     // ** A ** //
-    invariant::DomainPPL dom_A(&paving, FULL_WALL);
-    dom_A.set_border_path_in(false);
-    dom_A.set_border_path_out(false);
-
     double t_c, x_c, y_c, r_spatial, r_time;
     t_c = search_space[0].lb();
     x_c = 137 * pm3d.get_grid_conversion(1);
@@ -58,88 +48,50 @@ int main(int argc, char *argv[])
     initial_condition[1] = ibex::Interval(x_c-r_spatial, x_c+r_spatial);
     initial_condition[2] = ibex::Interval(y_c-r_spatial, y_c+r_spatial);
     SepFwdBwd s_A(f_id, initial_condition);
-    dom_A.set_sep_input(&s_A);
 
     // ** B ** //
-    invariant::DomainPPL dom_B(&paving, FULL_WALL);
-    dom_B.set_border_path_in(false);
-    dom_B.set_border_path_out(false);
     t_c = search_space[0].ub();
     initial_condition[0] = ibex::Interval(t_c-r_time, t_c+r_time);
     SepFwdBwd s_B(f_id, initial_condition);
-    dom_B.set_sep_output(&s_B);
 
-    // ******* Maze *********
-    invariant::MazePPL maze_A(&dom_A, &dyn_A);
-    invariant::MazePPL maze_B(&dom_B, &dyn_B);
-    cout << "Domain = " << search_space << endl;
+    EulerianMazePPL eulerian_maze(search_space, &pm3d, &s_A, &s_B, false);
+
+    // Paving bisection strategy
+    const std::vector<double> limit_bisection = {15*60-1, 250-1, 250-1};
+    eulerian_maze.get_paving()->set_limit_bisection(limit_bisection);
+    eulerian_maze.get_paving()->set_enable_bisection_strategy(0, BISECTION_LB_UB);
+    eulerian_maze.get_paving()->set_bisection_strategy_slice(0, 900*5); // 3?
+
+    //Maze contraction strategy
+    for(MazePPL* maze:eulerian_maze.get_maze_outer()){
+        maze->set_widening_limit(5); // 10 ?
+        maze->set_enable_contraction_limit(true);
+        maze->set_enable_contract_vector_field(true);
+    }
+    for(MazePPL* maze:eulerian_maze.get_maze_inner()){
+        maze->set_enable_contraction_limit(true);
+        maze->set_contraction_limit(5); // 15 ?
+        maze->set_enable_contract_vector_field(true);
+    }
 
     double time_start = omp_get_wtime();
-    VtkMazePPL vtkMazePPL_A("PrevimerPPL_eulerian_A");
+//    VtkMazePPL vtkMazePPL_A("PrevimerPPL_eulerian_A");
     VtkMazePPL vtkMazePPL_B("PrevimerPPL_eulerian_B");
-    VtkMazePPL vtkMazePPL_A_bis("PrevimerPPL_eulerian_A_bis");
-//    omp_set_num_threads(1);
+    VtkMazePPL vtkMazePPL_B_inner("PrevimerPPL_eulerian_B_inner");
 
-    maze_A.set_widening_limit(10);
-    maze_A.set_enable_contraction_limit(true);
-    maze_A.set_contraction_limit(15);
-
-    maze_B.set_widening_limit(10);
-    maze_B.set_enable_contraction_limit(true);
-    maze_B.set_contraction_limit(15);
-    int factor_door = 2;
-
-//    dom_B.add_maze_inter(&maze_A);
-//    dom_A.add_maze_inter(&maze_B);
-
-    paving.set_enable_bisection_strategy(0, BISECTION_LB);
-    paving.set_bisection_strategy_slice(0, 900*3);
-
-    for(int i=0; i<2; i++){
+    //    omp_set_num_threads(1);
+    for(int i=0; i<30; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
-        paving.bisect();
+        eulerian_maze.bisect();
+        eulerian_maze.contract(1);
 
-        // A
-        maze_A.get_domain()->set_init(FULL_WALL);
-        maze_A.set_enable_contract_domain(true);
-        maze_A.contract();
-
-        maze_A.get_domain()->set_init(FULL_DOOR);
-        maze_A.reset_nb_operations();
-        maze_A.set_enable_contract_domain(false);
-        maze_A.contract(paving.size_active()*factor_door);
-
-        vtkMazePPL_A.show_maze(&maze_A);
-
-        // B
-        maze_B.get_domain()->set_init(FULL_WALL);
-        maze_B.set_enable_contract_domain(true);
-        maze_B.contract();
-
-        maze_B.get_domain()->set_init(FULL_DOOR);
-        maze_B.reset_nb_operations();
-        maze_B.set_enable_contract_domain(false);
-        maze_B.contract(paving.size_active()*factor_door);
-
-        vtkMazePPL_B.show_maze(&maze_B);
-
-        // A
-        maze_A.reset_nb_operations();
-        maze_A.get_domain()->set_init(FULL_WALL);
-        maze_A.set_enable_contract_domain(true);
-        maze_A.contract();
-
-        maze_A.get_domain()->set_init(FULL_DOOR);
-        maze_A.reset_nb_operations();
-        maze_A.set_enable_contract_domain(false);
-        maze_A.contract(paving.size_active()*factor_door);
-
-        vtkMazePPL_A_bis.show_maze(&maze_A);
-
+//        vtkMazePPL_A.show_maze(eulerian_maze.get_maze_outer(0));
+        vtkMazePPL_B.show_maze(eulerian_maze.get_maze_outer(1));
+        vtkMazePPL_B_inner.show_maze(eulerian_maze.get_maze_inner(1));
     }
+
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
-    cout << paving << endl;
 
 //    IntervalVector position(3);
 //    position[0] = ibex::Interval(5405); // 450, 900

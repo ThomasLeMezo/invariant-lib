@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
     vector<double> ratio_bisection1 = {8.0, 8.0, 1.0};
     vector<double> ratio_bisection2 = {1.0, 1.0, 1.0};
     paving.set_ratio_bisection(ratio_bisection1);
+    paving.set_enable_bisection_strategy(2, BISECTION_LB);
+    paving.set_bisection_strategy_slice(2, 0.1);
 
     IntervalVector bounding_box(3);
     bounding_box[0] = ibex::Interval(-2, 4);
@@ -86,8 +88,7 @@ int main(int argc, char *argv[])
 
         if(maze_outer.get_bounding_box().is_interior_subset(bounding_box)){
             paving.set_ratio_bisection(ratio_bisection2);
-            paving.set_enable_bisection_strategy(2, true);
-            paving.set_bisection_strategy_slice(2, 0.1);
+            paving.set_enable_bisection_strategy(2, BISECTION_STANDARD);
         }
 
         cout << " - paving = " << paving.size() << endl;

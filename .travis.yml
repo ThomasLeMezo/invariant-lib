@@ -10,7 +10,7 @@ matrix:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
         packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, libnetcdf-dev]
-  - os: linux
+  - os: linu
     language: python
     env: PYTHON=3.4 CPP_VERSION=11 GCC=4.8
     python: "3.4"

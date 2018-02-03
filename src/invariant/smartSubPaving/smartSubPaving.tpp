@@ -251,6 +251,16 @@ std::pair<ibex::IntervalVector, ibex::IntervalVector> SmartSubPaving<_Tp>::bisec
         p1[dim_max] = ibex::Interval(position[dim_max].lb(), position[dim_max].ub()-m_bisection_strategy_slice[dim_max]);
         p2[dim_max] = ibex::Interval(position[dim_max].ub()-m_bisection_strategy_slice[dim_max], position[dim_max].ub());
     }
+    else if(m_bisection_strategy[dim_max]==BISECTION_LB_UB && position[dim_max].diam()>2*m_bisection_strategy_slice[dim_max]){
+        if(position[dim_max].mid()-m_position[dim_max].lb()>m_position[dim_max].ub()-position[dim_max].mid()){
+            p1[dim_max] = ibex::Interval(position[dim_max].lb(), position[dim_max].ub()-m_bisection_strategy_slice[dim_max]);
+            p2[dim_max] = ibex::Interval(position[dim_max].ub()-m_bisection_strategy_slice[dim_max], position[dim_max].ub());
+        }
+        else{
+            p1[dim_max] = ibex::Interval(position[dim_max].lb(), position[dim_max].lb()+m_bisection_strategy_slice[dim_max]);
+            p2[dim_max] = ibex::Interval(position[dim_max].lb()+m_bisection_strategy_slice[dim_max], position[dim_max].ub());
+        }
+    }
     else{
         p1[dim_max] = ibex::Interval(position[dim_max].lb(), position[dim_max].mid());
         p2[dim_max] = ibex::Interval(position[dim_max].mid(), position[dim_max].ub());
