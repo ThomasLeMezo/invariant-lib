@@ -215,7 +215,7 @@ protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
     std::vector<Pave<_Tp>*>         m_paves; // Paves of the SmartSubPaving
-    std::vector<Pave<_Tp>*>         m_paves_not_bisectable; // Paves of the SmartSubPaving
+    std::vector<Pave<_Tp>*>         m_paves_removed; // Paves of the SmartSubPaving
     mutable unsigned char           m_dim = 0; // Dimension of the space
     mutable Pave_node<_Tp>*         m_tree = nullptr; // Root of the pave node tree
 
@@ -253,12 +253,12 @@ inline Pave_node<_Tp>* SmartSubPaving<_Tp>::get_tree() const{
 
 template<typename _Tp>
 inline const std::vector<Pave<_Tp> *> &SmartSubPaving<_Tp>::get_paves_not_bisectable() const{
-    return m_paves_not_bisectable;
+    return m_paves_removed;
 }
 
 template<typename _Tp>
 inline const size_t SmartSubPaving<_Tp>::size() const{
-    return m_paves.size() + m_paves_not_bisectable.size();
+    return m_paves.size() + m_paves_removed.size();
 }
 
 template<typename _Tp>

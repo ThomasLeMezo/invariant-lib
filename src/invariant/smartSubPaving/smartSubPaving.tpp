@@ -15,7 +15,7 @@ SmartSubPaving<_Tp>::SmartSubPaving(const ibex::IntervalVector &space):
     // Analyze faces (border)
     for(Pave<_Tp> *p:m_paves)
         p->analyze_border();
-    for(Pave<_Tp> *p:m_paves_not_bisectable)
+    for(Pave<_Tp> *p:m_paves_removed)
         p->analyze_border();
 
     // Root of the pave node tree
@@ -122,6 +122,7 @@ void SmartSubPaving<_Tp>::bisect(){
 #pragma omp for
         for(size_t i = 0; i<bisectable_paves.size(); i++){
             Pave<_Tp> *p = bisectable_paves[i];
+
             if((m_bisection_tree==nullptr && p->request_bisection())
                || (m_bisection_tree!=nullptr && m_bisection_tree->eval_bisection(p))){
                 if(p->bisect_step_one()){
@@ -136,7 +137,7 @@ void SmartSubPaving<_Tp>::bisect(){
                 if(all_removed){ // Store not bisectable paves (for all mazes)
 #pragma omp critical
                     {
-                        m_paves_not_bisectable.push_back(p);
+                        m_paves_removed.push_back(p);
                     }
                 }
                 else{
@@ -188,7 +189,7 @@ void SmartSubPaving<_Tp>::bisect_monothread(){
         else{
             // Store not bisectable paves
             p->set_removed_rooms();
-            m_paves_not_bisectable.push_back(p);
+            m_paves_removed.push_back(p);
         }
     }
 
@@ -220,13 +221,8 @@ std::pair<ibex::IntervalVector, ibex::IntervalVector> SmartSubPaving<_Tp>::bisec
             possible_dim.push_back(true);
             one_possible = true;
         }
-        else{
+        else
             possible_dim.push_back(false);
-        }
-    }
-    if(!one_possible){ // If no-one possible make all possible
-        for(int dim=0; dim<m_dim; dim++)
-            possible_dim[dim] = true;
     }
 
     // Find largest dimension
@@ -235,7 +231,7 @@ std::pair<ibex::IntervalVector, ibex::IntervalVector> SmartSubPaving<_Tp>::bisec
     double max = 0;
     for(int i=0; i<m_dim; i++){
         double test = diam[i]*m_ratio_dimension[i];
-        if((max<test) & (possible_dim[i])){
+        if((max<test) & (possible_dim[i] || !one_possible)){
             max = test;
             dim_max = i;
         }

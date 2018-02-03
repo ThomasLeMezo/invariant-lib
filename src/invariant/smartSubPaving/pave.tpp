@@ -212,6 +212,7 @@ bool Pave<_Tp>::bisect_step_one(){
             Room<_Tp> *r = (it->second);
             if(!r->is_removed()){
                 r->reset();
+                r->set_father_hull(r->get_father_hull() & r->get_hull_typed());
             }
         }
         m_subpaving->add_paves(this);

@@ -67,6 +67,16 @@ inline void Room<_Tp>::reset(){
         Door<_Tp> *d = f->get_doors()[m_maze];
         d->reset();
     }
+
+    // Vector field reset
+    m_vector_fields.clear();
+    m_vector_fields_d1.clear();
+    m_vector_fields_typed_bwd.clear();
+    m_vector_fields_typed_fwd.clear();
+    m_vector_field_zero.clear();
+    m_contract_vector_field = true;
+    compute_vector_field();
+    compute_vector_field_typed();
 }
 
 template<typename _Tp>
@@ -207,6 +217,7 @@ void Room<_Tp>::contract_vector_field(){
                     v_bool_in[i] |= ibex::Interval(0);
             }
 
+            // Possible IN
             if((f->get_orientation() & v_bool_in).is_empty()){
                 d->push_back_possible_in(false);
                 if(!zero.is_subset(v) && domain_init == FULL_DOOR)
@@ -215,6 +226,7 @@ void Room<_Tp>::contract_vector_field(){
             else
                 d->push_back_possible_in(true);
 
+            // Possible OUT
             if((f->get_orientation() & v_bool_out).is_empty()){
                 d->push_back_possible_out(false);
                 if(!zero.is_subset(v) && domain_init == FULL_DOOR)
@@ -472,7 +484,6 @@ void Room<_Tp>::contract_consistency(){
 
                     if(m_is_father_hull) // For father hull
                         door_out_iv &= *m_father_hull;
-                    //                    door_out_iv &= door->get_face()->get_position_typed();
 
                     door->set_output_private(door_out_iv);
                 }
@@ -495,7 +506,6 @@ void Room<_Tp>::contract_consistency(){
 
                     if(m_is_father_hull) // For father hull
                         door_in_iv &= *m_father_hull;
-                    //                    door_in_iv &= door->get_face()->get_position_typed();
 
                     door->set_input_private(door_in_iv);
                 }
@@ -751,6 +761,7 @@ template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
     bool change = false;
+//    get_private_doors_info("before removed");
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
         if(m_contract_vector_field){
@@ -780,12 +791,23 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() != FULL_DOOR)
+    if(m_maze->get_domain()->get_init() != FULL_WALL)
         return false;
 
-    ibex::IntervalVector position(2);
-    position[0] = ibex::Interval(-2.078125, -1.78125);
-    position[1] = ibex::Interval(3.328125, 3.625);
+//    ibex::IntervalVector position(2);
+//    position[0] = ibex::Interval(-2.078125, -1.78125);
+//    position[1] = ibex::Interval(3.328125, 3.625);
+
+    ibex::IntervalVector position(3);
+    position[0] = ibex::Interval(0, 450);
+    position[1] = ibex::Interval(45976.5625, 46074.21875);
+    position[2] = ibex::Interval(125566.40625, 125664.0625);
+
+//    ibex::IntervalVector position(3);
+//    position[0] = ibex::Interval(0, 450);
+//    position[1] = ibex::Interval(45976.5625, 46074.21875);
+//    position[2] = ibex::Interval(125468.75, 125566.40625);
+
     //    position[2] = ibex::Interval(126250, 127812.5);
     //    ibex::IntervalVector position2(2);
     //    position2[0] = Interval(0.75, 1.5);
