@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     initial_condition[2] = ibex::Interval(y_c-r_spatial, y_c+r_spatial);
     SepFwdBwd s_C(f_id, initial_condition);
 
-    EulerianMazePPL eulerian_maze(search_space, &pm3d, /*&s_A,*/ &s_C, &s_B, false, false);
+    EulerianMazePPL eulerian_maze(search_space, &pm3d, &s_A, &s_C, &s_B, false, false);
 
     // Paving bisection strategy
     const std::vector<double> limit_bisection = {5*60, 250.0/4.0, 250.0/4.0};
@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
         vtkMazePPL_A.show_maze(eulerian_maze.get_maze_outer(0));
         vtkMazePPL_A.show_subpaving(eulerian_maze.get_maze_outer(0));
         vtkMazePPL_C_FWD.show_maze(eulerian_maze.get_maze_outer(1));
-//        vtkMazePPL_B.show_maze(eulerian_maze.get_maze_outer(2));
-//        vtkMazePPL_C_BWD.show_maze(eulerian_maze.get_maze_outer(3));
+        vtkMazePPL_B.show_maze(eulerian_maze.get_maze_outer(2));
+        vtkMazePPL_C_BWD.show_maze(eulerian_maze.get_maze_outer(3));
 //        vtkMazePPL_B_inner.show_maze(eulerian_maze.get_maze_inner(1));
     }
 
