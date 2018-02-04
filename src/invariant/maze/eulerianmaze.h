@@ -34,10 +34,10 @@ public:
      * @param f_dyn
      * @param sepA
      */
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, bool copy_function=true);
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, bool copy_function=true);
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC, bool copy_function=true);
-    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, bool with_inner=true, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, bool with_inner=true, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC, bool with_inner=true, bool copy_function=true);
+    EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list, bool with_inner=true, bool copy_function=true);
 
     ~EulerianMaze();
 
@@ -115,6 +115,7 @@ private:
     std::vector<BooleanTree<_Tp>*> m_boolean_tree_list;
 
     bool m_copy_function = true;
+    bool m_with_inner = true;
 };
 
 template<typename _Tp>

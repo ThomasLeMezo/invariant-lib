@@ -34,8 +34,8 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
             Room<_Tp> *r = p->get_rooms()[maze];
             if(!r->is_removed()){
-//                if(m_domain_init == FULL_DOOR) // Not necessary
-//                    r->set_full_private_with_father();
+                //                if(m_domain_init == FULL_DOOR) // Not necessary
+                //                    r->set_full_private_with_father();
                 if(m_domain_init == FULL_WALL)
                     r->set_empty_private();
                 r->reset_first_contract();
@@ -341,12 +341,15 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
             if(!r->is_removed() && r->is_father_hull()){
                 Pave<_Tp> *p = r->get_pave();
                 Room<_Tp> *r_inter = p->get_rooms()[maze_inter];
-                if(maze_inter->get_contract_once()){
-                    r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
-                }
-                else{
-                    if(r_inter->is_father_hull())
-                        r->set_father_hull(r->get_father_hull() & r_inter->get_father_hull());
+
+                if(!r_inter->is_initial_door_input() && !r_inter->is_initial_door_output()){ // Cause a bug if no condition
+                    if(maze_inter->get_contract_once()){
+                        r->set_father_hull(r->get_father_hull() & r_inter->get_hull_typed());
+                    }
+                    else{
+                        if(r_inter->is_father_hull())
+                            r->set_father_hull(r->get_father_hull() & r_inter->get_father_hull());
+                    }
                 }
             }
         }
@@ -360,8 +363,8 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
 
     if(maze->get_domain()->get_init()==FULL_DOOR){
         std::vector<Room<_Tp> *> room_list;
-            m_subpaving->get_tree()->get_all_child_rooms_not_empty_private(room_list, maze);
-//        m_subpaving->get_tree()->get_all_child_rooms(room_list, maze);
+        m_subpaving->get_tree()->get_all_child_rooms_not_empty_private(room_list, maze);
+        //        m_subpaving->get_tree()->get_all_child_rooms(room_list, maze);
         for(Maze<_Tp> *maze_union:m_maze_list_union){
             if(maze_union->get_contract_once()){
                 for(size_t i=0; i<room_list.size(); i++){

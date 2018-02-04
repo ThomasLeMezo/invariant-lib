@@ -7,33 +7,37 @@
 namespace invariant {
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, bool copy_function){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, bool with_inner, bool copy_function){
     m_separator_list.push_back(sepA);
     m_copy_function = copy_function;
+    m_with_inner = with_inner;
     init_mazes(space, f_dyn);
 }
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, bool copy_function){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, bool with_inner, bool copy_function){
     m_separator_list.push_back(sepA);
     m_separator_list.push_back(sepB);
     m_copy_function = copy_function;
+    m_with_inner = with_inner;
     init_mazes(space, f_dyn);
 }
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC, bool copy_function){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, ibex::Sep* sepA, ibex::Sep* sepB, ibex::Sep* sepC, bool with_inner, bool copy_function){
     m_separator_list.push_back(sepA);
     m_separator_list.push_back(sepB);
     m_separator_list.push_back(sepC);
     m_copy_function = copy_function;
+    m_with_inner = with_inner;
     init_mazes(space, f_dyn);
 }
 
 template <typename _Tp>
-EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list, bool copy_function){
+EulerianMaze<_Tp>::EulerianMaze(const ibex::IntervalVector &space, ibex::Function *f_dyn, const std::vector<ibex::Sep*> &separator_list, bool with_inner, bool copy_function){
     m_separator_list.insert(m_separator_list.end(), separator_list.begin(), separator_list.end());
     m_copy_function = copy_function;
+    m_with_inner = with_inner;
     init_mazes(space, f_dyn);
 }
 
@@ -75,25 +79,26 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
 
     /// ************** FWD ************** ///
     for(size_t i=0; i<(size_t)std::max((int)nb_sep-1, 1); i++){
-            // Outer
-            invariant::Domain<_Tp> *dom_outer = new invariant::Domain<_Tp>(m_paving, FULL_WALL);
-            dom_outer->set_border_path_in(false);
-            dom_outer->set_border_path_out(false);
-            dom_outer->set_sep_input(m_separator_list[i]);
-            m_dom_list.push_back(dom_outer);
-            m_dom_outer_fwd_list.push_back(dom_outer);
-            ibex::Function *f1;
-            if(m_copy_function)
-                f1 = new ibex::Function(*f_dyn);
-            else
-                f1=f_dyn;
-            Dynamics_Function *dyn1 = new Dynamics_Function(f1, FWD);
-            m_dyn_list.push_back(dyn1);
-            invariant::Maze<_Tp> *maze_outer_fwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
-            m_maze_outer_list.push_back(maze_outer_fwd);
-            m_maze_outer_fwd_list.push_back(maze_outer_fwd);
+        // Outer
+        invariant::Domain<_Tp> *dom_outer = new invariant::Domain<_Tp>(m_paving, FULL_WALL);
+        dom_outer->set_border_path_in(false);
+        dom_outer->set_border_path_out(false);
+        dom_outer->set_sep_input(m_separator_list[i]);
+        m_dom_list.push_back(dom_outer);
+        m_dom_outer_fwd_list.push_back(dom_outer);
+        ibex::Function *f1;
+        if(m_copy_function)
+            f1 = new ibex::Function(*f_dyn);
+        else
+            f1=f_dyn;
+        Dynamics_Function *dyn1 = new Dynamics_Function(f1, FWD);
+        m_dyn_list.push_back(dyn1);
+        invariant::Maze<_Tp> *maze_outer_fwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
+        m_maze_outer_list.push_back(maze_outer_fwd);
+        m_maze_outer_fwd_list.push_back(maze_outer_fwd);
 
-            // Inner
+        // Inner
+        if(m_with_inner){
             invariant::Domain<_Tp> *dom_inner = new invariant::Domain<_Tp>(m_paving, FULL_DOOR);
             dom_inner->set_border_path_in(true);
             dom_inner->set_border_path_out(true);
@@ -113,28 +118,30 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             m_maze_inner_list.push_back(maze_inner_fwd);
             m_maze_inner_fwd_list.push_back(maze_inner_fwd);
         }
+    }
 
     /// ************** BWD ************** ///
     for(size_t i=nb_sep-1; i>0; i--){
-            // Outer
-            invariant::Domain<_Tp> *dom_outer = new invariant::Domain<_Tp>(m_paving, FULL_WALL);
-            dom_outer->set_border_path_in(false);
-            dom_outer->set_border_path_out(false);
-            dom_outer->set_sep_output(m_separator_list[i]);
-            m_dom_list.push_back(dom_outer);
-            m_dom_outer_bwd_list.push_back(dom_outer);
-            ibex::Function *f1;
-            if(m_copy_function)
-                f1 = new ibex::Function(*f_dyn);
-            else
-                f1=f_dyn;
-            Dynamics_Function *dyn1 = new Dynamics_Function(f1, BWD);
-            m_dyn_list.push_back(dyn1);
-            invariant::Maze<_Tp> *maze_outer_bwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
-            m_maze_outer_list.push_back(maze_outer_bwd);
-            m_maze_outer_bwd_list.push_back(maze_outer_bwd);
+        // Outer
+        invariant::Domain<_Tp> *dom_outer = new invariant::Domain<_Tp>(m_paving, FULL_WALL);
+        dom_outer->set_border_path_in(false);
+        dom_outer->set_border_path_out(false);
+        dom_outer->set_sep_output(m_separator_list[i]);
+        m_dom_list.push_back(dom_outer);
+        m_dom_outer_bwd_list.push_back(dom_outer);
+        ibex::Function *f1;
+        if(m_copy_function)
+            f1 = new ibex::Function(*f_dyn);
+        else
+            f1=f_dyn;
+        Dynamics_Function *dyn1 = new Dynamics_Function(f1, BWD);
+        m_dyn_list.push_back(dyn1);
+        invariant::Maze<_Tp> *maze_outer_bwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
+        m_maze_outer_list.push_back(maze_outer_bwd);
+        m_maze_outer_bwd_list.push_back(maze_outer_bwd);
 
-            // Inner
+        // Inner
+        if(m_with_inner){
             invariant::Domain<_Tp> *dom_inner = new invariant::Domain<_Tp>(m_paving, FULL_DOOR);
             dom_inner->set_border_path_in(true);
             dom_inner->set_border_path_out(true);
@@ -153,6 +160,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             invariant::Maze<_Tp> *maze_inner_bwd = new invariant::Maze<_Tp>(dom_inner, dyn2);
             m_maze_inner_list.push_back(maze_inner_bwd);
             m_maze_inner_bwd_list.push_back(maze_inner_bwd);
+        }
     }
 
     /// ****** Outer Domain ******
@@ -168,14 +176,16 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     }
 
     /// ****** Inner Domain ******
-    for(size_t i=0; i<nb_sep-1; i++){ // ToDo: improve ?
-        m_dom_inner_fwd_list[i]->add_maze_union(m_maze_inner_bwd_list);
-        m_dom_inner_bwd_list[i]->add_maze_union(m_maze_inner_fwd_list);
+    if(m_with_inner){
+        for(size_t i=0; i<nb_sep-1; i++){ // ToDo: improve ?
+            m_dom_inner_fwd_list[i]->add_maze_union(m_maze_inner_bwd_list);
+            m_dom_inner_bwd_list[i]->add_maze_union(m_maze_inner_fwd_list);
 
-        for(size_t k=0; k<nb_sep-1; k++){
-            if(i!=k){
-                m_dom_inner_fwd_list[i]->add_maze_union(m_maze_inner_fwd_list[k]);
-                m_dom_inner_bwd_list[i]->add_maze_union(m_maze_inner_bwd_list[k]);
+            for(size_t k=0; k<nb_sep-1; k++){
+                if(i!=k){
+                    m_dom_inner_fwd_list[i]->add_maze_union(m_maze_inner_fwd_list[k]);
+                    m_dom_inner_bwd_list[i]->add_maze_union(m_maze_inner_bwd_list[k]);
+                }
             }
         }
     }
@@ -188,19 +198,26 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     }
 
     BooleanTreeUnion<_Tp> *bisection_outer = new BooleanTreeUnion<_Tp>(bisection_outer_binome);
-    BooleanTreeUnion<_Tp> *bisection_inner = new BooleanTreeUnion<_Tp>(m_maze_inner_list);
-    BooleanTreeInter<_Tp> *bisection_total = new BooleanTreeInter<_Tp>(bisection_outer, bisection_inner);
-    m_paving->set_bisection_tree(bisection_total);
-
     m_boolean_tree_list.push_back(bisection_outer);
-    m_boolean_tree_list.push_back(bisection_inner);
-    m_boolean_tree_list.push_back(bisection_total);
+
+    if(m_with_inner){
+        BooleanTreeUnion<_Tp> *bisection_inner = new BooleanTreeUnion<_Tp>(m_maze_inner_list);
+        BooleanTreeInter<_Tp> *bisection_total = new BooleanTreeInter<_Tp>(bisection_outer, bisection_inner);
+        m_paving->set_bisection_tree(bisection_total);
+        m_boolean_tree_list.push_back(bisection_inner);
+        m_boolean_tree_list.push_back(bisection_total);
+    }
+    else
+        m_paving->set_bisection_tree(bisection_outer);
+
     m_boolean_tree_list.insert(m_boolean_tree_list.begin(), bisection_outer_binome.begin(), bisection_outer_binome.end());
 
-    BooleanTreeInter<_Tp> *tree_removing_inner = new BooleanTreeInter<_Tp>(m_maze_inner_list);
-    for(Maze<_Tp> *maze_inner:m_maze_inner_list)
-        maze_inner->set_boolean_tree_removing(tree_removing_inner);
-    m_boolean_tree_list.push_back(tree_removing_inner);
+    if(m_with_inner){
+        BooleanTreeInter<_Tp> *tree_removing_inner = new BooleanTreeInter<_Tp>(m_maze_inner_list);
+        for(Maze<_Tp> *maze_inner:m_maze_inner_list)
+            maze_inner->set_boolean_tree_removing(tree_removing_inner);
+        m_boolean_tree_list.push_back(tree_removing_inner);
+    }
 
     BooleanTreeUnion<_Tp> *tree_removing_outer = new BooleanTreeUnion<_Tp>(m_maze_outer_list);
     for(Maze<_Tp> * maze_outer:m_maze_outer_list)
@@ -216,19 +233,21 @@ void EulerianMaze<_Tp>::bisect(){
 
 template <typename _Tp>
 void EulerianMaze<_Tp>::contract(size_t nb_step){
-        std::cout << " Outer Maze" << std::endl;
-        for(size_t k=0; k<nb_step; k++){
+    std::cout << " Outer Maze" << std::endl;
+    for(size_t k=0; k<nb_step; k++){
         for(Maze<_Tp> *maze_outer:m_maze_outer_list)
             maze_outer->contract();
-        }
-        m_maze_outer_list[0]->contract(); // Loop constraint
+    }
+    m_maze_outer_list[0]->contract(); // Loop constraint
 
+    if(m_with_inner){
         std::cout << " Inner Maze" << std::endl;
         for(size_t k=0; k<nb_step; k++){
-        for(Maze<_Tp> *maze_inner:m_maze_inner_list)
-            maze_inner->contract();
+            for(Maze<_Tp> *maze_inner:m_maze_inner_list)
+                maze_inner->contract();
         }
         m_maze_inner_list[0]->contract(); // Loop constraint (?)
+    }
 }
 
 template <typename _Tp>

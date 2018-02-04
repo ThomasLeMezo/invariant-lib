@@ -42,9 +42,9 @@ int main(int argc, char *argv[])
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
-    const std::vector<double> limit_bisection = {15*60/2.0, 250/2.0, 250/2.0};
+//    const std::vector<double> limit_bisection = {15*60/8.0, 250/2.0, 250/2.0};
 //    const std::vector<double> limit_bisection = {900.0, 250/2.0, 250/2.0};
-    paving.set_limit_bisection(limit_bisection);
+//    paving.set_limit_bisection(limit_bisection);
 
     double t_c, x_c, y_c, r_spatial, r_time;
     t_c = search_space[0].lb();
@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
     maze.set_enable_contract_vector_field(true);
 
 //    paving.set_enable_bisection_strategy(0, BISECTION_LB);
-//    paving.set_bisection_strategy_slice(0, 900*3);
+    paving.set_bisection_strategy_slice(0, 900*3);
 
-    for(int i=0; i<30; i++){
+    for(int i=0; i<20; i++){
         std::time_t t_now = std::time(nullptr);
         cout << i << " - " << std::ctime(&t_now);
 
@@ -103,11 +103,11 @@ int main(int argc, char *argv[])
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
     cout << paving << endl;
 
-//    IntervalVector position(3);
-//    position[0] = ibex::Interval(100); // 450, 900
-//    position[1] = ibex::Interval(46020); // 37304, 37980
-//    position[2] = ibex::Interval(125510); // 119766, 120469 // 125600
-//    vtkMazePPL.show_room_info(&maze, position);
+    IntervalVector position(3);
+    position[0] = ibex::Interval(700); // 450, 900
+    position[1] = ibex::Interval(46020); // 37304, 37980
+    position[2] = ibex::Interval(125510); // 119766, 120469 // 125600
+    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;
 }

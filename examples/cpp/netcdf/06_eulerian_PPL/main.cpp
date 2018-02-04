@@ -54,30 +54,43 @@ int main(int argc, char *argv[])
     initial_condition[0] = ibex::Interval(t_c-r_time, t_c+r_time);
     SepFwdBwd s_B(f_id, initial_condition);
 
-    EulerianMazePPL eulerian_maze(search_space, &pm3d, &s_A, &s_B, false);
+    // ** C ** //
+    t_c = 23000;
+    x_c = 46100;
+    y_c = 125000;
+    r_time = 5000.0; // in s
+    r_spatial = 1500.0; // in m
+    initial_condition[0] = ibex::Interval(t_c-r_time, t_c+r_time);
+    initial_condition[1] = ibex::Interval(x_c-r_spatial, x_c+r_spatial);
+    initial_condition[2] = ibex::Interval(y_c-r_spatial, y_c+r_spatial);
+    SepFwdBwd s_C(f_id, initial_condition);
+
+    EulerianMazePPL eulerian_maze(search_space, &pm3d, &s_A, &s_C/*, &s_B*/, false, false);
 
     // Paving bisection strategy
-    const std::vector<double> limit_bisection = {15*60-1, 250-1, 250-1};
+    const std::vector<double> limit_bisection = {5*60, 250.0/3.0, 250.0/3.0};
     eulerian_maze.get_paving()->set_limit_bisection(limit_bisection);
-    eulerian_maze.get_paving()->set_enable_bisection_strategy(0, BISECTION_LB_UB);
-    eulerian_maze.get_paving()->set_bisection_strategy_slice(0, 900*5); // 3?
+    eulerian_maze.get_paving()->set_enable_bisection_strategy(0, BISECTION_STANDARD);
+    eulerian_maze.get_paving()->set_bisection_strategy_slice(0, 900*3); // 3?
 
     //Maze contraction strategy
     for(MazePPL* maze:eulerian_maze.get_maze_outer()){
-        maze->set_widening_limit(5); // 10 ?
+        maze->set_widening_limit(10); // 10 ?
         maze->set_enable_contraction_limit(true);
         maze->set_enable_contract_vector_field(true);
     }
-    for(MazePPL* maze:eulerian_maze.get_maze_inner()){
-        maze->set_enable_contraction_limit(true);
-        maze->set_contraction_limit(5); // 15 ?
-        maze->set_enable_contract_vector_field(true);
-    }
+//    for(MazePPL* maze:eulerian_maze.get_maze_inner()){
+//        maze->set_enable_contraction_limit(true);
+//        maze->set_contraction_limit(15); // 15 ?
+//        maze->set_enable_contract_vector_field(true);
+//    }
 
     double time_start = omp_get_wtime();
-//    VtkMazePPL vtkMazePPL_A("PrevimerPPL_eulerian_A");
+    VtkMazePPL vtkMazePPL_A("PrevimerPPL_eulerian_A");
     VtkMazePPL vtkMazePPL_B("PrevimerPPL_eulerian_B");
-    VtkMazePPL vtkMazePPL_B_inner("PrevimerPPL_eulerian_B_inner");
+    VtkMazePPL vtkMazePPL_C_FWD("PrevimerPPL_eulerian_C_FWD");
+    VtkMazePPL vtkMazePPL_C_BWD("PrevimerPPL_eulerian_C_BWD");
+//    VtkMazePPL vtkMazePPL_B_inner("PrevimerPPL_eulerian_B_inner");
 
     //    omp_set_num_threads(1);
     for(int i=0; i<30; i++){
@@ -86,18 +99,21 @@ int main(int argc, char *argv[])
         eulerian_maze.bisect();
         eulerian_maze.contract(1);
 
-//        vtkMazePPL_A.show_maze(eulerian_maze.get_maze_outer(0));
-        vtkMazePPL_B.show_maze(eulerian_maze.get_maze_outer(1));
-        vtkMazePPL_B_inner.show_maze(eulerian_maze.get_maze_inner(1));
+        vtkMazePPL_A.show_maze(eulerian_maze.get_maze_outer(0));
+        vtkMazePPL_A.show_subpaving(eulerian_maze.get_maze_outer(0));
+        vtkMazePPL_C_FWD.show_maze(eulerian_maze.get_maze_outer(1));
+//        vtkMazePPL_B.show_maze(eulerian_maze.get_maze_outer(2));
+//        vtkMazePPL_C_BWD.show_maze(eulerian_maze.get_maze_outer(3));
+//        vtkMazePPL_B_inner.show_maze(eulerian_maze.get_maze_inner(1));
     }
 
     cout << "TIME = " << omp_get_wtime() - time_start << "s" << endl;
 
-//    IntervalVector position(3);
-//    position[0] = ibex::Interval(5405); // 450, 900
-//    position[1] = ibex::Interval(34200); // 37304, 37980
-//    position[2] = ibex::Interval(126600); // 119766, 120469
-//    vtkMazePPL.show_room_info(&maze, position);
+    IntervalVector position(3);
+    position[0] = ibex::Interval(28000); // 450, 900
+    position[1] = ibex::Interval(47600); // 37304, 37980
+    position[2] = ibex::Interval(126500); // 119766, 120469
+//    vtkMazePPL_A.show_room_info(eulerian_maze.get_maze_outer(0), position);
 
     return 0;
 }
