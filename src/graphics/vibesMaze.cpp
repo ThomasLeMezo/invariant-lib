@@ -176,7 +176,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
             d_iv = d->get_input() | d->get_output();
         }
         else{
-            for(int i=0; i<m_eulerian_maze->get_maze_outer_fwd().size(); i++){
+            for(size_t i=0; i<m_eulerian_maze->get_maze_outer_fwd().size(); i++){
                 DoorIBEX *d= p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_fwd()[i]];
                 IntervalVector d_tmp = d->get_input() | d->get_output();
                 d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_bwd()[m_eulerian_maze->get_maze_outer_bwd().size()-1-i]];
@@ -212,7 +212,8 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
             d_iv = d->get_input() | d->get_output();
         }
         else{
-            for(int i=0; i<m_eulerian_maze->get_maze_inner_fwd().size(); i++){
+            d_iv = IntervalVector(2);
+            for(size_t i=0; i<m_eulerian_maze->get_maze_inner_fwd().size(); i++){
                 DoorIBEX *d= p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_inner_fwd()[i]];
                 IntervalVector d_tmp = d->get_input() | d->get_output();
                 d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_inner_bwd()[m_eulerian_maze->get_maze_inner_bwd().size()-1-i]];
@@ -255,7 +256,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
             d_iv = d->get_input() | d->get_output();
         }
         else{
-            for(int i=0; i<m_eulerian_maze->get_maze_outer_fwd().size(); i++){
+            for(size_t i=0; i<m_eulerian_maze->get_maze_outer_fwd().size(); i++){
                 DoorIBEX *d= p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_fwd()[i]];
                 IntervalVector d_tmp = d->get_input() | d->get_output();
                 d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_bwd()[m_eulerian_maze->get_maze_outer_bwd().size()-1-i]];
