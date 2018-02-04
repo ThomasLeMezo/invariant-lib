@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
     string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     array<array<size_t, 2>, 2> grid_limits; // X, Y limit data loading
-    grid_limits[0][0] = 80; grid_limits[0][1] = 280; // max = 584
-    grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754
+    grid_limits[0][0] = 80; grid_limits[0][1] = 280; // max = 584 || 20000 -> 70000 (mid = 45000, diam = 50000)
+    grid_limits[1][0] = 380; grid_limits[1][1] = 580; // max = 754 || 95000 -> 145000 (mid = 120000, diam = 50000)
 
 //    PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
     PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     // ** A ** //
     double t_c, x_c, y_c, r_spatial, r_time;
     t_c = search_space[0].lb();
-    x_c = 137 * pm3d.get_grid_conversion(1);
-    y_c = 477 * pm3d.get_grid_conversion(2);
+    x_c = 137 * pm3d.get_grid_conversion(1); // 34250
+    y_c = 477 * pm3d.get_grid_conversion(2); // 119250
     r_spatial = 1000.0; // in m
     r_time = 5*60.0; // in s
 
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_B(f_id, initial_condition);
 
     // ** C ** //
-    t_c = 23000;
+    t_c = 25000;
     x_c = 46100;
     y_c = 125000;
     r_time = 5000.0; // in s
@@ -68,14 +68,14 @@ int main(int argc, char *argv[])
     EulerianMazePPL eulerian_maze(search_space, &pm3d, &s_A, &s_C, &s_B, false, false);
 
     // Paving bisection strategy
-    const std::vector<double> limit_bisection = {5*60, 250.0/4.0, 250.0/4.0};
+    const std::vector<double> limit_bisection = {15*60.0/3.0, 250.0/3.0, 250.0/3.0};
     eulerian_maze.get_paving()->set_limit_bisection(limit_bisection);
     eulerian_maze.get_paving()->set_enable_bisection_strategy(0, BISECTION_STANDARD);
-    eulerian_maze.get_paving()->set_bisection_strategy_slice(0, 900*3); // 3?
+//    eulerian_maze.get_paving()->set_bisection_strategy_slice(0, 900*3); // 3?
 
     //Maze contraction strategy
     for(MazePPL* maze:eulerian_maze.get_maze_outer()){
-        maze->set_widening_limit(10); // 10 ?
+        maze->set_widening_limit(15); // 10 ?
         maze->set_enable_contraction_limit(true);
         maze->set_enable_contract_vector_field(true);
     }

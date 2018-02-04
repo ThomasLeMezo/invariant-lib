@@ -17,8 +17,8 @@ using namespace ibex;
 int main(int argc, char *argv[])
 {
     // ****** Dynamics *******
-    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
-//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+//    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/file_test.xml");
+    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 //    string sources_xml = string("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_15_01_18.xml");
 
     array<array<size_t, 2>, 2> grid_limits; // X, Y limit data loading
@@ -48,11 +48,10 @@ int main(int argc, char *argv[])
 
     double t_c, x_c, y_c, r_spatial, r_time;
     t_c = search_space[0].lb();
-    // (137, 477)
-    x_c = 184 * pm3d.get_grid_conversion(1);
-    y_c = 502 * pm3d.get_grid_conversion(2);
-    r_spatial = 10.0; // in m
-    r_time = 3*60.0; // in s
+    x_c = 137 * pm3d.get_grid_conversion(1); // 34250
+    y_c = 477 * pm3d.get_grid_conversion(2); // 119250
+    r_spatial = 1000.0; // in m
+    r_time = 5*60.0; // in s
     cout << "Center of initial set = " << t_c << " " << x_c << " " << y_c << endl;
 
     IntervalVector initial_condition(3);
@@ -78,7 +77,7 @@ int main(int argc, char *argv[])
     int factor_door = 2;
     maze.set_enable_contract_vector_field(true);
 
-//    paving.set_enable_bisection_strategy(0, BISECTION_LB);
+    paving.set_enable_bisection_strategy(0, BISECTION_LB);
     paving.set_bisection_strategy_slice(0, 900*3);
 
     for(int i=0; i<20; i++){
@@ -107,7 +106,7 @@ int main(int argc, char *argv[])
     position[0] = ibex::Interval(700); // 450, 900
     position[1] = ibex::Interval(46020); // 37304, 37980
     position[2] = ibex::Interval(125510); // 119766, 120469 // 125600
-    vtkMazePPL.show_room_info(&maze, position);
+//    vtkMazePPL.show_room_info(&maze, position);
 
     return 0;
 }
