@@ -150,13 +150,25 @@ public:
      * @brief add maze for domain intersection
      * @param maze
      */
-    void add_maze_inter(Maze<_Tp> *maze);
+    void add_maze_inter_initial_condition(Maze<_Tp> *maze);
 
     /**
      * @brief add maze list for domain intersection
      * @param maze_list
      */
-    void add_maze_inter(std::vector<Maze<_Tp>*> maze_list);
+    void add_maze_inter_initial_condition(std::vector<Maze<_Tp>*> maze_list);
+
+    /**
+     * @brief add maze for domain intersection
+     * @param maze
+     */
+    void add_maze_inter_father_hull(Maze<_Tp> *maze);
+
+    /**
+     * @brief add maze list for domain intersection
+     * @param maze_list
+     */
+    void add_maze_inter_father_hull(std::vector<Maze<_Tp>*> maze_list);
 
     /**
      * @brief add maze for domain union
@@ -228,7 +240,8 @@ private:
 
     DOMAIN_INITIALIZATION m_domain_init = FULL_DOOR;
 
-    std::vector<Maze<_Tp> *> m_maze_list_inter;
+    std::vector<Maze<_Tp> *> m_maze_list_inter_father_hull;
+    std::vector<Maze<_Tp> *> m_maze_list_inter_initial_condition;
     std::vector<Maze<_Tp> *> m_maze_list_union;
 
     omp_lock_t m_list_room_access;
@@ -281,8 +294,8 @@ inline void Domain<_Tp>::set_border_path_out(bool out){
 }
 
 template<typename _Tp>
-inline void Domain<_Tp>::add_maze_inter(Maze<_Tp> *maze){
-    m_maze_list_inter.push_back(maze);
+inline void Domain<_Tp>::add_maze_inter_initial_condition(Maze<_Tp> *maze){
+    m_maze_list_inter_initial_condition.push_back(maze);
 }
 
 template<typename _Tp>
@@ -291,8 +304,18 @@ inline void Domain<_Tp>::add_maze_union(Maze<_Tp> *maze){
 }
 
 template<typename _Tp>
-inline void Domain<_Tp>::add_maze_inter(std::vector<Maze<_Tp> *> maze_list){
-    m_maze_list_inter.insert(m_maze_list_inter.end(), maze_list.begin(), maze_list.end());
+inline void Domain<_Tp>::add_maze_inter_initial_condition(std::vector<Maze<_Tp> *> maze_list){
+    m_maze_list_inter_initial_condition.insert(m_maze_list_inter_initial_condition.end(), maze_list.begin(), maze_list.end());
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::add_maze_inter_father_hull(std::vector<Maze<_Tp> *> maze_list){
+    m_maze_list_inter_father_hull.insert(m_maze_list_inter_father_hull.end(), maze_list.begin(), maze_list.end());
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::add_maze_inter_father_hull(Maze<_Tp> *maze){
+    m_maze_list_inter_father_hull.push_back(maze);
 }
 
 template<typename _Tp>

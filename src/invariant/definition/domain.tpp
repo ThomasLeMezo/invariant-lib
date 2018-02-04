@@ -277,7 +277,7 @@ void Domain<_Tp>::contract_border(Maze<_Tp> *maze, std::vector<Pave<_Tp>*> &pave
 
 template<typename _Tp>
 void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
-    if(m_maze_list_inter.empty())
+    if(m_maze_list_inter_initial_condition.empty() && m_maze_list_inter_father_hull.empty())
         return;
     std::cout << " ==> contract inter maze" << std::endl;
 
@@ -285,7 +285,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
     if(maze->get_domain()->get_init()==FULL_DOOR && !maze->is_escape_trajectories()){
         std::vector<Room<_Tp> *> room_list;
         m_subpaving->get_tree()->get_all_child_rooms_not_empty_private(room_list, maze);
-        for(Maze<_Tp> *maze_inter:m_maze_list_inter){
+        for(Maze<_Tp> *maze_inter:m_maze_list_inter_father_hull){
             if(!maze_inter->is_escape_trajectories()){
                 //#pragma omp for
                 for(size_t i=0; i<room_list.size(); i++){
@@ -303,7 +303,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
         std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
         // Contract the initial condition (input & output)
 
-        for(Maze<_Tp> *maze_inter:m_maze_list_inter){
+        for(Maze<_Tp> *maze_inter:m_maze_list_inter_initial_condition){
             if(maze_inter->get_contract_once()){
                 for(size_t i=0; i<room_list_initial.size(); i++){
                     Room<_Tp> *r = room_list_initial[i];
@@ -334,7 +334,7 @@ void Domain<_Tp>::contract_inter_maze(Maze<_Tp> *maze){
 
     // Contract father_hull (usefull to limit propagation)
     std::vector<Pave<_Tp> *> room_list = maze->get_subpaving()->get_paves();
-    for(Maze<_Tp> *maze_inter:m_maze_list_inter){
+    for(Maze<_Tp> *maze_inter:m_maze_list_inter_father_hull){
         //#pragma omp for
         for(size_t i=0; i<room_list.size(); i++){
             Room<_Tp> *r = room_list[i]->get_rooms()[maze];
@@ -381,7 +381,7 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
     else{
         std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
         // Contract the initial condition (input & output)
-        for(Maze<_Tp> *maze_union:m_maze_list_inter){
+        for(Maze<_Tp> *maze_union:m_maze_list_inter_initial_condition){
             if(maze_union->get_contract_once()){
                 for(size_t i=0; i<room_list_initial.size(); i++){
                     Room<_Tp> *r = room_list_initial[i];

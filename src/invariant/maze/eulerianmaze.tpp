@@ -165,14 +165,19 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
 
     /// ****** Outer Domain ******
     for(size_t i=1; i<m_dom_outer_fwd_list.size(); i++){
-        m_dom_outer_fwd_list[i]->add_maze_inter(m_maze_outer_fwd_list[i-1]);
+        m_dom_outer_fwd_list[i]->add_maze_inter_initial_condition(m_maze_outer_fwd_list[i-1]);
     }
     for(size_t i=1; i<m_dom_outer_bwd_list.size(); i++){
-        m_dom_outer_bwd_list[i]->add_maze_inter(m_maze_outer_bwd_list[i-1]);
+        m_dom_outer_bwd_list[i]->add_maze_inter_initial_condition(m_maze_outer_bwd_list[i-1]);
     }
     if(nb_sep>1){
-        m_dom_outer_bwd_list[0]->add_maze_inter(m_maze_outer_fwd_list[nb_sep-2]);
-        m_dom_outer_fwd_list[0]->add_maze_inter(m_maze_outer_bwd_list[nb_sep-2]);
+        m_dom_outer_bwd_list[0]->add_maze_inter_initial_condition(m_maze_outer_fwd_list[m_maze_outer_fwd_list.size()-1]);
+        m_dom_outer_fwd_list[0]->add_maze_inter_initial_condition(m_maze_outer_bwd_list[m_maze_outer_bwd_list.size()-1]);
+    }
+
+    for(size_t i=0; i<m_dom_outer_fwd_list.size(); i++){
+        m_dom_outer_fwd_list[i]->add_maze_inter_father_hull(m_maze_outer_bwd_list[m_maze_outer_bwd_list.size()-1-i]);
+        m_dom_outer_bwd_list[i]->add_maze_inter_father_hull(m_maze_outer_fwd_list[m_maze_outer_fwd_list.size()-1-i]);
     }
 
     /// ****** Inner Domain ******
@@ -193,7 +198,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
     std::vector<BooleanTree<_Tp> *> bisection_outer_binome;
     size_t nb_maze_outer_fwd = m_dom_outer_fwd_list.size();
     for(size_t i=0; i<nb_maze_outer_fwd; i++){
-        BooleanTreeInter<_Tp> *bisection_outer = new BooleanTreeInter<_Tp>(m_maze_outer_fwd_list[i], m_maze_outer_bwd_list[nb_maze_outer_fwd-i-1]); // Union of binome intersection
+        BooleanTreeInter<_Tp> *bisection_outer = new BooleanTreeInter<_Tp>(m_maze_outer_fwd_list[i], m_maze_outer_bwd_list[nb_maze_outer_fwd-i-1]); // Intersection of binome intersection
         bisection_outer_binome.push_back(bisection_outer);
     }
 

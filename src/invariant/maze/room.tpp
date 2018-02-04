@@ -976,6 +976,11 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r) {
         stream << "    |=> output = " << print(r.get_initial_door_output()) << std::endl;
     }
 
+    if(r.is_father_hull())
+        stream << " => father hull (true) =" << print(r.get_father_hull()) << std::endl;
+    else
+        stream << " => father hull (false)" << std::endl;
+
     for(Face<_Tp> *f:r.get_pave()->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[r.get_maze()];
         stream << " Face : " << d->get_face()->get_orientation() << " - " << *d << std::endl;
