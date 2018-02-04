@@ -58,6 +58,12 @@ public:
     ~Room();
 
     /**
+     * @brief Room
+     * @param r
+     */
+//    Room(const Room<_Tp> &r);
+
+    /**
      * @brief reset
      */
     void reset();
@@ -411,6 +417,9 @@ public:
     bool is_father_hull() const;
     const _Tp& get_father_hull() const;
 
+    bool is_first_contract() const;
+    bool is_contract_vector_field() const;
+
     /**
      * @brief reset first contract
      */
@@ -759,6 +768,16 @@ inline void Room<_Tp>::set_union_hull(const _Tp &hull){
         Door<_Tp> *d = f->get_doors()[m_maze];
         d->set_union_hull(hull);
     }
+}
+
+template <typename _Tp>
+inline bool Room<_Tp>::is_first_contract() const{
+    return m_first_contract;
+}
+
+template <typename _Tp>
+inline bool Room<_Tp>::is_contract_vector_field() const{
+    return m_contract_vector_field;
 }
 
 inline std::string print(const ibex::IntervalVector &iv){

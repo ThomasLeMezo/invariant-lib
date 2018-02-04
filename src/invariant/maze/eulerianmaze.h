@@ -78,6 +78,30 @@ public:
     std::vector<Maze<_Tp>*> get_maze_outer();
 
     /**
+     * @brief get_maze_outer_fwd
+     * @return
+     */
+    std::vector<Maze<_Tp>*> get_maze_outer_fwd();
+
+    /**
+     * @brief get_maze_outer_bwd
+     * @return
+     */
+    std::vector<Maze<_Tp>*> get_maze_outer_bwd();
+
+    /**
+     * @brief get_maze_inner_fwd
+     * @return
+     */
+    std::vector<Maze<_Tp>*> get_maze_inner_fwd();
+
+    /**
+     * @brief get_maze_inner_bwd
+     * @return
+     */
+    std::vector<Maze<_Tp>*> get_maze_inner_bwd();
+
+    /**
      * @brief get_number_separators
      * @return
      */
@@ -131,6 +155,26 @@ SmartSubPaving<_Tp>* EulerianMaze<_Tp>::get_paving(){
 template<typename _Tp>
 std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer(){
     return m_maze_outer_list;
+}
+
+template<typename _Tp>
+std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer_fwd(){
+    return m_maze_outer_fwd_list;
+}
+
+template<typename _Tp>
+std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer_bwd(){
+    return m_maze_outer_bwd_list;
+}
+
+template<typename _Tp>
+std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_inner_fwd(){
+    return m_maze_inner_fwd_list;
+}
+
+template<typename _Tp>
+std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_inner_bwd(){
+    return m_maze_inner_bwd_list;
 }
 
 template<typename _Tp>

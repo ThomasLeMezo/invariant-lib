@@ -43,37 +43,43 @@ int main(int argc, char *argv[])
     SepFwdBwd sep_C(f_sep_C, box_C);
 
     // Eulerian
-    EulerianMaze<> eulerian_maze(space, &f, &sep_A, &sep_B, &sep_C, false);
+    EulerianMaze<> eulerian_maze(space, &f, &sep_A, &sep_B, &sep_C, true);
 
     double time_start = omp_get_wtime();
     //    omp_set_num_threads(1);
-    for(int i=0; i<17; i++){
+    for(int i=0; i<20; i++){
         cout << i << endl;
         eulerian_maze.bisect();
         eulerian_maze.contract(1);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    for(size_t i=0; i<eulerian_maze.get_number_maze(); i++){
-        ostringstream name;
-        name << "graph_" << i;
-        VibesMaze v_maze(name.str(), eulerian_maze.get_maze_outer(i)/*, eulerian_maze.get_maze_inner(i)*/);
-        v_maze.setProperties(0, 0, 512, 512);
-        v_maze.show();
+//    for(size_t i=0; i<eulerian_maze.get_number_maze(); i++){
+//        ostringstream name;
+//        name << "graph_" << i;
+//        VibesMaze v_maze(name.str(), eulerian_maze.get_maze_outer(i), eulerian_maze.get_maze_inner(i));
+//        v_maze.setProperties(0, 0, 512, 512);
+//        v_maze.show();
 
-        v_maze.drawBox(box_C, "r[]");
-        v_maze.drawBox(box_B, "r[]");
-        v_maze.drawCircle(xc_1, yc_1, r_1, "r[]");
+//        v_maze.drawBox(box_C, "r[]");
+//        v_maze.drawBox(box_B, "r[]");
+//        v_maze.drawCircle(xc_1, yc_1, r_1, "r[]");
 
-//        if(i==3){
-//            IntervalVector position_info(2);
-//            position_info[0] = ibex::Interval(1.1);
-//            position_info[1] = ibex::Interval(0.6);
-//            v_maze.show_room_info(eulerian_maze.get_maze_outer(i), position_info);
-//            if(eulerian_maze.get_maze_outer(i)->get_dynamics()->get_sens()==BWD)
-//                cout << "BWD detected" << endl;
-//        }
-    }
+////        if(i==3){
+////            IntervalVector position_info(2);
+////            position_info[0] = ibex::Interval(1.1);
+////            position_info[1] = ibex::Interval(0.6);
+////            v_maze.show_room_info(eulerian_maze.get_maze_outer(i), position_info);
+////            if(eulerian_maze.get_maze_outer(i)->get_dynamics()->get_sens()==BWD)
+////                cout << "BWD detected" << endl;
+////        }
+//    }
+    VibesMaze v_maze_eulerian("Eulerian", &eulerian_maze);
+    v_maze_eulerian.setProperties(0, 0, 512, 512);
+    v_maze_eulerian.show();
+    v_maze_eulerian.drawBox(box_C, "r[]");
+    v_maze_eulerian.drawBox(box_B, "r[]");
+    v_maze_eulerian.drawCircle(xc_1, yc_1, r_1, "r[]");
 
     vibes::endDrawing();
 }

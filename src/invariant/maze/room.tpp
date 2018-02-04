@@ -41,6 +41,45 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics)
 
 }
 
+//template<typename _Tp>
+//Room<_Tp>::Room(const Room<_Tp> &r){
+//    m_pave = r.get_pave();
+//    m_maze = r.get_maze();
+//    m_vector_fields = r.get_vector_fields();
+//    m_vector_fields_d1 = r.get_vector_fields_d();
+
+//    m_vector_fields_typed_fwd = r.get_vector_fields_typed_fwd();
+//    m_vector_fields_typed_bwd = r.get_vector_fields_typed_bwd();
+
+//    m_vector_field_zero = r.get_vector_fields_zero();
+
+//    m_contain_zero_coordinate = r.get_contain_zero_coordinate();
+//    m_contain_zero = r.get_contain_zero();
+//    m_empty = r.is_empty();
+//    m_full = r.is_full();
+
+//    m_first_contract = r.is_first_contract();
+//    m_contract_vector_field = r.is_contract_vector_field();
+
+//    m_in_deque = r.is_in_deque();
+//    m_removed = r.is_removed();
+
+//    m_is_initial_door_input = r.is_initial_door_input();
+//    m_is_initial_door_output = r.is_initial_door_output();
+
+//    if(m_is_initial_door_input)
+//        m_initial_door_input = new _Tp(r.get_initial_door_input());
+//    if(m_is_initial_door_output)
+//        m_initial_door_output = new _Tp(r.get_initial_door_output());
+
+//    // Valid hull
+//    m_is_father_hull = r.is_father_hull();
+//    if(m_is_father_hull)
+//        m_father_hull = new _Tp(r.get_father_hull());
+
+//    m_nb_contract = r.get_nb_contractions();
+//}
+
 template<typename _Tp>
 inline void Room<_Tp>::reset(){
     m_full = true;

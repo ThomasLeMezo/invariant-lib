@@ -182,6 +182,12 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
 
     /// ****** Inner Domain ******
     if(m_with_inner){
+        // Test ("inner" between 2 consecutive sep)
+//        for(size_t i=0; i<m_dom_inner_fwd_list.size(); i++){
+//            m_dom_inner_fwd_list[i]->add_maze_union(m_maze_inner_bwd_list[m_maze_inner_bwd_list.size()-1-i]);
+//            m_dom_inner_bwd_list[i]->add_maze_union(m_maze_inner_fwd_list[m_maze_inner_fwd_list.size()-1-i]);
+//        }
+
         for(size_t i=0; i<nb_sep-1; i++){ // ToDo: improve ?
             m_dom_inner_fwd_list[i]->add_maze_union(m_maze_inner_bwd_list);
             m_dom_inner_bwd_list[i]->add_maze_union(m_maze_inner_fwd_list);

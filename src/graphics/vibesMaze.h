@@ -10,6 +10,7 @@
 #include "domain.h"
 #include "face.h"
 #include "door.h"
+#include "eulerianmaze.h"
 
 #include "VibesFigure.h"
 #include "vibes/vibes.h"
@@ -18,11 +19,12 @@ class VibesMaze: public VibesFigure
 {
 
 public:
-    enum VIBES_MAZE_TYPE{VIBES_MAZE_INNER, VIBES_MAZE_OUTER, VIBES_MAZE_OUTER_AND_INNER};
+    enum VIBES_MAZE_TYPE{VIBES_MAZE_INNER, VIBES_MAZE_OUTER, VIBES_MAZE_OUTER_AND_INNER, VIBES_MAZE_EULERIAN};
 public:
     VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g);
     VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type=VIBES_MAZE_OUTER);
     VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner);
+    VibesMaze(const std::string& figure_name, invariant::EulerianMazeIBEX* e);
     ~VibesMaze(){}
 
     virtual void show() const;
@@ -66,6 +68,8 @@ private:
 
     void show_maze_outer_inner() const;
 
+    void show_eulerian_maze() const;
+
     void draw_room_outer(invariant::PaveIBEX *p) const;
     void draw_room_inner(invariant::PaveIBEX *p) const;
     void draw_room_inner_outer(invariant::PaveIBEX *p) const;
@@ -77,6 +81,7 @@ private:
 
     invariant::MazeIBEX*    m_maze_outer = nullptr;
     invariant::MazeIBEX*    m_maze_inner = nullptr;
+    invariant::EulerianMazeIBEX* m_eulerian_maze = nullptr;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;
 
