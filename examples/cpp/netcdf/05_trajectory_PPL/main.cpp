@@ -77,8 +77,8 @@ int main(int argc, char *argv[])
     int factor_door = 2;
     maze.set_enable_contract_vector_field(true);
 
-    paving.set_enable_bisection_strategy(0, BISECTION_LB);
-    paving.set_bisection_strategy_slice(0, 900*3);
+//    paving.set_enable_bisection_strategy(0, BISECTION_LB);
+//    paving.set_bisection_strategy_slice(0, 900*3);
 
     for(int i=0; i<20; i++){
         std::time_t t_now = std::time(nullptr);
