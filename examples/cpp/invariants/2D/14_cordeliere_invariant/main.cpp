@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
     double h0 = -9;
-
     ibex::Function h(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
     ibex::Function hdiff(h, Function::DIFF);
     ibex::Function psi(x1, x2, tanh(h(x1, x2)-h0)+ibex::Interval::PI/2.0);

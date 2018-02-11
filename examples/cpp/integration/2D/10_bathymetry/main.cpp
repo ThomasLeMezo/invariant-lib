@@ -23,21 +23,16 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-4.75,4.75);
-    space[1] = ibex::Interval(-3.5,6);
-
-//    space[0] = ibex::Interval(-3,3);
-//    space[1] = ibex::Interval(-3,3);
+    space[0] = ibex::Interval(-6, 6);
+    space[1] = ibex::Interval(-6, 6);
 
     invariant::SmartSubPaving<> paving(space);
 
     // ****** Domain Outer ******* //
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
     double x1_c, x2_c, r;
-    x1_c = -2.0;
-    x2_c = 4;
-//    x1_c = 1.2;
-//    x2_c = 1;
+    x1_c = 1.5;
+    x2_c = -1.9;
     r = 0.3;
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -53,7 +48,14 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    ibex::Function f(x1, x2, -Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    double h0 = -9;
+    ibex::Interval sensor_error(-0.1, 0.1);
+    ibex::Function h(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
+    ibex::Function hdiff(h, Function::DIFF);
+    ibex::Function psi(x1, x2, tanh(h(x1, x2)-h0+sensor_error)+ibex::Interval::PI/2.0);
+    ibex::Function f(x1, x2, Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
+                                    (hdiff(x1, x2)[1]*cos(psi(x1, x2))+hdiff(x1, x2)[0]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0]))));
+
     Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //

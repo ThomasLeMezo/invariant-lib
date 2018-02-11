@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 //    ibex::Function f_outer(x1, x2, Return(x2,
 //                                     (-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(-0.5, 0.5))));
     ibex::Function f_outer(x1, x2, Return(x2,
-                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-3.0, 3.0)));
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5, 0.5)));
 
     Dynamics_Function dyn_outer(&f_outer, FWD_BWD);
 
@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
 //    ibex::Function f_inner2(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(0.5))));
     ibex::Function f_inner1(x1, x2, Return(x2,
-                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-3.0))));
+                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5))));
     ibex::Function f_inner2(x1, x2, Return(x2,
-                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(3.0))));
+                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(0.5))));
 
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
@@ -79,15 +79,15 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("Kernel car on the hill", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Kernel car on the hill"/*, &maze_outer*/, &maze_inner);
     v_maze.setProperties(0, 0, 512, 512);
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(6.6);
-    position_info[1] = ibex::Interval(-2.4, -2.05);
-//    v_maze.setProperties(600, 0, 512, 512);
-//    v_maze.show_room_info(&maze_inner, position_info);
+    position_info[0] = ibex::Interval(12.24);
+    position_info[1] = ibex::Interval(-0.24);
+    v_maze.setProperties(600, 0, 512, 512);
+    v_maze.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 }
