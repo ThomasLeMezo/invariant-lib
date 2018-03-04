@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
 
     // Sep C
     IntervalVector box_C(2);
-    box_C[0] = ibex::Interval(0.7, 1.2);
-    box_C[1] = ibex::Interval(-1.5, -1.0);
+    box_C[0] = ibex::Interval(0.74, 1.2);
+    box_C[1] = ibex::Interval(-1.5, -1.06);
     Function f_sep_C(x1, x2, Return(x1, x2));
     SepFwdBwd sep_C(f_sep_C, box_C);
 

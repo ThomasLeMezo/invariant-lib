@@ -44,11 +44,11 @@ void VibesMaze::show() const{
     show_graph();
     if(m_maze_outer != nullptr && m_maze_inner == nullptr)
         show_maze_outer();
-    if(m_maze_outer == nullptr && m_maze_inner != nullptr)
+    else if(m_maze_outer == nullptr && m_maze_inner != nullptr)
         show_maze_inner();
     else if(m_maze_outer != nullptr && m_maze_inner != nullptr)
         show_maze_outer_inner();
-    else if(m_eulerian_maze != nullptr);
+    else if(m_eulerian_maze != nullptr)
         show_eulerian_maze();
 
 }
