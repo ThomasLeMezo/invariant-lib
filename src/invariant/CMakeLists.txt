@@ -13,6 +13,8 @@ include_directories(maze)
 include_directories(serialization)
 
   set(SRC
+    definition/spacefunction.cpp
+
     serialization/ibex_serialization.cpp
 
     definition/dynamics.cpp
@@ -40,6 +42,8 @@ include_directories(serialization)
 
   set(HEADERS
     serialization/ibex_serialization.h
+
+    definition/spacefunction.h
 
     definition/domain.h
     definition/domain.tpp
