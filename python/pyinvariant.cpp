@@ -53,10 +53,10 @@ using namespace ibex;
           .def("set_sep", &invariant::DomainIBEX::set_sep)
           .def("set_sep_input", &invariant::DomainIBEX::set_sep_input)
           .def("set_sep_output", &invariant::DomainIBEX::set_sep_output)
-          .def("add_maze_union", (void (invariant::DomainIBEX::*)(std::vector<invariant::MazeIBEX *> maze_list)) &invariant::DomainIBEX::add_maze_union)
-          .def("add_maze_union", (void (invariant::DomainIBEX::*)(invariant::MazeIBEX *maze)) &invariant::DomainIBEX::add_maze_union)
-          .def("add_maze_inter", (void (invariant::DomainIBEX::*)(std::vector<invariant::MazeIBEX *> maze_list)) &invariant::DomainIBEX::add_maze_inter)
-          .def("add_maze_inter", (void (invariant::DomainIBEX::*)(invariant::MazeIBEX *maze)) &invariant::DomainIBEX::add_maze_inter)
+//          .def("add_maze_union", (void (invariant::DomainIBEX::*)(std::vector<invariant::MazeIBEX *> maze_list)) &invariant::DomainIBEX::add_maze_union)
+//          .def("add_maze_union", (void (invariant::DomainIBEX::*)(invariant::MazeIBEX *maze)) &invariant::DomainIBEX::add_maze_union)
+//          .def("add_maze_inter", (void (invariant::DomainIBEX::*)(std::vector<invariant::MazeIBEX *> maze_list)) &invariant::DomainIBEX::add_maze_inter)
+//          .def("add_maze_inter", (void (invariant::DomainIBEX::*)(invariant::MazeIBEX *maze)) &invariant::DomainIBEX::add_maze_inter)
     ;
 
   // ********* Dynamics Function *********

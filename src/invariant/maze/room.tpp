@@ -486,7 +486,7 @@ void Room<_Tp>::contract_consistency(){
     /// ************ Compute propagation ************ //
     bool global_compute = false;
     for(int n_vf=0; n_vf<nb_vec; n_vf++){
-        if(m_vector_field_zero[n_vf] && nb_vec==1){ // Case Zero in f // ToDo : Check condition nb_vec==1 ?
+        if(m_vector_field_zero[n_vf]){ // Case Zero in f
             if(domain_init == FULL_WALL && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output)))
                 this->set_full_possible();
         }
