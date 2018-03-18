@@ -506,8 +506,6 @@ ibex::IntervalVector convert_iv(const ibex::IntervalVector &iv);
 
 ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p);
 
-ibex::IntervalVector contract_polynome(const ibex::Interval &a, const ibex::Interval &b, const ibex::Interval &c, const ibex::IntervalVector &box);
-
 ///
 /// \brief Get the difference Hull a\b
 /// \param a

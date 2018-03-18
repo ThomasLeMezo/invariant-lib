@@ -30,6 +30,8 @@ include_directories(serialization)
 
     definition/dataSet/datasetfunction.cpp
     definition/dataSet/datasetnode.cpp
+
+    maze/taylor.cpp
   )
 
   if(WITH_NETCDF)
@@ -86,6 +88,8 @@ include_directories(serialization)
     maze/sepmaze.tpp
 
     maze/eulerianmaze.tpp
+
+    maze/taylor.h
   )
 
   if(WITH_NETCDF)

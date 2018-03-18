@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    omp_set_num_threads(1);
-    for(int i=0; i<4; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<12; i++){
         cout << i << endl;
         paving.bisect();
 //        if(i==7)
