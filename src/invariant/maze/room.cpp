@@ -19,21 +19,6 @@ ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p){
 
 template<>
 void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
-    // Contraction with Taylor 1 order
-    // ToDo : implement with several vector fields...
-    if(in.size()==2 && m_vector_fields_d1.size()>0){
-        ibex::IntervalMatrix jac=m_vector_fields_d1[0];
-        ibex::IntervalVector vect_d(2);
-        vect_d[0] = jac[0][0]*vect[0] + 0.5*jac[0][1]*vect[1];
-        vect_d[1] = jac[1][1]*vect[1] + 0.5*jac[1][0]*vect[0];
-        ibex::IntervalVector vect_in = m_maze->get_dynamics()->eval(in)[0];
-
-        if(sens==FWD)
-            out &= taylor_contrat_box(out, vect_d, vect_in, in);
-        else if(sens==BWD)
-            in &= taylor_contrat_box(in, vect_d, -vect_in, out);
-    }
-
     // Contraction with Taylor 0 order
     // assert 0 not in v.
 
@@ -58,6 +43,22 @@ void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::I
         out &= (c+in);
     else if(sens==BWD)
         in &= (c+out);
+
+
+    // Contraction with Taylor 1 order
+    // ToDo : implement with several vector fields...
+//    if(in.size()==2 && !in.is_empty() && !out.is_empty() && m_vector_fields_d1.size()>0){
+//        ibex::IntervalMatrix jac=m_vector_fields_d1[0];
+//        ibex::IntervalVector vect_d(2);
+//        vect_d[0] = jac[0][0]*vect[0] + 0.5*jac[0][1]*vect[1];
+//        vect_d[1] = jac[1][1]*vect[1] + 0.5*jac[1][0]*vect[0];
+//        ibex::IntervalVector vect_in = m_maze->get_dynamics()->eval(in)[0];
+
+//        if(sens==FWD)
+//            out &= taylor_contrat_box(out, vect_d, vect_in, in);
+//        else if(sens==BWD)
+//            in &= taylor_contrat_box(in, vect_d, -vect_in, out);
+//    }
 }
 
 template <>

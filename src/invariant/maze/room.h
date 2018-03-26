@@ -25,6 +25,7 @@ _Tp get_empty_door_container(int dim);
 #include "maze.h"
 #include "door.h"
 #include "face.h"
+#include "resultstorage.h"
 
 namespace ppl=Parma_Polyhedra_Library;
 
@@ -360,14 +361,14 @@ protected:
      * @param n_vf
      * @param out_results
      */
-    void compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector< std::array<_Tp, 2> > > &in_results);
+    void compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_storage);
 
     /**
      * @brief compute_standard_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_standard_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector< std::array<_Tp, 2> > > &in_results);
+    void compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result_storage);
 
 public:
     /**

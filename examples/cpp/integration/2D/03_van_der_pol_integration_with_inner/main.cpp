@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    ibex::Function f(x1, x2, -Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //

@@ -57,6 +57,7 @@ include_directories(serialization)
     maze/room.h
     maze/door.h
     maze/sepmaze.h
+    maze/resultstorage.h
 
     maze/eulerianmaze.h
 
@@ -86,6 +87,7 @@ include_directories(serialization)
     maze/room.tpp
     maze/door.tpp
     maze/sepmaze.tpp
+    maze/resultstorage.tpp
 
     maze/eulerianmaze.tpp
 

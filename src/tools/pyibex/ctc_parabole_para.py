@@ -29,26 +29,26 @@ def drawPolygone(a0, b0, c0, a1, b1, c1, t, color=''):
 def draw_trajectories(a, b, c, time_step):
 	
 	
-	drawPolygone(a[0].lb(), b[0].ub(), c[0].lb(), a[1].lb(), b[1].ub(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].lb(), b[0].ub(), c[0].lb(), a[1].lb(), b[1].ub(), c[1].lb(), time_step, "red")
 	drawPolygone(a[0].lb(), b[0].ub(), c[0].ub(), a[1].lb(), b[1].ub(), c[1].ub(), time_step, "red")
-	drawPolygone(a[0].ub(), b[0].lb(), c[0].lb(), a[1].ub(), b[1].lb(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].ub(), b[0].lb(), c[0].lb(), a[1].ub(), b[1].lb(), c[1].lb(), time_step, "red")
 	drawPolygone(a[0].ub(), b[0].lb(), c[0].ub(), a[1].ub(), b[1].lb(), c[1].ub(), time_step, "red")
 	
 	drawPolygone(a[0].lb(), b[0].ub(), c[0].lb(), a[1].ub(), b[1].lb(), c[1].ub(), time_step, "red")
-	drawPolygone(a[0].lb(), b[0].ub(), c[0].ub(), a[1].ub(), b[1].lb(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].lb(), b[0].ub(), c[0].ub(), a[1].ub(), b[1].lb(), c[1].lb(), time_step, "red")
 	drawPolygone(a[0].ub(), b[0].lb(), c[0].lb(), a[1].lb(), b[1].ub(), c[1].ub(), time_step, "red")
-	drawPolygone(a[0].ub(), b[0].lb(), c[0].ub(), a[1].lb(), b[1].ub(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].ub(), b[0].lb(), c[0].ub(), a[1].lb(), b[1].ub(), c[1].lb(), time_step, "red")
 
 	# c[0].lb(), c[1].ub()
 	drawPolygone(a[0].ub(), b[0].ub(), c[0].lb(), a[1].lb(), b[1].lb(), c[1].ub(), time_step, "red")
 	drawPolygone(a[0].lb(), b[0].lb(), c[0].lb(), a[1].ub(), b[1].ub(), c[1].ub(), time_step, "red")
 	# c[0].lb(), c[1].lb()
-	drawPolygone(a[0].ub(), b[0].ub(), c[0].lb(), a[1].ub(), b[1].ub(), c[1].lb(), time_step, "red")
-	drawPolygone(a[0].lb(), b[0].lb(), c[0].lb(), a[1].lb(), b[1].lb(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].ub(), b[0].ub(), c[0].lb(), a[1].ub(), b[1].ub(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].lb(), b[0].lb(), c[0].lb(), a[1].lb(), b[1].lb(), c[1].lb(), time_step, "red")
 	
 	# c[1].ub(), c[1].lb()
-	drawPolygone(a[0].ub(), b[0].ub(), c[0].ub(), a[1].lb(), b[1].lb(), c[1].lb(), time_step, "red")
-	drawPolygone(a[0].lb(), b[0].lb(), c[0].ub(), a[1].ub(), b[1].ub(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].ub(), b[0].ub(), c[0].ub(), a[1].lb(), b[1].lb(), c[1].lb(), time_step, "red")
+	# drawPolygone(a[0].lb(), b[0].lb(), c[0].ub(), a[1].ub(), b[1].ub(), c[1].lb(), time_step, "red")
 
 	# c[1].ub(), c[1].ub()
 	drawPolygone(a[0].ub(), b[0].ub(), c[0].ub(), a[1].ub(), b[1].ub(), c[1].ub(), time_step, "red")
@@ -62,7 +62,7 @@ def compute_box(t, a, b, c):
 def compute_t(x, a, b, c, t):
 	if(not a == Interval.ZERO):
 		t1 = (-b+sqrt(b**2-4*a*c))/(2*a) & Interval.POS_REALS & t
-		t2 = (-b-sqrt(b**2-4*a*c))/(2*a) & Interval.POS_REALS & t	
+		t2 = (-b-sqrt(b**2-4*a*c))/(2*a) & Interval.POS_REALS & t
 
 		if(not (t2 & Interval.POS_REALS).is_empty()):
 			if(t1.lb()<=t2.ub()):
@@ -84,13 +84,17 @@ def contract_box(box, a, b, c, sens, t):
 		c1 = c[1][0]-box[1]
 		t_y = compute_t(box[1], a[1], b[1], c1.lb(), t)
 		box_tmp |= compute_box(t_y, a, b, c)
+		print("t_y = ", t_y, " box_tmp = ", box_tmp)
 		t_y = compute_t(box[1], a[1], b[1], c1.ub(), t)
 		box_tmp |= compute_box(t_y, a, b, c)
+		print("t_y = ", t_y, " box_tmp = ", box_tmp)
 
 		c1 = c[1][1]-box[1]
 		t_y = compute_t(box[1], a[1], b[1], c1.lb(), t)
 		box_tmp |= compute_box(t_y, a, b, c)
+		print("t_y = ", t_y, " box_tmp = ", box_tmp)
 		t_y = compute_t(box[1], a[1], b[1], c1.ub(), t)
+		print("t_y = ", t_y, " box_tmp = ", box_tmp, "\n")
 		box_tmp |= compute_box(t_y, a, b, c)
 	else:
 		c1 = c[0][0]-box[0]
@@ -104,12 +108,14 @@ def contract_box(box, a, b, c, sens, t):
 		box_tmp |= compute_box(t_x, a, b, c)
 		t_x = compute_t(box[0], a[0], b[0], c1.ub(), t)
 		box_tmp |= compute_box(t_x, a, b, c)
+
+	drawBox(box_tmp, "blue")
 	return box_tmp
 
 def test_case(pave, box, a, b, c, name):
 	vibes.newFigure(name)
 	vibes.setFigureSize(512, 512)
-	vibes.axisLimits(-0.5, 2, -0.5, 1.5)
+	vibes.axisLimits(pave[0][0]-1, pave[0][1]+1, pave[1][0]-1, pave[1][1]+1)
 	print("#### ", name, "####")
 
 	sens = 0
@@ -144,46 +150,62 @@ def test_case(pave, box, a, b, c, name):
 vibes.beginDrawing()
 
 pave = IntervalVector([[0, 1], [0, 1]])
-box = IntervalVector([[0, 1], [1, 1]])
+out = IntervalVector([[0, 1], [1, 1]])
 
 # a = IntervalVector([[1, 1], [1, 2]])
 # b = IntervalVector([[1, 1], [0, 0]])
 # c = IntervalVector([[0, 0], [0, 0]])
-# test_case(pave, box, a, b, c, "Test 1")
+# test_case(pave, out, a, b, c, "Test 1")
 
 # a = IntervalVector([[0.8, 1], [0.8, 1]])
 # b = IntervalVector([[0.5, 0.8], [0.5, 0.8]])
 # c = IntervalVector([[0.5, 0.7], [0, 0]])
-# test_case(pave, box, a, b, c, "Test 2")
+# test_case(pave, out, a, b, c, "Test 2")
 
 ########### Not optimal ! ####################
-a = IntervalVector([[0.5, 1.0], [1, 1]])
-b = IntervalVector([[0.5, 1], [0.5, 1]])
-c = IntervalVector([[0.5, 0.7], [0, 0]])
-test_case(pave, box, a, b, c, "Test 3") 
+# a = IntervalVector([[0.5, 1.0], [1, 1]])
+# b = IntervalVector([[0.5, 1], [0.5, 1]])
+# c = IntervalVector([[0.5, 0.7], [0, 0]])
+# test_case(pave, out, a, b, c, "Test 3") 
 ##############################################
 
 # a = IntervalVector([[0.5, 1.0], [1, 1]])
 # b = IntervalVector([[0.5, 1], [0.5, 1]])
 # c = IntervalVector([[0, 0], [0.25, 0.5]])
-# test_case(pave, box, a, b, c, "Test 4")
+# test_case(pave, out, a, b, c, "Test 4")
 
 # a = IntervalVector([[-1.0, -0.5], [1, 1]])
 # b = IntervalVector([[0.5, 1], [0.5, 1]])
 # c = IntervalVector([[0, 0], [0.25, 0.5]])
-# test_case(pave, box, a, b, c, "Test 5")
+# test_case(pave, out, a, b, c, "Test 5")
 
 # a = IntervalVector([[-1.0, 0], [0.0, 1]])
 # b = IntervalVector([[0.5, 1], [0.5, 1]])
 # c = IntervalVector([[0, 0], [0.25, 0.5]])
-# test_case(pave, box, a, b, c, "Test 6")
+# test_case(pave, out, a, b, c, "Test 6")
 
 # a = IntervalVector([[-0.5, 0.5], [-0.5, 0.5]])
 # b = IntervalVector([[0.5, 1], [0.5, 1]])
 # c = IntervalVector([[0, 0], [0.25, 0.5]])
-# test_case(pave, box, a, b, c, "Test 7")
+# test_case(pave, out, a, b, c, "Test 7")
 
 # a = IntervalVector([[-1, 1], [-1, 1]])
 # b = IntervalVector([[-1, 1], [-1, 1]])
 # c = IntervalVector([[0, 0], [0.25, 0.5]])
-# test_case(pave, box, a, b, c, "Test 8")
+# test_case(pave, out, a, b, c, "Test 8")
+
+
+pave = IntervalVector([[1.875, 2.25] , [0.75, 1.5]])
+c = IntervalVector([[1.875, 1.875] , [0.75, 1.5]])
+a = IntervalVector([[-4.171875, -1.880859375], [3.65057373046875, 32.466796875]])
+b = IntervalVector([[0.75, 1.5], [-5.6484375, -3.76171875]])
+out = IntervalVector([[1.875, 2.25] , [0.75, 0.75]]) 
+test_case(pave, out, a, b, c, "Van Der Pol test 1")
+
+pave = IntervalVector([[1.875, 2.25] , [0.75, 1.5]])
+OUT = IntervalVector([[1.875, 1.875] , [0.75, 1.5]])
+a = IntervalVector([[-4.171875, -1.880859375], [3.65057373046875, 32.466796875]])
+b = IntervalVector([[0.75, 1.5], [-5.6484375, -3.76171875]])
+IN = IntervalVector([[1.875, 2.25] , [0.75, 0.75]]) 
+test_case(pave, OUT, a, b, IN, "Van Der Pol test 2")
+

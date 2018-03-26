@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn(&f, FWD_BWD, true);
+    Dynamics_Function dyn(&f, FWD_BWD, false);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<12; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
 //        if(i==7)
@@ -83,10 +83,11 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze);
     v_maze.setProperties(0, 0, 512, 521);
     v_maze.show();
+    vibes::drawLine(ptX, ptY, "green[green]");
 
     IntervalVector position_info(2);
     position_info[0] = ibex::Interval(2);
-    position_info[1] = ibex::Interval(0.3);
+    position_info[1] = ibex::Interval(1.2);
 //    v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();

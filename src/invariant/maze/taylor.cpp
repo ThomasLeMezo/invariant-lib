@@ -20,6 +20,9 @@ ibex::Interval taylor_contract_t(const ibex::Interval &t, const ibex::Interval &
         ibex::Interval t1 = (-b+sqrt(pow(b, 2)-4*a*c))/(2*a) & Interval::POS_REALS & t;
         ibex::Interval t2 = (-b-sqrt(pow(b,2)-4*a*c))/(2*a) & Interval::POS_REALS & t;
 
+        if(t1.is_empty() & t2.is_empty())
+            t1 = Interval::POS_REALS; // Debug...
+
         if(!(t2 & ibex::Interval::POS_REALS).is_empty()){
             if(t1.lb() <= t2.ub())
                 return (t2 | t1);

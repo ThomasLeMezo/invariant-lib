@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<18; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<14; i++){
         subpaving.bisect();
         cout << i << " - " << maze_outer.contract() << endl;
         cout << i << " - " << maze_inner.contract() << endl;

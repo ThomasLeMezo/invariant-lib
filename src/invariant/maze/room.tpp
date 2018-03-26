@@ -300,7 +300,7 @@ void Room<_Tp>::contract_vector_field(){
 }
 
 template<typename _Tp>
-void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector<std::array<_Tp, 2> > > &in_results){
+void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_storage){
     const int dim = m_pave->get_dim();
     DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
@@ -318,7 +318,8 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
 
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
                     //                    door->set_input_private(in_return); // Write input // Not a good idea here ? => To Check the impact !
-                    in_results[n_vf][face][sens] = in_return;
+//                    in_results[n_vf][face][sens] = in_return;
+                    result_storage.push_back_input(in_return, face, sens, face, sens);
 
                     /// Impact on other faces (OUT -> IN)
                     if(!out_return.is_empty()){
@@ -331,7 +332,8 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
                                     _Tp in_tmp(door_in->get_input_private());
                                     if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD); // ToDo : check _fwd ?
-                                        in_results[n_vf][face_in][sens_in] |= in_tmp;
+                                        result_storage.push_back_input(in_tmp, face_in, sens_in, face, sens);
+//                                        in_results[n_vf][face_in][sens_in] |= in_tmp;
                                     }
                                 }
                             }
@@ -341,7 +343,8 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
                 if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
                     /// Write output here to improve standard mode efficency
                     //                    door->set_output_private(out_return); // Write output ==> See remarks before
-                    out_results[n_vf][face][sens] = out_return;
+//                    out_results[n_vf][face][sens] = out_return;
+                    result_storage.push_back_output(out_return, face, sens, face, sens);
 
                     /// Impact on other faces (IN -> OUT)
                     if(!in_return.is_empty()){
@@ -354,7 +357,8 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
                                     _Tp in_tmp(in_return);
                                     if(!out_tmp.is_empty() && door_out->is_possible_out()[n_vf]){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+//                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+                                        result_storage.push_back_output(out_tmp, face, sens, face_out, sens_out);
                                     }
                                 }
                             }
@@ -367,7 +371,7 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, std::vector<std::vector< st
 }
 
 template<typename _Tp>
-void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<std::array<_Tp, 2> > > &out_results, std::vector<std::vector<std::array<_Tp, 2> > > &in_results){
+void Room<_Tp>::compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result_storage){
     const int dim = m_pave->get_dim();
     DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
@@ -396,7 +400,8 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
 
                                     if(!out_tmp.is_empty() && !in_tmp.is_empty()){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+//                                        out_results[n_vf][face_out][sens_out] |= out_tmp;
+                                        result_storage.push_back_output(out_tmp, face_in, sens_in, face_out, sens_out);
                                     }
                                 }
                                 /// ************ OUT -> IN ************
@@ -407,7 +412,8 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
 
                                     if(!out_tmp.is_empty() && !in_tmp.is_empty()){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
-                                        in_results[n_vf][face_in][sens_in] |= in_tmp;
+//                                        in_results[n_vf][face_in][sens_in] |= in_tmp;
+                                        result_storage.push_back_input(in_tmp, face_in, sens_in, face_out, sens_out);
                                     }
                                 }
                             }
@@ -433,7 +439,8 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
 
                     if(!out_tmp.is_empty()){
                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                        out_results[n_vf][face][sens] |= out_tmp;
+//                        out_results[n_vf][face][sens] |= out_tmp;
+                        result_storage.push_back_output_initial(out_tmp, face, sens);
                     }
                 }
 
@@ -445,7 +452,8 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, std::vector<std::vector<st
 
                     if(!in_tmp.is_empty()){
                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
-                        in_results[n_vf][face][sens] |= in_tmp;
+//                        in_results[n_vf][face][sens] |= in_tmp;
+                        result_storage.push_back_input_initial(in_tmp, face, sens);
                     }
 
                 }
@@ -471,50 +479,55 @@ void Room<_Tp>::contract_consistency(){
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
 
     /// ************ Create empty results vector ************ //
-    std::vector<std::vector< std::array<_Tp, 2> > > out_results, in_results; // One per vec_field, dim, sens
     const int nb_vec = m_vector_fields.size();
-    for(int vf=0; vf<nb_vec; vf++){
-        std::vector< std::array<_Tp, 2>> out_result;
-        for(int i=0; i<dim; i++){
-            std::array<_Tp, 2> output = {get_empty_door_container<_Tp>(dim), get_empty_door_container<_Tp>(dim)};
-            out_result.push_back(output);
-        }
-        out_results.push_back(out_result);
-        in_results.push_back(out_result);
-    }
+
+//    std::vector<std::vector< std::array<_Tp, 2> > > out_results, in_results; // One per vec_field, dim, sens
+//    for(int vf=0; vf<nb_vec; vf++){
+//        std::vector< std::array<_Tp, 2>> out_result;
+//        for(int i=0; i<dim; i++){
+//            std::array<_Tp, 2> output = {get_empty_door_container<_Tp>(dim), get_empty_door_container<_Tp>(dim)};
+//            out_result.push_back(output);
+//        }
+//        out_results.push_back(out_result);
+//        in_results.push_back(out_result);
+//    }
+    ResultStorage<_Tp> result_storage(dim);
 
     /// ************ Compute propagation ************ //
     bool global_compute = false;
     for(int n_vf=0; n_vf<nb_vec; n_vf++){
-        if(m_vector_field_zero[n_vf]){ // Case Zero in f
+        if(m_vector_field_zero[n_vf]){ // Case Zero in f --- ToDo : Check working seems WRONG ! ???
             if(domain_init == FULL_WALL && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output)))
                 this->set_full_possible();
         }
         else{
             global_compute |= true;
-            compute_sliding_mode(n_vf, out_results, in_results);
-            compute_standard_mode(n_vf, out_results, in_results);
+//            compute_sliding_mode(n_vf, out_results, in_results);
+//            compute_standard_mode(n_vf, out_results, in_results);
+            compute_sliding_mode(n_vf, result_storage);
+            compute_standard_mode(n_vf, result_storage);
         }
     }
 
     /// ************ Save propagation to private doors ************ //
     if(global_compute){
-        for(int face = 0; face<dim; face++){
-            for(int sens = 0; sens < 2; sens++){
+        for(size_t face = 0; face<(size_t)dim; face++){
+            for(size_t sens = 0; sens < 2; sens++){
                 Face<_Tp>* f= m_pave->get_faces()[face][sens];
                 Door<_Tp>* door = f->get_doors()[m_maze];
 
                 if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
-                    _Tp door_out_iv(door->get_face()->get_position_typed());
-                    bool one_possible = false;
-                    for(int n_vf=0; n_vf<nb_vec; n_vf++){
-                        if(domain_init == FULL_DOOR || (domain_init == FULL_WALL && door->is_possible_out()[n_vf])){
-                            one_possible = true;
-                            door_out_iv &= out_results[n_vf][face][sens];
-                        }
-                    }
-                    if(!one_possible) // For Kernel
-                        set_empty<_Tp>(door_out_iv);
+//                    _Tp door_out_iv(door->get_face()->get_position_typed());
+//                    bool one_possible = false;
+//                    for(int n_vf=0; n_vf<nb_vec; n_vf++){
+//                        if(domain_init == FULL_DOOR || (domain_init == FULL_WALL && door->is_possible_out()[n_vf])){
+//                            one_possible = true;
+//                            door_out_iv &= out_results[n_vf][face][sens];
+//                        }
+//                    }
+//                    if(!one_possible) // For Kernel
+//                        set_empty<_Tp>(door_out_iv);
+                    _Tp door_out_iv = result_storage.get_output(face, sens);
 
                     if(domain_init == FULL_DOOR)
                         door_out_iv &= door->get_output_private();
@@ -527,16 +540,18 @@ void Room<_Tp>::contract_consistency(){
                     door->set_output_private(door_out_iv);
                 }
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
-                    _Tp door_in_iv(door->get_face()->get_position_typed());
-                    bool one_possible = false;
-                    for(int n_vf=0; n_vf<nb_vec; n_vf++){
-                        if(domain_init == FULL_DOOR || (domain_init == FULL_WALL && door->is_possible_in()[n_vf])){
-                            one_possible = true;
-                            door_in_iv &= in_results[n_vf][face][sens];
-                        }
-                    }
-                    if(!one_possible) // For Kernel
-                        set_empty<_Tp>(door_in_iv);
+//                    _Tp door_in_iv(door->get_face()->get_position_typed());
+//                    bool one_possible = false;
+//                    for(int n_vf=0; n_vf<nb_vec; n_vf++){
+//                        if(domain_init == FULL_DOOR || (domain_init == FULL_WALL && door->is_possible_in()[n_vf])){
+//                            one_possible = true;
+//                            door_in_iv &= in_results[n_vf][face][sens];
+//                        }
+//                    }
+//                    if(!one_possible) // For Kernel
+//                        set_empty<_Tp>(door_in_iv);
+
+                    _Tp door_in_iv = result_storage.get_input(face, sens);
 
                     if(domain_init == FULL_DOOR)
                         door_in_iv &= door->get_input_private();
@@ -830,17 +845,16 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() != FULL_WALL)
-        return false;
+    if(m_maze->get_domain()->get_init() == FULL_DOOR){
 
-//    ibex::IntervalVector position(2);
-//    position[0] = ibex::Interval(-2.078125, -1.78125);
-//    position[1] = ibex::Interval(3.328125, 3.625);
+    ibex::IntervalVector position(2);
+    position[0] = ibex::Interval(1.875, 2.25);
+    position[1] = ibex::Interval(0.75, 1.5);
 
-    ibex::IntervalVector position(3);
-    position[0] = ibex::Interval(0, 450);
-    position[1] = ibex::Interval(45976.5625, 46074.21875);
-    position[2] = ibex::Interval(125566.40625, 125664.0625);
+//    ibex::IntervalVector position(3);
+//    position[0] = ibex::Interval(0, 450);
+//    position[1] = ibex::Interval(45976.5625, 46074.21875);
+//    position[2] = ibex::Interval(125566.40625, 125664.0625);
 
 //    ibex::IntervalVector position(3);
 //    position[0] = ibex::Interval(0, 450);
@@ -884,7 +898,11 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
         }
         return true;
     }
-    return false;
+    else
+        return false;
+    }
+    else
+        return false;
 }
 
 template<typename _Tp>
