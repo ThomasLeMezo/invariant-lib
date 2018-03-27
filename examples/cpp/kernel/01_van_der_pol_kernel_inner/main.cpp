@@ -55,7 +55,6 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze.contract(); // To init the first room in case of Propagator
     for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << " - " << maze.contract() << " - " << paving.size() << endl;

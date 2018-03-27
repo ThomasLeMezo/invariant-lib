@@ -1,4 +1,5 @@
 #include "spacefunction.h"
+#include "iostream"
 
 using namespace std;
 using namespace ibex;

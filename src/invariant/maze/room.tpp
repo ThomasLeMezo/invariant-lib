@@ -139,6 +139,7 @@ void Room<_Tp>::compute_vector_field(){
     m_contain_zero = false;
     ibex::IntervalVector position(m_pave->get_position());
 
+    // Contract position according to father_hull to get a better vector field approximation
     if(m_maze->get_contract_vector_field() && m_is_father_hull){
         position &= convert_iv(*m_father_hull);
     }
