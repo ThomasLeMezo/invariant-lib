@@ -34,8 +34,6 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
             Room<_Tp> *r = p->get_rooms()[maze];
             if(!r->is_removed()){
-                //                if(m_domain_init == FULL_DOOR) // Not necessary
-                //                    r->set_full_private_with_father();
                 if(m_domain_init == FULL_WALL)
                     r->set_empty_private();
                 r->reset_first_contract();

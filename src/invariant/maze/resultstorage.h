@@ -20,7 +20,7 @@ template <typename _Tp=ibex::IntervalVector>
 class ResultStorage
 {   
 public:
-    ResultStorage(size_t dim);
+    ResultStorage(size_t dim, size_t nb_vf=1);
 
     void test();
 
@@ -44,6 +44,7 @@ private:
     sub_tab_type m_output_initial;
 
     size_t m_dim;
+    size_t m_nb_vf;
 };
 
 }

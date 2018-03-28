@@ -57,24 +57,25 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    ibex::Function f_outer(x1, x2, Return(x2,
-                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+2.0));
-    ibex::Function f_inner(x1, x2, -Return(x2,
-                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+2.0));
-    Dynamics_Function dyn_outer(&f_outer, FWD);
-    Dynamics_Function dyn_inner(&f_inner, BWD);
+//    ibex::Interval u(1.2);
+//    ibex::Interval u(-1.2);
+    ibex::Interval u(-1.2, 1.2);
+    ibex::Function f(x1, x2, Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+u));
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     
     for(int i=0; i<15; i++){
+        cout << i  << endl;
         paving.bisect();
-        cout << i << " outer - " << maze_outer.contract() << " - " << paving.size() << endl;
-        cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
+        maze_outer.contract();
+        maze_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -87,9 +88,9 @@ int main(int argc, char *argv[])
 
     v_maze.drawCircle(0.0, 0.0, 1, "black[red]");
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(-1.2, -1.16);
-    position_info[1] = ibex::Interval(3.62);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(-1.2, -1.16);
+//    position_info[1] = ibex::Interval(3.62);
 //    v_maze.get_room_info(&maze_inner, position_info);
 //    v_maze.show_room_info(&maze_inner, position_info);
 
