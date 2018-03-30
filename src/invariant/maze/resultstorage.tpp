@@ -45,33 +45,10 @@ void ResultStorage<_Tp>::push_back_output_initial(const _Tp &val, const size_t &
     m_output_initial[face][sens].push_back(val);
 }
 
-#if 0
 template<typename _Tp>
 _Tp ResultStorage<_Tp>::get_output(const size_t &face, const size_t &sens){
-    _Tp result = get_empty_door_container<_Tp>(m_dim);
-    for(size_t face_in = 0; face_in < m_dim; face_in++){
-        for(size_t sens_in = 0; sens_in < 2; sens_in++){
-            _Tp tmp(m_dim);
-            size_t nb_vf = m_input2output[face_in][sens_in][face][sens].size();
-//            if(nb_vf !=2)
-//                std::cout << "ERROR (output) nb_vf = " << nb_vf << std::endl;
-            if(nb_vf >0){
-                for(size_t n_vf=0; n_vf<nb_vf; n_vf++)
-                    tmp &= m_input2output[face_in][sens_in][face][sens][n_vf];
-                result |= tmp;
-            }
-        }
-    }
-    size_t nb_vf = m_output_initial[face][sens].size();
-    if(nb_vf>0){
-        for(size_t n_vf=0; n_vf<nb_vf; n_vf++)
-            result |= m_output_initial[face][sens][n_vf];
-    }
-    return result;
-}
-#else
-template<typename _Tp>
-_Tp ResultStorage<_Tp>::get_output(const size_t &face, const size_t &sens){
+    if(m_nb_vf>1)
+        return get_output2(face, sens);
     _Tp result = get_empty_door_container<_Tp>(m_dim);
     bool first = true;
 
@@ -98,33 +75,45 @@ _Tp ResultStorage<_Tp>::get_output(const size_t &face, const size_t &sens){
     }
     return result;
 }
-#endif
 
-#if 0
 template<typename _Tp>
-_Tp ResultStorage<_Tp>::get_input(const size_t &face, const size_t &sens){
+_Tp ResultStorage<_Tp>::get_output2(const size_t &face, const size_t &sens){
     _Tp result = get_empty_door_container<_Tp>(m_dim);
-    for(size_t face_out = 0; face_out < m_dim; face_out++){
-        for(size_t sens_out = 0; sens_out < 2; sens_out++){
-            _Tp tmp(m_dim);
-            size_t nb_vf = m_output2input[face][sens][face_out][sens_out].size();
-            if(nb_vf >0){
-                for(size_t n_vf=0; n_vf<nb_vf; n_vf++)
-                    tmp &= m_output2input[face][sens][face_out][sens_out][n_vf];
-                result |= tmp;
+
+    for(size_t n_vf=0; n_vf<m_nb_vf*4; n_vf++){
+        for(size_t face_in = 0; face_in < m_dim; face_in++){
+            for(size_t sens_in = 0; sens_in < 2; sens_in++){
+
+                for(size_t n_vf2=0; n_vf2<m_nb_vf*4; n_vf2++){
+                    for(size_t face_in2 = 0; face_in2 < m_dim; face_in2++){
+                        for(size_t sens_in2 = 0; sens_in2 < 2; sens_in2++){
+
+                            if(!(n_vf == n_vf2 && face_in == face_in2 && sens_in == sens_in2)){
+                                if(m_input2output[face_in][sens_in][face][sens].size()>n_vf
+                                   && m_input2output[face_in2][sens_in2][face][sens].size()>n_vf2)
+                                    result |= m_input2output[face_in][sens_in][face][sens][n_vf] & m_input2output[face_in2][sens_in2][face][sens][n_vf2];
+                            }
+
+                        }
+                    }
+                }
+
             }
         }
     }
-    size_t nb_vf = m_input_initial[face][sens].size();
+
+    size_t nb_vf = m_output_initial[face][sens].size();
     if(nb_vf>0){
         for(size_t n_vf=0; n_vf<nb_vf; n_vf++)
-            result |= m_input_initial[face][sens][n_vf];
+            result |= m_output_initial[face][sens][n_vf];
     }
     return result;
 }
-#else
+
 template<typename _Tp>
 _Tp ResultStorage<_Tp>::get_input(const size_t &face, const size_t &sens){
+    if(m_nb_vf>1)
+        return get_input2(face, sens);
     _Tp result = get_empty_door_container<_Tp>(m_dim);
     bool first = true;
 
@@ -151,7 +140,40 @@ _Tp ResultStorage<_Tp>::get_input(const size_t &face, const size_t &sens){
     }
     return result;
 }
-#endif
+
+template<typename _Tp>
+_Tp ResultStorage<_Tp>::get_input2(const size_t &face, const size_t &sens){
+    _Tp result = get_empty_door_container<_Tp>(m_dim);
+
+    for(size_t n_vf=0; n_vf<m_nb_vf*4; n_vf++){
+        for(size_t face_out = 0; face_out < m_dim; face_out++){
+            for(size_t sens_out = 0; sens_out < 2; sens_out++){
+
+                for(size_t n_vf2=0; n_vf2<m_nb_vf*4; n_vf2++){
+                    for(size_t face_out2 = 0; face_out2 < m_dim; face_out2++){
+                        for(size_t sens_out2 = 0; sens_out2 < 2; sens_out2++){
+
+                            if(!(n_vf == n_vf2 && face_out == face_out2 && sens_out == sens_out2)){
+                                if(m_output2input[face][sens][face_out][sens_out].size()>n_vf
+                                   && m_output2input[face][sens][face_out2][sens_out2].size()>n_vf2)
+                                    result |= m_output2input[face][sens][face_out][sens_out][n_vf] & m_output2input[face][sens][face_out2][sens_out2][n_vf2];
+                            }
+
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    size_t nb_vf = m_input_initial[face][sens].size();
+    if(nb_vf>0){
+        for(size_t n_vf=0; n_vf<nb_vf; n_vf++)
+            result |= m_input_initial[face][sens][n_vf];
+    }
+    return result;
+}
 
 
 }

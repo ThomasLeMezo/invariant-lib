@@ -58,10 +58,7 @@ int main(int argc, char *argv[])
     for(int i=0; i<14; i++){
         cout << i << endl;
         paving.bisect();
-//        if(i==9)
-//            maze.contract(1000);
-//        else
-            maze.contract();
+        maze.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -72,10 +69,10 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(0.7);
-    position_info[1] = ibex::Interval(-1.54);
-    v_maze.show_room_info(&maze, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(0.7);
+//    position_info[1] = ibex::Interval(-1.54);
+//    v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();
 }

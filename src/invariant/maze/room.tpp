@@ -237,6 +237,10 @@ void Room<_Tp>::contract_vector_field(){
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
 
+    ibex::IntervalVector vector_fields_union(m_vector_fields[0]);
+    for(size_t n_vf=1; n_vf<m_vector_fields.size(); n_vf++)
+        vector_fields_union |= m_vector_fields[n_vf];
+
     for(Face<_Tp> *f:m_pave->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[m_maze];
 
@@ -276,9 +280,9 @@ void Room<_Tp>::contract_vector_field(){
                 d->push_back_possible_out(true);
 
             /// ************* Compute Collinearity *************
-            ibex::IntervalVector product = hadamard_product(v, f->get_normal());
 
             // Collinearity
+            ibex::IntervalVector product = hadamard_product(vector_fields_union, f->get_normal()); // // v instead of vector_fields_union
             if(zero.is_subset(product))
                 d->push_back_collinear_vector_field(true);
             else
@@ -287,7 +291,7 @@ void Room<_Tp>::contract_vector_field(){
             // Composante collineaire
             std::vector<bool> where_zeros;
             for(int n_dim=0; n_dim<dim; n_dim++){
-                if(ibex::Interval::ZERO.is_subset(v[n_dim]))
+                if(ibex::Interval::ZERO.is_subset(vector_fields_union[n_dim])) // v instead of vector_fields_union
                     where_zeros.push_back(true);
                 else
                     where_zeros.push_back(false);

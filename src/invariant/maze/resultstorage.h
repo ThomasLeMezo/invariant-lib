@@ -31,7 +31,9 @@ public:
     void push_back_output_initial(const _Tp &val, const size_t &face, const size_t &sens);
 
     _Tp get_output(const size_t &face, const size_t &sens);
+    _Tp get_output2(const size_t &face, const size_t &sens);
     _Tp get_input(const size_t &face, const size_t &sens);
+    _Tp get_input2(const size_t &face, const size_t &sens);
 
 private:
     typedef std::vector< std::array<std::vector<_Tp>, 2>> sub_tab_type;
