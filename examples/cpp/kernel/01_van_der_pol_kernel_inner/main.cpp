@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-6,6);
-    space[1] = ibex::Interval(-6,6);
+    space[0] = ibex::Interval(-3,3);
+    space[1] = ibex::Interval(-3,3);
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
@@ -55,7 +55,8 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<14; i++){
+    omp_set_num_threads(1);
+    for(int i=0; i<11; i++){
         cout << i << endl;
         paving.bisect();
         maze.contract();
@@ -69,10 +70,11 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(0.7);
-//    position_info[1] = ibex::Interval(-1.54);
-//    v_maze.show_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(1.45);
+    position_info[1] = ibex::Interval(-1.2);
+    v_maze.show_room_info(&maze, position_info);
+    v_maze.setProperties(0, 10, 512, 512);
 
     vibes::endDrawing();
 }

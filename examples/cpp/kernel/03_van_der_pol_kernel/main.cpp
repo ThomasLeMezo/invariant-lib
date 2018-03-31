@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(false);
 
     // ****** Dynamics Outer ******* //
-    float u = 0.3;
+    float u = 1.0;
     ibex::Function f_outer(x1, x2, -Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-u, u)));
     Dynamics_Function dyn_outer(&f_outer, FWD_BWD);

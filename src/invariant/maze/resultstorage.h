@@ -16,19 +16,19 @@ using ResultStorageIBEX = ResultStorage<ibex::IntervalVector>;
 
 class Dynamics; // declared only for friendship
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _Tp>
 class ResultStorage
 {   
 public:
-    ResultStorage(size_t dim, size_t nb_vf=1);
+    ResultStorage(const size_t &dim, const size_t &nb_vf);
 
     void test();
 
-    void push_back_input(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out);
-    void push_back_output(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out);
+    void push_back_input(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
+    void push_back_output(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
 
-    void push_back_input_initial(const _Tp &val, const size_t &face, const size_t &sens);
-    void push_back_output_initial(const _Tp &val, const size_t &face, const size_t &sens);
+    void push_back_input_initial(const _Tp &val, const size_t &face, const size_t &sens, const size_t &n_vf);
+    void push_back_output_initial(const _Tp &val, const size_t &face, const size_t &sens, const size_t &n_vf);
 
     _Tp get_output(const size_t &face, const size_t &sens);
     _Tp get_output2(const size_t &face, const size_t &sens);
@@ -36,6 +36,7 @@ public:
     _Tp get_input2(const size_t &face, const size_t &sens);
 
 private:
+    //
     typedef std::vector< std::array<std::vector<_Tp>, 2>> sub_tab_type;
     typedef std::vector< std::array<sub_tab_type, 2>> tab_type;
 
