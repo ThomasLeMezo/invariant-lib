@@ -23,6 +23,7 @@ public:
      * @param functions
      */
     Dynamics_Function(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    Dynamics_Function(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool taylor=false);
 
     /**
      * @brief Dynamics destructor
@@ -55,6 +56,11 @@ private:
      * @param function
      */
     void add_function_d1(ibex::Function* f);
+
+    /**
+     * @brief compute taylor functions
+     */
+    void compute_taylor(bool taylor);
 
 protected:
     std::vector<ibex::Function*> m_functions;

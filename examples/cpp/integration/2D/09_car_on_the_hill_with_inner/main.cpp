@@ -59,14 +59,20 @@ int main(int argc, char *argv[])
     // ****** Dynamics Outer & Inner ******* //
 //    ibex::Interval u(1.2);
 //    ibex::Interval u(-1.2);
-    ibex::Interval u(-1.2, 1.2);
+    double u= 1.2;
     ibex::Function f(x1, x2, Return(x2,
-                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+u));
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
     Dynamics_Function dyn(&f, FWD);
+
+    ibex::Function f1(x1, x2, Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
+    ibex::Function f2(x1, x2, Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
+    Dynamics_Function dyn_u(&f1, &f2, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_u);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

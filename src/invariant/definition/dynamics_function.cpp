@@ -8,24 +8,34 @@ Dynamics_Function::Dynamics_Function(const vector<Function*> functions, const DY
     Dynamics(sens)
 {
     m_functions = functions;
+    compute_taylor(taylor);
     omp_init_lock(&m_lock_dynamics);
-    if(taylor){
-        for(Function* f:functions){
-            ibex::Function *f_diff = new ibex::Function(*f, ibex::Function::DIFF);
-            m_functions_d1.push_back(f_diff);
-        }
-    }
 }
 
 Dynamics_Function::Dynamics_Function(Function *f, const DYNAMICS_SENS sens, bool taylor):
     Dynamics(sens)
 {
     m_functions.push_back(f);
-    if(taylor){
-        ibex::Function *f_diff = new ibex::Function(*f, ibex::Function::DIFF);
-        m_functions_d1.push_back(f_diff);
-    }
+    compute_taylor(taylor);
     omp_init_lock(&m_lock_dynamics);
+}
+
+Dynamics_Function::Dynamics_Function(Function *f1, Function *f2, const DYNAMICS_SENS sens, bool taylor):
+    Dynamics(sens)
+{
+    m_functions.push_back(f1);
+    m_functions.push_back(f2);
+    compute_taylor(taylor);
+    omp_init_lock(&m_lock_dynamics);
+}
+
+void Dynamics_Function::compute_taylor(bool taylor){
+    if(taylor){
+        for(Function* f:m_functions){
+            ibex::Function *f_diff = new ibex::Function(*f, ibex::Function::DIFF);
+            m_functions_d1.push_back(f_diff);
+        }
+    }
 }
 
 Dynamics_Function::~Dynamics_Function(){

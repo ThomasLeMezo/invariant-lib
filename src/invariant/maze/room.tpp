@@ -327,47 +327,47 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_
                 if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
                     result_storage.push_back_input(in_return, face, sens, face, sens, n_vf);
 
-                /// Impact : IN (others) <- OUT (self)
-                if(!out_return.is_empty()){
-                    for(int face_in=0; face_in<dim; face_in++){
-                        for(int sens_in = 0; sens_in < 2; sens_in++){
-                            if(!(face_in == face && sens_in == sens)){
-                                Face<_Tp>* f_out = m_pave->get_faces()[face_in][sens_in];
-                                Door<_Tp>* door_in = f_out->get_doors()[m_maze];
-                                _Tp out_tmp(out_return);
-                                _Tp in_tmp(door_in->get_input_private());
-                                if(domain_init == FULL_WALL)
-                                    in_tmp = f_out->get_position_typed();
+                    /// Impact : IN (others) <- OUT (self)
+                    if(!out_return.is_empty()){
+                        for(int face_in=0; face_in<dim; face_in++){
+                            for(int sens_in = 0; sens_in < 2; sens_in++){
+                                if(!(face_in == face && sens_in == sens)){
+                                    Face<_Tp>* f_out = m_pave->get_faces()[face_in][sens_in];
+                                    Door<_Tp>* door_in = f_out->get_doors()[m_maze];
+                                    _Tp out_tmp(out_return);
+                                    _Tp in_tmp(door_in->get_input_private());
+                                    if(domain_init == FULL_WALL)
+                                        in_tmp = f_out->get_position_typed();
 
-                                if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
-                                    this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD); // ToDo : check _fwd ?
-                                    result_storage.push_back_input(in_tmp, face_in, sens_in, face, sens, n_vf);
+                                    if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD); // ToDo : check _fwd ?
+                                        result_storage.push_back_input(in_tmp, face_in, sens_in, face, sens, n_vf);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                /// Impact : IN (self) <- OUT (others)
-                if(!in_return.is_empty()){
-                    for(int face_out=0; face_out<dim; face_out++){
-                        for(int sens_out = 0; sens_out < 2; sens_out++){
-                            if(!(face_out == face && sens_out == sens)){
-                                Face<_Tp>* f_out = m_pave->get_faces()[face_out][sens_out];
-                                Door<_Tp>* door_out = f_out->get_doors()[m_maze];
+                    /// Impact : IN (self) <- OUT (others)
+                    if(!in_return.is_empty()){
+                        for(int face_out=0; face_out<dim; face_out++){
+                            for(int sens_out = 0; sens_out < 2; sens_out++){
+                                if(!(face_out == face && sens_out == sens)){
+                                    Face<_Tp>* f_out = m_pave->get_faces()[face_out][sens_out];
+                                    Door<_Tp>* door_out = f_out->get_doors()[m_maze];
 
-                                _Tp out_tmp(door_out->get_output_private());
-                                if(domain_init == FULL_WALL)
-                                    out_tmp = f_out->get_position_typed();
-                                _Tp in_tmp(in_return);
+                                    _Tp out_tmp(door_out->get_output_private());
+                                    if(domain_init == FULL_WALL)
+                                        out_tmp = f_out->get_position_typed();
+                                    _Tp in_tmp(in_return);
 
-                                if(!out_tmp.is_empty() && door_out->is_possible_out()[n_vf]){
-                                    this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
-                                    result_storage.push_back_output(in_tmp, face, sens, face_out, sens_out, n_vf);
+                                    if(!out_tmp.is_empty() && door_out->is_possible_out()[n_vf]){
+                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
+                                        result_storage.push_back_input(in_tmp, face, sens, face_out, sens_out, n_vf);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
                 }
 
@@ -400,15 +400,16 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_
                         for(int face_in=0; face_in<dim; face_in++){
                             for(int sens_in = 0; sens_in < 2; sens_in++){
                                 if(!(face_in == face && sens_in == sens)){
-                                    Face<_Tp>* f_out = m_pave->get_faces()[face_in][sens_in];
-                                    Door<_Tp>* door_in = f_out->get_doors()[m_maze];
-                                    _Tp out_tmp(out_return);
-                                    _Tp in_tmp(door_in->get_input_private());
+                                    result_storage.push_back_output(out_return, face_in, sens_in, face, sens, n_vf); // Test improved version
+                                    //                                    Face<_Tp>* f_out = m_pave->get_faces()[face_in][sens_in];
+                                    //                                    Door<_Tp>* door_in = f_out->get_doors()[m_maze];
+                                    //                                    _Tp out_tmp(out_return);
+                                    //                                    _Tp in_tmp(door_in->get_input_private());
 
-                                    if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
-                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD); // ToDo : check _fwd ?
-                                        result_storage.push_back_output(out_tmp, face_in, sens_in, face, sens, n_vf);
-                                    }
+                                    //                                    if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
+                                    //                                        this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD); // ToDo : check _fwd ?
+                                    //                                        result_storage.push_back_output(out_tmp, face_in, sens_in, face, sens, n_vf);
+                                    //                                    }
                                 }
                             }
                         }
@@ -431,7 +432,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result
             Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
             Door<_Tp>* door_in = f_in->get_doors()[m_maze];
 
-            if(!(/*domain_init == FULL_DOOR &&*/ door_in->is_collinear()[n_vf])){ // avoid sliding mode on face in when Full_Door
+            if(!door_in->is_collinear()[n_vf]){ // avoid sliding mode on face in
                 const _Tp in(door_in->get_input_private());
 
                 for(int face_out=0; face_out<dim; face_out++){
@@ -439,7 +440,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result
                         if(!(face_out == face_in && sens_out == sens_in)){ // Done with sliding mode if necessary
                             Face<_Tp>* f_out = m_pave->get_faces()[face_out][sens_out];
                             Door<_Tp>* door_out = f_out->get_doors()[m_maze];
-                            if(!(/*domain_init == FULL_DOOR &&*/ door_out->is_collinear()[n_vf])){ // avoid sliding mode on face out
+                            if(!door_out->is_collinear()[n_vf]){ // avoid sliding mode on face out
                                 const _Tp out(door_out->get_output_private());
 
                                 /// ************ IN -> OUT ************
@@ -588,29 +589,32 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
     int dim = m_pave->get_dim();
     in_return = get_empty_door_container<_Tp>(dim);
     out_return = get_empty_door_container<_Tp>(dim);
+    _Tp position_typed = f_in->get_position_typed();
 
     /// Compute IN_OUT door => Already done by the continuity contractor ??=> bug if removed
     DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
     _Tp output_global_door(door->get_output_private());
     _Tp input_global_door(door->get_input_private());
     if(domain_init==FULL_WALL){
-        output_global_door = f_in->get_position_typed();
+        output_global_door = position_typed;
         input_global_door = output_global_door;
     }
 
     bool input_full = door->is_full_private_input();
     bool output_full = door->is_full_private_output();
-    for(Face<_Tp> *f_n:f_in->get_neighbors()){
-        Door<_Tp>* d_n = f_n->get_doors()[m_maze];
+    if(!input_full || !output_full){
+        for(Face<_Tp> *f_n:f_in->get_neighbors()){
+            Door<_Tp>* d_n = f_n->get_doors()[m_maze];
+            if(!output_full)
+                output_global_door |= d_n->get_output();
+            if(!input_full)
+                input_global_door |= d_n->get_input();
+        }
         if(!output_full)
-            output_global_door |= d_n->get_output();
+            output_global_door &= position_typed;
         if(!input_full)
-            input_global_door |= d_n->get_input();
+            input_global_door &= position_typed;
     }
-    if(!output_full)
-        output_global_door &= f_in->get_position_typed();
-    if(!input_full)
-        input_global_door &= f_in->get_position_typed();
 
     if(output_global_door.is_empty() || input_global_door.is_empty()){
         in_return = in_return; // i.e. empty container (cf. before)
@@ -738,7 +742,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
                             if(is_same_face)
                                 set_empty<_Tp>(own_surface);
                             else if(is_in_adj_pave_list){
-                                own_surface &= get_diff_hull<_Tp>(f_out_adj->get_position_typed(), face_out_n->get_position_typed() & f_out_adj->get_position_typed());
+                                own_surface &= get_diff_hull<_Tp>(own_surface, face_out_n->get_position_typed() & own_surface); // Optimization (bug with PPL?)
                             }
 
                             /// Note : computation of the own_surface will remove the propagation of exact face_in to itself
@@ -780,7 +784,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &o
 
                             /// Note : Use input door in both WALL & DOOR case
                             if(local_pave)
-                                in_tmp_OUT &= d_out_adj->get_input_private();
+                                in_tmp_OUT &= d_out_adj->get_input_private(); // Fwd case (?)
                             else
                                 in_tmp_OUT &= d_out_adj->get_input();
 
