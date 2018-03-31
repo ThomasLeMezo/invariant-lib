@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(false);
 
     // ****** Dynamics Outer ******* //
-    float u = 1.0;
+    float u = 0.5;
     ibex::Function f_outer(x1, x2, -Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-u, u)));
     Dynamics_Function dyn_outer(&f_outer, FWD_BWD);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-//    omp_set_num_threads(1);
+//    omp_set_num_threads(2);
     for(int i=0; i<18; i++){
         paving.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;
