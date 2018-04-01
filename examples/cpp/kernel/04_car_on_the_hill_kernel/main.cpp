@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
     // ****** Domain Inner ******* //
     invariant::Domain<> dom_inner(&paving, FULL_WALL);
 
-    dom_inner.set_border_path_in(false);
-    dom_inner.set_border_path_out(true);
+    dom_inner.set_border_path_in(true);
+    dom_inner.set_border_path_out(false);
 
     // ****** Dynamics Outer ******* //
 //    ibex::Function f_outer(x1, x2, Return(x2,
@@ -45,22 +45,22 @@ int main(int argc, char *argv[])
     ibex::Function f_outer(x1, x2, Return(x2,
                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5, 0.5)));
 
-    Dynamics_Function dyn_outer(&f_outer, FWD_BWD);
+    Dynamics_Function dyn_outer(&f_outer, BWD);
 
     // ****** Dynamics Inner ******* //
 //    ibex::Function f_inner1(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(-0.5))));
 //    ibex::Function f_inner2(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(0.5))));
-    ibex::Function f_inner1(x1, x2, Return(x2,
-                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5))));
-    ibex::Function f_inner2(x1, x2, Return(x2,
-                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(0.5))));
+    ibex::Function f_inner1(x1, x2, -Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5)));
+    ibex::Function f_inner2(x1, x2, -Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(0.5)));
 
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
-    Dynamics_Function dyn_inner(f_list_inner, BWD);
+    Dynamics_Function dyn_inner(f_list_inner, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);

@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-2.5,2.5);
-    space[1] = ibex::Interval(-3.5,3.5);
+    space[0] = ibex::Interval(-6,6);
+    space[1] = ibex::Interval(-6,6);
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
 //                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(0.3)));
 
     ibex::Function f1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-1)));
     ibex::Function f2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(1)));
 
     vector<Function *> f_list;
     f_list.push_back(&f1);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<18; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
         maze.contract();
@@ -70,11 +70,11 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(-0.913);
-    position_info[1] = ibex::Interval(-3.493);
-    v_maze.show_room_info(&maze, position_info);
-    v_maze.setProperties(0, 10, 512, 512);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(-0.913);
+//    position_info[1] = ibex::Interval(-3.493);
+//    v_maze.show_room_info(&maze, position_info);
+//    v_maze.setProperties(0, 10, 512, 512);
 
 //    position_info[0] = ibex::Interval(-2.43, -2.42);
 //    position_info[1] = ibex::Interval(0.5);
