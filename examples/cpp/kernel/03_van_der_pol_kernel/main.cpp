@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-6,6);
-    space[1] = ibex::Interval(-6,6);
+    space[0] = ibex::Interval(-2.5,2.5);
+    space[1] = ibex::Interval(-3.5,3.5);
 
     invariant::SmartSubPaving<> paving(space);
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-//    omp_set_num_threads(2);
+//    omp_set_num_threads(1);
     for(int i=0; i<18; i++){
         paving.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;

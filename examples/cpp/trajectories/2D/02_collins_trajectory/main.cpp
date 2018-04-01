@@ -54,8 +54,10 @@ int main(int argc, char *argv[])
 
     invariant::Maze<> maze_B(&dom_B, &dynB);
 
-    dom_B.add_maze_inter(&maze_A);
-    dom_A.add_maze_inter(&maze_B);
+//    dom_B.add_maze_inter(&maze_A);
+//    dom_A.add_maze_inter(&maze_B);
+    dom_B.add_maze_inter_initial_condition(&maze_A);
+    dom_A.add_maze_inter_initial_condition(&maze_B);
 
     double time_start = omp_get_wtime();
 

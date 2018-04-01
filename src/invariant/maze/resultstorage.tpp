@@ -87,20 +87,18 @@ _Tp ResultStorage<_Tp>::get_output2(const size_t &face, const size_t &sens){
     for(size_t n_vf=0; n_vf<m_nb_vf; n_vf++){
         for(size_t face_in = 0; face_in < m_dim; face_in++){
             for(size_t sens_in = 0; sens_in < 2; sens_in++){
+                if(!m_input2output[face_in][sens_in][face][sens][n_vf].is_empty()){
 
-                for(size_t n_vf2=0; n_vf2<m_nb_vf; n_vf2++){
-                    if(n_vf2 != n_vf){
-                        for(size_t face_in2 = 0; face_in2 < m_dim; face_in2++){
-                            for(size_t sens_in2 = 0; sens_in2 < 2; sens_in2++){
-
-                                if(!(n_vf == n_vf2 && face_in == face_in2 && sens_in == sens_in2))
+                    for(size_t n_vf2=0; n_vf2<m_nb_vf; n_vf2++){
+                        if(n_vf2 != n_vf){
+                            for(size_t face_in2 = 0; face_in2 < m_dim; face_in2++){
+                                for(size_t sens_in2 = 0; sens_in2 < 2; sens_in2++){
                                     result |= m_input2output[face_in][sens_in][face][sens][n_vf] & m_input2output[face_in2][sens_in2][face][sens][n_vf2];
-
+                                }
                             }
                         }
                     }
                 }
-
             }
         }
     }
@@ -153,9 +151,7 @@ _Tp ResultStorage<_Tp>::get_input2(const size_t &face, const size_t &sens){
                     if(n_vf2 != n_vf){
                         for(size_t face_out2 = 0; face_out2 < m_dim; face_out2++){
                             for(size_t sens_out2 = 0; sens_out2 < 2; sens_out2++){
-
-                                if(!(n_vf == n_vf2 && face_out == face_out2 && sens_out == sens_out2))
-                                    result |= m_output2input[face][sens][face_out][sens_out][n_vf] & m_output2input[face][sens][face_out2][sens_out2][n_vf2];
+                                result |= m_output2input[face][sens][face_out][sens_out][n_vf] & m_output2input[face][sens][face_out2][sens_out2][n_vf2];
                             }
                         }
                     }

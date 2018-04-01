@@ -247,17 +247,17 @@ int main(){
 //    ctc.contract(test);
 //    cout << "test = " << test << endl;
 
-    invariant::ResultStorageIBEX r(2);
-    ibex::IntervalVector iv_test(2);
+    invariant::ResultStorageIBEX r(2, 1);
+    ibex::IntervalVector iv_test(2, 1);
     iv_test[0] = ibex::Interval(0, 1);
     iv_test[1] = ibex::Interval(2, 3);
-    r.push_back_input(iv_test, 1, 0, 0, 1);
+    r.push_back_input(iv_test, 1, 0, 0, 1, 0);
 
 
-    invariant::ResultStoragePPL r2(2);
+    invariant::ResultStoragePPL r2(2, 1);
     Parma_Polyhedra_Library::C_Polyhedron p(2);
     cout << p.is_universe() << endl;
-    r2.push_back_input(p, 1, 0, 0, 1);
+    r2.push_back_input(p, 1, 0, 0, 1, 0);
     cout << "test" << endl;
 
     return 0;

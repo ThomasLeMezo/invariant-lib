@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<16; i++){
+    for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
         maze.contract();
@@ -66,15 +66,19 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze);
+    VibesMaze v_maze("VanDerPolKernelInner", &maze);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(2.47, 2.49);
-    position_info[1] = ibex::Interval(-0.48);
+    position_info[0] = ibex::Interval(-0.913);
+    position_info[1] = ibex::Interval(-3.493);
     v_maze.show_room_info(&maze, position_info);
     v_maze.setProperties(0, 10, 512, 512);
+
+//    position_info[0] = ibex::Interval(-2.43, -2.42);
+//    position_info[1] = ibex::Interval(0.5);
+//    v_maze.show_room_info(&maze, position_info);
 
     vibes::endDrawing();
 }

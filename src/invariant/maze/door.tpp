@@ -237,7 +237,7 @@ inline void Door<_Tp>::reset(){
     m_possible_in_union = false;
     m_possible_out_union = false;
     m_collinear_vector_field.clear();
-    m_zeros_in_vector_fields.clear();
+    m_collinear_vector_field_union = false;
 }
 
 }
