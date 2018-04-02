@@ -77,6 +77,15 @@ class VibesFigure
     void setProperties(int x, int y, int width, int height);
 
     /**
+     * @brief set Figure axis limits
+     * @param x_min
+     * @param x_max
+     * @param y_min
+     * @param y_max
+     */
+    void setAxis(const double &x_min, const double &x_max, const double &y_min, const double &y_max);
+
+    /**
      * \brief Save vibes-figure in SVG/PNG/... format.
      *
      * A file named {figure_name}{suffix}.svg is created in the current directory.

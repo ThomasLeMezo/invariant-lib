@@ -50,6 +50,11 @@ void VibesFigure::setProperties(int x, int y, int width, int height)
                         "height", m_height));
 }
 
+void VibesFigure::setAxis(const double &x_min, const double &x_max, const double &y_min, const double &y_max)
+{
+  vibes::axisLimits(x_min, x_max, y_min, y_max, m_name);
+}
+
 void VibesFigure::saveImage(const string& prefix, const string& extension) const
 {
   vibes::saveImage(prefix + m_name + extension, m_name);

@@ -884,14 +884,14 @@ bool Room<_Tp>::contract(){
 
         //        get_private_doors_info("before");
         change |= contract_continuity();
-        //        get_private_doors_info("continuity");
+                get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
             //            get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
-            //             get_private_doors_info("consistency");
+                         get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -903,8 +903,8 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if(m_maze->get_domain()->get_init() == FULL_DOOR){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(4.09375, 4.5625);
-        position[1] = ibex::Interval(-2.25, -2);
+        position[0] = ibex::Interval(-1.296875, -1.1796875);
+        position[1] = ibex::Interval(-1.125, -1);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);
