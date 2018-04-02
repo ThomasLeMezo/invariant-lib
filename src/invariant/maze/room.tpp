@@ -646,12 +646,19 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
         }
     }
 
-    out_return &= in_return;
-    in_return &= out_return;
+    if(domain_init==FULL_DOOR){ // Only for DOOR
+        out_return &= in_return;
+        in_return &= out_return;
 
-    if(domain_init!=FULL_WALL){
         in_return &= door->get_input_private();
         out_return &= door->get_output_private();
+    }
+    else{
+        DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
+        if(dynamics_sens==FWD)
+            in_return &= out_return;
+        if(dynamics_sens==BWD)
+            out_return &= in_return;
     }
 }
 
@@ -809,6 +816,9 @@ void Room<_Tp>::contract_consistency(){
                 //                    if(m_is_father_hull) // For father hull
                 //                        door_out_iv &= *m_father_hull;
 
+                if(get_nb_dim_flat(door_out_iv)==dim){
+                    door_out_iv = get_empty_door_container<_Tp>(dim);
+                }
                 door->set_output_private(door_out_iv);
             }
             if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
@@ -821,7 +831,9 @@ void Room<_Tp>::contract_consistency(){
 
                 //                    if(m_is_father_hull) // For father hull
                 //                        door_in_iv &= *m_father_hull;
-
+                if(get_nb_dim_flat(door_in_iv)==dim){
+                    door_in_iv = get_empty_door_container<_Tp>(dim);
+                }
                 door->set_input_private(door_in_iv);
             }
         }
@@ -873,7 +885,7 @@ bool Room<_Tp>::contract(){
             get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
-                                    get_private_doors_info("consistency");
+//                                    get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -885,8 +897,8 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if(m_maze->get_domain()->get_init() == FULL_WALL){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(12.1796875, 12.234375);
-        position[1] = ibex::Interval(0.09375, 0.140625);
+        position[0] = ibex::Interval(6.109375, 6.21875);
+        position[1] = ibex::Interval(-2.53125, -2.4375);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);

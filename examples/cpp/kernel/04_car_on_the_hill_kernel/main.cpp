@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
-    for(int i=0; i<16; i++){
+    for(int i=0; i<14; i++){
         cout << i << endl;
         paving.bisect();
         maze_inner.contract();
@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(12.2, 12.26);
-    position_info[1] = ibex::Interval(0.12);
+    position_info[0] = ibex::Interval(6.15);
+    position_info[1] = ibex::Interval(-2.56, -2.48);
     v_maze.show_room_info(&maze_inner, position_info);
     v_maze.setProperties(600, 0, 512, 512);
 
