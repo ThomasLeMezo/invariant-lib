@@ -53,12 +53,11 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x, -Return((x[1]),
                            (-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
-    Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
 //    vibes::beginDrawing();

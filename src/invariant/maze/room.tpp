@@ -232,13 +232,24 @@ void Room<_Tp>::set_full_possible(){
 
 template<typename _Tp>
 void Room<_Tp>::contract_according_to_vector_field(){
-    if(m_maze->get_domain()->get_init()==FULL_DOOR){
-        for(Face<_Tp> *f:m_pave->get_faces_vector()){
-            Door<_Tp> *d = f->get_doors()[m_maze];
-            for(size_t n_vf=0; n_vf<d->is_possible_in().size(); n_vf++){
-                if(!d->is_possible_in()[n_vf])
+    int dim = m_pave->get_dim();
+    ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
+    if(m_maze->get_domain()->get_init() == FULL_DOOR){
+        for(int face=0; face<dim; face++){
+            for(size_t sens=0; sens<2; sens++){
+                Face<_Tp> *f = m_pave->get_faces()[face][sens];
+                Door<_Tp> *d = f->get_doors()[m_maze];
+                bool input_empty=true;
+                bool output_empty=true;
+                for(size_t n_vf=0; n_vf<m_vector_fields.size(); n_vf++){
+                    if(zero.is_subset(m_vector_fields[n_vf]) || d->is_possible_in()[n_vf])
+                        input_empty=false;
+                    if(zero.is_subset(m_vector_fields[n_vf]) || d->is_possible_out()[n_vf])
+                        output_empty=false;
+                }
+                if(input_empty)
                     d->set_empty_private_input();
-                if(!d->is_possible_out()[n_vf])
+                if(output_empty)
                     d->set_empty_private_output();
             }
         }
@@ -248,9 +259,6 @@ void Room<_Tp>::contract_according_to_vector_field(){
 template<typename _Tp>
 void Room<_Tp>::contract_vector_field(){
     int dim = m_pave->get_dim();
-    DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
-    ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
-
     //    get_private_doors_info("contract_vector_field");
 
     for(int face=0; face<dim; face++){
@@ -278,8 +286,6 @@ void Room<_Tp>::contract_vector_field(){
                 // Possible IN
                 if((f->get_orientation() & v_bool_in).is_empty()){
                     d->push_back_possible_in(false);
-                    if(!zero.is_subset(v) && domain_init == FULL_DOOR)
-                        d->set_empty_private_input();
                 }
                 else
                     d->push_back_possible_in(true);
@@ -287,8 +293,6 @@ void Room<_Tp>::contract_vector_field(){
                 // Possible OUT
                 if((f->get_orientation() & v_bool_out).is_empty()){
                     d->push_back_possible_out(false);
-                    if(!zero.is_subset(v) && domain_init == FULL_DOOR)
-                        d->set_empty_private_output();
                 }
                 else
                     d->push_back_possible_out(true);
@@ -296,8 +300,10 @@ void Room<_Tp>::contract_vector_field(){
         }
     }
 
+    contract_according_to_vector_field();
     // Note : synchronization will be proceed at the end of all contractors
     // to avoid unecessary lock
+
 }
 
 template<typename _Tp>
@@ -357,7 +363,7 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_
                         for(int face_out=0; face_out<dim; face_out++){
                             for(int sens_out = 0; sens_out < 2; sens_out++){
                                 if(!(face_out == face && sens_out == sens)){
-//                                    result_storage.push_back_input(in_return, face, sens, face_out, sens_out, n_vf); // To be tested
+                                    //                                    result_storage.push_back_input(in_return, face, sens, face_out, sens_out, n_vf); // To be tested
                                     Face<_Tp>* f_out = m_pave->get_faces()[face_out][sens_out];
                                     Door<_Tp>* door_out = f_out->get_doors()[m_maze];
 
@@ -816,9 +822,9 @@ void Room<_Tp>::contract_consistency(){
                 //                    if(m_is_father_hull) // For father hull
                 //                        door_out_iv &= *m_father_hull;
 
-//                if(get_nb_dim_flat(door_out_iv)==(int)dim){
-//                    door_out_iv = get_empty_door_container<_Tp>(dim);
-//                }
+                //                if(get_nb_dim_flat(door_out_iv)==(int)dim){
+                //                    door_out_iv = get_empty_door_container<_Tp>(dim);
+                //                }
                 door->set_output_private(door_out_iv);
             }
             if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
@@ -831,9 +837,9 @@ void Room<_Tp>::contract_consistency(){
 
                 //                    if(m_is_father_hull) // For father hull
                 //                        door_in_iv &= *m_father_hull;
-//                if(get_nb_dim_flat(door_in_iv)==(int)dim){
-//                    door_in_iv = get_empty_door_container<_Tp>(dim);
-//                }
+                //                if(get_nb_dim_flat(door_in_iv)==(int)dim){
+                //                    door_in_iv = get_empty_door_container<_Tp>(dim);
+                //                }
                 door->set_input_private(door_in_iv);
             }
         }
@@ -863,7 +869,7 @@ template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
     bool change = false;
-//    get_private_doors_info("before removed");
+    //    get_private_doors_info("before removed");
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
         if(m_contract_vector_field){
@@ -878,14 +884,14 @@ bool Room<_Tp>::contract(){
 
         //        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        //        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
-//            get_private_doors_info("before consistency");
+            //            get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
-//                                    get_private_doors_info("consistency");
+            //             get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -894,11 +900,11 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() == FULL_WALL){
+    if(m_maze->get_domain()->get_init() == FULL_DOOR){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(6.109375, 6.21875);
-        position[1] = ibex::Interval(-2.53125, -2.4375);
+        position[0] = ibex::Interval(4.09375, 4.5625);
+        position[1] = ibex::Interval(-2.25, -2);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);

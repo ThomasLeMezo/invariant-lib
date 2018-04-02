@@ -61,17 +61,17 @@ int main(int argc, char *argv[])
     Dynamics_Function dyn_u(&f1, &f2, FWD);
 
     // ******* Mazes ********* //
-//    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
     invariant::Maze<> maze_inner(&dom_inner, &dyn_u);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     
 //    omp_set_num_threads(1);
-    for(int i=0; i<10; i++){
-        cout << i  << endl;
+    for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-//        maze_outer.contract();
+        maze_outer.contract();
         maze_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
@@ -86,11 +86,11 @@ int main(int argc, char *argv[])
 //    v_maze.drawCircle(0.0, 0.0, 1, "black[red]");
     v_maze.drawCircle(0.0, 0.0, 1, "red[]");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(3.8);
-//    position_info[1] = ibex::Interval(0.4);
-//    v_maze.setProperties(0, 0, 512, 512);
-//    v_maze.show_room_info(&maze_inner, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(4.2);
+    position_info[1] = ibex::Interval(-2.1, -1.9);
+    v_maze.setProperties(0, 0, 512, 512);
+    v_maze.show_room_info(&maze_inner, position_info);
 
 
     vibes::endDrawing();

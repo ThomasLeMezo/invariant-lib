@@ -47,17 +47,17 @@ int main(int argc, char *argv[])
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
-    dom_outer.set_sep_output(&s_outer);
+    dom_outer.set_sep_input(&s_outer);
 
     invariant::Domain<> dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
-    dom_inner.set_sep_output(&s_inner);
+    dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x, -Return(x[1],
+    ibex::Function f(x, Return(x[1],
                                     (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
-    Dynamics_Function dyn(&f, BWD);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
