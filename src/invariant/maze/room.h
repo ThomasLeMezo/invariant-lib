@@ -331,6 +331,12 @@ protected:
     void contract_according_to_vector_field();
 
     /**
+     * @brief set full result
+     * @param result_storage
+     */
+    void set_full_result(const int n_vf, ResultStorage<_Tp> &result_storage);
+
+    /**
      * @brief Basic contraction between [in] and [out] according to a [vect].
      * @param in
      * @param out

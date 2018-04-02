@@ -202,6 +202,12 @@ public:
     BooleanTree<_Tp> * get_boolean_tree_removing() const;
 
     /**
+     * @brief get_contraction_step
+     * @return
+     */
+    int get_contraction_step() const;
+
+    /**
      * @brief set_boolean_tree_removing
      */
     void set_boolean_tree_removing(BooleanTree<_Tp> *);
@@ -239,6 +245,11 @@ namespace invariant{
 template <typename _Tp>
 inline BooleanTree<_Tp> * Maze<_Tp>::get_boolean_tree_removing() const{
     return m_boolean_tree_removing;
+}
+
+template <typename _Tp>
+inline int Maze<_Tp>::get_contraction_step() const{
+    return m_contraction_step;
 }
 
 template <typename _Tp>

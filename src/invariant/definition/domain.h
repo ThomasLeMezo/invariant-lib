@@ -147,6 +147,18 @@ public:
     void set_border_path_out(bool out);
 
     /**
+     * @brief Get border IN initial condition
+     * @return
+     */
+    bool get_border_path_in() const;
+
+    /**
+     * @brief Get border OUT initial condition
+     * @return
+     */
+    bool get_border_path_out() const;
+
+    /**
      * @brief add maze for domain intersection
      * @param maze
      */
@@ -291,6 +303,16 @@ inline void Domain<_Tp>::set_border_path_in(bool in){
 template<typename _Tp>
 inline void Domain<_Tp>::set_border_path_out(bool out){
     m_border_path_out = out;
+}
+
+template<typename _Tp>
+inline bool Domain<_Tp>::get_border_path_in() const{
+    return m_border_path_in;
+}
+
+template<typename _Tp>
+inline bool Domain<_Tp>::get_border_path_out() const{
+    return m_border_path_out;
 }
 
 template<typename _Tp>

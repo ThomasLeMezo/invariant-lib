@@ -20,10 +20,10 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-//    space[0] = ibex::Interval(-1.0, 13.0);
-//    space[1] = ibex::Interval(-16, 16);
     space[0] = ibex::Interval(-1.0, 13.0);
-    space[1] = ibex::Interval(-6, 6);
+    space[1] = ibex::Interval(-16, 16);
+//    space[0] = ibex::Interval(-1.0, 13.0);
+//    space[1] = ibex::Interval(-6, 6);
 
     invariant::SmartSubPaving<> paving(space);
 
@@ -79,13 +79,14 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("Kernel car on the hill"/*, &maze_outer*/, &maze_inner);
-    v_maze.setProperties(0, 0, 512, 512);
+//    VibesMaze v_maze("Kernel car on the hill", &maze_outer, &maze_inner);
+    VibesMaze v_maze("Kernel car on the hill", &maze_inner);
+    v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(12.24);
-    position_info[1] = ibex::Interval(-0.24);
+    position_info[0] = ibex::Interval(12.14);
+    position_info[1] = ibex::Interval(-0.1);
     v_maze.setProperties(600, 0, 512, 512);
     v_maze.show_room_info(&maze_inner, position_info);
 

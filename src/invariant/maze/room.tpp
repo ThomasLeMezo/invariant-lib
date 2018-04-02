@@ -317,6 +317,13 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_
                 _Tp in_return = get_empty_door_container<_Tp>(dim);
                 contract_sliding_mode(n_vf, face, sens, out_return, in_return);
 
+                if(f_in->is_border()){
+                    if(m_maze->get_domain()->get_border_path_in())
+                        in_return |= f_in->get_position_typed();
+                    if(m_maze->get_domain()->get_border_path_out())
+                        out_return |= f_in->get_position_typed();
+                }
+
                 if(domain_init==FULL_WALL){
                     in_return |= door->get_input_private(); // In case of border ?
                     out_return |= door->get_output_private();
@@ -399,9 +406,9 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_
                         for(int face_in=0; face_in<dim; face_in++){
                             for(int sens_in = 0; sens_in < 2; sens_in++){
                                 if(!(face_in == face && sens_in == sens)){
-//                                    result_storage.push_back_output(out_return, face_in, sens_in, face, sens, n_vf); // Test improved version
-                                    Face<_Tp>* f_out = m_pave->get_faces()[face_in][sens_in];
-                                    Door<_Tp>* door_in = f_out->get_doors()[m_maze];
+                                    //                                    result_storage.push_back_output(out_return, face_in, sens_in, face, sens, n_vf); // Test improved version
+                                    Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
+                                    Door<_Tp>* door_in = f_in->get_doors()[m_maze];
                                     _Tp out_tmp(out_return);
                                     _Tp in_tmp(door_in->get_input_private());
 
@@ -733,6 +740,22 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result
 }
 
 template<typename _Tp>
+void Room<_Tp>::set_full_result(const int n_vf, ResultStorage<_Tp> &result_storage){
+    for(size_t face = 0; face < m_pave->get_dim(); face++){
+        for(size_t sens = 0; sens < 2; sens++){
+            Face<_Tp> *f = m_pave->get_faces()[face][sens];
+            _Tp tmp = f->get_position_typed(); // IN -> OUT [tmp]
+            for(size_t face2 = 0; face2 < m_pave->get_dim(); face2++){
+                for(size_t sens2 = 0; sens2 < 2; sens2++){
+                    result_storage.push_back_input(tmp, face2, sens2, face, sens, n_vf);
+                    result_storage.push_back_output(tmp, face2, sens2, face, sens, n_vf);
+                }
+            }
+        }
+    }
+}
+
+template<typename _Tp>
 void Room<_Tp>::contract_consistency(){
     const size_t dim = m_pave->get_dim();
 
@@ -753,52 +776,48 @@ void Room<_Tp>::contract_consistency(){
     ResultStorage<_Tp> result_storage(dim, nb_vec);
 
     /// ************ Compute propagation ************ //
-    bool global_compute = false;
     for(size_t n_vf=0; n_vf<nb_vec; n_vf++){
-        //        if(m_vector_field_zero[n_vf]){ // Case Zero in f --- ToDo : Check working seems WRONG ! ???
-        //            if(domain_init == FULL_WALL && (!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output)))
-        //                this->set_full_possible();
-        //        }
-        //        else{
-        global_compute |= true;
-        compute_sliding_mode(n_vf, result_storage);
-        compute_standard_mode(n_vf, result_storage);
-        //        }
+        if(m_vector_field_zero[n_vf]){ // Case Zero in f --- ToDo : Check working seems WRONG ! ???
+            if(!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))
+                this->set_full_result(n_vf, result_storage);
+        }
+        else{
+            compute_sliding_mode(n_vf, result_storage);
+            compute_standard_mode(n_vf, result_storage);
+        }
     }
 
     /// ************ Save propagation to private doors ************ //
-    if(global_compute){
-        for(size_t face = 0; face<(size_t)dim; face++){
-            for(size_t sens = 0; sens < 2; sens++){
-                Face<_Tp>* f= m_pave->get_faces()[face][sens];
-                Door<_Tp>* door = f->get_doors()[m_maze];
+    for(size_t face = 0; face<(size_t)dim; face++){
+        for(size_t sens = 0; sens < 2; sens++){
+            Face<_Tp>* f= m_pave->get_faces()[face][sens];
+            Door<_Tp>* door = f->get_doors()[m_maze];
 
-                if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
-                    _Tp door_out_iv = result_storage.get_output(face, sens);
+            if(dynamics_sens == FWD || dynamics_sens == FWD_BWD){
+                _Tp door_out_iv = result_storage.get_output(face, sens);
 
-                    if(domain_init == FULL_DOOR)
-                        door_out_iv &= door->get_output_private();
-                    else
-                        door_out_iv |= door->get_output_private();
+                if(domain_init == FULL_DOOR)
+                    door_out_iv &= door->get_output_private();
+                else
+                    door_out_iv |= door->get_output_private();
 
-                    //                    if(m_is_father_hull) // For father hull
-                    //                        door_out_iv &= *m_father_hull;
+                //                    if(m_is_father_hull) // For father hull
+                //                        door_out_iv &= *m_father_hull;
 
-                    door->set_output_private(door_out_iv);
-                }
-                if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
-                    _Tp door_in_iv = result_storage.get_input(face, sens);
+                door->set_output_private(door_out_iv);
+            }
+            if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
+                _Tp door_in_iv = result_storage.get_input(face, sens);
 
-                    if(domain_init == FULL_DOOR)
-                        door_in_iv &= door->get_input_private();
-                    else
-                        door_in_iv |= door->get_input_private();
+                if(domain_init == FULL_DOOR)
+                    door_in_iv &= door->get_input_private();
+                else
+                    door_in_iv |= door->get_input_private();
 
-                    //                    if(m_is_father_hull) // For father hull
-                    //                        door_in_iv &= *m_father_hull;
+                //                    if(m_is_father_hull) // For father hull
+                //                        door_in_iv &= *m_father_hull;
 
-                    door->set_input_private(door_in_iv);
-                }
+                door->set_input_private(door_in_iv);
             }
         }
     }
@@ -827,7 +846,7 @@ template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
     bool change = false;
-    //    get_private_doors_info("before removed");
+//    get_private_doors_info("before removed");
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
         if(m_contract_vector_field){
@@ -842,7 +861,7 @@ bool Room<_Tp>::contract(){
 
         //        get_private_doors_info("before");
         change |= contract_continuity();
-        //                get_private_doors_info("continuity");
+//        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
@@ -858,11 +877,11 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() == FULL_WALL){
+    if(true || m_maze->get_domain()->get_init() == FULL_WALL){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(2.48046875, 2.5);
-        position[1] = ibex::Interval(-0.4921875, -0.46484375);
+        position[0] = ibex::Interval(3.625, 4.09375);
+        position[1] = ibex::Interval(0.25, 0.5);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);
@@ -918,23 +937,23 @@ void Room<_Tp>::analyze_change(std::vector<Room *>&list_rooms) const{
         Door<_Tp> *d = f->get_doors()[m_maze];
         change |= d->analyze_change(list_rooms);
     }
-    //    if(change && m_contain_zero_coordinate){ // Because of sliding mode
-    //        get_all_active_neighbors(list_rooms);
-    //    }
-    if(change){ // Improve of commented function above - To be tested
-        for(size_t face = 0; face<m_pave->get_dim(); face++){
-            for(size_t sens=0; sens<2; sens++){
-                if(m_zero_component_in_vector_fields_union[face]){
-                    Face<_Tp> *f = m_pave->get_faces()[face][sens];
-                    for(Face<_Tp>*f_n:f->get_neighbors()){
-                        Room<_Tp> *r_n = f_n->get_pave()->get_rooms()[m_maze];
-                        if(!r_n->is_removed())
-                            list_rooms.push_back(r_n);
-                    }
-                }
-            }
-        }
+    if(change && m_contain_zero_coordinate){ // Because of sliding mode
+        get_all_active_neighbors(list_rooms);
     }
+    //    if(change){ // Improve of commented function above - To be tested (seems not working well with car on the hill)
+    //        for(size_t face = 0; face<m_pave->get_dim(); face++){
+    //            for(size_t sens=0; sens<2; sens++){
+    //                if(m_zero_component_in_vector_fields_union[face]){
+    //                    Face<_Tp> *f = m_pave->get_faces()[face][sens];
+    //                    for(Face<_Tp>*f_n:f->get_neighbors()){
+    //                        Room<_Tp> *r_n = f_n->get_pave()->get_rooms()[m_maze];
+    //                        if(!r_n->is_removed())
+    //                            list_rooms.push_back(r_n);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 }
 
 template<typename _Tp>
