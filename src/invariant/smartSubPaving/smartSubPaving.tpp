@@ -124,7 +124,7 @@ void SmartSubPaving<_Tp>::bisect(){
             Pave<_Tp> *p = bisectable_paves[i];
 
             if((m_bisection_tree==nullptr && p->request_bisection())
-               || (m_bisection_tree!=nullptr && m_bisection_tree->eval_bisection(p))){
+               || (m_bisection_tree!=nullptr && (m_bisection_tree->eval_bisection(p)))){
                 if(p->bisect_step_one()){
 #pragma omp critical
                     {
@@ -165,6 +165,7 @@ void SmartSubPaving<_Tp>::bisect(){
         maze->reset_nb_operations();
     }
 
+    m_bisection_step++;
     std::cout << " to " << m_paves.size() << ") - ";
     std::cout << omp_get_wtime() - time_start << "s" <<  std::endl;
 }

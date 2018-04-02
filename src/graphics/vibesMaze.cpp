@@ -89,10 +89,10 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
                 }
             }
         }
-        if(nb_vec>1)
-            delete[] d_iv_list;
-        else
+        if(m_both_wall)
             delete d_iv_list;
+        else
+            delete[] d_iv_list;
     }
     if(!pt_x.empty())
         vibes::drawPolygon(pt_x, pt_y, "black[#FF00FF]");

@@ -481,6 +481,10 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
     ibex::IntervalVector pave_extrude(f_in->get_position());
 
     for(int id_zero=0; id_zero<dim; id_zero++){
+        // ToDo : source of bug : select more than required pave (issue difficult to solve...)
+        // Should not be the union but required when there is command (otherwise it might won't proceed to the contraction)
+        // It then selects more pave than required
+        // One solution : add a constraint to remove "point" intersection (see get_nb_dim_flat(inter) : a point has "dim" flat dimension)
         if(m_zero_component_in_vector_fields_union[(size_t)id_zero])
             pave_extrude[id_zero] = ibex::Interval::ALL_REALS;
     }
@@ -493,8 +497,9 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
         }
         else{
             ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
+            ibex::IntervalVector inter = pave_adj->get_position() & f_in->get_position();
 
-            if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude)){ // Key point : dim of the intersection equal to dim of the extrude pave
+            if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude) && get_nb_dim_flat(inter)<dim){ // Key point : dim of the intersection equal to dim of the extrude pave
                 adjacent_paves_valid.push_back(pave_adj);
                 Room<_Tp> *room_n= pave_adj->get_rooms()[m_maze];
                 vec_field_global |= room_n->get_one_vector_fields(n_vf);
@@ -507,8 +512,8 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
 
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
     if(zero.is_subset(vec_field_global)){ // Case no contraction (if there is a possible cycle) or border face
-        in_return = door->get_input_private();
-        out_return = door->get_output_private();
+        in_return = input_global_door;
+        out_return = output_global_door;
         return;
     }
 
@@ -868,7 +873,7 @@ bool Room<_Tp>::contract(){
             get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
-            //                        get_private_doors_info("consistency");
+                                    get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -877,11 +882,11 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(true || m_maze->get_domain()->get_init() == FULL_WALL){
+    if(m_maze->get_domain()->get_init() == FULL_WALL){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(3.625, 4.09375);
-        position[1] = ibex::Interval(0.25, 0.5);
+        position[0] = ibex::Interval(12.1796875, 12.234375);
+        position[1] = ibex::Interval(0.09375, 0.140625);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);
@@ -889,8 +894,9 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
         //    position[2] = ibex::Interval(125566.40625, 125664.0625);
 
         if(m_pave->get_position() == position){
+            m_debug_cpt++;
             if(cout_message){
-                std::cout << message << std::endl;
+                std::cout << m_debug_cpt << " " << message << std::endl;
 
                 if(m_maze->get_domain()->get_init()==FULL_WALL)
                     std::cout << "FULL_WALL" << std::endl;

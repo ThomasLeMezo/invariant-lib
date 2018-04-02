@@ -479,6 +479,7 @@ protected:
 
     // To Be Removed
     size_t     m_nb_contract = 0;
+    size_t     m_debug_cpt = 0;
 
 //    ibex::Function *m_contract_function = nullptr;
 //    ibex::CtcFwdBwd *m_ctc = nullptr;
