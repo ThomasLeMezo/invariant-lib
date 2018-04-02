@@ -69,8 +69,8 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
-    omp_set_num_threads(1);
-    for(int i=0; i<14; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
         maze_inner.contract();
@@ -80,16 +80,16 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("Kernel car on the hill"/*, &maze_outer*/, &maze_inner);
+    VibesMaze v_maze("Kernel car on the hill", &maze_outer, &maze_inner);
 //    VibesMaze v_maze("Kernel car on the hill", &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(6.15);
-    position_info[1] = ibex::Interval(-2.56, -2.48);
-    v_maze.show_room_info(&maze_inner, position_info);
-    v_maze.setProperties(600, 0, 512, 512);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(6.15);
+//    position_info[1] = ibex::Interval(-2.56, -2.48);
+//    v_maze.show_room_info(&maze_inner, position_info);
+//    v_maze.setProperties(600, 0, 512, 512);
 
     vibes::endDrawing();
 }

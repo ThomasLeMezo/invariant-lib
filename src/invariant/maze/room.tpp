@@ -816,9 +816,9 @@ void Room<_Tp>::contract_consistency(){
                 //                    if(m_is_father_hull) // For father hull
                 //                        door_out_iv &= *m_father_hull;
 
-                if(get_nb_dim_flat(door_out_iv)==dim){
-                    door_out_iv = get_empty_door_container<_Tp>(dim);
-                }
+//                if(get_nb_dim_flat(door_out_iv)==(int)dim){
+//                    door_out_iv = get_empty_door_container<_Tp>(dim);
+//                }
                 door->set_output_private(door_out_iv);
             }
             if(dynamics_sens == BWD || dynamics_sens == FWD_BWD){
@@ -831,9 +831,9 @@ void Room<_Tp>::contract_consistency(){
 
                 //                    if(m_is_father_hull) // For father hull
                 //                        door_in_iv &= *m_father_hull;
-                if(get_nb_dim_flat(door_in_iv)==dim){
-                    door_in_iv = get_empty_door_container<_Tp>(dim);
-                }
+//                if(get_nb_dim_flat(door_in_iv)==(int)dim){
+//                    door_in_iv = get_empty_door_container<_Tp>(dim);
+//                }
                 door->set_input_private(door_in_iv);
             }
         }
@@ -882,7 +882,7 @@ bool Room<_Tp>::contract(){
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
-            get_private_doors_info("before consistency");
+//            get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
 //                                    get_private_doors_info("consistency");
