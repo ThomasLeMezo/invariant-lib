@@ -98,7 +98,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                     Room<_Tp> *r = nullptr;
                     omp_set_lock(&m_deque_access);
 
-                    if(!m_deque_rooms.empty()){
+                    if(!m_deque_rooms.empty() && !stop_contraction){
                         // To improve the efficiency, we start half of the thread on the back of the deque
                         // and the other on the front
                         if(omp_get_thread_num()%2==1){

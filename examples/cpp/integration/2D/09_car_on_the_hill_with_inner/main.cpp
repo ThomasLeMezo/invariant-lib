@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
     invariant::Maze<> maze_inner(&dom_inner, &dyn_u);
 
-    VibesMaze v_maze_debug("SmartSubPaving_debug", &maze_inner);
-    v_maze_debug.setProperties(0, 0, 1024, 1024);
-    string test;
+//    VibesMaze v_maze_debug("SmartSubPaving_debug", &maze_inner);
+//    v_maze_debug.setProperties(0, 0, 1024, 1024);
+//    string test;
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
         if(i<9)
             maze_inner.contract();
         else{
-            maze_inner.contract(1900);
+            maze_inner.contract(1860);
 //            for(int j=1700; j<1900; j+=10){
 //                maze_inner.contract(j);
 //                vibes::clearFigure(v_maze_debug.name());
