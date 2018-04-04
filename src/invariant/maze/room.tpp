@@ -232,9 +232,10 @@ void Room<_Tp>::set_full_possible(){
 
 template<typename _Tp>
 void Room<_Tp>::contract_according_to_vector_field(){
-    int dim = m_pave->get_dim();
-    ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
     if(m_maze->get_domain()->get_init() == FULL_DOOR){
+        int dim = m_pave->get_dim();
+        ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
+
         for(int face=0; face<dim; face++){
             for(size_t sens=0; sens<2; sens++){
                 Face<_Tp> *f = m_pave->get_faces()[face][sens];
@@ -343,12 +344,12 @@ void Room<_Tp>::compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_
                         for(int face_in=0; face_in<dim; face_in++){
                             for(int sens_in = 0; sens_in < 2; sens_in++){
                                 if(!(face_in == face && sens_in == sens)){
-                                    Face<_Tp>* f_out = m_pave->get_faces()[face_in][sens_in];
-                                    Door<_Tp>* door_in = f_out->get_doors()[m_maze];
+                                    Face<_Tp>* f_in = m_pave->get_faces()[face_in][sens_in];
+                                    Door<_Tp>* door_in = f_in->get_doors()[m_maze];
                                     _Tp out_tmp(out_return);
                                     _Tp in_tmp(door_in->get_input_private());
                                     if(domain_init == FULL_WALL)
-                                        in_tmp = f_out->get_position_typed();
+                                        in_tmp = f_in->get_position_typed();
 
                                     if(!in_tmp.is_empty() && door_in->is_possible_in()[n_vf]){
                                         this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD); // ToDo : check _fwd ?
@@ -660,11 +661,9 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
         out_return &= door->get_output_private();
     }
     else{
-        DYNAMICS_SENS dynamics_sens = m_maze->get_dynamics()->get_sens();
-        if(dynamics_sens==FWD)
-            in_return &= out_return;
-        if(dynamics_sens==BWD)
-            out_return &= in_return;
+        // Order seems to be different if FULL_WALL
+        in_return &= out_return;
+        out_return &= in_return;
     }
 }
 
@@ -869,7 +868,7 @@ template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
     bool change = false;
-    //    get_private_doors_info("before removed");
+//    get_private_doors_info("before removed");
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
         if(m_contract_vector_field){
@@ -884,14 +883,14 @@ bool Room<_Tp>::contract(){
 
         //        get_private_doors_info("before");
         change |= contract_continuity();
-                get_private_doors_info("continuity");
+//        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
             //            get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
-                         get_private_doors_info("consistency");
+            get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -903,8 +902,8 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if(m_maze->get_domain()->get_init() == FULL_DOOR){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(-1.296875, -1.1796875);
-        position[1] = ibex::Interval(-1.125, -1);
+        position[0] = ibex::Interval(2.296875, 2.34375);
+        position[1] = ibex::Interval(0, 0.09375);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);

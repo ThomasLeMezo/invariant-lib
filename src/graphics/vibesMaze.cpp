@@ -525,7 +525,7 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         //        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave
-        if(m_maze_inner != nullptr){ //maze->get_domain()->get_init() == FULL_WALL){
+        if(m_maze_inner != nullptr && !p->get_rooms()[m_maze_inner]->is_full_union()){ //maze->get_domain()->get_init() == FULL_WALL){
             draw_room_inner(p);
         }
         if(m_maze_outer != nullptr){//maze->get_domain()->get_init() == FULL_DOOR){

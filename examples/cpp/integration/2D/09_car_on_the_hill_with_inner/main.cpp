@@ -5,7 +5,7 @@
 #include "vibesMaze.h"
 
 #include "ibex_SepFwdBwd.h"
-#include "booleantreenot.h"
+//#include "booleantreenot.h"
 #include "booleantreeinter.h"
 
 #include <iostream>
@@ -23,8 +23,10 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-2, 5);
-    space[1] = ibex::Interval(-3, 3);
+//    space[0] = ibex::Interval(-2, 5);
+//    space[1] = ibex::Interval(-3, 3);
+    space[0] = ibex::Interval(-2.0, 13.0);
+    space[1] = ibex::Interval(-6, 6);
 
     invariant::SmartSubPaving<> paving(space);
 
@@ -54,11 +56,11 @@ int main(int argc, char *argv[])
                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
     Dynamics_Function dyn(&f, FWD);
 
-    ibex::Function f1(x1, x2, -Return(x2,
+    ibex::Function f1(x1, x2, Return(x2,
                                       -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
-    ibex::Function f2(x1, x2, -Return(x2,
+    ibex::Function f2(x1, x2, Return(x2,
                                       -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
-    Dynamics_Function dyn_u(&f1, &f2, BWD);
+    Dynamics_Function dyn_u(&f1, &f2, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -70,40 +72,28 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    omp_set_num_threads(1);
-    for(int i=0; i<10; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<14; i++){
         cout << i << endl;
         paving.bisect();
         maze_outer.contract();
-        if(i<9)
-            maze_inner.contract();
-        else{
-            maze_inner.contract(1860);
-//            for(int j=1700; j<1900; j+=10){
-//                maze_inner.contract(j);
-//                vibes::clearFigure(v_maze_debug.name());
-//                v_maze_debug.show();
-//                v_maze_debug.drawCircle(0.0, 0.0, 1, "red[]");
-//                v_maze_debug.setAxis(-2, -0.5, -1.6, -0.3);
-//                cin >> test;
-//            }
-        }
+        maze_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    VibesMaze v_maze("SmartSubPaving"/*, &maze_outer*/, &maze_inner);
+    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
     //    v_maze.drawCircle(0.0, 0.0, 1, "black[red]");
     v_maze.drawCircle(0.0, 0.0, 1, "red[]");
 
-        IntervalVector position_info(2);
-        position_info[0] = ibex::Interval(-1.45);
-        position_info[1] = ibex::Interval(-1);
-        v_maze.setProperties(0, 0, 512, 512);
-        v_maze.show_room_info(&maze_inner, position_info);
+//        IntervalVector position_info(2);
+//        position_info[0] = ibex::Interval(-1.45);
+//        position_info[1] = ibex::Interval(-1);
+//        v_maze.setProperties(0, 0, 512, 512);
+//        v_maze.show_room_info(&maze_inner, position_info);
 
 
     vibes::endDrawing();
