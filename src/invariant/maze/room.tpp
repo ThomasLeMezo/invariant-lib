@@ -764,7 +764,7 @@ void Room<_Tp>::set_full_result(const int n_vf, ResultStorage<_Tp> &result_stora
             _Tp tmp = f->get_position_typed(); // IN -> OUT [tmp]
             for(size_t face2 = 0; face2 < m_pave->get_dim(); face2++){
                 for(size_t sens2 = 0; sens2 < 2; sens2++){
-                    result_storage.push_back_input(tmp, face2, sens2, face, sens, n_vf);
+                    result_storage.push_back_input(tmp, face, sens, face2, sens2, n_vf);
                     result_storage.push_back_output(tmp, face2, sens2, face, sens, n_vf);
                 }
             }
@@ -795,8 +795,15 @@ void Room<_Tp>::contract_consistency(){
     /// ************ Compute propagation ************ //
     for(size_t n_vf=0; n_vf<nb_vec; n_vf++){
         if(m_vector_field_zero[n_vf]){ // Case Zero in f --- ToDo : Check working seems WRONG ! ???
-            if(!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output))
+            if(!is_empty_private() || (m_is_initial_door_input || m_is_initial_door_output)){
                 this->set_full_result(n_vf, result_storage);
+                if(domain_init==FULL_WALL){
+                    if(dynamics_sens == FWD)
+                        this->set_full_private_input();
+                    if(dynamics_sens == BWD)
+                        this->set_full_private_output();
+                }
+            }
         }
         else{
             compute_sliding_mode(n_vf, result_storage);
