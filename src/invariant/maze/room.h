@@ -481,6 +481,9 @@ protected:
     size_t     m_nb_contract = 0;
     size_t     m_debug_cpt = 0;
 
+    // zero contraction
+    bool       m_zero_contraction = true;
+
 //    ibex::Function *m_contract_function = nullptr;
 //    ibex::CtcFwdBwd *m_ctc = nullptr;
 

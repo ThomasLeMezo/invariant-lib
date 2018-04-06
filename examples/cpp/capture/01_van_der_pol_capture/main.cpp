@@ -53,8 +53,6 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-
-    SpaceFunction sf = SpaceFunction();
     double xB_c, yB_c, rB;
     xB_c = -1;
     yB_c = 1;
@@ -63,9 +61,7 @@ int main(int argc, char *argv[])
     SepFwdBwd s_circle(f_circle, LEQ);
 
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-
-    sf.push_back(&f, &s_circle);
-    Dynamics_Function dyn(&sf, FWD);
+    Dynamics_Function dyn(&f, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -73,6 +69,9 @@ int main(int argc, char *argv[])
 
     invariant::BooleanTreeInterIBEX bisection_tree(&maze_outer, &maze_inner);
     paving.set_bisection_tree(&bisection_tree);
+
+    dom_outer.set_sep_zero(&s_circle);
+    dom_inner.set_sep_zero(&s_circle);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

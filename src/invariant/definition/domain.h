@@ -2,7 +2,10 @@
 #define DOMAIN_ENUM
 namespace invariant{
     enum DOMAIN_INITIALIZATION{FULL_DOOR, FULL_WALL};
+    enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
+    enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
 }
+
 #endif
 
 #ifndef DOMAIN_H
@@ -25,8 +28,7 @@ namespace invariant{
 using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron>;
 using DomainIBEX = Domain<ibex::IntervalVector>;
 
-enum DOMAIN_SEP{SEP_INSIDE, SEP_OUTSIDE, SEP_UNKNOWN};
-enum DOOR_SELECTOR{DOOR_INPUT, DOOR_OUTPUT, DOOR_INPUT_OUTPUT};
+
 
 template <typename _Tp> class SmartSubPaving;
 template <typename _Tp> class Maze;
@@ -118,6 +120,15 @@ public:
      */
     void set_sep_output(ibex::Sep* sep);
 
+    // *************** Output *********************
+
+    /**
+     * @brief Set a separator which close/open all doors outside the constraint (equivalent to a zero (formal) vector field outside the constraint)
+     * Note: A numerical zero vector field won't work this is why we use a formal vector field
+     * @param sep
+     */
+    void set_sep_zero(ibex::Sep* sep);
+
     // *************** Contractors *********************
 
     /**
@@ -206,7 +217,6 @@ public:
      */
     void set_init(DOMAIN_INITIALIZATION init);
 
-private:
     /**
      * @brief Contract all output or input doors of the maze according to the separator contractor
      * @param maze
@@ -214,8 +224,16 @@ private:
      * @param l
      * @param output : true => contract output, false => contract input
      */
-    void contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, bool output, DOMAIN_SEP accelerator);
+    void contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, bool output, DOMAIN_SEP accelerator, ibex::Sep *sep);
 
+    /**
+     * @brief contract zero door (private input)
+     * @param door
+     * @return false if the door is completly inside or outside the constraint
+     */
+    bool contract_zero_door(Room<_Tp> *r);
+
+private:
     /**
      * @brief Contract the boarders according to the options
      * @param maze
@@ -241,11 +259,22 @@ private:
      */
     void contract_box(Room<_Tp> *room, const ibex::IntervalVector &initial_condition, DOOR_SELECTOR doorSelector=DOOR_INPUT_OUTPUT);
 
+    /**
+     * @brief propagate box : Same operation as contract box but with union operator
+     * @param room
+     * @param initial_condition
+     * @param doorSelector
+     */
+    void propagate_box(Room<_Tp> *room, const ibex::IntervalVector &initial_condition, DOOR_SELECTOR doorSelector=DOOR_INPUT_OUTPUT);
+
+
 private:
     SmartSubPaving<_Tp> * m_subpaving;
 
     ibex::Sep* m_sep_input = nullptr;
     ibex::Sep* m_sep_output = nullptr;
+
+    ibex::Sep* m_sep_zero = nullptr;
 
     bool m_border_path_in = true;
     bool m_border_path_out = true;
@@ -257,8 +286,8 @@ private:
     std::vector<Maze<_Tp> *> m_maze_list_union;
 
     omp_lock_t m_list_room_access;
-    omp_lock_t m_lock_sep_input;
-    omp_lock_t m_lock_sep_output;
+    omp_lock_t m_lock_sep;
+    omp_lock_t m_lock_sep_zero;
 };
 }
 
@@ -288,6 +317,11 @@ inline void Domain<_Tp>::set_sep_input(ibex::Sep* sep){
 template<typename _Tp>
 inline void Domain<_Tp>::set_sep_output(ibex::Sep* sep){
     m_sep_output = sep;
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::set_sep_zero(ibex::Sep* sep){
+    m_sep_zero = sep;
 }
 
 template<typename _Tp>

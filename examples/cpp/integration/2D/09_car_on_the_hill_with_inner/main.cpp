@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
     Dynamics_Function dyn(&f, FWD);
 
-    ibex::Function f1(x1, x2, Return(x2,
+    ibex::Function f1(x1, x2, -Return(x2,
                                       -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
-    ibex::Function f2(x1, x2, Return(x2,
+    ibex::Function f2(x1, x2, -Return(x2,
                                       -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
-    Dynamics_Function dyn_u(&f1, &f2, FWD);
+    Dynamics_Function dyn_u(&f1, &f2, BWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -73,11 +73,20 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<14; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
         maze_outer.contract();
-        maze_inner.contract();
+//        if(i<11)
+            maze_inner.contract();
+//        else{
+//            for(size_t j=0; j<5546; j+=100){
+//                maze_inner.contract(j);
+//                v_maze_debug.show();
+//                v_maze_debug.setAxis(-2,2,-2,2);
+//                cin >> test;
+//            }
+//        }
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -90,8 +99,8 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(0.0, 0.0, 1, "red[]");
 
 //        IntervalVector position_info(2);
-//        position_info[0] = ibex::Interval(-1.45);
-//        position_info[1] = ibex::Interval(-1);
+//        position_info[0] = ibex::Interval(1.08);
+//        position_info[1] = ibex::Interval(0.98);
 //        v_maze.setProperties(0, 0, 512, 512);
 //        v_maze.show_room_info(&maze_inner, position_info);
 
