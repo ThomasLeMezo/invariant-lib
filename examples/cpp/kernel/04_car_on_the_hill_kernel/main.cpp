@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
     // ****** Domain Inner ******* //
     invariant::Domain<> dom_inner(&paving, FULL_WALL);
 
-    dom_inner.set_border_path_in(false);
-    dom_inner.set_border_path_out(true);
+    dom_inner.set_border_path_in(true);
+    dom_inner.set_border_path_out(false);
 
     // ****** Dynamics Outer ******* //
 //    ibex::Function f_outer(x1, x2, Return(x2,
@@ -45,22 +45,22 @@ int main(int argc, char *argv[])
     ibex::Function f_outer(x1, x2, Return(x2,
                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5, 0.5)));
 
-    Dynamics_Function dyn_outer(&f_outer, FWD_BWD);
+    Dynamics_Function dyn_outer(&f_outer, BWD);
 
     // ****** Dynamics Inner ******* //
 //    ibex::Function f_inner1(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(-0.5))));
 //    ibex::Function f_inner2(x1, x2, Return(-x2,
 //                                     -(-9.81*sin( (-1.1/1.2*sin(x1)-1.2*sin(1.1*x1))/2.0 ) -0.7*x2 + ibex::Interval(0.5))));
-    ibex::Function f_inner1(x1, x2, Return(x2,
-                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5))));
-    ibex::Function f_inner2(x1, x2, Return(x2,
-                                     (-9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(0.5))));
+    ibex::Function f_inner1(x1, x2, -Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-0.5)));
+    ibex::Function f_inner2(x1, x2, -Return(x2,
+                                     -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(0.5)));
 
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
-    Dynamics_Function dyn_inner(f_list_inner, BWD);
+    Dynamics_Function dyn_inner(f_list_inner, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
@@ -69,7 +69,8 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     vibes::beginDrawing();
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+//    omp_set_num_threads(1);
+    for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
         maze_inner.contract();
@@ -79,15 +80,16 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("Kernel car on the hill"/*, &maze_outer*/, &maze_inner);
-    v_maze.setProperties(0, 0, 512, 512);
+    VibesMaze v_maze("Kernel car on the hill", &maze_outer, &maze_inner);
+//    VibesMaze v_maze("Kernel car on the hill", &maze_inner);
+    v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(12.24);
-    position_info[1] = ibex::Interval(-0.24);
-    v_maze.setProperties(600, 0, 512, 512);
-    v_maze.show_room_info(&maze_inner, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(6.15);
+//    position_info[1] = ibex::Interval(-2.56, -2.48);
+//    v_maze.show_room_info(&maze_inner, position_info);
+//    v_maze.setProperties(600, 0, 512, 512);
 
     vibes::endDrawing();
 }

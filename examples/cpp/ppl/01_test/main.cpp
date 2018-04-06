@@ -15,6 +15,8 @@
 #include <vtkCellArray.h>
 #include <vtkDataSetSurfaceFilter.h>
 
+#include "resultstorage.h"
+
 using namespace std;
 namespace PPL = Parma_Polyhedra_Library;
 using namespace Parma_Polyhedra_Library::IO_Operators;
@@ -232,18 +234,31 @@ int main(){
     //    write_VTK(ph_projection, "ph_projection");
 
 
-    ibex::Variable x(2), a, b, c;
-    Function f= Function(x, a, b, c, a*pow(x[0], 2)+b*x[0]+c-x[1]);
-    IntervalVector test(5);
-    test[0] = ibex::Interval(-10, 10);
-    test[1] = ibex::Interval(-10, 10);
-    test[2] = ibex::Interval(1);
-    test[3] = ibex::Interval(1);
-    test[4] = ibex::Interval(1);
-    cout << "test = " << test << endl;
-    ibex::CtcFwdBwd ctc(f);
-    ctc.contract(test);
-    cout << "test = " << test << endl;
+//    ibex::Variable x(2), a, b, c;
+//    Function f= Function(x, a, b, c, a*pow(x[0], 2)+b*x[0]+c-x[1]);
+//    IntervalVector test(5);
+//    test[0] = ibex::Interval(-10, 10);
+//    test[1] = ibex::Interval(-10, 10);
+//    test[2] = ibex::Interval(1);
+//    test[3] = ibex::Interval(1);
+//    test[4] = ibex::Interval(1);
+//    cout << "test = " << test << endl;
+//    ibex::CtcFwdBwd ctc(f);
+//    ctc.contract(test);
+//    cout << "test = " << test << endl;
+
+    invariant::ResultStorageIBEX r(2, 1);
+    ibex::IntervalVector iv_test(2, 1);
+    iv_test[0] = ibex::Interval(0, 1);
+    iv_test[1] = ibex::Interval(2, 3);
+    r.push_back_input(iv_test, 1, 0, 0, 1, 0);
+
+
+    invariant::ResultStoragePPL r2(2, 1);
+    Parma_Polyhedra_Library::C_Polyhedron p(2);
+    cout << p.is_universe() << endl;
+    r2.push_back_input(p, 1, 0, 0, 1, 0);
+    cout << "test" << endl;
 
     return 0;
 }

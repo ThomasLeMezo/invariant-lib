@@ -51,19 +51,19 @@ int main(int argc, char *argv[])
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x, -Return((x[1]),
+    ibex::Function f(x, Return((x[1]),
                            (-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
-    Dynamics_Function dyn_outer(&f, FWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    Dynamics_Function dyn(&f, BWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
     // ******* Algorithm ********* //
 //    vibes::beginDrawing();
     double time_start = omp_get_wtime();
     
+//    omp_set_num_threads(1);
     for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
@@ -79,22 +79,10 @@ int main(int argc, char *argv[])
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
 
-//    VibesMaze v_maze_inner("graph_inner",&maze_inner, VibesMaze::VIBES_MAZE_INNER);
-//    v_maze_inner.setProperties(0, 0, 512, 512);
-//    v_maze_inner.show();
-
-//    VibesMaze v_maze_outer("graph_outer",&maze_outer, VibesMaze::VIBES_MAZE_OUTER);
-//    v_maze_outer.setProperties(0, 0, 512, 512);
-//    v_maze_outer.show();
-
-//    VibesMaze v_maze_info("graph_info", &maze_inner);
-//    v_maze_info.setProperties(0, 0, 512, 512);
-//    v_maze_info.show();
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(3.6, 5);
-    position_info[1] = ibex::Interval(-2);
-//    v_maze.setProperties(0, 0, 300, 300);
-//    v_maze.show_room_info(&maze_inner, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(2.32);
+//    position_info[1] = ibex::Interval(0.06);
+//    v_maze.show_room_info(&maze_outer, position_info);
 
 //    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/synchronous_generator_basin.svg", "Synchronous Generator Basin");
 

@@ -230,6 +230,8 @@ protected:
     omp_lock_t m_write_add_pave;
 
     BooleanTree<_Tp> *m_bisection_tree = nullptr;
+
+    int m_bisection_step = 0;
 };
 
     /**

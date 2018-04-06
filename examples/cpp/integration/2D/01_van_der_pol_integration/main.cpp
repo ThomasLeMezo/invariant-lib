@@ -39,10 +39,8 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
-    vector<Function *> f_list;
-    f_list.push_back(&f);
-    Dynamics_Function dyn(f_list, FWD);
+    ibex::Function f(x1, x2, -Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    Dynamics_Function dyn(&f, BWD);
 
     // ******* Maze *********
     invariant::Maze<> maze(&dom, &dyn);

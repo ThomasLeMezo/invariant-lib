@@ -64,8 +64,10 @@ int main(int argc, char *argv[])
     invariant::BooleanTreeInterIBEX bisect_graph(&mazeA, &mazeB);
     paving.set_bisection_tree(&bisect_graph);
 
-    dom_B.add_maze_inter(&mazeA);
-    dom_A.add_maze_inter(&mazeB);
+//    dom_B.add_maze_inter(&mazeA);
+//    dom_A.add_maze_inter(&mazeB);
+    dom_B.add_maze_inter_initial_condition(&mazeA);
+    dom_A.add_maze_inter_initial_condition(&mazeB);
 
     // ****** Contractions *******
     double time_start = omp_get_wtime();

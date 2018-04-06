@@ -7,15 +7,15 @@ Domain<_Tp>::Domain(SmartSubPaving<_Tp> *paving, DOMAIN_INITIALIZATION domain_in
     m_subpaving = paving;
     m_domain_init = domain_init;
     omp_init_lock(&m_list_room_access);
-    omp_init_lock(&m_lock_sep_output);
-    omp_init_lock(&m_lock_sep_input);
+    omp_init_lock(&m_lock_sep);
+    omp_init_lock(&m_lock_sep_zero);
 }
 
 template<typename _Tp>
 Domain<_Tp>::~Domain(){
     omp_destroy_lock(&m_list_room_access);
-    omp_destroy_lock(&m_lock_sep_output);
-    omp_destroy_lock(&m_lock_sep_input);
+    omp_destroy_lock(&m_lock_sep);
+    omp_destroy_lock(&m_lock_sep_zero);
 }
 
 template<typename _Tp>
@@ -34,8 +34,6 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
             Pave<_Tp> *p = m_subpaving->get_paves()[i];
             Room<_Tp> *r = p->get_rooms()[maze];
             if(!r->is_removed()){
-                //                if(m_domain_init == FULL_DOOR) // Not necessary
-                //                    r->set_full_private_with_father();
                 if(m_domain_init == FULL_WALL)
                     r->set_empty_private();
                 r->reset_first_contract();
@@ -47,10 +45,10 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
 #pragma omp single
         {
             if(m_sep_output != nullptr){
-                contract_separator(maze, m_subpaving->get_tree(), true, SEP_UNKNOWN); // Output
+                contract_separator(maze, m_subpaving->get_tree(), true, SEP_UNKNOWN, m_sep_output); // Output
             }
             if(m_sep_input != nullptr){
-                contract_separator(maze, m_subpaving->get_tree(), false, SEP_UNKNOWN); // Input
+                contract_separator(maze, m_subpaving->get_tree(), false, SEP_UNKNOWN, m_sep_input); // Input
             }
         }
 
@@ -90,7 +88,7 @@ void Domain<_Tp>::contract_domain(Maze<_Tp> *maze, std::vector<Room<_Tp>*> &list
 }
 
 template<typename _Tp>
-void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, bool output, DOMAIN_SEP accelerator){
+void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node, bool output, DOMAIN_SEP accelerator, ibex::Sep* sep){
     //    ibex::IntervalVector test(2);
     //    test[0] = ibex::Interval(0, 2);
     //    test[1] = ibex::Interval(-3.5, -1.125);
@@ -100,7 +98,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
     if(pave_node->get_removed()[maze])
         return;
     switch (accelerator) {
-    case SEP_INSIDE:{
+    case SEP_INSIDE:
         if(!pave_node->get_fullness()[maze] || m_domain_init==FULL_WALL){
             if(pave_node->is_leaf()){
                 Pave<_Tp>* p = pave_node->get_pave();
@@ -122,13 +120,12 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
             }
             else{
 #pragma omp task
-                contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE);
+                contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE, sep);
 #pragma omp task
-                contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE);
+                contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE, sep);
 #pragma omp taskwait
             }
         }
-    }
         break;
     case SEP_OUTSIDE:{
         if(!pave_node->get_emptyness()[maze] || m_domain_init==FULL_DOOR){
@@ -145,9 +142,9 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
             else{
                 if(m_domain_init != FULL_WALL){
 #pragma omp task
-                    contract_separator(maze, pave_node->get_children().first, output, SEP_OUTSIDE);
+                    contract_separator(maze, pave_node->get_children().first, output, SEP_OUTSIDE, sep);
 #pragma omp task
-                    contract_separator(maze, pave_node->get_children().second, output, SEP_OUTSIDE);
+                    contract_separator(maze, pave_node->get_children().second, output, SEP_OUTSIDE, sep);
 #pragma omp taskwait
                 }
             }
@@ -157,16 +154,10 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
     case SEP_UNKNOWN:{
         ibex::IntervalVector x_in(pave_node->get_position());
         ibex::IntervalVector x_out(x_in);
-        if(output){
-            omp_set_lock(&m_lock_sep_output);
-            m_sep_output->separate(x_in, x_out);
-            omp_unset_lock(&m_lock_sep_output);
-        }
-        else{
-            omp_set_lock(&m_lock_sep_input);
-            m_sep_input->separate(x_in, x_out);
-            omp_unset_lock(&m_lock_sep_input);
-        }
+
+        omp_set_lock(&m_lock_sep);
+        sep->separate(x_in, x_out);
+        omp_unset_lock(&m_lock_sep);
 
         if(pave_node->is_leaf()){
             Pave<_Tp> *p = pave_node->get_pave();
@@ -217,25 +208,25 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
             if(x_in.is_empty()){
                 // Completly inside the constraint
 #pragma omp task
-                contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE);
+                contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE, sep);
 #pragma omp task
-                contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE);
+                contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE, sep);
 #pragma taskwait
             }
             else if(x_out.is_empty()){
                 // Completly outside the constraint
 #pragma omp task
-                contract_separator(maze, pave_node->get_children().first, output, SEP_OUTSIDE);
+                contract_separator(maze, pave_node->get_children().first, output, SEP_OUTSIDE, sep);
 #pragma omp task
-                contract_separator(maze, pave_node->get_children().second, output, SEP_OUTSIDE);
+                contract_separator(maze, pave_node->get_children().second, output, SEP_OUTSIDE, sep);
 #pragma omp taskwait
             }
             else{
                 // Mix area (outside & inside)
 #pragma omp task
-                contract_separator(maze,pave_node->get_children().first, output, SEP_UNKNOWN);
+                contract_separator(maze,pave_node->get_children().first, output, SEP_UNKNOWN, sep);
 #pragma omp task
-                contract_separator(maze,pave_node->get_children().second, output, SEP_UNKNOWN);
+                contract_separator(maze,pave_node->get_children().second, output, SEP_UNKNOWN, sep);
 #pragma omp taskwait
             }
         }
@@ -244,6 +235,42 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
     default:
         break;
     }
+}
+
+
+template<typename _Tp>
+bool Domain<_Tp>::contract_zero_door(Room<_Tp> *r){
+    if(m_sep_zero == nullptr)
+        return false;
+    if(!r->is_removed()){
+        ibex::IntervalVector x_in(r->get_pave()->get_position());
+        ibex::IntervalVector x_out(x_in);
+
+        omp_set_lock(&m_lock_sep);
+        m_sep_zero->separate(x_in, x_out);
+        omp_unset_lock(&m_lock_sep);
+
+
+        if(x_in.is_empty()){ // Inside the constraint
+            return false;
+        }
+        else if(x_out.is_empty()){  // Outside the constraint
+            if(m_domain_init == FULL_WALL)
+                r->set_empty_private();
+            if(m_domain_init == FULL_DOOR)
+                r->set_full_private();
+            return false;
+        }
+        else{ // Inside & Outside the constraint => x_out not empty & x_in not empty
+            if(m_domain_init == FULL_DOOR)
+                propagate_box(r, x_out, DOOR_INPUT_OUTPUT); // r->set_full_initial_door_output();
+            if(m_domain_init == FULL_WALL)
+                contract_box(r, x_out, DOOR_INPUT_OUTPUT); // r->set_full_private_output();
+            return true;
+        }
+    }
+    else
+        return false;
 }
 
 template<typename _Tp>
@@ -406,6 +433,18 @@ void Domain<_Tp>::contract_box(Room<_Tp> *room, const ibex::IntervalVector& init
             d->set_output_private(convert<_Tp>(initial_condition & convert<ibex::IntervalVector>(d->get_output_private())));
         if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)
             d->set_input_private(convert<_Tp>(initial_condition & convert<ibex::IntervalVector>(d->get_input_private())));
+    }
+}
+
+template<typename _Tp>
+void Domain<_Tp>::propagate_box(Room<_Tp> *room, const ibex::IntervalVector& initial_condition, DOOR_SELECTOR doorSelector){
+    // Warning : no inversion of constraint (output=>input) because this is not a propagation as in the case of FULL_WALL
+    for(Face<_Tp> *f:room->get_pave()->get_faces_vector()){
+        Door<_Tp> *d = f->get_doors()[room->get_maze()];
+        if(doorSelector == DOOR_OUTPUT || doorSelector == DOOR_INPUT_OUTPUT)
+            d->set_output_private(convert<_Tp>(convert<ibex::IntervalVector>(d->get_output_private()) | (initial_condition & convert<ibex::IntervalVector>(d->get_face()->get_position_typed()))));
+        if(doorSelector == DOOR_INPUT || doorSelector == DOOR_INPUT_OUTPUT)
+            d->set_input_private(convert<_Tp>(convert<ibex::IntervalVector>(d->get_output_private()) | (initial_condition & convert<ibex::IntervalVector>(d->get_face()->get_position_typed()))));
     }
 }
 

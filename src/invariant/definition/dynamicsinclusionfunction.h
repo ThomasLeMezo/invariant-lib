@@ -3,6 +3,12 @@
 
 #include "dynamics_function.h"
 
+/**
+ * Dynamics Inclusion Function is an extension of Dynamics Function when the function depends of an interval parameters (inclusion function)
+ * that can change during the computation
+ *
+*/
+
 namespace invariant {
 class DynamicsInclusionFunction: public Dynamics_Function
 {

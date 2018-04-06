@@ -80,8 +80,8 @@ int main(int argc, char *argv[])
     std::vector<Maze<>*> maze_outer_list{&maze_A, &maze_B};
     std::vector<Maze<>*> maze_inner_list{&maze_A_inner, &maze_B_inner};
 
-    dom_B.add_maze_inter(&maze_A);
-    dom_A.add_maze_inter(&maze_B);
+    dom_B.add_maze_inter_initial_condition(&maze_A); // ToDo Check...
+    dom_A.add_maze_inter_initial_condition(&maze_B);
     dom_B_inner.add_maze_union(&maze_A_inner);
     dom_A_inner.add_maze_union(&maze_B_inner);
 

@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-6,6);
-    space[1] = ibex::Interval(-6,6);
+    space[0] = ibex::Interval(-2.5,2.5);
+    space[1] = ibex::Interval(-3.5,3.5);
 
     invariant::SmartSubPaving<> paving(space);
 
@@ -46,15 +46,16 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(false);
 
     // ****** Dynamics Outer ******* //
-    ibex::Function f_outer(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.5, 0.5)));
-    Dynamics_Function dyn_outer(&f_outer, FWD);
+    float u = 0.5;
+    ibex::Function f_outer(x1, x2, -Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-u, u)));
+    Dynamics_Function dyn_outer(&f_outer, FWD_BWD);
 
     // ****** Dynamics Inner ******* //
     ibex::Function f_inner1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-u)));
     ibex::Function f_inner2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(0.5)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(u)));
     vector<Function *> f_list_inner;
     f_list_inner.push_back(&f_inner1);
     f_list_inner.push_back(&f_inner2);
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze_inner.contract();
+//    omp_set_num_threads(1);
     for(int i=0; i<18; i++){
         paving.bisect();
         cout << i << " inner - " << maze_inner.contract() << " - " << paving.size() << endl;

@@ -20,10 +20,12 @@ public:
      * @brief BooleanTree constructor
      */
     BooleanTree(const std::vector<Maze<_Tp>*> &maze_list);
+    BooleanTree(Maze<_Tp>* maze_A);
     BooleanTree(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B);
     BooleanTree(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B, Maze<_Tp>* maze_C);
 
     BooleanTree(const std::vector<BooleanTree<_Tp>*> &bisectionTree_list);
+    BooleanTree(BooleanTree<_Tp>* bisectionTree);
     BooleanTree(BooleanTree<_Tp>* bisectionTree_A, BooleanTree<_Tp>* bisectionTree_B);
     BooleanTree(BooleanTree<_Tp>* bisectionTree_A, BooleanTree<_Tp>* bisectionTree_B, BooleanTree<_Tp>* bisectionTree_C);
 

@@ -1,6 +1,7 @@
 #include "ibex_SepFwdBwd.h"
 #include <iostream>
 #include "previmer3d.h"
+#include "dynamics_function.h"
 #include "maze.h"
 #include <ibex.h>
 #include <math.h>
@@ -81,8 +82,9 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ******* Maze *********
-//    invariant::MazePPL maze(&dom, &pm3d);
-    invariant::MazeIBEX maze(&dom, &pm3d);
+    Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
+    MazeIBEX maze(&dom, &dyn);
+    // MazePPL maze(&dom, &dyn);
 
     cout << "Domain = " << search_space << endl;
 

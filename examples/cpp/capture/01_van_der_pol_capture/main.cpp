@@ -14,6 +14,8 @@
 #include "graphiz_graph.h"
 #include <omp.h>
 
+#include "spacefunction.h"
+
 using namespace std;
 using namespace ibex;
 using namespace invariant;
@@ -36,8 +38,6 @@ int main(int argc, char *argv[])
     double x1_c, x2_c, r;
     x1_c = -2.0;
     x2_c = 4;
-//    x1_c = 1.2;
-//    x2_c = 1;
     r = 0.3;
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -53,6 +53,13 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
+    double xB_c, yB_c, rB;
+    xB_c = -1;
+    yB_c = 1;
+    rB = 3.5;
+    ibex::Function f_circle(x1, x2, pow(x1-xB_c, 2)+pow(x2-yB_c, 2)-pow(2, rB));
+    SepFwdBwd s_circle(f_circle, LEQ);
+
     ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
     Dynamics_Function dyn(&f, FWD);
 
@@ -62,6 +69,9 @@ int main(int argc, char *argv[])
 
     invariant::BooleanTreeInterIBEX bisection_tree(&maze_outer, &maze_inner);
     paving.set_bisection_tree(&bisection_tree);
+
+    dom_outer.set_sep_zero(&s_circle);
+    dom_inner.set_sep_zero(&s_circle);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -78,6 +88,7 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1048, 1048);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
+    v_maze.drawCircle(xB_c, yB_c, rB, "green[]");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(-2);

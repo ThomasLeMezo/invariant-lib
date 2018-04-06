@@ -25,6 +25,7 @@ _Tp get_empty_door_container(int dim);
 #include "maze.h"
 #include "door.h"
 #include "face.h"
+#include "resultstorage.h"
 
 namespace ppl=Parma_Polyhedra_Library;
 
@@ -330,6 +331,12 @@ protected:
     void contract_according_to_vector_field();
 
     /**
+     * @brief set full result
+     * @param result_storage
+     */
+    void set_full_result(const int n_vf, ResultStorage<_Tp> &result_storage);
+
+    /**
      * @brief Basic contraction between [in] and [out] according to a [vect].
      * @param in
      * @param out
@@ -348,26 +355,26 @@ protected:
     /**
      * @brief Get door contraction in case of sliding mode (IN & OUT)
      * @param n_vf
-     * @param face_in
-     * @param sens_in
+     * @param face
+     * @param sens
      * @param out_return
      * @param in_return
      */
-    void contract_sliding_mode(int n_vf, int face_in, int sens_in, _Tp &out_return, _Tp &in_return);
+    void contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_return, _Tp &in_return);
 
     /**
      * @brief compute_sliding_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_sliding_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector< std::array<_Tp, 2> > > &in_results);
+    void compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_storage);
 
     /**
      * @brief compute_standard_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_standard_mode(const int n_vf, std::vector<std::vector< std::array<_Tp, 2> > > &out_results, std::vector<std::vector< std::array<_Tp, 2> > > &in_results);
+    void compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result_storage);
 
 public:
     /**
@@ -433,6 +440,7 @@ protected:
     Maze<_Tp>*   m_maze = nullptr; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
     std::vector<ibex::IntervalMatrix> m_vector_fields_d1; // Vector field of the Room
+    ibex::IntervalVector m_vector_fields_union;
 
     std::vector<_Tp> m_vector_fields_typed_fwd; // Typed Vector field of the Room
     std::vector<_Tp> m_vector_fields_typed_bwd; // Typed Vector field of the Room
@@ -440,6 +448,9 @@ protected:
     std::vector<bool>    m_vector_field_zero;
     bool            m_contain_zero_coordinate = false;
     bool            m_contain_zero = false; // if a zero in one of the list vect
+
+    std::vector<std::vector<bool>> m_zero_component_in_vector_field;
+    std::vector<bool>   m_zero_component_in_vector_fields_union;
 
     mutable bool    m_empty = false;
     mutable bool    m_full = false;
@@ -468,6 +479,10 @@ protected:
 
     // To Be Removed
     size_t     m_nb_contract = 0;
+    size_t     m_debug_cpt = 0;
+
+    // zero contraction
+    bool       m_zero_contraction = true;
 
 //    ibex::Function *m_contract_function = nullptr;
 //    ibex::CtcFwdBwd *m_ctc = nullptr;

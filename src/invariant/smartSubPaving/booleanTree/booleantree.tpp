@@ -8,6 +8,11 @@ BooleanTree<_Tp>::BooleanTree(const std::vector<Maze<_Tp>*> &maze_list){
 }
 
 template<typename _Tp>
+BooleanTree<_Tp>::BooleanTree(Maze<_Tp>* maze){
+    m_maze_list.push_back(maze);
+}
+
+template<typename _Tp>
 BooleanTree<_Tp>::BooleanTree(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B){
     m_maze_list.push_back(maze_A);
     m_maze_list.push_back(maze_B);
@@ -23,6 +28,11 @@ BooleanTree<_Tp>::BooleanTree(Maze<_Tp>* maze_A, Maze<_Tp>* maze_B, Maze<_Tp>* m
 template<typename _Tp>
 BooleanTree<_Tp>::BooleanTree(const std::vector<BooleanTree<_Tp>*> &bisectionTree_list){
     m_children_list = bisectionTree_list;
+}
+
+template<typename _Tp>
+BooleanTree<_Tp>::BooleanTree(BooleanTree<_Tp>* bisectionTree){
+    m_children_list.push_back(bisectionTree);
 }
 
 template<typename _Tp>

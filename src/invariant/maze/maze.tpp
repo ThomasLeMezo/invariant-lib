@@ -75,8 +75,12 @@ int Maze<_Tp>::contract(size_t nb_operations){
     bool stop_contraction = m_deque_rooms.empty();
 
     if(stop_contraction && m_contraction_step!=0){
-        std::cout << " => MAZE EMPTY" << std::endl;
+        std::cout << " => [WARNING] MAZE EMPTY" << std::endl;
         m_empty = true;
+        return 0;
+    }
+    if((nb_operations!=0 && m_nb_operations>=nb_operations)){
+        std::cout << " => [WARNING] Not enough step allowed" << std::endl;
         return 0;
     }
     omp_lock_t lock_nb_operations;
@@ -94,7 +98,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                     Room<_Tp> *r = nullptr;
                     omp_set_lock(&m_deque_access);
 
-                    if(!m_deque_rooms.empty()){
+                    if(!m_deque_rooms.empty() && !stop_contraction){
                         // To improve the efficiency, we start half of the thread on the back of the deque
                         // and the other on the front
                         if(omp_get_thread_num()%2==1){

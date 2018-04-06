@@ -35,15 +35,15 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(true);
 
     // ****** Dynamics ******* //
-    ibex::Function f1(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.3)));
-    ibex::Function f2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(0.3)));
+//    ibex::Function f1(x1, x2, Return(x2,
+//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.3)));
+//    ibex::Function f2(x1, x2, Return(x2,
+//                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(0.3)));
 
-//    ibex::Function f1(x1, x2, Return(Interval(1.0),
-//                                    ibex::Interval(0.5)));
-//    ibex::Function f2(x1, x2, Return(Interval(1.0),
-//                                     ibex::Interval(-0.5)));
+    ibex::Function f1(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-1)));
+    ibex::Function f2(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(1)));
 
     vector<Function *> f_list;
     f_list.push_back(&f1);
@@ -55,23 +55,30 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    maze.contract(); // To init the first room in case of Propagator
+//    omp_set_num_threads(1);
     for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
+        maze.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze, VibesMaze::VIBES_MAZE_INNER);
+    VibesMaze v_maze("VanDerPolKernelInner", &maze);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
-    vibes::endDrawing();
 
 //    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(1);
-//    position_info[1] = ibex::Interval(1);
-//    v_maze.get_room_info(&maze, position_info);
+//    position_info[0] = ibex::Interval(-0.913);
+//    position_info[1] = ibex::Interval(-3.493);
+//    v_maze.show_room_info(&maze, position_info);
+//    v_maze.setProperties(0, 10, 512, 512);
+
+//    position_info[0] = ibex::Interval(-2.43, -2.42);
+//    position_info[1] = ibex::Interval(0.5);
+//    v_maze.show_room_info(&maze, position_info);
+
+    vibes::endDrawing();
 }

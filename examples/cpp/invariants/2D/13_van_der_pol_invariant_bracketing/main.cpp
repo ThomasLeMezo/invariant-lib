@@ -37,8 +37,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    Dynamics_Function dyn_outer(&f, FWD_BWD);
-    Dynamics_Function dyn_inner(&f, FWD);
+    ibex::Function f2(x1, x2, Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
+    Dynamics_Function dyn_outer(&f, FWD_BWD); // Duplicate because of simultaneous access of f (semaphore on Dynamics_Function)
+    Dynamics_Function dyn_inner(&f2, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
@@ -46,7 +48,9 @@ int main(int argc, char *argv[])
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<18; i++){
+//    omp_set_num_threads(1);
+
+    for(int i=0; i<14; i++){
         subpaving.bisect();
         cout << i << " - " << maze_outer.contract() << endl;
         cout << i << " - " << maze_inner.contract() << endl;

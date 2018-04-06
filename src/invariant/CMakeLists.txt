@@ -57,6 +57,7 @@ include_directories(serialization)
     maze/room.h
     maze/door.h
     maze/sepmaze.h
+    maze/resultstorage.h
 
     maze/eulerianmaze.h
 
@@ -67,6 +68,7 @@ include_directories(serialization)
     smartSubPaving/booleanTree/booleantree.h
     smartSubPaving/booleanTree/booleantreeunion.h
     smartSubPaving/booleanTree/booleantreeinter.h
+#    smartSubPaving/booleanTree/booleantreenot.h
 
     definition/dataSet/datasetnode.h
     definition/dataSet/datasetnode.tpp
@@ -81,11 +83,13 @@ include_directories(serialization)
     smartSubPaving/booleanTree/booleantree.tpp
     smartSubPaving/booleanTree/booleantreeunion.tpp
     smartSubPaving/booleanTree/booleantreeinter.tpp
+#    smartSubPaving/booleanTree/booleantreenot.tpp
 
     maze/maze.tpp
     maze/room.tpp
     maze/door.tpp
     maze/sepmaze.tpp
+    maze/resultstorage.tpp
 
     maze/eulerianmaze.tpp
 

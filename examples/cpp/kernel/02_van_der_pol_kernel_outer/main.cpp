@@ -35,9 +35,9 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x1, x2, Return(-x2,
-                                    -(1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.5, 0.5)));
-    Dynamics_Function dyn(&f, BWD);
+    ibex::Function f(x1, x2, -Return(x2,
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)+ibex::Interval(-0.5, 0.5)));
+    Dynamics_Function dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

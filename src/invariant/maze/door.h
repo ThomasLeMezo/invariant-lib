@@ -205,6 +205,12 @@ public:
     void push_back_collinear_vector_field(bool val);
 
     /**
+     * @brief Set if the vector field union is collinear to the face
+     * @param val
+     */
+    void set_collinear_vector_field_union(bool val);
+
+    /**
      * @brief Get if this door is a possible out for propagation
      * @return
      */
@@ -229,10 +235,22 @@ public:
     const std::vector<bool>& is_collinear() const;
 
     /**
+     * @brief Get if the vector field union is collinear to the door
+     * @return
+     */
+    const bool &is_collinear_union() const;
+
+    /**
      * @brief Set the dimensions where the n-ith vector field cross zero
      * @param zeros
      */
     void push_back_zeros_in_vector_field(std::vector<bool> zeros);
+
+    /**
+     * @brief Set the dimensions where the n-ith vector field cross zero
+     * @param zeros
+     */
+    void push_back_zeros_in_vector_field_union(std::vector<bool> zeros);
 
     /**
      * @brief Return the list of dimensions where the i-th vector field cross zero
@@ -240,6 +258,13 @@ public:
      * @return
      */
     const std::vector<bool> &get_where_zeros(size_t vector_field_id) const;
+
+    /**
+     * @brief Return the list of dimensions where the i-th vector field cross zero
+     * @param vector_field_id
+     * @return
+     */
+    const std::vector<bool> &get_where_zeros_union() const;
 
     /**
      * @brief Reduce de size of the Door if inactive (delete private IV)
@@ -290,7 +315,7 @@ protected:
     bool                 m_possible_in_union = false; // For at least one command
     bool                 m_possible_out_union = false;
     std::vector<bool>    m_collinear_vector_field;
-    std::vector<std::vector<bool>> m_zeros_in_vector_fields;
+    bool                 m_collinear_vector_field_union;
 
     // Idea : add a father hull in each door ?
 };
@@ -360,18 +385,18 @@ inline void Door<_Tp>::push_back_collinear_vector_field(bool val){
 }
 
 template <typename _Tp>
-inline void Door<_Tp>::push_back_zeros_in_vector_field(std::vector<bool> zeros){
-    m_zeros_in_vector_fields.push_back(zeros);
-}
-
-template <typename _Tp>
-inline const std::vector<bool>& Door<_Tp>::get_where_zeros(size_t vector_field_id) const{
-    return m_zeros_in_vector_fields[vector_field_id];
+inline void Door<_Tp>::set_collinear_vector_field_union(bool val){
+    m_collinear_vector_field_union = val;
 }
 
 template <typename _Tp>
 inline const std::vector<bool>& Door<_Tp>::is_collinear() const{
     return m_collinear_vector_field;
+}
+
+template <typename _Tp>
+inline const bool& Door<_Tp>::is_collinear_union() const{
+    return m_collinear_vector_field_union;
 }
 
 template <typename _Tp>
