@@ -162,8 +162,8 @@ bool Pave<_Tp>::bisect_step_one(){
             // Store father hull (improve efficiency when widening ?)
             _Tp hull = r->get_hull_typed();
 
-//            r_first->set_father_hull(hull & r_first->get_pave()->get_position_typed());
-//            r_second->set_father_hull(hull & r_second->get_pave()->get_position_typed());
+            r_first->set_father_hull(hull & r_first->get_pave()->get_position_typed());
+            r_second->set_father_hull(hull & r_second->get_pave()->get_position_typed());
 
             // ToDo : add a contraction of Room(s) according to father
 

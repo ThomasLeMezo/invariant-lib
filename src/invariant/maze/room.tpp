@@ -825,8 +825,8 @@ void Room<_Tp>::contract_consistency(){
                 else
                     door_out_iv |= door->get_output_private();
 
-                //                    if(m_is_father_hull) // For father hull
-                //                        door_out_iv &= *m_father_hull;
+                if(m_is_father_hull) // For father hull
+                    door_out_iv &= *m_father_hull;
 
                 //                if(get_nb_dim_flat(door_out_iv)==(int)dim){
                 //                    door_out_iv = get_empty_door_container<_Tp>(dim);
@@ -841,8 +841,8 @@ void Room<_Tp>::contract_consistency(){
                 else
                     door_in_iv |= door->get_input_private();
 
-                //                    if(m_is_father_hull) // For father hull
-                //                        door_in_iv &= *m_father_hull;
+                if(m_is_father_hull) // For father hull
+                    door_in_iv &= *m_father_hull;
                 //                if(get_nb_dim_flat(door_in_iv)==(int)dim){
                 //                    door_in_iv = get_empty_door_container<_Tp>(dim);
                 //                }
