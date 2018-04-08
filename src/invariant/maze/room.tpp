@@ -32,9 +32,12 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics):
     omp_init_lock(&m_lock_contraction);
     omp_init_lock(&m_lock_deque);
     omp_init_lock(&m_lock_vector_field);
+    omp_init_lock(&m_lock_hybrid_read);
 
     compute_vector_field();
     compute_vector_field_typed();
+
+    compute_hybrid();
 }
 
 template<typename _Tp>
@@ -57,6 +60,7 @@ inline void Room<_Tp>::reset(){
         delete(m_initial_door_output);
         m_initial_door_output=nullptr;
     }
+
     m_nb_contract = 0;
 
     for(Face<_Tp> *f:m_pave->get_faces_vector()){
@@ -76,8 +80,7 @@ inline void Room<_Tp>::reset(){
     m_contract_vector_field = true;
     compute_vector_field();
     compute_vector_field_typed();
-
-
+    compute_hybrid();
 }
 
 template<typename _Tp>
@@ -85,6 +88,7 @@ Room<_Tp>::~Room(){
     omp_destroy_lock(&m_lock_contraction);
     omp_destroy_lock(&m_lock_deque);
     omp_destroy_lock(&m_lock_vector_field);
+    omp_destroy_lock(&m_lock_hybrid_read);
 
     if(m_initial_door_output != nullptr)
         delete(m_initial_door_output);
@@ -92,6 +96,59 @@ Room<_Tp>::~Room(){
         delete(m_initial_door_input);
     if(m_father_hull != nullptr)
         delete(m_father_hull);
+}
+
+template<typename _Tp>
+void Room<_Tp>::compute_hybrid(){
+    if(m_maze->get_dynamics()->get_hybrid_guard().size()!=0){
+        DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
+        size_t dim = m_pave->get_dim();
+        if(m_pave->get_pave_father() != nullptr){ // Step of a bisection
+            Room<_Tp> *room_father = m_pave->get_pave_father()->get_rooms()[m_maze];
+            for(std::pair<ibex::Sep*, ibex::IntervalVector> pair_hyb:room_father->get_hybrid_door_guards()){
+                if(!pair_hyb.second.is_empty()){
+                    ibex::Sep* sep = pair_hyb.first;
+                    ibex::IntervalVector x_in(m_pave->get_position());
+                    ibex::IntervalVector x_out(x_in);
+                    sep->separate(x_in, x_out);
+
+                    if(!x_out.is_empty()){
+                        if(!x_in.is_empty())
+                            x_out &= x_in;
+                        m_hybrid_guard_position.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_out));
+                        if(domain_init==FULL_WALL)
+                            m_hybrid_guard_door.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET)));
+                        else
+                            m_hybrid_guard_door.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_out));
+                    }
+                }
+            }
+        }
+        else{ // No bisection yet
+            for(ibex::Sep* sep:m_maze->get_dynamics()->get_hybrid_guard()){
+                ibex::IntervalVector x_in(m_pave->get_position());
+                ibex::IntervalVector x_out(x_in);
+                sep->separate(x_in, x_out);
+
+                if(!x_out.is_empty()){
+                    if(!x_in.is_empty())
+                        x_out &= x_in;
+                    m_hybrid_guard_position.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_out));
+                    if(domain_init==FULL_WALL)
+                        m_hybrid_guard_door.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET)));
+                    else
+                        m_hybrid_guard_door.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_out));
+                }
+            }
+        }
+        m_hybrid_guard_door_private = m_hybrid_guard_door;
+
+        // Add room to hybrid list
+        if(!m_is_hybrid_list){
+            m_maze->add_hybrid_room(this);
+            m_is_hybrid_list=true;
+        }
+    }
 }
 
 template<typename _Tp>
@@ -654,8 +711,8 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
     }
 
     if(domain_init==FULL_DOOR){ // Only for DOOR
-//        out_return &= in_return;
-//        in_return &= out_return;
+        //        out_return &= in_return;
+        //        in_return &= out_return;
 
         in_return &= door->get_input_private();
         out_return &= door->get_output_private();
@@ -880,7 +937,7 @@ template<typename _Tp>
 bool Room<_Tp>::contract(){
     // Do not synchronization in this function or sub-functions
     bool change = false;
-//    get_private_doors_info("before removed");
+    //    get_private_doors_info("before removed");
     if(!is_removed()){
         DOMAIN_INITIALIZATION domain_init = m_maze->get_domain()->get_init();
         if(m_contract_vector_field){
@@ -895,7 +952,7 @@ bool Room<_Tp>::contract(){
 
         //        get_private_doors_info("before");
         change |= contract_continuity();
-//        get_private_doors_info("continuity");
+        //        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
@@ -962,6 +1019,11 @@ void Room<_Tp>::synchronize(){
     for(Face<_Tp> *f:m_pave->get_faces_vector()){
         Door<_Tp> *d = f->get_doors()[m_maze];
         d->synchronize();
+    }
+    if(!m_hybrid_guard_door_private.empty()){
+        omp_set_lock(&m_lock_hybrid_read);
+        m_hybrid_guard_door = m_hybrid_guard_door_private;
+        omp_unset_lock(&m_lock_hybrid_read);
     }
 }
 
@@ -1160,6 +1222,46 @@ const ibex::IntervalVector Room<_Tp>::get_hull_complementary(){
         complementary |= result[i];
     }
     return complementary;
+}
+
+template<typename _Tp>
+void Room<_Tp>::discover_hybrid_room(){
+    std::map<ibex::Sep*, std::array<ibex::Function*, 2>> map_reset;
+    Dynamics *d = m_maze->get_dynamics();
+    map_reset = d->get_hybrid_reset();
+    for(std::pair<ibex::Sep*, ibex::IntervalVector> pair:m_hybrid_guard_position){
+        ibex::Function *f_pos = map_reset[pair.first][0];
+        ibex::IntervalVector x_pos(m_pave->get_dim());
+#pragma omp critical
+        {
+            x_pos = f_pos->eval_vector(pair.second); // Lock issue ?
+        }
+        std::vector<Pave<_Tp>*> pave_list;
+        m_maze->get_subpaving()->get_tree()->get_intersection_pave_outer(pave_list, x_pos);
+        std::vector<Room<_Tp>*> room_list;
+        for(Pave<_Tp>* p:pave_list){
+            Room<_Tp> *r=p->get_rooms()[m_maze];
+            if(!r->is_removed()){
+                room_list.push_back(r);
+                r->add_hybrid_room_neg(this, pair.first);
+            }
+        }
+
+    }
+}
+
+template<typename _Tp>
+void Room<_Tp>::add_hybrid_room_neg(Room<_Tp> *r, ibex::Sep* sep){
+    omp_set_lock(&m_lock_hybrid_read);
+    auto it = m_hybrid_doors_neg.find(sep);
+    if (it == m_hybrid_doors_neg.end() ) { // key not foung
+        std::vector<Room<_Tp>*> tmp;
+        tmp.push_back(r);
+        m_hybrid_doors_neg.insert(std::pair<ibex::Sep*,std::vector<Room<_Tp>*>>(sep, tmp));
+    } else {
+        it->second.push_back(r);
+    }
+    omp_unset_lock(&m_lock_hybrid_read);
 }
 
 }

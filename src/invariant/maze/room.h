@@ -10,6 +10,8 @@ _Tp get_empty_door_container(int dim);
 #ifndef ROOM_H
 #define ROOM_H
 
+#include <map>
+
 #include <ibex_IntervalVector.h>
 #include <ibex_IntervalMatrix.h>
 #include <ibex_Function.h>
@@ -307,6 +309,17 @@ public:
         return r1;
     }
 
+    /**
+     * @brief discover_hybrid_room
+     */
+    void discover_hybrid_room();
+
+    /**
+     * @brief add_hybrid_room_neg
+     * @param r
+     */
+    void add_hybrid_room_neg(Room<_Tp> *r, ibex::Sep* sep);
+
 protected:
     /**
      * @brief Contract doors according to the neighbors
@@ -390,10 +403,15 @@ public:
     size_t get_nb_contractions() const;
 
     /**
-     * @brief get vector fields typed
+     * @brief get vector fields typed fwd
      * @return
      */
     const std::vector<_Tp>& get_vector_fields_typed_fwd() const;
+
+    /**
+     * @brief get_vector_fields_typed_bwd
+     * @return
+     */
     const std::vector<_Tp>& get_vector_fields_typed_bwd() const;
 
     /**
@@ -402,29 +420,79 @@ public:
     void compute_vector_field();
 
     /**
-     * @brief is initial door input/output
+     * @brief is initial door input
      * @return
      */
     bool is_initial_door_input() const;
+
+    /**
+     * @brief is initial door output
+     * @return
+     */
     bool is_initial_door_output() const;
 
     /**
-     * @brief set_initial_condition
+     * @brief set_initial_door_input
+     * @param door
      */
     void set_initial_door_input(const _Tp &door);
+
+    /**
+     * @brief set_initial_door_output
+     * @param door
+     */
     void set_initial_door_output(const _Tp &door);
 
+    /**
+     * @brief get_initial_door_input
+     * @return
+     */
     const _Tp& get_initial_door_input() const;
+
+    /**
+     * @brief get_initial_door_output
+     * @return
+     */
     const _Tp& get_initial_door_output() const;
 
+    /**
+     * @brief set_full_initial_door_input
+     */
     void set_full_initial_door_input();
+
+    /**
+     * @brief set_full_initial_door_output
+     */
     void set_full_initial_door_output();
 
+    /**
+     * @brief set_father_hull
+     * @param hull
+     */
     void set_father_hull(const _Tp &hull);
+
+    /**
+     * @brief is_father_hull
+     * @return
+     */
     bool is_father_hull() const;
+
+    /**
+     * @brief get_father_hull
+     * @return
+     */
     const _Tp& get_father_hull() const;
 
+    /**
+     * @brief is_first_contract
+     * @return
+     */
     bool is_first_contract() const;
+
+    /**
+     * @brief is_contract_vector_field
+     * @return
+     */
     bool is_contract_vector_field() const;
 
     /**
@@ -432,8 +500,42 @@ public:
      */
     void reset_first_contract();
 
+    /**
+     * @brief reset_init_door_input
+     */
     void reset_init_door_input();
+
+    /**
+     * @brief reset_init_door_output
+     */
     void reset_init_door_output();
+
+    /**
+     * @brief compute_hybrid
+     */
+    void compute_hybrid();
+
+    /**
+     * @brief get_hybrid_door_guards
+     * @return
+     */
+    std::map<ibex::Sep*, ibex::IntervalVector> get_hybrid_door_guards() const;
+
+    /**
+     * @brief reset_hybrid_doors
+     */
+    void reset_hybrid_doors();
+
+    /**
+     * @brief Return true if this pave is in the maze hybrid list
+     * @return
+     */
+    bool is_hybrid_list() const;
+
+    /**
+     * @brief reset_hybrid_list
+     */
+    void reset_hybrid_list();
 
 protected:
     Pave<_Tp>*   m_pave = nullptr; // pointer to the associated face
@@ -472,6 +574,15 @@ protected:
     bool    m_is_initial_door_output = false;
     _Tp* m_initial_door_input = nullptr;
     _Tp* m_initial_door_output = nullptr;
+
+    // Hybrid condition
+    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_position;
+    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_door;
+    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_door_private;
+    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_doors_pos;
+    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_doors_neg;
+    omp_lock_t   m_lock_hybrid_read;
+    bool        m_is_hybrid_list = false;
 
     // Valid hull
     bool m_is_father_hull = false;
@@ -791,8 +902,29 @@ inline bool Room<_Tp>::is_first_contract() const{
 }
 
 template <typename _Tp>
+inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_Tp>::get_hybrid_door_guards() const{
+    return m_hybrid_guard_position;
+}
+
+template <typename _Tp>
 inline bool Room<_Tp>::is_contract_vector_field() const{
     return m_contract_vector_field;
+}
+
+template <typename _Tp>
+inline void Room<_Tp>::reset_hybrid_doors(){
+    m_hybrid_doors_neg.clear();
+    m_hybrid_doors_pos.clear();
+}
+
+template <typename _Tp>
+inline bool Room<_Tp>::is_hybrid_list() const{
+    return m_is_hybrid_list;
+}
+
+template <typename _Tp>
+inline void Room<_Tp>::reset_hybrid_list(){
+    m_is_hybrid_list = false;
 }
 
 inline std::string print(const ibex::IntervalVector &iv){

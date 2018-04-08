@@ -11,12 +11,15 @@ Maze<_Tp>::Maze(invariant::Domain<_Tp> *domain, Dynamics *dynamics)
     m_subpaving = domain->get_subpaving();
     omp_init_lock(&m_deque_access);
     omp_init_lock(&m_initial_rooms_access);
+    omp_init_lock(&m_hybrid_rooms_access);
 
     SmartSubPaving<_Tp> *g = domain->get_subpaving();
     for(Pave<_Tp>*p:g->get_paves()){
         Room<_Tp> *r = new Room<_Tp>(p, this, dynamics);
         p->add_room(r);
     }
+
+    discover_hybrid_rooms();
 
     g->add_maze(this);
     m_empty = false;
@@ -26,6 +29,7 @@ template<typename _Tp>
 Maze<_Tp>::~Maze(){
     omp_destroy_lock(&m_deque_access);
     omp_destroy_lock(&m_initial_rooms_access);
+    omp_destroy_lock(&m_hybrid_rooms_access);
 }
 
 template<typename _Tp>
@@ -233,6 +237,20 @@ void Maze<_Tp>::compute_vector_field(){
         Room<_Tp> *r = p->get_rooms()[this];
         r->compute_vector_field();
     }
+}
+
+template<typename _Tp>
+void Maze<_Tp>::discover_hybrid_rooms(){
+#pragma omp for
+        for(size_t i = 0; i<m_hybrid_rooms_list.size(); i++){
+            Room<_Tp>* r=m_hybrid_rooms_list[i];
+            r->reset_hybrid_doors();
+        }
+#pragma omp for
+        for(size_t i = 0; i<m_hybrid_rooms_list.size(); i++){
+            Room<_Tp>* r=m_hybrid_rooms_list[i];
+            r->discover_hybrid_room();
+        }
 }
 
 }

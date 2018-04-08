@@ -116,6 +116,11 @@ void SmartSubPaving<_Tp>::bisect(){
     std::vector<Pave<_Tp>*> bisected_paves;
     m_paves.clear();
 
+    // Hybrid reset
+    for(Maze<_Tp> *maze:m_mazes){
+        maze->reset_hybrid_room_list();
+    }
+
 #pragma omp parallel
     {
         Parma_Polyhedra_Library::Thread_Init* thread_init = initialize_thread<_Tp>();
@@ -163,6 +168,11 @@ void SmartSubPaving<_Tp>::bisect(){
     // Reset maze
     for(Maze<_Tp> *maze:m_mazes){
         maze->reset_nb_operations();
+    }
+
+    // Hybrid discover
+    for(Maze<_Tp> *maze:m_mazes){
+        maze->discover_hybrid_rooms();
     }
 
     m_bisection_step++;

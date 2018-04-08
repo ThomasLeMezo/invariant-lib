@@ -143,6 +143,8 @@ bool Pave<_Tp>::bisect_step_one(){
         Pave<_Tp> *pave0 = new Pave<_Tp>(result_boxes.first, m_subpaving); // lb
         Pave<_Tp> *pave1 = new Pave<_Tp>(result_boxes.second, m_subpaving); // ub
         m_pave_children = new std::array<Pave<_Tp>*, 2>({pave0, pave1});
+        pave0->set_pave_father(this);
+        pave1->set_pave_father(this);
 
         // Add inter link
         pave1->get_faces()[*m_bisection_axis][0]->add_neighbor(pave0->get_faces()[*m_bisection_axis][1]);
@@ -162,8 +164,8 @@ bool Pave<_Tp>::bisect_step_one(){
             // Store father hull (improve efficiency when widening ?)
             _Tp hull = r->get_hull_typed();
 
-            r_first->set_father_hull(hull & r_first->get_pave()->get_position_typed());
-            r_second->set_father_hull(hull & r_second->get_pave()->get_position_typed());
+//            r_first->set_father_hull(hull & r_first->get_pave()->get_position_typed());
+//            r_second->set_father_hull(hull & r_second->get_pave()->get_position_typed());
 
             // ToDo : add a contraction of Room(s) according to father
 
@@ -205,6 +207,10 @@ bool Pave<_Tp>::bisect_step_one(){
                 r_second->synchronize();
             }
         }
+
+        pave0->reset_pave_father(); // Test if necessary here ?
+        pave1->reset_pave_father();
+
         return true;
     }
     else{
@@ -213,6 +219,8 @@ bool Pave<_Tp>::bisect_step_one(){
             if(!r->is_removed()){
                 r->reset();
                 r->set_father_hull(r->get_father_hull() & r->get_hull_typed());
+                if(r->is_hybrid_list())
+                    r->get_maze()->add_hybrid_room(r);
             }
         }
         m_subpaving->add_paves(this);

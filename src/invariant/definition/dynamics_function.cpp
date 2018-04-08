@@ -76,4 +76,14 @@ void Dynamics_Function::add_function_d1(Function *f)
 {
     m_functions_d1.push_back(f);
 }
+
+void Dynamics_Function::add_hybrid_condition(ibex::Sep *sep_guard, ibex::Function *f_reset_pos, ibex::Function *f_reset_neg){
+    std::array<ibex::Function*, 2> tmp;
+    tmp[0] = f_reset_pos;
+    tmp[1] = f_reset_neg;
+    m_hybrid_reset.insert(std::pair<ibex::Sep*, std::array<ibex::Function*, 2>>(sep_guard, tmp));
+    m_hybrid_guard.push_back(sep_guard);
+}
+
+
 }

@@ -177,6 +177,23 @@ public:
     std::vector<Room<_Tp>*> get_initial_room_list();
 
     /**
+     * @brief add_hybrid_room
+     * @param room_pt
+     */
+    void add_hybrid_room(Room<_Tp>* r);
+
+    /**
+     * @brief reset_hybrid_room_list
+     */
+    void reset_hybrid_room_list();
+
+    /**
+     * @brief get_hybrid_room_list
+     * @return
+     */
+    std::vector<Room<_Tp>*> get_hybrid_room_list();
+
+    /**
      * @brief get_contract_once
      * @return
      */
@@ -212,6 +229,11 @@ public:
      */
     void set_boolean_tree_removing(BooleanTree<_Tp> *);
 
+    /**
+     * @brief discover_hybrid_rooms
+     */
+    void discover_hybrid_rooms();
+
 private:
     invariant::Domain<_Tp> *    m_domain = nullptr;
     SmartSubPaving<_Tp>  *    m_subpaving = nullptr; // SmartSubPaving associated with this maze
@@ -220,6 +242,7 @@ private:
     std::deque<Room<_Tp> *> m_deque_rooms;
     omp_lock_t  m_deque_access;
     omp_lock_t  m_initial_rooms_access;
+    omp_lock_t  m_hybrid_rooms_access;
 
     bool    m_espace_trajectories = true;
     bool    m_contract_once = false;
@@ -237,6 +260,8 @@ private:
     BooleanTree<_Tp> *m_boolean_tree_removing = nullptr;
 
     std::vector<Room<_Tp>*> m_initial_rooms_list;
+
+    std::vector<Room<_Tp>*> m_hybrid_rooms_list;
 };
 }
 
@@ -322,13 +347,32 @@ inline void Maze<_Tp>::add_initial_room(Room<_Tp>* room_pt){
 }
 
 template <typename _Tp>
-inline void Maze<_Tp>::reset_initial_room_list(){
+inline void Maze<_Tp>::reset_initial_room_list(){   
     m_initial_rooms_list.clear();
 }
 
 template <typename _Tp>
 inline std::vector<Room<_Tp>*> Maze<_Tp>::get_initial_room_list(){
     return m_initial_rooms_list;
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::add_hybrid_room(Room<_Tp>* r){
+    omp_set_lock(&m_hybrid_rooms_access);
+    m_hybrid_rooms_list.push_back(r);
+    omp_unset_lock(&m_hybrid_rooms_access);
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::reset_hybrid_room_list(){
+    for(Room<_Tp>*r:m_hybrid_rooms_list)
+        r->reset_hybrid_list();
+    m_hybrid_rooms_list.clear();
+}
+
+template <typename _Tp>
+inline std::vector<Room<_Tp>*> Maze<_Tp>::get_hybrid_room_list(){
+    return m_hybrid_rooms_list;
 }
 
 template <typename _Tp>

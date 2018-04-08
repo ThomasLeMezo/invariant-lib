@@ -3,6 +3,8 @@
 
 #include <ibex_IntervalVector.h>
 #include <ibex_IntervalMatrix.h>
+#include <ibex_Sep.h>
+#include <map>
 
 namespace invariant {
 
@@ -26,6 +28,15 @@ public:
     virtual const std::vector<ibex::IntervalVector> eval(const ibex::IntervalVector& position) =0;
 
     virtual const std::vector<ibex::IntervalMatrix> eval_d1(const ibex::IntervalVector &position) =0;
+
+    virtual std::vector<ibex::Sep*> get_hybrid_guard(){
+        return std::vector<ibex::Sep*>();
+    }
+
+    virtual std::map<ibex::Sep*, std::array<ibex::Function*, 2>> get_hybrid_reset(){
+        std::cout << "ERROR" << std::endl;
+        return std::map<ibex::Sep*, std::array<ibex::Function*, 2>>();
+    }
 
     DYNAMICS_SENS get_sens() const;
 

@@ -227,6 +227,22 @@ public:
      */
     size_t* get_bisection_axis() const;
 
+    /**
+     * @brief set_pave_father
+     */
+    void set_pave_father(Pave<_Tp>* pave_father);
+
+    /**
+     * @brief get_pave_father
+     * @return
+     */
+    Pave<_Tp> * get_pave_father();
+
+    /**
+     * @brief reset_pave_father
+     */
+    void reset_pave_father();
+
 private:
     /**
      * @brief compute typed position
@@ -249,6 +265,7 @@ private:
     bool                                                    m_border = false;
 
     std::array<Pave<_Tp>*, 2> *m_pave_children = nullptr;
+    Pave<_Tp> *m_pave_father = nullptr;
     size_t *m_bisection_axis = nullptr;
 
     //    std::map<Maze*, Door*>                      m_initial_condition_door;
@@ -351,6 +368,21 @@ inline Pave_node<_Tp>* Pave<_Tp>::get_tree() const{
 template <typename _Tp>
 inline const bool& Pave<_Tp>::is_border() const{
     return m_border;
+}
+
+template <typename _Tp>
+inline void Pave<_Tp>::set_pave_father(Pave<_Tp> *pave_father){
+    m_pave_father = pave_father;
+}
+
+template <typename _Tp>
+inline Pave<_Tp> * Pave<_Tp>::get_pave_father(){
+    return m_pave_father;
+}
+
+template <typename _Tp>
+inline void Pave<_Tp>::reset_pave_father(){
+    m_pave_father = nullptr;
 }
 
 /// ******************  Sepcialized ****************** ///
