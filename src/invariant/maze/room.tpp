@@ -981,7 +981,8 @@ void Room<_Tp>::contract_consistency(){
             // Reset computation
             ibex::Function *f_pos = m_maze->get_dynamics()->get_hybrid_reset()[sep][1];
             auto it_reset = m_hybrid_reset_door_private.find(sep);
-            it_reset->second |= f_pos->eval_vector(it_guard->second);
+            if(it_reset != m_hybrid_reset_door_private.end())
+                it_reset->second |= f_pos->eval_vector(it_guard->second);
         }
     }
 
@@ -1012,7 +1013,6 @@ bool Room<_Tp>::contract_continuity(){
     // Hybrid
     if(!m_hybrid_rooms_pos.empty()){
         ibex::IntervalVector hybrid_door(m_pave->get_dim(), ibex::Interval::EMPTY_SET);
-        std::cout << hybrid_door << std::endl;
 
         // Union of all hybrid conditions
         for(std::pair<ibex::Sep*,std::vector<Room<_Tp>*>> m:m_hybrid_rooms_pos){

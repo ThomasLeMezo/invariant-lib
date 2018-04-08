@@ -608,7 +608,7 @@ protected:
 
     std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_reset_door;
     std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_reset_door_private;
-    ibex::IntervalVector *m_hybrid_door;
+    ibex::IntervalVector *m_hybrid_door = nullptr;
 
     std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_rooms_pos;
     std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_rooms_neg;

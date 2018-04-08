@@ -59,6 +59,8 @@ Pave<_Tp>::~Pave(){
         delete(f);
     }
     delete(m_position_typed);
+    if(m_bisection_axis!=nullptr)
+        delete(m_bisection_axis);
 }
 
 template<typename _Tp>
