@@ -318,7 +318,7 @@ public:
      * @brief add_hybrid_room_neg
      * @param r
      */
-    void add_hybrid_room_neg(Room<_Tp> *r, ibex::Sep* sep);
+    void add_hybrid_room_pos(Room<_Tp> *r, ibex::Sep* sep);
 
 protected:
     /**
@@ -519,7 +519,13 @@ public:
      * @brief get_hybrid_door_guards
      * @return
      */
-    std::map<ibex::Sep*, ibex::IntervalVector> get_hybrid_door_guards() const;
+    std::map<ibex::Sep*, ibex::IntervalVector> get_hybrid_door_guards();
+
+    /**
+     * @brief get_hybrid_door_postion
+     * @return
+     */
+    std::map<ibex::Sep*, ibex::IntervalVector> get_hybrid_door_position();
 
     /**
      * @brief reset_hybrid_doors
@@ -536,6 +542,25 @@ public:
      * @brief reset_hybrid_list
      */
     void reset_hybrid_list();
+
+    /**
+     * @brief get_hybrid_reset_door
+     * @param sep
+     * @return
+     */
+    ibex::IntervalVector get_hybrid_reset_door(ibex::Sep *sep);
+
+    /**
+     * @brief set_hybrid_door
+     * @param iv
+     */
+    void set_hybrid_door(const ibex::IntervalVector &iv);
+
+    /**
+     * @brief get_hybrid_door
+     * @return
+     */
+    ibex::IntervalVector get_hybrid_door() const;
 
 protected:
     Pave<_Tp>*   m_pave = nullptr; // pointer to the associated face
@@ -577,10 +602,16 @@ protected:
 
     // Hybrid condition
     std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_position;
+
     std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_door;
     std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_door_private;
-    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_doors_pos;
-    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_doors_neg;
+
+    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_reset_door;
+    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_reset_door_private;
+    ibex::IntervalVector *m_hybrid_door;
+
+    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_rooms_pos;
+    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_rooms_neg;
     omp_lock_t   m_lock_hybrid_read;
     bool        m_is_hybrid_list = false;
 
@@ -785,6 +816,22 @@ inline const _Tp& Room<_Tp>::get_father_hull() const{
 }
 
 template <typename _Tp>
+inline void Room<_Tp>::set_hybrid_door(const ibex::IntervalVector &iv){
+    if(m_hybrid_door == nullptr)
+        m_hybrid_door = new ibex::IntervalVector(iv);
+    else
+        *m_hybrid_door = iv;
+}
+
+template <typename _Tp>
+inline ibex::IntervalVector Room<_Tp>::get_hybrid_door() const{
+    if(m_hybrid_door!=nullptr)
+        return *m_hybrid_door;
+    else
+        return ibex::IntervalVector(m_pave->get_dim(),ibex::Interval::EMPTY_SET);
+}
+
+template <typename _Tp>
 inline Maze<_Tp>* Room<_Tp>::get_maze() const{
     return m_maze;
 }
@@ -902,7 +949,12 @@ inline bool Room<_Tp>::is_first_contract() const{
 }
 
 template <typename _Tp>
-inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_Tp>::get_hybrid_door_guards() const{
+inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_Tp>::get_hybrid_door_guards(){
+    return m_hybrid_guard_door;
+}
+
+template <typename _Tp>
+inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_Tp>::get_hybrid_door_position(){
     return m_hybrid_guard_position;
 }
 
@@ -913,8 +965,8 @@ inline bool Room<_Tp>::is_contract_vector_field() const{
 
 template <typename _Tp>
 inline void Room<_Tp>::reset_hybrid_doors(){
-    m_hybrid_doors_neg.clear();
-    m_hybrid_doors_pos.clear();
+    m_hybrid_rooms_neg.clear();
+    m_hybrid_rooms_pos.clear();
 }
 
 template <typename _Tp>
@@ -925,6 +977,18 @@ inline bool Room<_Tp>::is_hybrid_list() const{
 template <typename _Tp>
 inline void Room<_Tp>::reset_hybrid_list(){
     m_is_hybrid_list = false;
+}
+
+template <typename _Tp>
+inline ibex::IntervalVector Room<_Tp>::get_hybrid_reset_door(ibex::Sep *sep){
+    ibex::IntervalVector tmp(m_pave->get_dim(), ibex::Interval::EMPTY_SET);
+    omp_set_lock(&m_lock_hybrid_read);
+    if(!m_hybrid_reset_door.empty()){
+        auto it = m_hybrid_reset_door.find(sep);
+        tmp = it->second;
+    }
+    omp_unset_lock(&m_lock_hybrid_read);
+    return tmp;
 }
 
 inline std::string print(const ibex::IntervalVector &iv){
@@ -938,6 +1002,11 @@ inline std::string print(const ppl::C_Polyhedron &p){
     ppl::IO_Operators::operator <<(stream, p);
     return stream.str();
 }
+
+template <typename _Tp>
+_Tp convert(const ibex::IntervalVector &iv);
+template <typename _Tp>
+_Tp convert(const ppl::C_Polyhedron &p);
 
 }
 #include "room.tpp"

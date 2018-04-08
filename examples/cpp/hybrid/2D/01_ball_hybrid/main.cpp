@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     IntervalVector space(2);
     space[0] = ibex::Interval(0,3);
-    space[1] = ibex::Interval(-6,6);
+    space[1] = ibex::Interval(-10,10);
 
     // ****** Domain *******
     invariant::SmartSubPaving<> paving(space);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, -Return(x2,-9.81+0*x2));
+    ibex::Function f(x1, x2, Return(x2,-9.81+0*x2));
     Dynamics_Function dyn(&f, FWD);
 
     // Hybrid
@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
     // ******* Maze *********
     invariant::Maze<> maze(&dom, &dyn);
 
+    omp_set_num_threads(1);
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){
         paving.bisect();
