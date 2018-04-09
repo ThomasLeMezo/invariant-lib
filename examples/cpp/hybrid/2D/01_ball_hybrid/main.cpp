@@ -39,12 +39,15 @@ int main(int argc, char *argv[])
     dom.set_sep(&s);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(x2,-9.81+0*x2));
+    ibex::Function f(x1, x2, Return(x2,-9.81-1*x2));
     Dynamics_Function dyn(&f, FWD);
 
     // Hybrid
-    ibex::Function f_sep_guard(x1, x2, x1);
+    ibex::Function f_sep_guard(x1, x2, x1-0.01*pow(x2, 2));
     ibex::SepFwdBwd sep_guard(f_sep_guard, EQ);
+
+    ibex::SepFwdBwd sep_zero(f_sep_guard, GEQ);
+    dom.set_sep_zero(&sep_zero);
 
     ibex::Function f_reset_pos(x1, x2, Return(x1, -x2));
     ibex::Function f_reset_neg(x1, x2, Return(x1, -x2));
@@ -55,9 +58,10 @@ int main(int argc, char *argv[])
 
     omp_set_num_threads(1);
     double time_start = omp_get_wtime();
-    for(int i=0; i<10; i++){
+    for(int i=0; i<18; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
+        maze.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -70,8 +74,8 @@ int main(int argc, char *argv[])
     v_maze.drawCircle(x1_c, x2_c, r, "red[]");
 
 //    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(3.1);
-//    position_info[1] = ibex::Interval(1.8);
+//    position_info[0] = ibex::Interval(0.05);
+//    position_info[1] = ibex::Interval(-5.8);
 //    v_maze.show_room_info(&maze, position_info);
 
 

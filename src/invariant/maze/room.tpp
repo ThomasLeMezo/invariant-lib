@@ -1061,7 +1061,7 @@ bool Room<_Tp>::contract(){
         //        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
-           && ((m_is_initial_door_input || m_is_initial_door_output) || !is_empty_private())){
+           && ((m_is_initial_door_input || m_is_initial_door_output || (m_hybrid_door!=nullptr && !m_hybrid_door->is_empty())) || !is_empty_private())){
             //            get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
@@ -1269,6 +1269,7 @@ std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r) {
     stream << " => border = "  << (r.get_pave()->is_border()?"true":"false") << std::endl;
     stream << " => zero = " << (r.get_contain_zero()?"true":"false") << std::endl;
     stream << " => initial door (input/output) = " << (r.is_initial_door_input()?"true":"false") << "/" << (r.is_initial_door_output()?"true":"false") << std::endl;
+    stream << " => hybrid door = " << r.get_hybrid_door() << std::endl;
 
     if(r.is_initial_door_input()){
         stream << "    |=> input = " << print(r.get_initial_door_input()) << std::endl;
