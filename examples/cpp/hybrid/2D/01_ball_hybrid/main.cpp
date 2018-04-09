@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     // Hybrid
     ibex::Function f_sep_guard(x1, x2, x1);
-    ibex::SepFwdBwd sep_guard(f_sep_guard, GEQ);
+    ibex::SepFwdBwd sep_guard(f_sep_guard, EQ);
 
     ibex::Function f_reset_pos(x1, x2, Return(x1, -x2));
     ibex::Function f_reset_neg(x1, x2, Return(x1, -x2));
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     omp_set_num_threads(1);
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<10; i++){
         paving.bisect();
         cout << i << " - " << maze.contract() << " - " << paving.size() << endl;
     }

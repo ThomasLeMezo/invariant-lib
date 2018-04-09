@@ -173,9 +173,6 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
 
     // Hybrid
     if(!r->get_hybrid_door_guards().empty()){
-//        ibex::IntervalVector center = IntervalVector(p->get_position().mid());
-//        ibex::IntervalVector size = IntervalVector(p ->get_position().diam()) |  IntervalVector(-p ->get_position().diam());
-//        vibes::drawBox(center + 0.1*size, "black[g]");
         for(std::pair<ibex::Sep*, ibex::IntervalVector> g:r->get_hybrid_door_guards()){
             vibes::drawBox(g.second, "black[g]");
         }

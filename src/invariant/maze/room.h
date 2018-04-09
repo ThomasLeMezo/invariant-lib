@@ -597,23 +597,23 @@ protected:
     // Initial condition
     bool    m_is_initial_door_input = false;
     bool    m_is_initial_door_output = false;
-    _Tp* m_initial_door_input = nullptr;
-    _Tp* m_initial_door_output = nullptr;
+    _Tp*    m_initial_door_input = nullptr;
+    _Tp*    m_initial_door_output = nullptr;
 
     // Hybrid condition
-    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_position;
+    std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_guard_position;
 
-    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_door;
-    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_guard_door_private;
+    std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_guard_door;
+    std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_guard_door_private;
 
-    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_reset_door;
-    std::map<ibex::Sep*, ibex::IntervalVector> m_hybrid_reset_door_private;
-    ibex::IntervalVector *m_hybrid_door = nullptr;
+    std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_reset_door;
+    std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_reset_door_private;
+    ibex::IntervalVector                            *m_hybrid_door = nullptr;
 
-    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_rooms_pos;
-    std::map<ibex::Sep*,std::vector<Room<_Tp>*>> m_hybrid_rooms_neg;
-    omp_lock_t   m_lock_hybrid_read;
-    bool        m_is_hybrid_list = false;
+    std::map<ibex::Sep*,std::vector<Room<_Tp>*>>    m_hybrid_rooms_pos;
+    std::map<ibex::Sep*,std::vector<Room<_Tp>*>>    m_hybrid_rooms_neg;
+    omp_lock_t                                      m_lock_hybrid_read;
+    bool                                            m_is_hybrid_list = false;
 
     // Valid hull
     bool m_is_father_hull = false;

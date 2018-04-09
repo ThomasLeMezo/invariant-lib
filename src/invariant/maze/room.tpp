@@ -77,6 +77,11 @@ inline void Room<_Tp>::reset(){
     m_zero_component_in_vector_field.clear();
     m_zero_component_in_vector_fields_union.clear();
 
+    if(m_hybrid_door!=nullptr){
+        delete(m_hybrid_door);
+        m_hybrid_door=nullptr;
+    }
+
     m_contract_vector_field = true;
     compute_vector_field();
     compute_vector_field_typed();
@@ -828,7 +833,7 @@ void Room<_Tp>::compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result
         }
     }
 
-    // Hybrid
+    // Hybrid (hybrid face -> OUT)
     if(m_hybrid_door!=nullptr && !m_hybrid_door->is_empty()){
         _Tp in(convert<_Tp>(*m_hybrid_door));
 
@@ -952,11 +957,16 @@ void Room<_Tp>::contract_consistency(){
     // Hybrid contribution to guard (to improve...) [work only for full_wall, one vector]
     if(!m_hybrid_guard_door.empty()){
         size_t n_vf = 0;
+        m_hybrid_reset_door_private.clear();
         for(std::pair<ibex::Sep*, ibex::IntervalVector> pair_hybrid:m_hybrid_guard_door_private){
             ibex::Sep* sep = pair_hybrid.first;
 
             // Guard computation
             auto it_guard = m_hybrid_guard_door_private.find(sep);
+            auto it_position = m_hybrid_guard_position.find(sep);
+            _Tp out(convert<_Tp>(it_guard->second));
+            _Tp out_full(convert<_Tp>(it_position->second));
+
             for(size_t face = 0; face<(size_t)dim; face++){
                 for(size_t sens = 0; sens < 2; sens++){
                     Face<_Tp>* f= m_pave->get_faces()[face][sens];
@@ -964,14 +974,12 @@ void Room<_Tp>::contract_consistency(){
 
                     if(door->is_possible_in()[n_vf]){
                         _Tp in_tmp(door->get_input_private());
-                        _Tp out_tmp(convert<_Tp>(pair_hybrid.second));
-                        if(domain_init == FULL_WALL){
-                            auto it = m_hybrid_guard_position.find(sep);
-                            out_tmp = convert<_Tp>(it->second);
-                        }
+                        _Tp out_tmp(out);
+                        if(domain_init == FULL_WALL)
+                            out_tmp = out_full;
 
-                        if(!in_tmp.is_empty()){
-                            this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_bwd(n_vf), BWD);
+                        if(!in_tmp.is_empty() && !out_tmp.is_empty()){
+                            this->contract_flow(in_tmp, out_tmp, get_one_vector_fields_typed_fwd(n_vf), FWD);
                             it_guard->second |= convert<ibex::IntervalVector>(out_tmp);
                         }
                     }
@@ -980,9 +988,8 @@ void Room<_Tp>::contract_consistency(){
 
             // Reset computation
             ibex::Function *f_pos = m_maze->get_dynamics()->get_hybrid_reset()[sep][1];
-            auto it_reset = m_hybrid_reset_door_private.find(sep);
-            if(it_reset != m_hybrid_reset_door_private.end())
-                it_reset->second |= f_pos->eval_vector(it_guard->second);
+            ibex::IntervalVector x_pos = f_pos->eval_vector(it_guard->second);
+            m_hybrid_reset_door_private.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_pos));
         }
     }
 
@@ -1020,6 +1027,7 @@ bool Room<_Tp>::contract_continuity(){
                 hybrid_door |= r->get_hybrid_reset_door(m.first);
             }
         }
+        hybrid_door &= m_pave->get_position();
         if(get_hybrid_door().is_subset(hybrid_door)){
             change = true;
             set_hybrid_door(hybrid_door);

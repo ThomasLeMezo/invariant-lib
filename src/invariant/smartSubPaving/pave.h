@@ -253,7 +253,7 @@ private:
 
     /** Class Variable **/
     mutable ibex::IntervalVector                            m_position; // Pave position
-    mutable _Tp                                             *m_position_typed; // Pave position
+    mutable _Tp                                             *m_position_typed=nullptr; // Pave position
     mutable std::vector< std::array<Face<_Tp>*, 2>>         m_faces; // Faces of the Pave
     mutable std::vector<invariant::Face<_Tp> *>             m_faces_vector; // Faces of the Pave
     mutable SmartSubPaving<_Tp>*                            m_subpaving = nullptr;
@@ -264,9 +264,9 @@ private:
     size_t                                                  m_serialization_id=0;
     bool                                                    m_border = false;
 
-    std::array<Pave<_Tp>*, 2> *m_pave_children = nullptr;
-    Pave<_Tp> *m_pave_father = nullptr;
-    size_t *m_bisection_axis = nullptr;
+    std::array<Pave<_Tp>*, 2>                               *m_pave_children = nullptr;
+    Pave<_Tp>                                               *m_pave_father = nullptr; // No new here (just pointer)
+    size_t                                                  *m_bisection_axis = nullptr;
 
     //    std::map<Maze*, Door*>                      m_initial_condition_door;
     //    std::map<Maze*, Door*>                      m_hybrid_door;
