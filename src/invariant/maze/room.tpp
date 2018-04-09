@@ -987,9 +987,11 @@ void Room<_Tp>::contract_consistency(){
             }
 
             // Reset computation
-            ibex::Function *f_pos = m_maze->get_dynamics()->get_hybrid_reset()[sep][1];
-            ibex::IntervalVector x_pos = f_pos->eval_vector(it_guard->second);
-            m_hybrid_reset_door_private.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_pos));
+            if(!it_guard->second.is_empty()){
+                ibex::Function *f_pos = m_maze->get_dynamics()->get_hybrid_reset()[sep][1];
+                ibex::IntervalVector x_pos = f_pos->eval_vector(it_guard->second);
+                m_hybrid_reset_door_private.insert(std::pair<ibex::Sep*, ibex::IntervalVector>(sep, x_pos));
+            }
         }
     }
 
@@ -1028,7 +1030,7 @@ bool Room<_Tp>::contract_continuity(){
             }
         }
         hybrid_door &= m_pave->get_position();
-        if(get_hybrid_door().is_subset(hybrid_door)){
+        if(!hybrid_door.is_empty() && get_hybrid_door().is_subset(hybrid_door)){
             change = true;
             set_hybrid_door(hybrid_door);
         }
@@ -1156,6 +1158,15 @@ void Room<_Tp>::analyze_change(std::vector<Room *>&list_rooms) const{
     //            }
     //        }
     //    }
+
+    // Hybrid
+    if(change){
+        for(std::pair<ibex::Sep*,std::vector<Room<_Tp>*>> pair_sep:m_hybrid_rooms_neg){
+            for(Room<_Tp>* r:pair_sep.second){
+                list_rooms.push_back(r);
+            }
+        }
+    }
 }
 
 template<typename _Tp>
