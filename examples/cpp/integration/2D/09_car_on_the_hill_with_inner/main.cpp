@@ -25,15 +25,15 @@ int main(int argc, char *argv[])
     IntervalVector space(2);
 //    space[0] = ibex::Interval(-2, 5);
 //    space[1] = ibex::Interval(-3, 3);
-    space[0] = ibex::Interval(-2.0, 13.0);
-    space[1] = ibex::Interval(-6, 6);
+    space[0] = ibex::Interval(-1, 6.0);
+    space[1] = ibex::Interval(-4, 4);
 
     invariant::SmartSubPaving<> paving(space);
 
     double x1_c, x2_c, r;
     x1_c = 0.0;
     x2_c = 0.0;
-    r = 1.0;
+    r = 0.5;
 
     // ****** Domain Outer ******* //
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
@@ -51,16 +51,18 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    double u= 1.2;
+    double u= 1;
+//    ibex::Function f(x1, x2, Return(x2,
+//                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
     ibex::Function f(x1, x2, Return(x2,
-                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
+                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
     Dynamics_Function dyn(&f, FWD);
 
-    ibex::Function f1(x1, x2, -Return(x2,
-                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
+//    ibex::Function f1(x1, x2, -Return(x2,
+//                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
     ibex::Function f2(x1, x2, -Return(x2,
-                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
-    Dynamics_Function dyn_u(&f1, &f2, BWD);
+                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
+    Dynamics_Function dyn_u(/*&f1, */&f2, BWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -73,7 +75,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<15; i++){
+    for(int i=0; i<14; i++){
         cout << i << endl;
         paving.bisect();
         maze_outer.contract();
@@ -94,9 +96,10 @@ int main(int argc, char *argv[])
 
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
     v_maze.show();
     //    v_maze.drawCircle(0.0, 0.0, 1, "black[red]");
-    v_maze.drawCircle(0.0, 0.0, 1, "red[]");
+    v_maze.drawCircle(0.0, 0.0, r, "red[red]");
 
 //        IntervalVector position_info(2);
 //        position_info[0] = ibex::Interval(1.08);

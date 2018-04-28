@@ -60,6 +60,12 @@ public:
      */
     void drawBox(const ibex::IntervalVector &box, std::string params) const;
 
+    /**
+     * @brief set_enable_cone
+     * @param val
+     */
+    void set_enable_cone(bool val);
+
 private:
     void show_graph() const;
     void show_maze_outer() const;
@@ -88,6 +94,7 @@ private:
     VIBES_MAZE_TYPE    m_type = VIBES_MAZE_OUTER;
 
     bool m_both_wall = false;
+    bool m_enable_cones = true;
 
 };
 
@@ -97,6 +104,10 @@ namespace vibes{
     VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::FaceIBEX &, f)
     VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::PaveIBEX*> &, l_p)
     VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::FaceIBEX*> &, l_f)
+}
+
+inline void VibesMaze::set_enable_cone(bool val){
+    m_enable_cones = val;
 }
 
 #endif // VibesMaze_H

@@ -23,21 +23,21 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-4.75,4.75);
-    space[1] = ibex::Interval(-3.5,6);
+//    space[0] = ibex::Interval(-4.75,4.75);
+//    space[1] = ibex::Interval(-3.5,6);
 
-//    space[0] = ibex::Interval(-3,3);
-//    space[1] = ibex::Interval(-3,3);
+    space[0] = ibex::Interval(-3,3);
+    space[1] = ibex::Interval(-3,3);
 
     invariant::SmartSubPaving<> paving(space);
 
     // ****** Domain Outer ******* //
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
     double x1_c, x2_c, r;
-    x1_c = -2.0;
-    x2_c = 4;
-//    x1_c = 1.2;
-//    x2_c = 1;
+//    x1_c = -2.0;
+//    x2_c = 4;
+    x1_c = 1.2;
+    x2_c = 1;
     r = 0.3;
     Function f_sep_outer(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s_outer(f_sep_outer, LT); // LT, LEQ, EQ, GEQ, GT
@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1048, 1048);
+    v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
 

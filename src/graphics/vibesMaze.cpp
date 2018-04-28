@@ -403,6 +403,8 @@ void VibesMaze::show_maze_outer_inner() const{
 }
 
 void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) const{
+    if(!m_enable_cones)
+        return;
     IntervalVector position(p->get_position());
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.0;
     invariant::RoomIBEX *r = p->get_rooms()[maze];
