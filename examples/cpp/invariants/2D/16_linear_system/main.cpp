@@ -32,19 +32,21 @@ int main(int argc, char *argv[])
 
     invariant::Domain<> dom_inner(&subpaving, FULL_WALL);
     dom_inner.set_border_path_in(true);
-    dom_inner.set_border_path_out(true);
+    dom_inner.set_border_path_out(false);
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(0.2*x1+0.2*x2-x1,
                                     -0.2*x1+0.5*x2+ibex::Interval(-1, 1)-x2));
-//    ibex::Function f2(x1, x2, -Return(0.2*x1+0.2*x2-x1,
-//                                    -0.2*x1+0.5*x2+ibex::Interval(-1, 1)-x2));
+    ibex::Function f1(x1, x2, Return(0.2*x1+0.2*x2-x1,
+                                    -0.2*x1+0.5*x2+ibex::Interval(1)-x2));
+    ibex::Function f2(x1, x2, Return(0.2*x1+0.2*x2-x1,
+                                    -0.2*x1+0.5*x2-ibex::Interval(1)-x2));
     Dynamics_Function dyn_outer(&f, FWD_BWD); // Duplicate because of simultaneous access of f (semaphore on Dynamics_Function)
-//    Dynamics_Function dyn_inner(&f2, BWD);
+    Dynamics_Function dyn_inner(&f2, &f1, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-//    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -53,7 +55,7 @@ int main(int argc, char *argv[])
     for(int i=0; i<14; i++){
         subpaving.bisect();
         cout << i << " - " << maze_outer.contract() << endl;
-//        cout << i << " - " << maze_inner.contract() << endl;
+        cout << i << " - " << maze_inner.contract() << endl;
         cout << subpaving.size() << endl;
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer/*, &maze_inner*/);
+    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
     v_maze.show();

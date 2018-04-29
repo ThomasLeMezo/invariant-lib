@@ -741,7 +741,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
     else{
         // Order seems to be different if FULL_WALL
         in_return &= out_return;
-        out_return &= in_return;
+//        out_return &= in_return; // ???
     }
 }
 
