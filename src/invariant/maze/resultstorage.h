@@ -22,7 +22,7 @@ class ResultStorage
 public:
     ResultStorage(const size_t &dim, const size_t &nb_vf);
 
-    void test();
+//    void test();
 
     void push_back_input(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
     void push_back_output(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);

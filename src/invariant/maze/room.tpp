@@ -596,7 +596,14 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
     //        std::cout << "ERROR" << std::endl;
 
     ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
-    if(zero.is_subset(vec_field_global)){ // Case no contraction (if there is a possible cycle) or border face
+    /** -> ToDo: check validity of the test
+     * Was vec_field_global before or it is not accurate as to get a cycle (that stay in the pave) we must have a zero
+     * in the neighbors or in the local pave.
+     * Otherwise it means that paths will leave the box at a certain time
+     * This must be check when there is a command...
+     *
+    */
+    if(zero.is_subset(vec_field_neighbors)){ // Case no contraction (if there is a possible cycle) or border face
         in_return = input_global_door;
         out_return = output_global_door;
         return;
@@ -1056,16 +1063,16 @@ bool Room<_Tp>::contract(){
         else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty()))
             return false;
 
-        //        get_private_doors_info("before");
+                get_private_doors_info("before");
         change |= contract_continuity();
-        //        get_private_doors_info("continuity");
+                get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output || (m_hybrid_door!=nullptr && !m_hybrid_door->is_empty())) || !is_empty_private())){
-            //            get_private_doors_info("before consistency");
+                        get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
-            get_private_doors_info("consistency");
+//            get_private_doors_info("consistency");
         }
     }
     m_first_contract = false;
@@ -1077,8 +1084,8 @@ bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
     if(m_maze->get_domain()->get_init() == FULL_DOOR){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(2.296875, 2.34375);
-        position[1] = ibex::Interval(0, 0.09375);
+        position[0] = ibex::Interval(0.662109375, 0.66796875);
+        position[1] = ibex::Interval(3.515625, 3.521484375);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);
