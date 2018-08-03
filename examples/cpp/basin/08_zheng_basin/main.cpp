@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         paving.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
         cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;

@@ -79,10 +79,10 @@ int main(int argc, char *argv[])
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(2.32);
-//    position_info[1] = ibex::Interval(0.06);
-//    v_maze.show_room_info(&maze_outer, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(2.46);
+    position_info[1] = ibex::Interval(-0.04);
+    v_maze.show_room_info(&maze_outer, position_info);
 
 //    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/synchronous_generator_basin.svg", "Synchronous Generator Basin");
 
