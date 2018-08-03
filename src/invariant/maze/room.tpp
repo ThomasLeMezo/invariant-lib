@@ -561,6 +561,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
     // Remove pave not in the zero(s) direction
     ibex::IntervalVector vec_field_global(dim, ibex::Interval::EMPTY_SET);
     ibex::IntervalVector vec_field_neighbors(dim, ibex::Interval::EMPTY_SET);
+    ibex::IntervalVector vec_field_local(dim, ibex::Interval::EMPTY_SET);
 
     std::vector<Pave<_Tp> *> adjacent_paves_valid;
     ibex::IntervalVector pave_extrude(f_in->get_position());
@@ -579,6 +580,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
         if(pave_adj==this->m_pave){
             adjacent_paves_valid.push_back(pave_adj);
             vec_field_global |= this->get_one_vector_fields(n_vf);
+            vec_field_local |= this->get_one_vector_fields(n_vf);
         }
         else{
             ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
@@ -603,7 +605,7 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
      * This must be check when there is a command...
      *
     */
-    if(zero.is_subset(vec_field_neighbors)){ // Case no contraction (if there is a possible cycle) or border face
+    if(zero.is_subset(vec_field_neighbors) || zero.is_subset(vec_field_local)){ // Case no contraction (if there is a possible cycle) or border face
         in_return = input_global_door;
         out_return = output_global_door;
         return;
