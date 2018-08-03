@@ -76,10 +76,10 @@ int main(int argc, char *argv[])
 //    v_maze.get_room_info(&maze, position_info);
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(-2.5);
-    position_info[1] = ibex::Interval(2.9);
+    position_info[0] = ibex::Interval(0.659, 0.665);
+    position_info[1] = ibex::Interval(3.513, 3.519);
 //    v_maze.get_room_info(&maze, position_info);
-//    v_maze.show_room_info(&maze, position_info);
+    v_maze.show_room_info(&maze_outer, position_info);
 
 //    position_info[0] = ibex::Interval(0);
 //    position_info[1] = ibex::Interval(-1);
