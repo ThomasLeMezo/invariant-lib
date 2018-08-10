@@ -1,7 +1,7 @@
 #ifndef DYNAMICSINCLUSIONFUNCTION_H
 #define DYNAMICSINCLUSIONFUNCTION_H
 
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 
 /**
  * Dynamics Inclusion Function is an extension of Dynamics Function when the function depends of an interval parameters (inclusion function)
@@ -10,7 +10,7 @@
 */
 
 namespace invariant {
-class DynamicsInclusionFunction: public Dynamics_Function
+class DynamicsInclusionFunction: public DynamicsFunction
 {
 public:   
     /**

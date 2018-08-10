@@ -1,7 +1,7 @@
 #include "ibex_SepFwdBwd.h"
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     vector<Function *> f_list;
     f_list.push_back(&f1);
     f_list.push_back(&f2);
-    Dynamics_Function dyn(f_list, FWD);
+    DynamicsFunction dyn(f_list, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

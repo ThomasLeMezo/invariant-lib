@@ -2,7 +2,7 @@
 #include "ibex_SepNot.h"
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x, y, theta, Return(v*cos(theta),
                                             v*sin(theta),
                                             u));
-    Dynamics_Function dyn(&f, FWD);
+    DynamicsFunction dyn(&f, FWD);
 
     // ******* Mazes ********* //
     MazePPL maze_outer(&dom_outer, &dyn);

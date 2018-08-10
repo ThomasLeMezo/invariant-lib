@@ -11,7 +11,7 @@ Room<_Tp>::Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics):
     const ibex::IntervalVector position(p->get_position());
 
     // Eval Vector field d1
-    m_vector_fields_d1 = dynamics->eval_d1(position);
+//    m_vector_fields_d1 = dynamics->eval_d1(position);
 
     // Create Doors
     int dim = m_pave->get_dim();

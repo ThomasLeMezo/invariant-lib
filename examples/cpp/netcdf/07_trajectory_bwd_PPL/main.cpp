@@ -1,7 +1,7 @@
 #include "ibex_SepFwdBwd.h"
 #include <iostream>
 #include "previmer3d.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include <ibex.h>
 #include <math.h>
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     double time_start_PM = omp_get_wtime();
     PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
-    Dynamics_Function dyn = Dynamics_Function(&pm3d, BWD);
+    DynamicsFunction dyn = DynamicsFunction(&pm3d, BWD);
 //    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
 
     // ****** Domain *******

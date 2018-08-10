@@ -53,7 +53,7 @@ EulerianMaze<_Tp>::~EulerianMaze(){
     for(Maze<_Tp>* maze:m_maze_inner_list)
         delete(maze);
 
-    for(Dynamics_Function* dyn:m_dyn_list)
+    for(DynamicsFunction* dyn:m_dyn_list)
         delete(dyn);
 
     for(Domain<_Tp>* dom:m_dom_list)
@@ -91,7 +91,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             f1 = new ibex::Function(*f_dyn);
         else
             f1=f_dyn;
-        Dynamics_Function *dyn1 = new Dynamics_Function(f1, FWD);
+        DynamicsFunction *dyn1 = new DynamicsFunction(f1, FWD);
         m_dyn_list.push_back(dyn1);
         invariant::Maze<_Tp> *maze_outer_fwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
         m_maze_outer_list.push_back(maze_outer_fwd);
@@ -112,7 +112,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
                 f2 = new ibex::Function(*f_dyn);
             else
                 f2=f_dyn;
-            Dynamics_Function *dyn2 = new Dynamics_Function(f2, FWD);
+            DynamicsFunction *dyn2 = new DynamicsFunction(f2, FWD);
             m_dyn_list.push_back(dyn2);
             invariant::Maze<_Tp> *maze_inner_fwd = new invariant::Maze<_Tp>(dom_inner, dyn2);
             m_maze_inner_list.push_back(maze_inner_fwd);
@@ -134,7 +134,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
             f1 = new ibex::Function(*f_dyn);
         else
             f1=f_dyn;
-        Dynamics_Function *dyn1 = new Dynamics_Function(f1, BWD);
+        DynamicsFunction *dyn1 = new DynamicsFunction(f1, BWD);
         m_dyn_list.push_back(dyn1);
         invariant::Maze<_Tp> *maze_outer_bwd = new invariant::Maze<_Tp>(dom_outer, dyn1);
         m_maze_outer_list.push_back(maze_outer_bwd);
@@ -155,7 +155,7 @@ void EulerianMaze<_Tp>::init_mazes(const ibex::IntervalVector &space, ibex::Func
                 f2 = new ibex::Function(*f_dyn);
             else
                 f2=f_dyn;
-            Dynamics_Function *dyn2 = new Dynamics_Function(f2, BWD);
+            DynamicsFunction *dyn2 = new DynamicsFunction(f2, BWD);
             m_dyn_list.push_back(dyn2);
             invariant::Maze<_Tp> *maze_inner_bwd = new invariant::Maze<_Tp>(dom_inner, dyn2);
             m_maze_inner_list.push_back(maze_inner_bwd);

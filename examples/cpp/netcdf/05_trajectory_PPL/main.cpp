@@ -8,7 +8,7 @@
 #include "vtkMaze3D.h"
 #include "vtkmazeppl.h"
 
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 
 using namespace std;
 using namespace invariant;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     double time_start_PM = omp_get_wtime();
     PreviMer3D pm3d = PreviMer3D(sources_xml, grid_limits);
 //    PreviMer3D pm3d = PreviMer3D("PreviMer3D.data");
-    Dynamics_Function dyn = Dynamics_Function(&pm3d, FWD);
+    DynamicsFunction dyn = DynamicsFunction(&pm3d, FWD);
 
     // ****** Domain *******
     IntervalVector search_space(3);

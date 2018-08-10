@@ -2,7 +2,7 @@
 #include "ibex_SepInter.h"
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
                                     (hdiff(x1, x2)[1]*cos(psi(x1, x2))+hdiff(x1, x2)[0]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0]))));
 
-    Dynamics_Function dyn(&f, FWD);
+    DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);

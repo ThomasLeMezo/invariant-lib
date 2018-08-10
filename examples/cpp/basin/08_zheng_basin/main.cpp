@@ -1,6 +1,6 @@
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "spacefunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     f.push_back(&f2, &D2);
     f.push_back(&f3, &D3);
 
-    Dynamics_Function dyn(&f, FWD);
+    DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);

@@ -3,7 +3,7 @@
 #include "ibex_SepUnion.h"
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, x3, Return(sigma * (x2 - x1),
                                         x1*(rho - x3) - x2,
                                         x1*x2 - beta * x3));
-    Dynamics_Function dyn(&f, FWD_BWD);
+    DynamicsFunction dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
     MazePPL maze(&dom, &dyn);

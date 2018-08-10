@@ -1,7 +1,7 @@
 #include "ibex_SepFwdBwd.h"
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x, y, z, Return(y+(-a*pow(x,3)+b*pow(x,2))-z+I,
                                         c-d*pow(x,2)-y,
                                         r*(s*(x-xR)-z)));
-    Dynamics_Function dyn(&f, FWD_BWD);
+    DynamicsFunction dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze(&dom, &dyn);

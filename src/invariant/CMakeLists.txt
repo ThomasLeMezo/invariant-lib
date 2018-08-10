@@ -18,7 +18,7 @@ include_directories(serialization)
     serialization/ibex_serialization.cpp
 
     definition/dynamics.cpp
-    definition/dynamics_function.cpp
+    definition/dynamicsFuction.cpp
     definition/dynamicsinclusionfunction.cpp
     definition/domain.cpp
 
@@ -50,7 +50,7 @@ include_directories(serialization)
     definition/domain.h
     definition/domain.tpp
     definition/dynamics.h
-    definition/dynamics_function.h
+    definition/dynamicsFunction.h
     definition/dynamicsinclusionfunction.h
 
     maze/maze.h
