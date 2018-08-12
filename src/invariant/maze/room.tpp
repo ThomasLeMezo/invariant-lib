@@ -1065,13 +1065,13 @@ bool Room<_Tp>::contract(){
         else if((domain_init==FULL_WALL && is_full()) || (domain_init == FULL_DOOR && is_empty()))
             return false;
 
-                get_private_doors_info("before");
+//        get_private_doors_info("before");
         change |= contract_continuity();
-                get_private_doors_info("continuity");
+//        get_private_doors_info("continuity");
 
         if((change || m_first_contract)
            && ((m_is_initial_door_input || m_is_initial_door_output || (m_hybrid_door!=nullptr && !m_hybrid_door->is_empty())) || !is_empty_private())){
-                        get_private_doors_info("before consistency");
+//            get_private_doors_info("before consistency");
             contract_consistency();
             change = true;
 //            get_private_doors_info("consistency");

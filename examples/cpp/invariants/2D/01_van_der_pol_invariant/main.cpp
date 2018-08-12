@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze);
+    VibesMaze v_maze("VanDerPolInvariant", &maze);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 

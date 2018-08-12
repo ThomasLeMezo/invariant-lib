@@ -93,6 +93,29 @@ size_t DataSetNode<_Tp, _n>::bisector(const std::vector<std::array<int, 2>> &pos
 }
 
 template<typename _Tp, size_t _n>
+size_t DataSetNode<_Tp, _n>::bisector(const std::vector<std::array<int, 2>> &position,std::vector<std::array<int, 2>> &p1,std::vector<std::array<int, 2>> &p2, const size_t &l_dim) const
+{
+    p1.clear(); p2.clear();
+
+    for(size_t dim=0; dim<position.size(); dim++){
+        if(dim==l_dim){
+            array<int, 2> a1, a2;
+            a1[0] = position[dim][0];
+            a1[1] = position[dim][0] + (position[dim][1]-position[dim][0])/2;
+            a2[0] = a1[1]+1;
+            a2[1] = position[dim][1];
+            p1.push_back(a1);
+            p2.push_back(a2);
+        }
+        else{
+            p1.push_back(position[dim]);
+            p2.push_back(position[dim]);
+        }
+    }
+    return l_dim;
+}
+
+template<typename _Tp, size_t _n>
 bool DataSetNode<_Tp, _n>::fill_tree(){
     if(is_leaf())
         return m_valid_data;
@@ -101,11 +124,17 @@ bool DataSetNode<_Tp, _n>::fill_tree(){
         valid_data |= m_children_first->fill_tree();
         valid_data |= m_children_second->fill_tree();
 
-        if(m_children_first->is_valid_data()){
+        if(m_children_first->is_valid_data())
             union_this(m_children_first->get_data());
+        else{
+            delete(m_children_first);
+            m_children_first = nullptr;
         }
-        if(m_children_second->is_valid_data()){
+        if(m_children_second->is_valid_data())
             union_this(m_children_second->get_data());
+        else{
+            delete(m_children_second);
+            m_children_second = nullptr;
         }
 
         if(m_children_first->is_leaf() && m_children_second->is_leaf()){
@@ -138,29 +167,66 @@ void DataSetNode<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, c
         // Bisect
         if(m_valid_data){
             // Test Data inclusion
-            bool inclusion = true;
-            for(size_t dim=0; dim<_n; dim++){
-                if(data[dim][0] > m_data[dim][0] && data[dim][1] < m_data[dim][1]) // complementary
-                    inclusion = false;
-            }
-            if(inclusion)
-                return;
+            //            bool inclusion = true;
+            //            for(size_t dim=0; dim<_n; dim++){
+            //                if(data[dim][0] > m_data[dim][0] && data[dim][1] < m_data[dim][1]) // complementary
+            //                    inclusion = false;
+            //            }
+            //            if(inclusion)
+            //                return;
 
-            std::vector<std::array<int, 2>> p1, p2;
-            bisector(position, p1, p2);
-            if(m_children_first != nullptr)
-                m_children_first->eval(target, p1, data);
-            if(m_children_second != nullptr)
-                m_children_second->eval(target, p2, data);
+            if(is_subset_data(data, m_data))
+                return;
+            else{
+                std::vector<std::array<int, 2>> p1, p2;
+                bisector(position, p1, p2, m_bisection_axis);
+                if(m_children_first != nullptr)
+                    m_children_first->eval(target, p1, data);
+                if(m_children_second != nullptr)
+                    m_children_second->eval(target, p2, data);
+            }
         }
     }
 }
+
+template<typename _Tp, size_t _n>
+void DataSetNode<_Tp, _n>::eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data) const{
+    if(m_valid_data){
+        if(!is_inter_empty_data(m_data, data)){
+            if(is_leaf() || is_subset_data(m_data, data)){
+                union_position(target, position);
+            }
+            else{
+                // Test position inclusion
+                if(!is_empty_position(target) && is_subset(target, position))
+                    return;
+                else{
+                    std::vector<std::array<int, 2>> p1, p2;
+                    bisector(position, p1, p2, m_bisection_axis);
+                    if(m_children_first != nullptr)
+                        m_children_first->eval_invert(target, p1, data);
+                    if(m_children_second != nullptr)
+                        m_children_second->eval_invert(target, p2, data);
+                }
+            }
+        }
+    }
+}
+
 
 template<typename _Tp, size_t _n>
 void DataSetNode<_Tp, _n>::union_this(const std::array<std::array<_Tp, 2>, _n>& data){
     for(size_t dim=0; dim<_n; dim++){
         m_data[dim][0] = min(m_data[dim][0], data[dim][0]);
         m_data[dim][1] = max(m_data[dim][1], data[dim][1]);
+    }
+}
+
+template<typename _Tp, size_t _n>
+void DataSetNode<_Tp, _n>::union_position(std::vector<std::array<int, 2>>& p1, const std::vector<std::array<int, 2>>& p2) const{
+    for(size_t dim=0; dim<p1.size(); dim++){
+        p1[dim][0] = min(p1[dim][0], p2[dim][0]);
+        p1[dim][1] = max(p1[dim][1], p2[dim][1]);
     }
 }
 
@@ -173,12 +239,38 @@ void DataSetNode<_Tp, _n>::union_data(std::array<std::array<_Tp, 2>, _n>& data) 
 }
 
 template<typename _Tp, size_t _n>
+bool DataSetNode<_Tp, _n>::is_inter_empty_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const{
+    for(size_t dim = 0; dim<_n; dim++){
+        if(d1[dim][1]<d2[dim][0] || d2[dim][1]<d1[dim][0])
+            return true;
+    }
+    return false;
+}
+
+template<typename _Tp, size_t _n>
+bool DataSetNode<_Tp, _n>::is_subset_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const{
+    for(size_t dim = 0; dim<_n; dim++){
+        if(d1[dim][1]>d2[dim][1] || d1[dim][0]<d2[dim][0])
+            return false;
+    }
+    return true;
+}
+
+template<typename _Tp, size_t _n>
 bool DataSetNode<_Tp, _n>::is_inter_empty(const std::vector<std::array<int, 2>> &p1, const std::vector<std::array<int, 2>> &p2) const{
     for(size_t dim = 0; dim<p1.size(); dim++){
         if(p1[dim][1]<p2[dim][0] || p2[dim][1]<p1[dim][0])
             return true;
     }
     return false;
+}
+
+template<typename _Tp, size_t _n>
+bool DataSetNode<_Tp, _n>::is_empty_position(const std::vector<std::array<int, 2>> &p1) const{
+    if(p1[0][1] < p1[0][0])
+        return true;
+    else
+        return false;
 }
 
 template<typename _Tp, size_t _n>
@@ -233,6 +325,28 @@ DataSetNode<_Tp, _n>::DataSetNode(std::ifstream& binFile){
     binFile.read((char*) &is_children_second, sizeof(bool));
     if(is_children_second){
         m_children_second = new DataSetNode<_Tp, _n>(binFile);
+    }
+}
+
+template<typename _Tp, size_t _n>
+void DataSetNode<_Tp, _n>::get_number_node_private(size_t &nb) const{
+    nb++;
+    if(m_children_first != nullptr)
+        m_children_first->get_number_node_private(nb);
+    if(m_children_second != nullptr)
+        m_children_second->get_number_node_private(nb);
+}
+
+template<typename _Tp, size_t _n>
+void DataSetNode<_Tp, _n>::get_number_leaf_private(size_t &nb) const{
+    if(is_leaf()){
+        nb++;
+    }
+    else{
+        if(m_children_first != nullptr)
+            m_children_first->get_number_leaf_private(nb);
+        if(m_children_second != nullptr)
+            m_children_second->get_number_leaf_private(nb);
     }
 }
 

@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
 //    omp_set_num_threads(1);
 
     for(int i=0; i<14; i++){
+        cout << i << endl;
         subpaving.bisect();
-        cout << i << " - " << maze_outer.contract() << endl;
-        cout << i << " - " << maze_inner.contract() << endl;
-        cout << subpaving.size() << endl;
+        maze_outer.contract();
+        maze_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

@@ -37,8 +37,10 @@ include_directories(serialization)
   if(WITH_NETCDF)
     set(SRC ${SRC}
       definition/netcdf/nodecurrent.cpp
+#      definition/netcdf/nodecurrent3d.cpp
       definition/netcdf/previmer.cpp
       definition/netcdf/previmer3d.cpp
+      definition/netcdf/lambertgrid.cpp
     )
   endif()
 
@@ -101,6 +103,7 @@ include_directories(serialization)
       definition/netcdf/nodecurrent.h
       definition/netcdf/previmer.h
       definition/netcdf/previmer3d.h
+      definition/netcdf/lambertgrid.h
     )
   endif()
 
@@ -113,6 +116,7 @@ include_directories(serialization)
   target_link_libraries(invariant-core
       ${LIBS}
       ${LIBS_NETCDF}
+      ${LIBS_PROJ4}
       ${LIBS_PPL}
       ${LIBS_GMP}
   )

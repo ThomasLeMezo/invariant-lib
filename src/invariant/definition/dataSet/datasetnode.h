@@ -55,6 +55,14 @@ public:
     void eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, std::array<std::array<_Tp, 2>, _n>& data) const;
 
     /**
+     * @brief invert_position
+     * @param target
+     * @param position
+     * @param data
+     */
+    void eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data) const;
+
+    /**
      * @brief Set the node val
      * @param data
      * @param valid_data
@@ -73,7 +81,38 @@ public:
      */
     void serialize(std::ofstream& binFile) const;
 
+    /**
+     * @brief get_number_node
+     * @return
+     */
+    size_t get_number_node() const;
+
+    /**
+     * @brief get_number_leaf
+     * @return
+     */
+    size_t get_number_leaf() const;
+
 private:
+
+    /**
+     * @brief is_empty_position
+     * @param p1
+     * @return
+     */
+    bool is_empty_position(const std::vector<std::array<int, 2>> &p1) const;
+
+    /**
+     * @brief get_number_node_private
+     * @return
+     */
+    void get_number_node_private(size_t &nb) const;
+
+    /**
+     * @brief get_number_leaf_private
+     * @param nb
+     */
+    void get_number_leaf_private(size_t &nb) const;
 
     /**
      * @brief Compute the union of min/max and modify this
@@ -86,12 +125,36 @@ private:
     void union_data(std::array<std::array<_Tp, 2>, _n>& data) const;
 
     /**
+     * @brief union_position
+     * @param p1
+     * @param p2
+     */
+    void union_position(std::vector<std::array<int, 2>>& p1, const std::vector<std::array<int, 2>>& p2) const;
+
+    /**
+     * @brief is_inter_empty_data
+     * @param d1
+     * @param d2
+     * @return
+     */
+    bool is_inter_empty_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const;
+
+    /**
+     * @brief is_subset_data
+     * @param d1
+     * @param d2
+     * @return
+     */
+    bool is_subset_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const;
+
+    /**
      * @brief Bisector
      * @param position
      * @param p1
      * @param p2
      */
     size_t bisector(const std::vector<std::array<int, 2>> &position, std::vector<std::array<int, 2>> &p1, std::vector<std::array<int, 2>> &p2) const;
+    size_t bisector(const std::vector<std::array<int, 2>> &position, std::vector<std::array<int, 2>> &p1, std::vector<std::array<int, 2>> &p2, const size_t &l_dim) const;
 
     /**
      * @brief is_inter_empty
@@ -119,6 +182,20 @@ private:
     DataSetNode<_Tp, _n> * m_children_second = nullptr;
 
 };
+
+template<typename _Tp, size_t _n>
+size_t DataSetNode<_Tp, _n>::get_number_node() const{
+    size_t nb = 0;
+    get_number_node_private(nb);
+    return nb;
+}
+
+template<typename _Tp, size_t _n>
+size_t DataSetNode<_Tp, _n>::get_number_leaf() const{
+    size_t nb = 0;
+    get_number_leaf_private(nb);
+    return nb;
+}
 
 template<typename _Tp, size_t _n>
 bool DataSetNode<_Tp, _n>::is_leaf() const{

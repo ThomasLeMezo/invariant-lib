@@ -7,6 +7,14 @@
 
 using namespace std;
 
+#define FUNCTION_EVAL_INVERT_BASE(type, cell) virtual void eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<type, 2>, cell>& data) const{}
+#define FUNCTION_EVAL_INVERT(type) \
+    FUNCTION_EVAL_INVERT_BASE(type, 1)\
+    FUNCTION_EVAL_INVERT_BASE(type, 2)\
+    FUNCTION_EVAL_INVERT_BASE(type, 3)\
+    FUNCTION_EVAL_INVERT_BASE(type, 4)\
+    FUNCTION_EVAL_INVERT_BASE(type, 5)
+
 #define FUNCTION_EVAL_BASE(type, cell) virtual void eval(const std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, std::array<std::array<type, 2>, cell>& data) const{}
 #define FUNCTION_EVAL(type) \
     FUNCTION_EVAL_BASE(type, 1)\
@@ -59,6 +67,17 @@ public:
     FUNCTION_EVAL(int)
     FUNCTION_EVAL(double)
     FUNCTION_EVAL(char)
+
+    /**
+     * @brief Eval invert the vector filed at this position
+     * @param target
+     * @param position
+     * @param data
+     */
+    FUNCTION_EVAL_INVERT(short int)
+    FUNCTION_EVAL_INVERT(int)
+    FUNCTION_EVAL_INVERT(double)
+    FUNCTION_EVAL_INVERT(char)
 
     /**
      * @brief Set the node val
