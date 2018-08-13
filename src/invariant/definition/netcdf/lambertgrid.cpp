@@ -44,8 +44,8 @@ void fill_vector(std::vector<std::vector<double>> &X, std::vector<std::vector<do
 }
 
 void LambertGrid::fill_leaf(std::vector<std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2>>>> &leaf_list,
-               std::vector<std::vector<double>> &X,
-               std::vector<std::vector<double>> &Y){
+                            std::vector<std::vector<double>> &X,
+                            std::vector<std::vector<double>> &Y){
     for(std::pair<DataSetVirtualNode*, std::vector<std::array<int, 2> > > &leaf:leaf_list){
         vector<array<int, 2>> position = leaf.second;
         array<array<double, 2>, 2> data;
@@ -91,12 +91,30 @@ std::vector<std::array<int, 2>> get_empty_position(){
     return target;
 }
 
+double find_max_distance(const std::vector<std::vector<double>> &data){
+    double d = 0.0;
+//    size_t i_save, j_save;
+
+    for(size_t i=0; i<data.size()-1; i++){
+        for(size_t j=0; j<data[0].size()-1; j++){
+            double d_test = max(abs(data[i][j+1] - data[i][j]), abs(data[i+1][j] - data[i][j]));
+            if(d_test>d){
+                d=d_test;
+//                i_save = i; j_save=j;
+            }
+        }
+    }
+//    cout << "max distance = "<< d << " (" << i_save << ", " << j_save << ")" << endl;
+
+    return d;
+}
+
 void LambertGrid::compute_grid_proj(NcFile &dataFile){
 
     /// **************************************************************
     /// *************************** NcData ***************************
 
-//    NcFile dataFile(file_name, NcFile::read);
+    //    NcFile dataFile(file_name, NcFile::read);
 
     // LambertGrid Size
     size_t nj_u_size = dataFile.getDim("nj_u").getSize();
@@ -123,12 +141,12 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
     // Init proj
     projPJ pj_lambert, pj_latlong;
     if (!(pj_lambert = pj_init_plus("+init=epsg:2154"))){
-      cout << "[Lambert_node] Error Lambert" << endl;
-      exit(1);
+        cout << "[Lambert_node] Error Lambert" << endl;
+        exit(1);
     }
     if (!(pj_latlong = pj_init_plus("+init=epsg:4326"))){
-      cout << "[Lambert_node] Error LatLong" << endl;
-      exit(1);
+        cout << "[Lambert_node] Error LatLong" << endl;
+        exit(1);
     }
 
     pj_transform(pj_latlong, pj_lambert, nij_u_size, 1, longitude_u, latitude_u, nullptr);
@@ -165,6 +183,16 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
     // Fill the tree
     m_dataSet_U->fill_tree();
     m_dataSet_V->fill_tree();
+
+    /// **************************************************************
+    /// *************************** Find distances *******************
+    m_distance_max_U_X = find_max_distance(m_U_X);
+    m_distance_max_U_Y = find_max_distance(m_U_Y);
+    m_distance_max_V_X = find_max_distance(m_V_X);
+    m_distance_max_V_Y = find_max_distance(m_V_Y);
+
+    m_distance_max_U = sqrt(m_distance_max_U_X*m_distance_max_U_X + m_distance_max_U_Y*m_distance_max_U_Y);
+    m_distance_max_V = sqrt(m_distance_max_V_X*m_distance_max_V_X + m_distance_max_V_Y*m_distance_max_V_Y);
 }
 
 LambertGrid::LambertGrid(const std::string &file_xml){
@@ -188,8 +216,9 @@ LambertGrid::LambertGrid(const std::string &file_xml){
 
                 NcVar u_var=dataFile.getVar("U");
                 NcVar v_var=dataFile.getVar("V");
+                NcVar time_var = dataFile.getVar("time");
 
-                // Global parameters
+                /// ******* Global parameters ******
                 if(first_read){
                     u_var.getAtt("scale_factor").getValues(&m_U_scale_factor);
                     u_var.getAtt("add_offset").getValues(&m_U_add_offset);
@@ -199,13 +228,19 @@ LambertGrid::LambertGrid(const std::string &file_xml){
                     v_var.getAtt("_FillValue").getValues(&m_V_Fill_Value);
                 }
 
-                // ******* Size U,V ******
+                /// ******* Time **********
+                double t;
+                time_var.getVar(&t);
+                m_time.push_back(t);
+
+                /// ******* DATA U,V ******
+                // Size U,V
                 size_t nj_u = dataFile.getDim("nj_u").getSize();
                 size_t ni_u = dataFile.getDim("ni_u").getSize();
                 size_t nj_v = dataFile.getDim("nj_v").getSize();
                 size_t ni_v = dataFile.getDim("ni_v").getSize();
 
-                // ******* DATA U,V ******
+                // Data
                 short int *raw_u = new short int[nj_u*ni_u];
                 short int *raw_v = new short int[nj_v*ni_v];
                 u_var.getVar(raw_u);
@@ -235,6 +270,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
                 m_U.push_back(tab_u);
                 m_V.push_back(tab_v);
 
+                /// ******* Grid Lambert Projection ******
                 if(first_read){
                     compute_grid_proj(dataFile);
                     first_read = false;
@@ -242,32 +278,104 @@ LambertGrid::LambertGrid(const std::string &file_xml){
             }
         }
     }
+
+    if(m_time.size()>1){
+        m_time_dt = m_time[1]-m_time[0];
+    }
+}
+
+size_t LambertGrid::get_time_grid(const double &t) const{
+    if(t<m_time[0])
+        return 0;
+    else if(t>m_time[m_time.size()-1])
+        return m_time.size()-1;
+    else
+        return (size_t)floor((t-m_time[0])/m_time_dt);
+}
+
+bool sort_pair(const std::pair<double, std::array<int, 2>> &d1, const std::pair<double, std::array<int, 2>> &d2){return (d1.first<d2.first);}
+
+double compute_ponderation(const std::vector<std::pair<double, std::array<int, 2>>> &map_distance,
+                           const std::vector<std::vector<std::vector<short int>>>& data,
+                           const size_t &t,
+                           const double &scale_factor,
+                           const double &add_offset){
+    double sum_coeff = 0.0;
+    double u = 0.0;
+    for(size_t i=0; i<min((size_t)4, map_distance.size()); i++){
+        // Liszka ponderation
+        double coeff = 1.0/sqrt(pow(map_distance[i].first, 2)+1);
+        u += coeff*((data[t][map_distance[i].second[0]][map_distance[i].second[1]])*scale_factor+add_offset);
+        sum_coeff += coeff;
+    }
+    if(sum_coeff!=0.0)
+        u /= sum_coeff;
+    return u;
 }
 
 void LambertGrid::eval(const double &x, const double &y, const double &t, double &u, double &v) const{
-    /// **************************************************************
-    /// *************************** Tests ****************************
-    // Test
-    std::vector<std::array<int, 2>> target = get_empty_position();
+    // Find corresponding Data
+    std::vector<std::array<int, 2>> target_U = get_empty_position();
+    array<array<double, 2>, 2> data_U;
+    data_U[0][0] = x-m_distance_max_U_X; data_U[0][1] = x+m_distance_max_U_X;
+    data_U[1][0] = y-m_distance_max_U_Y; data_U[1][1] = y+m_distance_max_U_Y;
+    m_dataSet_U->eval_invert(target_U, m_position_U, data_U);
 
-    array<array<double, 2>, 2> data;
-    data[0][0] = 102403; data[0][1] = 102490;
-    data[1][0] = 6848055; data[1][1] = 6848100;
-//    data[0][0] = 49851; data[0][1] = 49853;
-//    data[1][0] = 6728480; data[1][1] = 6728490;
+    std::vector<std::array<int, 2>> target_V = get_empty_position();
+    array<array<double, 2>, 2> data_V;
+    data_V[0][0] = x-m_distance_max_V_X; data_V[0][1] = x+m_distance_max_V_X;
+    data_V[1][0] = y-m_distance_max_V_Y; data_V[1][1] = y+m_distance_max_V_Y;
+    m_dataSet_V->eval_invert(target_V, m_position_V, data_V);
 
-//    array<array<double, 2>, 2> data;
-//    data[0][0] = 10.0; data[0][1] = 11.0;
-//    data[1][0] = 1.0; data[1][1] = 2.0;
+    std::vector<std::pair<double, std::array<int, 2>>> map_distance_U;
+    std::vector<std::pair<double, std::array<int, 2>>> map_distance_V;
 
-    m_dataSet_U->eval_invert(target, m_position_U, data);
+    for(int i=target_U[0][0]; i<=target_U[0][1]; i++){
+        for(int j=target_U[1][0]; j<=target_U[1][1]; j++){
+            double d = sqrt(pow(m_U_X[i][j]-x, 2)+pow(m_U_Y[i][j]-y, 2));
+            if(d<m_distance_max_U)
+                map_distance_U.push_back(make_pair(d, array<int, 2>({i, j})));
+        }
+    }
 
-    cout << m_dataSet_U->get_number_node() << endl;
-    cout << m_dataSet_U->get_number_leaf() << endl;
+    for(int i=target_V[0][0]; i<=target_V[0][1]; i++){
+        for(int j=target_V[1][0]; j<=target_V[1][1]; j++){
+            double d = sqrt(pow(m_V_X[i][j]-x, 2)+pow(m_V_Y[i][j]-y, 2));
+            if(d<m_distance_max_V)
+                map_distance_V.push_back(make_pair(d, array<int, 2>({i, j})));
+        }
+    }
 
-    cout << target[0][0] << " " << target[0][1] << endl;
-    cout << target[1][0] << " " << target[1][1] << endl;
+    // Sort distances
+    std::sort(map_distance_U.begin(), map_distance_U.end(), sort_pair);
+    std::sort(map_distance_V.begin(), map_distance_V.end(), sort_pair);
 
+    // Compute Current values : take 4 closest
+
+    const size_t t1 = get_time_grid(t);
+
+    double u_t1 = compute_ponderation(map_distance_U, m_U, t1, m_U_scale_factor, m_U_add_offset);
+    double v_t1 = compute_ponderation(map_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
+
+    const size_t t2 = t1+1;
+    if(t2<m_U.size()){
+        double u_t2 = u_t1;
+        double v_t2 = v_t1;
+        const double d_t1_t = abs(m_time[t1]-t);
+        const double d_t2_t = abs(m_time[t2]-t);
+        u_t2 = compute_ponderation(map_distance_U, m_U, t2, m_U_scale_factor, m_U_add_offset);
+        v_t2 = compute_ponderation(map_distance_V, m_V, t2, m_V_scale_factor, m_V_add_offset);
+
+        const double coeff1 = (1/sqrt(d_t1_t*d_t1_t+1));
+        const double coeff2 = (1/sqrt(d_t2_t*d_t2_t+1));
+        const double sum_coeff = coeff1+coeff2;
+        u = (coeff1*u_t1+coeff2*u_t2)/sum_coeff;
+        v = (coeff1*v_t1+coeff2*v_t2)/sum_coeff;
+    }
+    else{
+        u = u_t1;
+        v = v_t1;
+    }
 }
 
 LambertGrid::~LambertGrid(){

@@ -69,6 +69,13 @@ private:
                    std::vector<std::vector<double>> &X,
                    std::vector<std::vector<double>> &Y);
 
+    /**
+     * @brief get_time_grid
+     * @param t
+     * @return
+     */
+    size_t get_time_grid(const double &t) const;
+
 private:
     std::vector<std::vector<double>> m_U_X, m_U_Y, m_V_X, m_V_Y;
 
@@ -83,6 +90,10 @@ private:
 
     std::vector<std::vector<std::vector<short int>>> m_U, m_V;
     std::vector<double> m_time;
+    double m_time_dt;
+
+    double m_distance_max_U_X, m_distance_max_U_Y, m_distance_max_U;
+    double m_distance_max_V_X, m_distance_max_V_Y, m_distance_max_V;
 };
 
 inline const std::vector<std::vector<double>>& LambertGrid::get_U_X() const{
