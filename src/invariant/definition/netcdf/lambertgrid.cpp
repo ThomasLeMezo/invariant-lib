@@ -93,18 +93,18 @@ std::vector<std::array<int, 2>> get_empty_position(){
 
 double find_max_distance(const std::vector<std::vector<double>> &data){
     double d = 0.0;
-//    size_t i_save, j_save;
+    //    size_t i_save, j_save;
 
     for(size_t i=0; i<data.size()-1; i++){
         for(size_t j=0; j<data[0].size()-1; j++){
             double d_test = max(abs(data[i][j+1] - data[i][j]), abs(data[i+1][j] - data[i][j]));
             if(d_test>d){
                 d=d_test;
-//                i_save = i; j_save=j;
+                //                i_save = i; j_save=j;
             }
         }
     }
-//    cout << "max distance = "<< d << " (" << i_save << ", " << j_save << ")" << endl;
+    //    cout << "max distance = "<< d << " (" << i_save << ", " << j_save << ")" << endl;
 
     return d;
 }
@@ -313,68 +313,79 @@ double compute_ponderation(const std::vector<std::pair<double, std::array<int, 2
     return u;
 }
 
-void LambertGrid::eval(const double &x, const double &y, const double &t, double &u, double &v) const{
+bool LambertGrid::eval(const double &x, const double &y, const double &t, double &u, double &v) const{
     // Find corresponding Data
+    bool data_found = true;
+
     std::vector<std::array<int, 2>> target_U = get_empty_position();
     array<array<double, 2>, 2> data_U;
     data_U[0][0] = x-m_distance_max_U_X; data_U[0][1] = x+m_distance_max_U_X;
     data_U[1][0] = y-m_distance_max_U_Y; data_U[1][1] = y+m_distance_max_U_Y;
-    m_dataSet_U->eval_invert(target_U, m_position_U, data_U);
+    data_found &= m_dataSet_U->eval_invert(target_U, m_position_U, data_U);
 
     std::vector<std::array<int, 2>> target_V = get_empty_position();
     array<array<double, 2>, 2> data_V;
     data_V[0][0] = x-m_distance_max_V_X; data_V[0][1] = x+m_distance_max_V_X;
     data_V[1][0] = y-m_distance_max_V_Y; data_V[1][1] = y+m_distance_max_V_Y;
-    m_dataSet_V->eval_invert(target_V, m_position_V, data_V);
+    data_found &= m_dataSet_V->eval_invert(target_V, m_position_V, data_V);
 
     std::vector<std::pair<double, std::array<int, 2>>> map_distance_U;
     std::vector<std::pair<double, std::array<int, 2>>> map_distance_V;
 
-    for(int i=target_U[0][0]; i<=target_U[0][1]; i++){
-        for(int j=target_U[1][0]; j<=target_U[1][1]; j++){
-            double d = sqrt(pow(m_U_X[i][j]-x, 2)+pow(m_U_Y[i][j]-y, 2));
-            if(d<m_distance_max_U)
-                map_distance_U.push_back(make_pair(d, array<int, 2>({i, j})));
+    if(data_found){
+
+        for(int i=target_U[0][0]; i<=target_U[0][1]; i++){
+            for(int j=target_U[1][0]; j<=target_U[1][1]; j++){
+                double d = sqrt(pow(m_U_X[i][j]-x, 2)+pow(m_U_Y[i][j]-y, 2));
+                if(d<m_distance_max_U)
+                    map_distance_U.push_back(make_pair(d, array<int, 2>({i, j})));
+            }
         }
-    }
 
-    for(int i=target_V[0][0]; i<=target_V[0][1]; i++){
-        for(int j=target_V[1][0]; j<=target_V[1][1]; j++){
-            double d = sqrt(pow(m_V_X[i][j]-x, 2)+pow(m_V_Y[i][j]-y, 2));
-            if(d<m_distance_max_V)
-                map_distance_V.push_back(make_pair(d, array<int, 2>({i, j})));
+        for(int i=target_V[0][0]; i<=target_V[0][1]; i++){
+            for(int j=target_V[1][0]; j<=target_V[1][1]; j++){
+                double d = sqrt(pow(m_V_X[i][j]-x, 2)+pow(m_V_Y[i][j]-y, 2));
+                if(d<m_distance_max_V)
+                    map_distance_V.push_back(make_pair(d, array<int, 2>({i, j})));
+            }
         }
-    }
 
-    // Sort distances
-    std::sort(map_distance_U.begin(), map_distance_U.end(), sort_pair);
-    std::sort(map_distance_V.begin(), map_distance_V.end(), sort_pair);
+        // Sort distances
+        std::sort(map_distance_U.begin(), map_distance_U.end(), sort_pair);
+        std::sort(map_distance_V.begin(), map_distance_V.end(), sort_pair);
 
-    // Compute Current values : take 4 closest
+        // Compute Current values : take 4 closest
 
-    const size_t t1 = get_time_grid(t);
+        const size_t t1 = get_time_grid(t);
 
-    double u_t1 = compute_ponderation(map_distance_U, m_U, t1, m_U_scale_factor, m_U_add_offset);
-    double v_t1 = compute_ponderation(map_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
+        double u_t1 = compute_ponderation(map_distance_U, m_U, t1, m_U_scale_factor, m_U_add_offset);
+        double v_t1 = compute_ponderation(map_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
 
-    const size_t t2 = t1+1;
-    if(t2<m_U.size()){
-        double u_t2 = u_t1;
-        double v_t2 = v_t1;
-        const double d_t1_t = abs(m_time[t1]-t);
-        const double d_t2_t = abs(m_time[t2]-t);
-        u_t2 = compute_ponderation(map_distance_U, m_U, t2, m_U_scale_factor, m_U_add_offset);
-        v_t2 = compute_ponderation(map_distance_V, m_V, t2, m_V_scale_factor, m_V_add_offset);
+        const size_t t2 = t1+1;
+        if(t2<m_U.size()){
+            double u_t2 = u_t1;
+            double v_t2 = v_t1;
+            const double d_t1_t = abs(m_time[t1]-t);
+            const double d_t2_t = abs(m_time[t2]-t);
+            u_t2 = compute_ponderation(map_distance_U, m_U, t2, m_U_scale_factor, m_U_add_offset);
+            v_t2 = compute_ponderation(map_distance_V, m_V, t2, m_V_scale_factor, m_V_add_offset);
 
-        const double coeff1 = (1/sqrt(d_t1_t*d_t1_t+1));
-        const double coeff2 = (1/sqrt(d_t2_t*d_t2_t+1));
-        const double sum_coeff = coeff1+coeff2;
-        u = (coeff1*u_t1+coeff2*u_t2)/sum_coeff;
-        v = (coeff1*v_t1+coeff2*v_t2)/sum_coeff;
+            const double coeff1 = (1/sqrt(d_t1_t*d_t1_t+1));
+            const double coeff2 = (1/sqrt(d_t2_t*d_t2_t+1));
+            const double sum_coeff = coeff1+coeff2;
+            u = (coeff1*u_t1+coeff2*u_t2)/sum_coeff;
+            v = (coeff1*v_t1+coeff2*v_t2)/sum_coeff;
+        }
+        else{
+            u = u_t1;
+            v = v_t1;
+        }
+        return true;
     }
     else{
-        u = u_t1;
-        v = v_t1;
+        u=0.0;
+        v=0.0;
+        return false;
     }
 }
 

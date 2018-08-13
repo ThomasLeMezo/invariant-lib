@@ -50,7 +50,7 @@ public:
     /**
      * @brief eval
      */
-    void eval(const double &x, const double &y, const double &t, double &u, double &v) const;
+    bool eval(const double &x, const double &y, const double &t, double &u, double &v) const;
 
 private:
     /**

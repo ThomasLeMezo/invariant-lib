@@ -60,7 +60,7 @@ public:
      * @param position
      * @param data
      */
-    void eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data) const;
+    bool eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data) const;
 
     /**
      * @brief Set the node val

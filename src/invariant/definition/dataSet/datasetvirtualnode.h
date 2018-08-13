@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define FUNCTION_EVAL_INVERT_BASE(type, cell) virtual void eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<type, 2>, cell>& data) const{}
+#define FUNCTION_EVAL_INVERT_BASE(type, cell) virtual bool eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<type, 2>, cell>& data) const{return false;}
 #define FUNCTION_EVAL_INVERT(type) \
     FUNCTION_EVAL_INVERT_BASE(type, 1)\
     FUNCTION_EVAL_INVERT_BASE(type, 2)\
