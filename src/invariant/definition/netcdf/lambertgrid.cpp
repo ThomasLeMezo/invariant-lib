@@ -109,24 +109,24 @@ LambertGrid::LambertGrid(const string &file_name){
         double x_center = m_X[position[0][0]][position[1][0]];
         double x_ub, x_lb;
         if(position[0][0]+1<(int)ni_u_size)
-            x_ub = x_center - abs(m_X[position[0][0]+1][position[1][0]]-x_center)/2.0;
+            x_ub = x_center + ceil(abs(m_X[position[0][0]+1][position[1][0]]-x_center)/2.0);
         else
             x_ub = x_center;
 
         if(position[0][0]-1>=0)
-            x_lb = x_center + abs(x_center-m_X[position[0][0]-1][position[1][0]])/2.0;
+            x_lb = x_center - ceil(abs(x_center-m_X[position[0][0]-1][position[1][0]])/2.0);
         else
             x_lb = x_center;
 
         double y_center = m_Y[position[0][0]][position[1][0]];
         double y_ub, y_lb;
         if(position[1][0]+1<(int)nj_u_size)
-            y_ub = y_center - abs(m_Y[position[0][0]][position[1][0]+1]-y_center)/2.0;
+            y_ub = y_center + ceil(abs(m_Y[position[0][0]][position[1][0]+1]-y_center)/2.0);
         else
             y_ub = y_center;
 
         if(position[1][0]-1>=0)
-            y_lb = y_center + abs(y_center-m_Y[position[0][0]][position[1][0]-1])/2.0;
+            y_lb = y_center - ceil(abs(y_center-m_Y[position[0][0]][position[1][0]-1])/2.0);
         else
             y_lb = y_center;
 
@@ -143,8 +143,13 @@ LambertGrid::LambertGrid(const string &file_name){
     target.push_back(std::array<int, 2>({1000, -1}));
 
     array<array<double, 2>, 2> data;
-    data[0][0] = 102403; data[0][1] = 102420;
+    data[0][0] = 102403; data[0][1] = 102490;
     data[1][0] = 6848055; data[1][1] = 6848100;
+//    data[0][0] = 49851; data[0][1] = 49853;
+//    data[1][0] = 6728480; data[1][1] = 6728490;
+
+    cout << m_X[0][0] << endl;
+    cout << m_Y[0][0] << endl;
 
 //    array<array<double, 2>, 2> data;
 //    data[0][0] = 10.0; data[0][1] = 11.0;

@@ -223,14 +223,6 @@ void DataSetNode<_Tp, _n>::union_this(const std::array<std::array<_Tp, 2>, _n>& 
 }
 
 template<typename _Tp, size_t _n>
-void DataSetNode<_Tp, _n>::union_position(std::vector<std::array<int, 2>>& p1, const std::vector<std::array<int, 2>>& p2) const{
-    for(size_t dim=0; dim<p1.size(); dim++){
-        p1[dim][0] = min(p1[dim][0], p2[dim][0]);
-        p1[dim][1] = max(p1[dim][1], p2[dim][1]);
-    }
-}
-
-template<typename _Tp, size_t _n>
 void DataSetNode<_Tp, _n>::union_data(std::array<std::array<_Tp, 2>, _n>& data) const{
     for(size_t dim=0; dim<_n; dim++){
         data[dim][0] = min(m_data[dim][0], data[dim][0]);
@@ -239,9 +231,17 @@ void DataSetNode<_Tp, _n>::union_data(std::array<std::array<_Tp, 2>, _n>& data) 
 }
 
 template<typename _Tp, size_t _n>
+void DataSetNode<_Tp, _n>::union_position(std::vector<std::array<int, 2>>& p1, const std::vector<std::array<int, 2>>& p2) const{
+    for(size_t dim=0; dim<p1.size(); dim++){
+        p1[dim][0] = min(p1[dim][0], p2[dim][0]);
+        p1[dim][1] = max(p1[dim][1], p2[dim][1]);
+    }
+}
+
+template<typename _Tp, size_t _n>
 bool DataSetNode<_Tp, _n>::is_inter_empty_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const{
     for(size_t dim = 0; dim<_n; dim++){
-        if(d1[dim][1]<d2[dim][0] || d2[dim][1]<d1[dim][0])
+        if(d1[dim][1]<d2[dim][0] || d1[dim][0]>d2[dim][1])
             return true;
     }
     return false;
@@ -250,7 +250,7 @@ bool DataSetNode<_Tp, _n>::is_inter_empty_data(const std::array<std::array<_Tp, 
 template<typename _Tp, size_t _n>
 bool DataSetNode<_Tp, _n>::is_subset_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const{
     for(size_t dim = 0; dim<_n; dim++){
-        if(d1[dim][1]>d2[dim][1] || d1[dim][0]<d2[dim][0])
+        if(d1[dim][0]<d2[dim][0] || d1[dim][1]>d2[dim][1])
             return false;
     }
     return true;
