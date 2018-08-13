@@ -123,6 +123,7 @@ bool DataSetNode<_Tp, _n>::fill_tree(){
         bool valid_data = false;
         valid_data |= m_children_first->fill_tree();
         valid_data |= m_children_second->fill_tree();
+        m_valid_data = valid_data;
 
         if(m_children_first->is_valid_data())
             union_this(m_children_first->get_data());
@@ -137,7 +138,8 @@ bool DataSetNode<_Tp, _n>::fill_tree(){
             m_children_second = nullptr;
         }
 
-        if(m_children_first->is_leaf() && m_children_second->is_leaf()){
+        if(!(m_children_first==nullptr || m_children_second==nullptr) &&
+           m_children_first->is_leaf() && m_children_second->is_leaf()){
             if(m_children_first->get_data()==m_children_second->get_data()){
                 m_bisection_axis=-1;
 
@@ -149,7 +151,6 @@ bool DataSetNode<_Tp, _n>::fill_tree(){
             }
         }
 
-        m_valid_data = valid_data;
         return valid_data;
     }
 }

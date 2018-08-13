@@ -9,7 +9,9 @@ using namespace invariant;
 
 int main(int argc, char *argv[]){
 
-    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/data/MARC_L1-MARS2D-FINIS250_20180115T1800Z_MeteoMF.nc");
+    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+    double x, y, t, u, v;
+    g.eval(x, y, t, u, v);
 
 //    cout << g.get_X()[0][0] << endl;
 //    cout << g.get_Y()[0][0] << endl;

@@ -95,6 +95,18 @@ public:
      */
     virtual void serialize(std::ofstream& binFile) const  {}
 
+    /**
+     * @brief get_number_node_private
+     * @return
+     */
+    virtual size_t get_number_node() const {return 0;}
+
+    /**
+     * @brief get_number_leaf_private
+     * @param nb
+     */
+    virtual size_t get_number_leaf() const {return 0;}
+
 };
 
 inline DataSetVirtualNode::~DataSetVirtualNode(){}
