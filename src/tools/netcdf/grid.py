@@ -60,8 +60,8 @@ outProj = Proj(init='epsg:2154')
 # i_min = 494
 # i_max = 501
 
-j_min = 127  
-j_max = 148
+j_min = 136  
+j_max = 139
 i_min = 494
 i_max = 501
 

@@ -34,13 +34,17 @@ int main(int argc, char *argv[]){
     double t_start = 0;
     size_t k=0;
 
+//    g.eval(97554, 6849273, t_init, u, v);
+//    cout << u << endl;
+//    cout << v << endl;
+
     for(double x=x_init; x<x_init+250; x+=50.0){
         for(double y=y_init; y<y_init+250; y+=50.0){
             vector<double> x_position, y_position;
             double x_tmp = x;
             double y_tmp = y;
             cout << "> Compute Traj " << k++ << endl;
-            for(double t=t_init+t_start; t<t_init+3600*10; t+=dt){
+            for(double t=t_init+t_start; t<t_init+3600*24; t+=dt){
                 if(!g.eval(x_tmp, y_tmp, t, u, v))
                     break;
                 x_tmp+=u*dt;
@@ -52,5 +56,5 @@ int main(int argc, char *argv[]){
         }
     }
 
-//    vibes::axisAuto("Ouessant");
+    vibes::axisAuto("Ouessant");
 }

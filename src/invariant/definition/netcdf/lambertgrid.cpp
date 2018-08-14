@@ -201,7 +201,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
     pt::read_xml(file_xml, tree);
 
     string directory = tree.get<string>("PREVIMER.<xmlattr>.directory");
-    cout << " DATA Directory = " << directory<< endl;
+//    cout << " DATA Directory = " << directory<< endl;
     int file_id = 0;
     bool first_read = true;
 
@@ -209,7 +209,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
         if(v.first == "file"){
             string file_name = v.second.get<string>("");
             if(!file_name.empty()){
-                cout << " " << file_id << " " << file_name << endl;
+//                cout << " " << file_id << " " << file_name << endl;
                 file_id++;
 
                 NcFile dataFile(directory+file_name, NcFile::read);
@@ -278,6 +278,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
             }
         }
     }
+    cout << "Number files read = " << file_id << endl;
 
     if(m_time.size()>1){
         m_time_dt = m_time[1]-m_time[0];
@@ -304,7 +305,7 @@ double compute_ponderation(const std::vector<std::pair<double, std::array<int, 2
     double u = 0.0;
     for(size_t i=0; i<min((size_t)4, map_distance.size()); i++){
         // Liszka ponderation
-        double coeff = 1.0/sqrt(pow(map_distance[i].first, 2)+1);
+        double coeff = 1.0/sqrt(pow(map_distance[i].first, 2)+0.01);
         u += coeff*((data[t][map_distance[i].second[0]][map_distance[i].second[1]])*scale_factor+add_offset);
         sum_coeff += coeff;
     }
@@ -316,6 +317,10 @@ double compute_ponderation(const std::vector<std::pair<double, std::array<int, 2
 bool LambertGrid::eval(const double &x, const double &y, const double &t, double &u, double &v) const{
     // Find corresponding Data
     bool data_found = true;
+
+    const size_t t1 = get_time_grid(t);
+    if(abs(t-m_time[t1])>m_time_dt)
+        return false;
 
     std::vector<std::array<int, 2>> target_U = get_empty_position();
     array<array<double, 2>, 2> data_U;
@@ -355,14 +360,11 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
         std::sort(map_distance_V.begin(), map_distance_V.end(), sort_pair);
 
         // Compute Current values : take 4 closest
-
-        const size_t t1 = get_time_grid(t);
-
         double u_t1 = compute_ponderation(map_distance_U, m_U, t1, m_U_scale_factor, m_U_add_offset);
         double v_t1 = compute_ponderation(map_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
 
         const size_t t2 = t1+1;
-        if(t2<m_U.size()){
+        if(t2<m_U.size() && (t-m_time[t1]>0)){
             double u_t2 = u_t1;
             double v_t2 = v_t1;
             const double d_t1_t = abs(m_time[t1]-t);
@@ -370,8 +372,8 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
             u_t2 = compute_ponderation(map_distance_U, m_U, t2, m_U_scale_factor, m_U_add_offset);
             v_t2 = compute_ponderation(map_distance_V, m_V, t2, m_V_scale_factor, m_V_add_offset);
 
-            const double coeff1 = (1/sqrt(d_t1_t*d_t1_t+1));
-            const double coeff2 = (1/sqrt(d_t2_t*d_t2_t+1));
+            const double coeff1 = (1/sqrt(d_t1_t*d_t1_t+0.01));
+            const double coeff2 = (1/sqrt(d_t2_t*d_t2_t+0.01));
             const double sum_coeff = coeff1+coeff2;
             u = (coeff1*u_t1+coeff2*u_t2)/sum_coeff;
             v = (coeff1*v_t1+coeff2*v_t2)/sum_coeff;
