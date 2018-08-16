@@ -43,16 +43,29 @@ int main(int argc, char *argv[]){
             vector<double> x_position, y_position;
             double x_tmp = x;
             double y_tmp = y;
+            bool valid = true;
             cout << "> Compute Traj " << k++ << endl;
-            for(double t=t_init+t_start; t<t_init+3600*24; t+=dt){
-                if(!g.eval(x_tmp, y_tmp, t, u, v))
+            for(double t=t_init+t_start; t<t_init+3600*20; t+=dt){
+
+                // RK2 scheme
+                if(!g.eval(x_tmp, y_tmp, t, u, v)){
+                    valid = false;
                     break;
+                }
+                double x_r = x_tmp + dt/2.0*u;
+                double y_r = y_tmp + dt/2.0*v;
+
+                if(!g.eval(x_r, y_r, t+dt/2.0, u, v)){
+                    valid = false;
+                    break;
+                }
+
                 x_tmp+=u*dt;
                 y_tmp+=v*dt;
                 x_position.push_back(x_tmp);
                 y_position.push_back(y_tmp);
             }
-            vibes::drawLine(x_position, y_position);
+            vibes::drawLine(x_position, y_position, valid?"black":"grey");
         }
     }
 

@@ -191,8 +191,10 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
     m_distance_max_V_X = find_max_distance(m_V_X);
     m_distance_max_V_Y = find_max_distance(m_V_Y);
 
-    m_distance_max_U = sqrt(m_distance_max_U_X*m_distance_max_U_X + m_distance_max_U_Y*m_distance_max_U_Y);
-    m_distance_max_V = sqrt(m_distance_max_V_X*m_distance_max_V_X + m_distance_max_V_Y*m_distance_max_V_Y);
+    m_distance_max_U = 1.1*max(m_distance_max_U_X, m_distance_max_U_Y);
+    m_distance_max_V = 1.1*max(m_distance_max_V_X, m_distance_max_V_Y);
+//    m_distance_max_U = sqrt(m_distance_max_U_X*m_distance_max_U_X + m_distance_max_U_Y*m_distance_max_U_Y);
+//    m_distance_max_V = sqrt(m_distance_max_V_X*m_distance_max_V_X + m_distance_max_V_Y*m_distance_max_V_Y);
 }
 
 LambertGrid::LambertGrid(const std::string &file_xml){
