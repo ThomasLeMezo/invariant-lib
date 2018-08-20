@@ -8,7 +8,7 @@
 
 #include <maze.h>
 #include <smartSubPaving.h>
-#include <dynamics_function.h>
+#include <dynamicsFunction.h>
 
 #include <iostream>
 
@@ -117,7 +117,7 @@ private:
     std::vector<ibex::Sep*> m_separator_list;
 
     SmartSubPaving<_Tp> *m_paving=nullptr;
-    std::vector<Dynamics_Function*> m_dyn_list;
+    std::vector<DynamicsFunction*> m_dyn_list;
 
     std::vector<Domain<_Tp>*> m_dom_list;
 

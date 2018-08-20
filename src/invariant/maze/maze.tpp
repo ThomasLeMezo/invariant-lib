@@ -112,7 +112,11 @@ int Maze<_Tp>::contract(size_t nb_operations){
                         else{
                             r = m_deque_rooms.front();
                             if(r->get_pave()->get_position().size()>10)
+<<<<<<< HEAD
                                 std::cout << "ERROR" << std::endl;
+=======
+                                std::cout << "WARNING dimension > 10" << std::endl;
+>>>>>>> 4fe387570f39eb9e6f3ed281a07447b68ebe0a31
                             m_deque_rooms.pop_front();
                         }
                         r->reset_deque(); // Room can be added again to the deque

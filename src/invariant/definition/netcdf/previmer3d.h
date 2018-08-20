@@ -16,7 +16,6 @@
 
 namespace invariant {
 
-class NodeCurrent3D; // Friendchip
 class PreviMer3D : public ibex::Function
 {
 public:

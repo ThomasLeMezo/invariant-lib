@@ -1,6 +1,6 @@
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 
 #include "ibex_SepFwdBwd.h"
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     dom_outer.set_sep(&s_outer);
 
     ibex::Function f(x, y, z, Return(ibex::Interval(1.0, 1.1), ibex::Interval(1.0, 1.1), ibex::Interval(-0.1,0.1)));
-    Dynamics_Function dyn_outer(&f, FWD);
+    DynamicsFunction dyn_outer(&f, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze(&dom_outer, &dyn_outer);

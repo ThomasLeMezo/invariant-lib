@@ -22,3 +22,5 @@ add_subdirectory(13_van_der_pol_invariant_bracketing)
 add_subdirectory(14_cordeliere_invariant)
 add_subdirectory(15_dipole_invariant)
 add_subdirectory(16_linear_system)
+add_subdirectory(17_non_linear_system)
+

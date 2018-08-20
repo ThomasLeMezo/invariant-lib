@@ -1,7 +1,7 @@
 #include "ibex_SepFwdBwd.h"
 #include <iostream>
 #include "previmer3d.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include <ibex.h>
 #include <math.h>

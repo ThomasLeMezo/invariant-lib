@@ -5,12 +5,12 @@ using namespace ibex;
 
 namespace invariant {
 DynamicsInclusionFunction::DynamicsInclusionFunction(const std::vector<ibex::Function *> functions, const ibex::IntervalVector &inclusion_parameter, const DYNAMICS_SENS sens, bool taylor):
-Dynamics_Function(functions, sens, taylor), m_inclusion_parameter(inclusion_parameter)
+DynamicsFunction(functions, sens, taylor), m_inclusion_parameter(inclusion_parameter)
 {
 }
 
 DynamicsInclusionFunction::DynamicsInclusionFunction(ibex::Function *f,  const ibex::IntervalVector& inclusion_parameter, const DYNAMICS_SENS sens, bool taylor):
-Dynamics_Function(f, sens, taylor), m_inclusion_parameter(inclusion_parameter)
+DynamicsFunction(f, sens, taylor), m_inclusion_parameter(inclusion_parameter)
 {
 
 }
@@ -23,7 +23,7 @@ const std::vector<ibex::IntervalVector> DynamicsInclusionFunction::eval(const ib
     for(int i=0; i<m_inclusion_parameter.size(); i++)
         val[i+position.size()] = m_inclusion_parameter[i];
 
-    for(Function*f:m_functions){
+    for(Function*f:m_functions[omp_get_thread_num()]){
         IntervalVector result = f->eval_vector(val);
         vector_field.push_back(result);
     }

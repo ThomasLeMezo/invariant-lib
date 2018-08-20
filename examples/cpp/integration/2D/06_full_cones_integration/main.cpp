@@ -1,6 +1,6 @@
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, Return(ibex::Interval(-1, 1),
                                     ibex::Interval(-1, 1)));
 
-    Dynamics_Function dyn_outer(&f, FWD);
+    DynamicsFunction dyn_outer(&f, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);

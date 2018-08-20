@@ -1,6 +1,6 @@
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Function f(x, Return((x[1]),
                            (-0.5*x[1]-sin(x[0]+0.412)+sin(0.412))));
-    Dynamics_Function dyn(&f, BWD);
+    DynamicsFunction dyn(&f, BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -79,10 +79,10 @@ int main(int argc, char *argv[])
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(2.32);
-//    position_info[1] = ibex::Interval(0.06);
-//    v_maze.show_room_info(&maze_outer, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(2.46);
+    position_info[1] = ibex::Interval(-0.04);
+    v_maze.show_room_info(&maze_outer, position_info);
 
 //    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/synchronous_generator_basin.svg", "Synchronous Generator Basin");
 

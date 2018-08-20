@@ -1,5 +1,5 @@
-#ifndef DYNAMICS_FUNCTION_H
-#define DYNAMICS_FUNCTION_H
+#ifndef DynamicsFunction_H
+#define DynamicsFunction_H
 
 #include "dynamics.h"
 
@@ -12,26 +12,34 @@
 #include <omp.h>
 
 namespace invariant {
-class Dynamics_Function: public Dynamics
+class DynamicsFunction: public Dynamics
 {
 public:
     /**
      * @brief Dynamics constructor
      * @param functions
      */
-    Dynamics_Function(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool taylor=false);
 
     /**
      * @brief Dynamics constructor
      * @param functions
      */
-    Dynamics_Function(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool taylor=false);
-    Dynamics_Function(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool taylor=false);
 
     /**
      * @brief Dynamics destructor
      */
-    ~Dynamics_Function();
+    ~DynamicsFunction();
+
+    /**
+     * @brief init
+     * @param functions
+     * @param sens
+     * @param taylor
+     */
+    void init(const std::vector<ibex::Function*> functions, const DYNAMICS_SENS sens, bool taylor);
 
     /**
      * @brief Eval the vector field from the state space
@@ -67,17 +75,17 @@ public:
     std::map<ibex::Sep*, std::array<ibex::Function*, 2>> get_hybrid_reset() override;
 
 private:
-    /**
-     * @brief add_function_d1
-     * @param functions_list
-     */
-    void add_function_d1(std::vector<ibex::Function *> &functions_list);
+//    /**
+//     * @brief add_function_d1
+//     * @param functions_list
+//     */
+//    void add_function_d1(std::vector<ibex::Function *> &functions_list);
 
-    /**
-     * @brief add_function_d1
-     * @param function
-     */
-    void add_function_d1(ibex::Function* f);
+//    /**
+//     * @brief add_function_d1
+//     * @param function
+//     */
+//    void add_function_d1(ibex::Function* f);
 
     /**
      * @brief compute taylor functions
@@ -85,20 +93,24 @@ private:
     void compute_taylor(bool taylor);
 
 protected:
-    std::vector<ibex::Function*> m_functions;
-    std::vector<ibex::Function*> m_functions_d1;
+    std::vector<std::vector<ibex::Function*>> m_functions;
+    std::vector<std::vector<ibex::Function*>> m_functions_d1;
+
     std::vector<ibex::Sep*> m_hybrid_guard;
     std::map<ibex::Sep*, std::array<ibex::Function*, 2>> m_hybrid_reset;
+
     omp_lock_t  m_lock_dynamics; // Lock
+
+    int m_num_threads = 1;
 };
 
-inline std::vector<ibex::Sep*> Dynamics_Function::get_hybrid_guard(){
+inline std::vector<ibex::Sep*> DynamicsFunction::get_hybrid_guard(){
     return m_hybrid_guard;
 }
 
-inline std::map<ibex::Sep*, std::array<ibex::Function*, 2>> Dynamics_Function::get_hybrid_reset(){
+inline std::map<ibex::Sep*, std::array<ibex::Function*, 2>> DynamicsFunction::get_hybrid_reset(){
     return m_hybrid_reset;
 }
 
 }
-#endif // DYNAMICS_FUNCTION_H
+#endif // DynamicsFunction_H

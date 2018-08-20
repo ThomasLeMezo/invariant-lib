@@ -1,6 +1,6 @@
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -52,17 +52,17 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics Outer & Inner ******* //
     double u= 1;
-//    ibex::Function f(x1, x2, Return(x2,
-//                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
     ibex::Function f(x1, x2, Return(x2,
-                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
-    Dynamics_Function dyn(&f, FWD);
+                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
+//    ibex::Function f(x1, x2, -Return(x2,
+//                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
+    DynamicsFunction dyn(&f, FWD);
 
-//    ibex::Function f1(x1, x2, -Return(x2,
-//                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
-    ibex::Function f2(x1, x2, -Return(x2,
+    ibex::Function f1(x1, x2, Return(x2,
+                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
+    ibex::Function f2(x1, x2, Return(x2,
                                       -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
-    Dynamics_Function dyn_u(/*&f1, */&f2, BWD);
+    DynamicsFunction dyn_u(&f1, &f2, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -96,17 +96,16 @@ int main(int argc, char *argv[])
 
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(false);
+    v_maze.set_enable_cone(true);
     v_maze.show();
     //    v_maze.drawCircle(0.0, 0.0, 1, "black[red]");
     v_maze.drawCircle(0.0, 0.0, r, "red[red]");
 
-//        IntervalVector position_info(2);
-//        position_info[0] = ibex::Interval(1.08);
-//        position_info[1] = ibex::Interval(0.98);
-//        v_maze.setProperties(0, 0, 512, 512);
-//        v_maze.show_room_info(&maze_inner, position_info);
-
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(2.84);
+    position_info[1] = ibex::Interval(0.84);
+    v_maze.setProperties(0, 0, 512, 512);
+    v_maze.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 }
