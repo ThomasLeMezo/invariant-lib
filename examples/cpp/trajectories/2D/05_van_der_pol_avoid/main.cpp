@@ -48,6 +48,9 @@ int main(int argc, char *argv[])
     EulerianMaze<> eulerian_maze(space, &f, &sep_A, &sep_C, true);
     eulerian_maze.get_maze_outer(0)->get_domain()->set_sep_zero(&sep_B_not);
     eulerian_maze.get_maze_inner(0)->get_domain()->set_sep_zero(&sep_B_not);
+    eulerian_maze.get_maze_outer(1)->get_domain()->set_sep_zero(&sep_B_not);
+    eulerian_maze.get_maze_inner(1)->get_domain()->set_sep_zero(&sep_B_not);
+
 
     // ****** Contractions *******
     double time_start = omp_get_wtime();

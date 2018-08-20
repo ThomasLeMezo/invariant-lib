@@ -111,7 +111,7 @@ int Maze<_Tp>::contract(size_t nb_operations){
                         }
                         else{
                             r = m_deque_rooms.front();
-                            if(r->get_pave()->get_position().size()>3)
+                            if(r->get_pave()->get_position().size()>10)
                                 std::cout << "ERROR" << std::endl;
                             m_deque_rooms.pop_front();
                         }

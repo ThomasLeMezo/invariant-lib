@@ -352,6 +352,7 @@ void Room<_Tp>::contract_vector_field(){
                 ibex::IntervalVector v_bool_out = ibex::IntervalVector(dim, ibex::Interval::EMPTY_SET);
 
                 for(int i=0; i<dim; i++){
+                    // ToDo : Tester avec un champ de vecteur local pour chaque face ?
                     if(!(v[i] & ibex::Interval::POS_REALS).is_empty())
                         v_bool_out[i] |= ibex::Interval(1);
                     if(!(v[i] & ibex::Interval::NEG_REALS).is_empty())
