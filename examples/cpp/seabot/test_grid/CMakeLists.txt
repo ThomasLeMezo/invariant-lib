@@ -18,6 +18,7 @@ target_link_libraries(SEABOT_test_grid
     ${LIBS}
     invariant-core
     invariant-graphics
+    invariant-graphics-3D
 )
 
 

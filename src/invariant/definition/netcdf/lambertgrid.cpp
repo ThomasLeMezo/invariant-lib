@@ -19,7 +19,8 @@ namespace invariant {
 void load_raw_data(const NcFile &dataFile, const string &var_name, double *data, const size_t &data_size){
     NcVar var=dataFile.getVar(var_name);
 
-    double scale_factor, add_offset;
+    double scale_factor=1.0;
+    double add_offset = 0.0;
     var.getAtt("scale_factor").getValues(&scale_factor);
     var.getAtt("add_offset").getValues(&add_offset);
 
@@ -32,6 +33,18 @@ void load_raw_data(const NcFile &dataFile, const string &var_name, double *data,
     delete[] raw;
 }
 
+void load_raw_data_double(const NcFile &dataFile, const string &var_name, double *data, const size_t &data_size){
+    NcVar var=dataFile.getVar(var_name);
+
+    double *raw = new double[data_size];
+    var.getVar(raw);
+
+    for(size_t i=0; i<data_size; i++)
+        data[i] = raw[i]*DEG_TO_RAD;
+
+    delete[] raw;
+}
+
 void fill_vector(std::vector<std::vector<double>> &X, std::vector<std::vector<double>>&Y, double *dataX, double *dataY, const size_t &ni, const size_t &nj){
     for(size_t i=0; i<ni; i++){
         X.push_back(vector<double>());
@@ -39,6 +52,15 @@ void fill_vector(std::vector<std::vector<double>> &X, std::vector<std::vector<do
         for(size_t j=0; j<nj; j++){
             X[i].push_back(dataX[j*ni+i]);
             Y[i].push_back(dataY[j*ni+i]);
+        }
+    }
+}
+
+void fill_vector(std::vector<std::vector<short int>> &X, short int *dataX, const size_t &ni, const size_t &nj){
+    for(size_t i=0; i<ni; i++){
+        X.push_back(vector<short int>());
+        for(size_t j=0; j<nj; j++){
+            X[i].push_back(dataX[j*ni+i]);
         }
     }
 }
@@ -123,6 +145,9 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
     size_t nj_v_size = dataFile.getDim("nj_v").getSize();
     size_t ni_v_size = dataFile.getDim("ni_v").getSize();
     const size_t nij_v_size = nj_v_size*ni_v_size;
+    size_t nj_size = dataFile.getDim("nj").getSize();
+    size_t ni_size = dataFile.getDim("ni").getSize();
+    const size_t nij_size = nj_size*ni_size;
 
     // Longitude/Longitude for U
     double *longitude_u = new double[nij_u_size]();
@@ -134,6 +159,16 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
     double *latitude_v = new double[nij_v_size]();
     load_raw_data(dataFile, "longitude_v", longitude_v, nij_v_size);
     load_raw_data(dataFile, "latitude_v", latitude_v, nij_v_size);
+
+    double *longitude = new double[nij_size]();
+    double *latitude = new double[nij_size]();
+    short int *H0 = new short int[nij_size]();
+    load_raw_data_double(dataFile, "longitude", longitude, nij_size);
+    load_raw_data_double(dataFile, "latitude", latitude, nij_size);
+
+    NcVar var_H0=dataFile.getVar("H0");
+    var_H0.getAtt("_FillValue").getValues(&m_H0_Fill_Value);
+    var_H0.getVar(H0);
 
     /// **************************************************************
     /// *************************** Proj *****************************
@@ -151,16 +186,22 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
 
     pj_transform(pj_latlong, pj_lambert, nij_u_size, 1, longitude_u, latitude_u, nullptr);
     pj_transform(pj_latlong, pj_lambert, nij_v_size, 1, longitude_v, latitude_v, nullptr);
+    pj_transform(pj_latlong, pj_lambert, nij_size, 1, longitude, latitude, nullptr);
     pj_free(pj_lambert);
     pj_free(pj_latlong);
 
     fill_vector(m_U_X, m_U_Y, longitude_u, latitude_u, ni_u_size, nj_u_size);
     fill_vector(m_V_X, m_V_Y, longitude_v, latitude_v, ni_v_size, nj_v_size);
+    fill_vector(m_X, m_Y, longitude, latitude, ni_size, nj_size);
+    fill_vector(m_H0, H0, ni_size, nj_size);
 
     delete[] latitude_u;
     delete[] longitude_u;
     delete[] latitude_v;
     delete[] longitude_v;
+    delete[] latitude;
+    delete[] longitude;
+    delete[] H0;
 
     /// **************************************************************
     /// *************************** Build tree ***********************
@@ -193,8 +234,8 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
 
     m_distance_max_U = 1.1*max(m_distance_max_U_X, m_distance_max_U_Y);
     m_distance_max_V = 1.1*max(m_distance_max_V_X, m_distance_max_V_Y);
-//    m_distance_max_U = sqrt(m_distance_max_U_X*m_distance_max_U_X + m_distance_max_U_Y*m_distance_max_U_Y);
-//    m_distance_max_V = sqrt(m_distance_max_V_X*m_distance_max_V_X + m_distance_max_V_Y*m_distance_max_V_Y);
+    //    m_distance_max_U = sqrt(m_distance_max_U_X*m_distance_max_U_X + m_distance_max_U_Y*m_distance_max_U_Y);
+    //    m_distance_max_V = sqrt(m_distance_max_V_X*m_distance_max_V_X + m_distance_max_V_Y*m_distance_max_V_Y);
 }
 
 LambertGrid::LambertGrid(const std::string &file_xml){
@@ -203,7 +244,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
     pt::read_xml(file_xml, tree);
 
     string directory = tree.get<string>("PREVIMER.<xmlattr>.directory");
-//    cout << " DATA Directory = " << directory<< endl;
+    //    cout << " DATA Directory = " << directory<< endl;
     int file_id = 0;
     bool first_read = true;
 
@@ -211,7 +252,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
         if(v.first == "file"){
             string file_name = v.second.get<string>("");
             if(!file_name.empty()){
-//                cout << " " << file_id << " " << file_name << endl;
+                //                cout << " " << file_id << " " << file_name << endl;
                 file_id++;
 
                 NcFile dataFile(directory+file_name, NcFile::read);
