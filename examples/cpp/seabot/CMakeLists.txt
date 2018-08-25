@@ -3,6 +3,7 @@
 # ==================================================================
 
 
-add_subdirectory(test_grid)
+add_subdirectory(test_monte_carlo)
 add_subdirectory(test_dataset)
+add_subdirectory(test_fromveur)
 

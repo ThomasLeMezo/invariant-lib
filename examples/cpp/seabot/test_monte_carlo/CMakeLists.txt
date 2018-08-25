@@ -12,9 +12,9 @@ set(HEADERS
 
     )
 
-add_executable(SEABOT_test_grid ${SRC})
+add_executable(SEABOT_test_monte_carlo ${SRC})
 
-target_link_libraries(SEABOT_test_grid
+target_link_libraries(SEABOT_test_monte_carlo
     ${LIBS}
     invariant-core
     invariant-graphics
