@@ -10,7 +10,7 @@
 #include "maze.h"
 #include "sepmaze.h"
 #include "dynamics.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "vibesMaze.h"
 #include "vtkMaze3D.h"
 #include <string>
@@ -63,7 +63,7 @@ using namespace ibex;
   py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
   ;
 
-  py::class_<invariant::Dynamics_Function>(m, "DynamicsFunction", dynamics)
+  py::class_<invariant::DynamicsFunction>(m, "DynamicsFunction", dynamics)
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS>(),
                "f"_a,
                "DYNAMICS_SENS"_a)

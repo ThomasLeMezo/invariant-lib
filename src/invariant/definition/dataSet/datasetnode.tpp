@@ -126,13 +126,13 @@ bool DataSetNode<_Tp, _n>::fill_tree(){
         m_valid_data = valid_data;
 
         if(m_children_first->is_valid_data())
-            union_this(m_children_first->get_data());
+            union_data(m_data, m_children_first->get_data());
         else{
             delete(m_children_first);
             m_children_first = nullptr;
         }
         if(m_children_second->is_valid_data())
-            union_this(m_children_second->get_data());
+            union_data(m_data, m_children_second->get_data());
         else{
             delete(m_children_second);
             m_children_second = nullptr;
@@ -162,7 +162,7 @@ void DataSetNode<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, c
     }
     else if(is_leaf() || is_subset(position, target)){
         if(m_valid_data)
-            union_data(data);
+            union_data(data, m_data);
     }
     else{
         // Bisect
@@ -191,11 +191,12 @@ void DataSetNode<_Tp, _n>::eval(const std::vector<std::array<int, 2>> &target, c
 }
 
 template<typename _Tp, size_t _n>
-bool DataSetNode<_Tp, _n>::eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data) const{
+bool DataSetNode<_Tp, _n>::eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data, std::array<std::array<_Tp, 2>, _n> &data_return) const{
     if(m_valid_data){
         if(!is_inter_empty_data(m_data, data)){
             if(is_leaf() || is_subset_data(m_data, data)){
                 union_position(target, position);
+                union_data(data_return, m_data);
                 return true;
             }
             else{
@@ -207,9 +208,9 @@ bool DataSetNode<_Tp, _n>::eval_invert(std::vector<std::array<int, 2>> &target, 
                     std::vector<std::array<int, 2>> p1, p2;
                     bisector(position, p1, p2, m_bisection_axis);
                     if(m_children_first != nullptr)
-                        return_value |= m_children_first->eval_invert(target, p1, data);
+                        return_value |= m_children_first->eval_invert(target, p1, data, data_return);
                     if(m_children_second != nullptr)
-                        return_value |= m_children_second->eval_invert(target, p2, data);
+                        return_value |= m_children_second->eval_invert(target, p2, data, data_return);
                     return return_value;
                 }
             }
@@ -219,19 +220,19 @@ bool DataSetNode<_Tp, _n>::eval_invert(std::vector<std::array<int, 2>> &target, 
 }
 
 
-template<typename _Tp, size_t _n>
-void DataSetNode<_Tp, _n>::union_this(const std::array<std::array<_Tp, 2>, _n>& data){
-    for(size_t dim=0; dim<_n; dim++){
-        m_data[dim][0] = min(m_data[dim][0], data[dim][0]);
-        m_data[dim][1] = max(m_data[dim][1], data[dim][1]);
-    }
-}
+//template<typename _Tp, size_t _n>
+//void DataSetNode<_Tp, _n>::union_this(const std::array<std::array<_Tp, 2>, _n>& data){
+//    for(size_t dim=0; dim<_n; dim++){
+//        m_data[dim][0] = min(m_data[dim][0], data[dim][0]);
+//        m_data[dim][1] = max(m_data[dim][1], data[dim][1]);
+//    }
+//}
 
 template<typename _Tp, size_t _n>
-void DataSetNode<_Tp, _n>::union_data(std::array<std::array<_Tp, 2>, _n>& data) const{
+void DataSetNode<_Tp, _n>::union_data(std::array<std::array<_Tp, 2>, _n>& d1, const std::array<std::array<_Tp, 2>, _n> d2) const{
     for(size_t dim=0; dim<_n; dim++){
-        data[dim][0] = min(m_data[dim][0], data[dim][0]);
-        data[dim][1] = max(m_data[dim][1], data[dim][1]);
+        d1[dim][0] = min(d2[dim][0], d1[dim][0]);
+        d1[dim][1] = max(d2[dim][1], d1[dim][1]);
     }
 }
 

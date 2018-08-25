@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define FUNCTION_EVAL_INVERT_BASE(type, cell) virtual bool eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<type, 2>, cell>& data) const{return false;}
+#define FUNCTION_EVAL_INVERT_BASE(type, cell) virtual bool eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<type, 2>, cell>& data, std::array<std::array<type, 2>, cell>& data_return) const{return false;}
 #define FUNCTION_EVAL_INVERT(type) \
     FUNCTION_EVAL_INVERT_BASE(type, 1)\
     FUNCTION_EVAL_INVERT_BASE(type, 2)\
@@ -30,6 +30,16 @@ using namespace std;
     FUNCTION_NODE_VAL_BASE(type, 3)\
     FUNCTION_NODE_VAL_BASE(type, 4)\
     FUNCTION_NODE_VAL_BASE(type, 5)
+
+#define FUNCTION_SUBSET_DATA_BASE(type, cell) virtual bool is_subset_data(const std::array<std::array<type, 2>, cell> &d1, const std::array<std::array<type, 2>, cell> &d2) const {return false;}
+#define FUNCTION_SUBSET_DATA(type) \
+    FUNCTION_SUBSET_DATA_BASE(type, 1)\
+    FUNCTION_SUBSET_DATA_BASE(type, 2)\
+    FUNCTION_SUBSET_DATA_BASE(type, 3)\
+    FUNCTION_SUBSET_DATA_BASE(type, 4)\
+    FUNCTION_SUBSET_DATA_BASE(type, 5)
+
+
 
 class DataSetVirtualNode
 {
@@ -106,6 +116,17 @@ public:
      * @param nb
      */
     virtual size_t get_number_leaf() const {return 0;}
+
+    /**
+     * @brief is_subset_data
+     * @param d1
+     * @param d2
+     * @return
+     */
+    FUNCTION_SUBSET_DATA(short int)
+    FUNCTION_SUBSET_DATA(int)
+    FUNCTION_SUBSET_DATA(double)
+    FUNCTION_SUBSET_DATA(char)
 
 };
 

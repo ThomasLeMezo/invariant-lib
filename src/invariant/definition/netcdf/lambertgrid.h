@@ -106,6 +106,11 @@ private:
 
     double m_distance_max_U_X, m_distance_max_U_Y, m_distance_max_U;
     double m_distance_max_V_X, m_distance_max_V_Y, m_distance_max_V;
+
+    mutable std::vector<array<array<double, 2>, 2>> m_last_data_U_return;
+    mutable std::vector<array<array<double, 2>, 2>> m_last_data_V_return;
+    mutable std::vector<std::vector<std::array<int, 2>>> m_last_target_U;
+    mutable std::vector<std::vector<std::array<int, 2>>> m_last_target_V;
 };
 
 inline const std::vector<std::vector<double>>& LambertGrid::get_U_X() const{

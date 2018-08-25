@@ -22,6 +22,8 @@
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 
+#include <omp.h>
+
 using namespace std;
 using namespace invariant;
 
@@ -56,8 +58,10 @@ int main(int argc, char *argv[]){
     // Draw Ouessant
 //    draw_Ouessant();
 
+    double time_start = omp_get_wtime();
+
     // Compute trajectories
-    double x_init, y_init, t_init, u, v;
+    double x_init, y_init, t_init;
 
     double dt = 1.0;
 
@@ -65,41 +69,48 @@ int main(int argc, char *argv[]){
     x_init = 97339+250*3;
     y_init = 6848741;
 
-    double t_start = 0;
     double t_end = 3600*20.0;
-    size_t k=0;
+//    double t_end = 50;
+
+    vector<array<double, 3>> init_conditions;
+    for(int x=-10; x<10; x++){
+        for(int y=-10; y<10; y++){
+            init_conditions.push_back(array<double, 3>{x_init+50.0*x, y_init+50*y, t_init});
+        }
+    }
 
     vtkSmartPointer<vtkAppendPolyData> appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
 
+    const size_t nb_conditions = init_conditions.size();
 #pragma omp parallel for
-    for(int i=0; i<5; i++){
-        double x = x_init+50.0*i;
-        for(double y=y_init; y<y_init+250; y+=50.0){
-            double x_tmp = x;
-            double y_tmp = y;
+    for(size_t k=0; k<nb_conditions; k++){
+            double x_tmp = init_conditions[k][0];
+            double y_tmp = init_conditions[k][1];
+            double t_tmp = init_conditions[k][2];
             bool valid = true;
 #pragma omp critical
             {
-            cout << "> Compute Traj " << k++ << endl;
+            cout << "> Compute Traj " << k << endl;
             }
 
             vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-            for(double t=t_init+t_start; t<t_init+t_end; t+=dt){
+            for(double t=t_tmp; t<t_tmp+t_end; t+=dt){
                 // RK2 scheme
+                double u, v;
                 g.eval(x_tmp, y_tmp, t, u, v);
-                double x_r = x_tmp + dt/2.0*u;
-                double y_r = y_tmp + dt/2.0*v;
+                double x_r = x_tmp + (dt/2.0)*u;
+                double y_r = y_tmp + (dt/2.0)*v;
 
-                if(!g.eval(x_r, y_r, t+dt/2.0, u, v))
+                if(!g.eval(x_r, y_r, t+(dt/2.0), u, v))
                     valid = false;
 
                 x_tmp+=u*dt;
                 y_tmp+=v*dt;
 
-                points->InsertNextPoint(x_tmp, y_tmp, t);
+                points->InsertNextPoint(x_tmp, y_tmp, t+dt-t_init);
                 if(!valid)
-                    t=t_init+t_end;
+                    break;
             }
             linesPolyData->SetPoints(points);
 
@@ -118,7 +129,6 @@ int main(int argc, char *argv[]){
                     appendFilter->AddInputData(linesPolyData);
             }
         }
-    }
     appendFilter->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
@@ -127,4 +137,6 @@ int main(int argc, char *argv[]){
     outputWriter->SetFileName(file_name.str().c_str());
     outputWriter->SetInputData(appendFilter->GetOutput());
     outputWriter->Write();
+
+    cout << "TIME = " << omp_get_wtime() - time_start << endl;
 }

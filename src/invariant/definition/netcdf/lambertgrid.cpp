@@ -113,6 +113,15 @@ std::vector<std::array<int, 2>> get_empty_position(){
     return target;
 }
 
+std::array<std::array<double, 2>, 2> get_empty_data(){
+    std::array<std::array<double, 2>, 2> data;
+    data[0][0] = std::numeric_limits<double>::max();
+    data[0][1] = std::numeric_limits<double>::min();
+    data[1][0] = std::numeric_limits<double>::max();
+    data[1][1] = std::numeric_limits<double>::min();
+    return data;
+}
+
 double find_max_distance(const std::vector<std::vector<double>> &data){
     double d = 0.0;
     //    size_t i_save, j_save;
@@ -239,6 +248,16 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
 }
 
 LambertGrid::LambertGrid(const std::string &file_xml){
+    // Variable Init
+    int max_threads = omp_get_max_threads();
+    for(int i=0; i<max_threads; i++){
+        m_last_data_U_return.push_back(array<array<double, 2>, 2>());
+        m_last_data_V_return.push_back(array<array<double, 2>, 2>());
+        m_last_target_U.push_back(std::vector<std::array<int, 2>>());
+        m_last_target_V.push_back(std::vector<std::array<int, 2>>());
+    }
+
+    // Load files
     pt::ptree tree;
     cout << " READ file_xml = " << file_xml << endl;
     pt::read_xml(file_xml, tree);
@@ -365,28 +384,46 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
     if(abs(t-m_time[t1])>m_time_dt)
         return false;
 
-    std::vector<std::array<int, 2>> target_U = get_empty_position();
+    int thread_id = omp_get_thread_num();
+
+    // Area to search
     array<array<double, 2>, 2> data_U;
     data_U[0][0] = x-m_distance_max_U_X; data_U[0][1] = x+m_distance_max_U_X;
     data_U[1][0] = y-m_distance_max_U_Y; data_U[1][1] = y+m_distance_max_U_Y;
-    data_found &= m_dataSet_U->eval_invert(target_U, m_position_U, data_U);
-
-    std::vector<std::array<int, 2>> target_V = get_empty_position();
     array<array<double, 2>, 2> data_V;
     data_V[0][0] = x-m_distance_max_V_X; data_V[0][1] = x+m_distance_max_V_X;
     data_V[1][0] = y-m_distance_max_V_Y; data_V[1][1] = y+m_distance_max_V_Y;
-    data_found &= m_dataSet_V->eval_invert(target_V, m_position_V, data_V);
 
-    std::vector<std::pair<double, std::array<int, 2>>> map_distance_U;
-    std::vector<std::pair<double, std::array<int, 2>>> map_distance_V;
+    std::vector<std::array<int, 2>> target_U = get_empty_position();
+    std::vector<std::array<int, 2>> target_V = get_empty_position();
+
+    if(m_dataSet_U->is_subset_data(data_U, m_last_data_U_return[thread_id]))
+        target_U = m_last_target_U[thread_id];
+    else{
+        array<array<double, 2>, 2> data_U_return = get_empty_data();
+        data_found &= m_dataSet_U->eval_invert(target_U, m_position_U, data_U, data_U_return);
+        m_last_target_U[thread_id] = target_U;
+        m_last_data_U_return[thread_id] = data_U_return;
+    }
+
+    if(m_dataSet_V->is_subset_data(data_V, m_last_data_V_return[thread_id]))
+        target_V = m_last_target_V[thread_id];
+    else{
+        array<array<double, 2>, 2> data_V_return = get_empty_data();
+        data_found &= m_dataSet_V->eval_invert(target_V, m_position_V, data_V, data_V_return);
+        m_last_target_V[thread_id] = target_V;
+        m_last_data_V_return[thread_id] = data_V_return;
+    }
+
+    std::vector<std::pair<double, std::array<int, 2>>> vector_distance_U;
+    std::vector<std::pair<double, std::array<int, 2>>> vector_distance_V;
 
     if(data_found){
-
         for(int i=target_U[0][0]; i<=target_U[0][1]; i++){
             for(int j=target_U[1][0]; j<=target_U[1][1]; j++){
                 double d = sqrt(pow(m_U_X[i][j]-x, 2)+pow(m_U_Y[i][j]-y, 2));
                 if(d<m_distance_max_U)
-                    map_distance_U.push_back(make_pair(d, array<int, 2>({i, j})));
+                    vector_distance_U.push_back(make_pair(d, array<int, 2>({i, j})));
             }
         }
 
@@ -394,17 +431,24 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
             for(int j=target_V[1][0]; j<=target_V[1][1]; j++){
                 double d = sqrt(pow(m_V_X[i][j]-x, 2)+pow(m_V_Y[i][j]-y, 2));
                 if(d<m_distance_max_V)
-                    map_distance_V.push_back(make_pair(d, array<int, 2>({i, j})));
+                    vector_distance_V.push_back(make_pair(d, array<int, 2>({i, j})));
             }
         }
 
+        // Test if the point is inside none valid area
+        if(vector_distance_U.empty() || vector_distance_V.empty()){
+            u=0.0;
+            v=0.0;
+            return false;
+        }
+
         // Sort distances
-        std::sort(map_distance_U.begin(), map_distance_U.end(), sort_pair);
-        std::sort(map_distance_V.begin(), map_distance_V.end(), sort_pair);
+        std::sort(vector_distance_U.begin(), vector_distance_U.end(), sort_pair);
+        std::sort(vector_distance_V.begin(), vector_distance_V.end(), sort_pair);
 
         // Compute Current values : take 4 closest
-        double u_t1 = compute_ponderation(map_distance_U, m_U, t1, m_U_scale_factor, m_U_add_offset);
-        double v_t1 = compute_ponderation(map_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
+        double u_t1 = compute_ponderation(vector_distance_U, m_U, t1, m_U_scale_factor, m_U_add_offset);
+        double v_t1 = compute_ponderation(vector_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
 
         const size_t t2 = t1+1;
         if(t2<m_U.size() && (t-m_time[t1]>0)){
@@ -412,8 +456,8 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
             double v_t2 = v_t1;
             const double d_t1_t = abs(m_time[t1]-t);
             const double d_t2_t = abs(m_time[t2]-t);
-            u_t2 = compute_ponderation(map_distance_U, m_U, t2, m_U_scale_factor, m_U_add_offset);
-            v_t2 = compute_ponderation(map_distance_V, m_V, t2, m_V_scale_factor, m_V_add_offset);
+            u_t2 = compute_ponderation(vector_distance_U, m_U, t2, m_U_scale_factor, m_U_add_offset);
+            v_t2 = compute_ponderation(vector_distance_V, m_V, t2, m_V_scale_factor, m_V_add_offset);
 
             const double coeff1 = (1/sqrt(d_t1_t*d_t1_t+0.01));
             const double coeff2 = (1/sqrt(d_t2_t*d_t2_t+0.01));

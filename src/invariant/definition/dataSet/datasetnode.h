@@ -60,7 +60,7 @@ public:
      * @param position
      * @param data
      */
-    bool eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data) const;
+    bool eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data, std::array<std::array<_Tp, 2>, _n> &data_return) const;
 
     /**
      * @brief Set the node val
@@ -93,6 +93,14 @@ public:
      */
     size_t get_number_leaf() const;
 
+    /**
+     * @brief is_subset_data
+     * @param d1
+     * @param d2
+     * @return
+     */
+    bool is_subset_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const;
+
 private:
 
     /**
@@ -117,12 +125,12 @@ private:
     /**
      * @brief Compute the union of min/max and modify this
      */
-    void union_this(const std::array<std::array<_Tp, 2>, _n>& data);
+//    void union_this(const std::array<std::array<_Tp, 2>, _n>& data);
 
     /**
      * @brief Compute the union of min/max and modify data
      */
-    void union_data(std::array<std::array<_Tp, 2>, _n>& data) const;
+    void union_data(std::array<std::array<_Tp, 2>, _n>& d1, const std::array<std::array<_Tp, 2>, _n> d2) const;
 
     /**
      * @brief union_position
@@ -138,14 +146,6 @@ private:
      * @return
      */
     bool is_inter_empty_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const;
-
-    /**
-     * @brief is_subset_data
-     * @param d1
-     * @param d2
-     * @return
-     */
-    bool is_subset_data(const std::array<std::array<_Tp, 2>, _n> &d1, const std::array<std::array<_Tp, 2>, _n> &d2) const;
 
     /**
      * @brief Bisector
