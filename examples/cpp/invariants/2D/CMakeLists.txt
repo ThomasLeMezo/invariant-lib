@@ -24,3 +24,5 @@ add_subdirectory(15_dipole_invariant)
 add_subdirectory(16_linear_system)
 add_subdirectory(17_non_linear_system)
 
+add_subdirectory(18_piston_regulation)
+
