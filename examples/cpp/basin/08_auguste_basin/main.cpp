@@ -1,6 +1,6 @@
 #include "smartSubPaving.h"
 #include "domain.h"
-#include "dynamics_function.h"
+#include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
     ibex::Function f(x, -Return(consigne_err+ 50.0*(k*sign(atan2((x[1]+y_err), (x[0]+x_err)))*((-1-2*(x[0]+x_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err)))*(x[1]+y_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err)))                                            +tanh((k*(1+(x[0]+x_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err)))-sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err))))*(x[0]+x_err)),
                                 consigne_err + 50.0*(k*sign(atan2((x[1]+y_err), (x[0]+x_err)))*((x[0]+x_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err))*(1+(x[0]+x_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err)))-(x[1]+y_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err))*(x[1]+y_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err)))  +tanh((k*(1+(x[0]+x_err)/sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err)))-sqrt((x[0]+x_err)*(x[0]+x_err)+(x[1]+y_err)*(x[1]+y_err))))*(x[1]+y_err))));
-    Dynamics_Function dyn(&f,
+    DynamicsFunction dyn(&f,
                           FWD);
 
     // ******* Maze ********* //

@@ -333,17 +333,18 @@ void VtkMaze3D::show_maze(invariant::MazeIBEX *maze, std::string comment){
         step ++;
 
         if(r->is_full()){
-            //            IntervalVector position(p->get_position());
-            //            cubedata->SetBounds(position[0].lb(), position[0].ub(),
-            //                    position[1].lb(), position[1].ub(),
-            //                    position[2].lb(), position[2].ub());
-            //            cubedata->Update();
-            //#pragma omp critical(add_polygon)
-            //            {
-            //                polyData_polygon->AddInputData(cubedata->GetOutput());
-            //                if(step%1000==0)
-            //                    cout << "step = " << step << " /" << dim_paves_list << endl;
-            //            }
+            IntervalVector position(p->get_position());
+            vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
+            cubedata->SetBounds(position[0].lb(), position[0].ub(),
+                    position[1].lb(), position[1].ub(),
+                    position[2].lb(), position[2].ub());
+            cubedata->Update();
+#pragma omp critical(add_polygon)
+            {
+                polyData_polygon->AddInputData(cubedata->GetOutput());
+                if(step%1000==0)
+                    cout << "step = " << step << " /" << dim_paves_list << endl;
+            }
         }
         else if(!r->is_empty()){
             int nb_faces = 0;
@@ -385,39 +386,44 @@ void VtkMaze3D::show_maze(invariant::MazeIBEX *maze, std::string comment){
             }
 
             if(nb_faces>0){
-                vtkIdType pointIds[nb_points];
-                for(int i=0; i<nb_points; i++){
-                    pointIds[i] = i;
-                }
-                vtkSmartPointer<vtkCellArray> faces = vtkSmartPointer<vtkCellArray>::New();
+                //                vtkIdType pointIds[nb_points];
+                //                for(int i=0; i<nb_points; i++){
+                //                    pointIds[i] = i;
+                //                }
+                //                vtkSmartPointer<vtkCellArray> faces = vtkSmartPointer<vtkCellArray>::New();
 
-                for(int i=0; i<nb_faces; i++){
-                    vtkIdType face[4];
-                    for(int j=0; j<4; j++)
-                        face[j] = 4*i+j;
-                    faces->InsertNextCell(4, face);
-                }
+                //                for(int i=0; i<nb_faces; i++){
+                //                    vtkIdType face[4];
+                //                    for(int j=0; j<4; j++)
+                //                        face[j] = 4*i+j;
+                //                    faces->InsertNextCell(4, face);
+                //                }
 
-                vtkSmartPointer<vtkUnstructuredGrid> ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                ugrid->SetPoints(points);
-                ugrid->InsertNextCell(VTK_POLYHEDRON, nb_points, pointIds, nb_faces, faces->GetPointer());
+                //                vtkSmartPointer<vtkUnstructuredGrid> ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                //                ugrid->SetPoints(points);
+                //                ugrid->InsertNextCell(VTK_POLYHEDRON, nb_points, pointIds, nb_faces, faces->GetPointer());
 
-                // ********** Surface **************
-                // Create the convex hull of the pointcloud (delaunay + outer surface)
-                vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-                delaunay->SetInputData(ugrid);
-                delaunay->SetTolerance(0.0);
-                delaunay->Update();
+                if(points->GetNumberOfPoints()>3){
+                    vtkSmartPointer< vtkPolyData> polydata_points = vtkSmartPointer<vtkPolyData>::New();
+                    polydata_points->SetPoints(points);
 
-                vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-                surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
-                surfaceFilter->Update();
+                    // ********** Surface **************
+                    // Create the convex hull of the pointcloud (delaunay + outer surface)
+                    vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+                    delaunay->SetInputData(polydata_points);
+                    delaunay->SetTolerance(0.0);
+                    delaunay->Update();
+
+                    vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+                    surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+                    surfaceFilter->Update();
 
 #pragma omp critical(add_polygon)
-                {
-                    polyData_polygon->AddInputData(surfaceFilter->GetOutput());
-                    if(step%1000==0)
-                        cout << "step = " << step << " /" << dim_paves_list << endl;
+                    {
+                        polyData_polygon->AddInputData(surfaceFilter->GetOutput());
+                        if(step%1000==0)
+                            cout << "step = " << step << " /" << dim_paves_list << endl;
+                    }
                 }
             }
         }
