@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 
     double dt = 1.0;
 
-    t_init = 3708553500;
+    t_init = 3708553500; // -2208988800
     x_init = 97339+250*3;
     y_init = 6848741;
 

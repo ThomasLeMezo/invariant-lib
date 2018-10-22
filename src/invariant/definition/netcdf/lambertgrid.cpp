@@ -293,7 +293,7 @@ LambertGrid::LambertGrid(const std::string &file_xml){
                 /// ******* Time **********
                 double t;
                 time_var.getVar(&t);
-                m_time.push_back(t);
+                m_time.push_back(t-2208988800); // Convert to POSIX Time
 
                 /// ******* DATA U,V ******
                 // Size U,V

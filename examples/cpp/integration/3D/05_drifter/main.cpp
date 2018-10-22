@@ -35,7 +35,8 @@ const double A = g*rho/m;
 const double Cf = M_PI*pow(diam_collerette/2., 2);
 const double B = 0.5*rho*Cf/m;
 const double tick_to_volume = (screw_thread/tick_per_turn)*pow(piston_diameter/2.0, 2)*M_PI;
-const double alpha = compressibility_tick*tick_to_volume;
+//const double alpha = compressibility_tick*tick_to_volume;
+const double alpha = 0.0;
 
 int main(int argc, char *argv[]){
     // Parameters
@@ -58,28 +59,28 @@ int main(int argc, char *argv[]){
     Function f_e(x2, (set_point - x2));
     Function f_y(x1, x2, (x1-beta*atan(f_e(x2))));
     Function f_dx1(x1, x2, x3, (-A*(x3-alpha*x2)-B*abs(x1)*x1));
-    Function f_D(x2, (1+pow(f_e(x2),2)));
+    Function f_D(x2, (1+(f_e(x2)*f_e(x2))));
     Function f_dy(x1, x2,x3, (f_dx1(x1,x2,x3) + beta*x1/f_D(f_e(x2))));
 
-    Function f_u(x1, x2, x3, (alpha*x1 + (l1*f_dy(x1, x2, x3)+l2*f_y(x1, x2)
-                                          -beta*(2*f_e(x2)*pow(x1,2)-f_dx1(x1, x2, x3)*f_D(x2))/pow(f_D(x2),2)
-                                          -2*B*abs(x1)*f_dx1(x1, x2, x3))/A));
+    Function f_u(x1, x2, x3, min(max((alpha*x1 + (l1*f_dy(x1, x2, x3)+l2*f_y(x1, x2)
+                                          -beta*(2*f_e(x2)*(x1*x1)-f_dx1(x1, x2, x3)*f_D(x2))/(f_D(x2)*f_D(x2))
+                                          -2*B*abs(x1)*f_dx1(x1, x2, x3))/A), -10*tick_to_volume), 10*tick_to_volume));
 
     Function f1(x1, x2, x3, (-A*(x3-alpha*x2)-B*sign(x1)*x1*x1));
 
-    Function f(x1, x2, x3, Return(f1(x1, x2, x3),
+    Function f(x1, x2, x3, -Return(f1(x1, x2, x3),
                                   x1,
                                   f_u(x1, x2, x3)));
 
     // Test Function
-//    Function f(x1, x2, x3, Return(ibex::Interval(-1, 1),
-//                                  ibex::Interval(-1, 1),
-//                                  ibex::Interval(-1, 1)));
+//    Function f(x1, x2, x3, -Return(-x1,
+//                                  -x2,
+//                                  -x3));
 
-    IntervalVector space(3);
-    space[0] = ibex::Interval(-1.0,1.0); // Speed
-    space[1] = ibex::Interval(-5.0,5.0); // Depth
-    space[2] = ibex::Interval(-1000.*tick_to_volume, 400.*tick_to_volume); // Volume
+    ibex::IntervalVector space(3);
+    space[0] = ibex::Interval(-0.1,0.1); // Speed
+    space[1] = ibex::Interval(-0.1,0.1); // Depth
+    space[2] = ibex::Interval(-400.*tick_to_volume, 400.*tick_to_volume); // Volume
 
     cout << f.eval_vector(space) << endl;
 
@@ -117,15 +118,38 @@ int main(int argc, char *argv[]){
     // ******* Mazes ********* //
     invariant::MazePPL maze_outer(&dom_outer, &dyn_outer);
 //    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    maze_outer.set_widening_limit(1);
+    maze_outer.set_contraction_limit(5);
+    maze_outer.set_enable_contraction_limit(true);
+//    maze_outer.set_enable_contract_vector_field(true);
 
-
+    vector<double> bisection_ratio = {1./space[0].diam(), 4./space[1].diam(), 1./space[2].diam()};
+    paving.set_ratio_bisection(bisection_ratio);
 
     // ******* Algorithm ********* //
+
+    VtkMazePPL vtkMazePPL("drifter_PPL_3D");
+
     double time_start = omp_get_wtime();
+    for(int i=0; i<14; i++)
+        paving.bisect();
     for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
+//        maze_outer.contract();
+
+//        maze_outer.get_domain()->set_init(FULL_WALL);
+//        maze_outer.set_enable_contract_domain(true);
         maze_outer.contract();
+
+//        maze_outer.get_domain()->set_init(FULL_DOOR);
+//        maze_outer.reset_nb_operations();
+//        maze_outer.set_enable_contract_domain(false);
+//        maze_outer.contract(1000);
+
+        vtkMazePPL.show_subpaving(&maze_outer, "paving");
+        vtkMazePPL.show_maze(&maze_outer, "outer");
+
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
@@ -135,9 +159,5 @@ int main(int argc, char *argv[]){
 //    vtkMaze3D.show_graph(&paving);
 //    vtkMaze3D.show_maze(&maze_outer, "outer");
 //    vtkMaze3D.show_maze(&maze_inner, "inner");
-
-    VtkMazePPL vtkMazePPL("drifter_PPL_3D");
-    vtkMazePPL.show_subpaving(&maze_outer, "paving");
-    vtkMazePPL.show_maze(&maze_outer, "outer");
 
 }

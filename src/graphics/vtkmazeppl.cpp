@@ -8,6 +8,7 @@
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkCubeSource.h>
+#include <vtkHull.h>
 
 #include <ostream>
 #include <iostream>
@@ -171,12 +172,18 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
 
                         // ********** Surface **************
                         // Create the convex hull of the pointcloud (delaunay + outer surface)
-                        vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
-                        delaunay->SetInputData(polydata_points);
-                        delaunay->Update();
+                        //                        vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
+                        //                        delaunay->SetInputData(polydata_points);
+                        //                        delaunay->Update();
+
+                        vtkSmartPointer<vtkHull> hullFilter = vtkSmartPointer<vtkHull>::New();
+                        hullFilter->SetInputData(polydata_points);
+                        hullFilter->AddCubeFacePlanes();
+                        hullFilter->Update();
 
                         vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-                        surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+//                        surfaceFilter->SetInputConnection(delaunay->GetOutputPort());
+                        surfaceFilter->SetInputConnection(hullFilter->GetOutputPort());
                         surfaceFilter->Update();
 
 #pragma omp critical(add_polygon)
