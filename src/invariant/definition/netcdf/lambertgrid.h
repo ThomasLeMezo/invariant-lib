@@ -62,6 +62,22 @@ public:
     const std::vector<std::vector<double>> &get_Y() const;
     const std::vector<std::vector<short int>> &get_H0() const;
 
+    /**
+     * @brief rk2
+     * @param t_init
+     * @param t_end
+     * @param x_init
+     * @param y_init
+     * @param dt
+     * @param x_result
+     * @param y_result
+     * @param t_result
+     */
+    void rk2(const double &t_init, const double &t_end,
+                          const double &x_init, const double &y_init,
+                          const double &dt,
+                          vector<double> &x_result, vector<double> &y_result, vector<double> &t_result) const;
+
 private:
     /**
      * @brief compute_grid_proj

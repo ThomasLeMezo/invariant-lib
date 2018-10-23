@@ -3,6 +3,8 @@
 #include <cmath>
 #include <vibes/vibes.h>
 
+#include "vtkMaze3D.h"
+
 #include <vtkSmartPointer.h>
 #include <vtkAppendPolyData.h>
 
@@ -27,54 +29,27 @@
 using namespace std;
 using namespace invariant;
 
-void draw_Ouessant(LambertGrid &g){
-    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-
-    vtkSmartPointer<vtkPolyData> gridPolyData = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkPoints> points_grid = vtkSmartPointer<vtkPoints>::New();
-    vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
-    for(size_t i=0; i<g.get_X().size(); i++){
-        for(size_t j=0; j<g.get_X()[0].size(); j++){
-            if(g.get_H0()[i][j]==g.get_H0_Fill_Value()){
-                vtkIdType id= points_grid->InsertNextPoint(g.get_X()[i][j], g.get_Y()[i][j], 0.0);
-                cellArray->InsertNextCell(1, &id);
-            }
-        }
-    }
-    gridPolyData->SetPoints(points_grid);
-    gridPolyData->SetVerts(cellArray);
-
-    stringstream file_name_ouessant;
-    file_name_ouessant << "ouessant.vtp";
-    outputWriter->SetFileName(file_name_ouessant.str().c_str());
-    outputWriter->SetInputData(gridPolyData);
-    outputWriter->Write();
-}
-
-
 int main(int argc, char *argv[]){
-    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
+    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
 
-    // Draw Ouessant
-//    draw_Ouessant();
+//    draw_map(g);
 
     double time_start = omp_get_wtime();
 
     // Compute trajectories
     double x_init, y_init, t_init;
-
     double dt = 1.0;
+    t_init = 1540386000; //
 
-    t_init = 3708553500; //
-    x_init = 97339+250*3;
-    y_init = 6848741;
+    x_init = 145144;
+    y_init = 6831185;
 
-    double t_end = 3600*20.0;
+    double t_end = 3600*6.0;
 //    double t_end = 50;
 
     vector<array<double, 3>> init_conditions;
-    for(int x=-10; x<10; x++){
-        for(int y=-10; y<10; y++){
+    for(int x=-5; x<5; x++){
+        for(int y=-5; y<5; y++){
             init_conditions.push_back(array<double, 3>{x_init+50.0*x, y_init+50*y, t_init});
         }
     }
@@ -133,7 +108,7 @@ int main(int argc, char *argv[]){
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
     stringstream file_name;
-    file_name << "monte_carlos.vtp";
+    file_name << "trajectories.vtp";
     outputWriter->SetFileName(file_name.str().c_str());
     outputWriter->SetInputData(appendFilter->GetOutput());
     outputWriter->Write();

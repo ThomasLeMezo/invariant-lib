@@ -3,6 +3,7 @@
 
 #include "smartSubPaving.h"
 #include "previmer3d.h"
+#include "lambertgrid.h"
 
 //#include <vtkAppendPolyData.h>
 //#include <vtkCubeSource.h>
@@ -66,5 +67,11 @@ private:
  * @param y0
 **/
 void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0);
+
+/**
+ * @brief draw_map
+ * @param g
+ */
+void draw_map(invariant::LambertGrid &g);
 
 #endif // VTK_GRAPH_H

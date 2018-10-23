@@ -522,3 +522,27 @@ void monteCarlos(invariant::PreviMer3D &pm3d, double t0, double x0, double y0){
     outputWriter->SetInputData(linesPolyData);
     outputWriter->Write();
 }
+
+void draw_map(LambertGrid &g){
+    vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+
+    vtkSmartPointer<vtkPolyData> gridPolyData = vtkSmartPointer<vtkPolyData>::New();
+    vtkSmartPointer<vtkPoints> points_grid = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
+    for(size_t i=0; i<g.get_X().size(); i++){
+        for(size_t j=0; j<g.get_X()[0].size(); j++){
+            if(g.get_H0()[i][j]==g.get_H0_Fill_Value()){
+                vtkIdType id= points_grid->InsertNextPoint(g.get_X()[i][j], g.get_Y()[i][j], 0.0);
+                cellArray->InsertNextCell(1, &id);
+            }
+        }
+    }
+    gridPolyData->SetPoints(points_grid);
+    gridPolyData->SetVerts(cellArray);
+
+    stringstream file_name_ouessant;
+    file_name_ouessant << "map.vtp";
+    outputWriter->SetFileName(file_name_ouessant.str().c_str());
+    outputWriter->SetInputData(gridPolyData);
+    outputWriter->Write();
+}
