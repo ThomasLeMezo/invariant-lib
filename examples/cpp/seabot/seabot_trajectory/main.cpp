@@ -41,16 +41,20 @@ int main(int argc, char *argv[]){
     double dt = 1.0;
     t_init = 1540386000; //
 
-    x_init = 145144;
-    y_init = 6831185;
+//    x_init = 145144;
+//    y_init = 6831185;
 
-    double t_end = 3600*6.0;
-//    double t_end = 50;
+    x_init = 146650;
+    y_init = 6831060;
+
+    double t_end = 3600*12.0;
 
     vector<array<double, 3>> init_conditions;
-    for(int x=-5; x<5; x++){
-        for(int y=-5; y<5; y++){
-            init_conditions.push_back(array<double, 3>{x_init+50.0*x, y_init+50*y, t_init});
+    for(double x=-3; x<3; x++){
+        for(double y=-3; y<3; y++){
+            for(double t=-3; t<3; t++){
+                init_conditions.push_back(array<double, 3>{x_init+50.0*x, y_init+50*y, t_init+t*5*60.});
+            }
         }
     }
 
