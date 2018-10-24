@@ -32,7 +32,7 @@ using namespace invariant;
 int main(int argc, char *argv[]){
     LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
 
-//    draw_map(g);
+    draw_map(g);
 
     double time_start = omp_get_wtime();
 
@@ -47,13 +47,13 @@ int main(int argc, char *argv[]){
     x_init = 146650;
     y_init = 6831060;
 
-    double t_end = 3600*12.0;
+    double t_end = 3600*2.0;
 
     vector<array<double, 3>> init_conditions;
     for(double x=-3; x<3; x++){
         for(double y=-3; y<3; y++){
             for(double t=-3; t<3; t++){
-                init_conditions.push_back(array<double, 3>{x_init+50.0*x, y_init+50*y, t_init+t*5*60.});
+                init_conditions.push_back(array<double, 3>{x_init+25.0*x, y_init+25*y, t_init+t*5*60.});
             }
         }
     }

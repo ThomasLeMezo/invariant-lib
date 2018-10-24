@@ -73,10 +73,22 @@ public:
      * @param y_result
      * @param t_result
      */
-    void rk2(const double &t_init, const double &t_end,
+    bool rk2(const double &t_init, const double &t_end,
                           const double &x_init, const double &y_init,
                           const double &dt,
-                          vector<double> &x_result, vector<double> &y_result, vector<double> &t_result) const;
+                          array<vector<double>, 3> &result) const;
+
+    /**
+     * @brief get_t_min
+     * @return
+     */
+    const double& get_time_min() const;
+
+    /**
+     * @brief get_t_max
+     * @return
+     */
+    const double& get_time_max() const;
 
 private:
     /**
@@ -159,6 +171,14 @@ inline const std::vector<std::vector<double>> &LambertGrid::get_Y() const{
 
 inline const std::vector<std::vector<short> >& LambertGrid::get_H0() const{
     return m_H0;
+}
+
+inline const double& LambertGrid::get_time_max() const{
+  return m_time[m_time.size()-1];
+}
+
+inline const double& LambertGrid::get_time_min() const{
+  return m_time[0];
 }
 
 }
