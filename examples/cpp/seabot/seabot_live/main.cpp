@@ -32,10 +32,10 @@ int main(int argc, char *argv[]){
     cout << "Tmin = " << std::fixed << t_min << " Tmax = " << t_max << endl;
 
     vector<array<double, 3>> init_conditions;
-    for(double x=-1; x<=1; x++){
-        for(double y=-1; y<=1; y++){
-            for(double t=-1; t<=1; t++){
-                init_conditions.push_back(array<double, 3>{x_init+25.0*x, y_init+25*y, t_init+t*5*60.});
+    for(double x=0; x<=0; x++){
+        for(double y=0; y<=0; y++){
+            for(double t=0; t<=0; t++){
+                init_conditions.push_back(array<double, 3>{x_init+5.0*x, y_init+5*y, t_init+t*5*60.});
             }
         }
     }
@@ -48,24 +48,18 @@ int main(int argc, char *argv[]){
             double x_tmp = init_conditions[k][0];
             double y_tmp = init_conditions[k][1];
             double t_tmp = init_conditions[k][2];
-//            bool valid = true;
-//#pragma omp critical
-//            {
-//            cout << "> Compute Traj " << k << endl;
-//            }
 
             array<vector<double>,3> sim_result;
             g.rk2(t_tmp,t_max, x_tmp, y_tmp, dt,sim_result);
 
 #pragma omp critical
             {
-//              cout << "--> simu.size = " << sim_result[0].size() << endl;
                 result.push_back(sim_result);
             }
         }
 
     ofstream myfile;
-    myfile.open ("/home/lemezoth/seabot_forcast.txt");
+    myfile.open ("/home/lemezoth/iridium/seabot_forcast.txt");
     for(size_t i=0; i<result[0][0].size(); i++){
       myfile << std::fixed << result[0][2][i] << " " << result[0][0][i] << " " << result[0][1][i] << endl;
     }

@@ -32,28 +32,25 @@ using namespace invariant;
 int main(int argc, char *argv[]){
     LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
 
-    draw_map(g);
+//    draw_map(g);
 
     double time_start = omp_get_wtime();
 
     // Compute trajectories
     double x_init, y_init, t_init;
     double dt = 1.0;
-    t_init = 1540386000; //
+    t_init = 1541394000; //
+    x_init = 149357;
+    y_init = 6828729;
 
-//    x_init = 145144;
-//    y_init = 6831185;
-
-    x_init = 146650;
-    y_init = 6831060;
-
-    double t_end = 3600*2.0;
+    double t_end = 3600*6.0;
+    bool plot_unfinished_trajectories = true;
 
     vector<array<double, 3>> init_conditions;
-    for(double x=-3; x<3; x++){
-        for(double y=-3; y<3; y++){
-            for(double t=-3; t<3; t++){
-                init_conditions.push_back(array<double, 3>{x_init+25.0*x, y_init+25*y, t_init+t*5*60.});
+    for(double x=-1; x<=1; x++){
+        for(double y=-1; y<=1; y++){
+            for(double t=-1; t<=1; t++){
+                init_conditions.push_back(array<double, 3>{x_init+5.0*x, y_init+5*y, t_init+t*3*60.});
             }
         }
     }
@@ -104,7 +101,7 @@ int main(int argc, char *argv[]){
 
 #pragma omp critical
             {
-                if(valid)
+                if(valid || plot_unfinished_trajectories)
                     appendFilter->AddInputData(linesPolyData);
             }
         }
