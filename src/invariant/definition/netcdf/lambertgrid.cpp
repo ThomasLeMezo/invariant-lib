@@ -485,14 +485,15 @@ LambertGrid::~LambertGrid(){
         delete(m_dataSet_V);
 }
 
-bool LambertGrid::rk2(const double &t_init, const double &t_end,
+bool LambertGrid::rk2(const double &t_init, const double &duration,
                       const double &x_init, const double &y_init,
                       const double &dt,
-                      array<vector<double>,3> &result) const{
+                      array<vector<double>,3> &result,
+                      bool break_on_error) const{
     double x_tmp = x_init;
     double y_tmp = y_init;
     bool valid = true;
-    for(double t=t_init; t<t_end; t+=dt){
+    for(double t=t_init; t<(t_init+duration); t+=dt){
         // RK2 scheme
         double u, v;
         this->eval(x_tmp, y_tmp, t, u, v);
@@ -505,10 +506,11 @@ bool LambertGrid::rk2(const double &t_init, const double &t_end,
         x_tmp+=u*dt;
         y_tmp+=v*dt;
 
-        result[0].push_back(x_tmp);
-        result[1].push_back(y_tmp);
-        result[2].push_back(t);
-        if(!valid)
+        result[0].push_back(t);
+        result[1].push_back(x_tmp);
+        result[2].push_back(y_tmp);
+
+        if(break_on_error && !valid)
             break;
     }
     return valid;

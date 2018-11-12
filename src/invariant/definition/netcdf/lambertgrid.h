@@ -73,10 +73,11 @@ public:
      * @param y_result
      * @param t_result
      */
-    bool rk2(const double &t_init, const double &t_end,
+    bool rk2(const double &t_init, const double &duration,
                           const double &x_init, const double &y_init,
                           const double &dt,
-                          array<vector<double>, 3> &result) const;
+                          array<vector<double>, 3> &result,
+                          bool break_on_error = true) const;
 
     /**
      * @brief get_t_min
