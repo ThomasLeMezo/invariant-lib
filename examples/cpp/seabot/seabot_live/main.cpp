@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 
     double t_max = g.get_time_max();
     double t_min = g.get_time_min();
-    double duration = max(t_max - t_min, 4.*3600); // To Change ?
+    double duration = min(t_max - t_min, 4.*3600); // To Change ?
     cout << "Tmin = " << std::fixed << t_min << " Tmax = " << t_max << " duration = " << duration << endl;
 
     vector<array<double, 4>> init_conditions;
