@@ -105,7 +105,7 @@ void VtkMazePPL::show_subpaving(invariant::MazePPL *maze, string comment){
     outputWriter->Write();
 }
 
-void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
+void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment, bool complementary)
 {
     cout << " ==> vtk maze" << endl;
     vtkSmartPointer<vtkAppendPolyData> polyData_polygon = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -138,6 +138,7 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
                     DoorPPL *d = f->get_doors()[maze];
                     ph_union |= d->get_hull();
                 }
+
                 if(r->is_initial_door_input())
                     ph_union |= r->get_initial_door_input();
                 if(r->is_initial_door_output())
@@ -145,6 +146,12 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment)
 
                 //            ph_union &= p->get_position_typed();
                 ph_union.minimized_constraints();
+
+                if(complementary){
+                  ppl::C_Polyhedron position(p->get_position_typed());
+                  position.difference_assign(ph_union);
+                  ph_union = position;
+                }
 
                 if(ph_union.space_dimension()==3){
                     int nb_generator = 0;

@@ -406,21 +406,40 @@ void Domain<_Tp>::contract_union_maze(Maze<_Tp> *maze){
         }
     }
     else{
-        std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
-        // Contract the initial condition (input & output)
-        for(Maze<_Tp> *maze_union:m_maze_list_inter_initial_condition){
+//        std::vector<Room<_Tp> *> room_list_initial = maze->get_initial_room_list();
+//        // Contract the initial condition (input & output)
+//        // BUG ???????????? initialy: m_maze_list_inter_initial_condition
+//        // (m_maze_list_union) or m_maze_list_inter_initial_condition ?
+//        for(Maze<_Tp> *maze_union:m_maze_list_inter_initial_condition){
+//            if(maze_union->get_contract_once()){
+//                for(size_t i=0; i<room_list_initial.size(); i++){
+//                    Room<_Tp> *r = room_list_initial[i];
+//                    Pave<_Tp> *p = r->get_pave();
+//                    Room<_Tp> *r_union = p->get_rooms()[maze_union];
+//                    if(r->is_initial_door_input())
+//                        r->set_initial_door_input(r->get_initial_door_input() | r_union->get_hull_typed());
+//                    if(r->is_initial_door_output())
+//                        r->set_initial_door_output(r->get_initial_door_output() | r_union->get_hull_typed());
+//                }
+//            }
+//        }
+
+        // Other version ?
+      std::vector<Room<_Tp> *> room_list;
+      m_subpaving->get_tree()->get_all_child_rooms_not_empty_private(room_list, maze);
+        for(Maze<_Tp> *maze_union:m_maze_list_union){
             if(maze_union->get_contract_once()){
-                for(size_t i=0; i<room_list_initial.size(); i++){
-                    Room<_Tp> *r = room_list_initial[i];
+                for(size_t i=0; i<room_list.size(); i++){
+                    Room<_Tp> *r = room_list[i];
                     Pave<_Tp> *p = r->get_pave();
                     Room<_Tp> *r_union = p->get_rooms()[maze_union];
-                    if(r->is_initial_door_input())
-                        r->set_initial_door_input(r->get_initial_door_input() | r_union->get_hull_typed());
-                    if(r->is_initial_door_output())
-                        r->set_initial_door_output(r->get_initial_door_output() | r_union->get_hull_typed());
+                    *r |= *r_union;
+
                 }
             }
         }
+
+
     }
 }
 

@@ -17,7 +17,7 @@ public:
      * @param maze
      * @param comment
      */
-    void show_maze(invariant::MazePPL *maze, std::string comment="");
+    void show_maze(invariant::MazePPL *maze, std::string comment="", bool complementary=false);
 
     /**
      * @brief show_subpaving

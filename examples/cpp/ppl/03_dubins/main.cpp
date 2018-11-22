@@ -70,34 +70,39 @@ int main(int argc, char *argv[])
 
     // ******* Mazes ********* //
     MazePPL maze_outer(&dom_outer, &dyn);
-    maze_outer.set_widening_limit(50);
+    maze_outer.set_widening_limit(20);
 
-//    MazePPL maze_inner(&dom_inner, &dyn);
-//    maze_inner.set_enable_contraction_limit(true);
-//    maze_inner.set_contraction_limit(25);
+    MazePPL maze_inner(&dom_inner, &dyn);
+    maze_inner.set_enable_contraction_limit(true);
+    maze_inner.set_contraction_limit(3);
 
     VtkMazePPL vtkMazePPL_outer("DubinsPPL_outer");
-//    VtkMazePPL vtkMazePPL_inner("DubinsPPL_inner");
+    VtkMazePPL vtkMazePPL_inner("DubinsPPL_inner");
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<20; i++){
+    for(int i=0; i<19; i++){
         cout << i << endl;
         paving.bisect();
 
         maze_outer.get_domain()->set_init(FULL_WALL);
         maze_outer.set_enable_contract_domain(true);
+        cout << " ==> Outer widening" << endl;
         maze_outer.contract();
 
         maze_outer.get_domain()->set_init(FULL_DOOR);
         maze_outer.reset_nb_operations();
         maze_outer.set_enable_contract_domain(false);
+        cout << " ==> Outer back" << endl;
         maze_outer.contract(30000);
         vtkMazePPL_outer.show_maze(&maze_outer);
 
-//        maze_inner.contract(paving.size_active()*10);
-//        vtkMazePPL_inner.show_maze(&maze_inner);
+        cout << " ==> Inner" << endl;
+        maze_inner.contract(paving.size_active()*3);
+        vtkMazePPL_inner.show_maze(&maze_inner, "", true);
+
+        vtkMazePPL_outer.show_subpaving(&maze_outer);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
     cout << paving << endl;
