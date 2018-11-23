@@ -28,8 +28,8 @@ int main(int argc, char *argv[]){
     invariant::SmartSubPaving<> subpaving(space);
 
     double x1_c, x2_c, r;
-    x1_c = 0.5;
-    x2_c = 0.5;
+    x1_c = 0.0;
+    x2_c = 0.0;
     r = 1.5;
 
     // Outer
@@ -62,10 +62,10 @@ int main(int argc, char *argv[]){
     /// ************************
     ///         Dynamics
     /// ************************
-    ibex::Function f(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    ibex::Function f2(x1, x2, Return(x2,
-                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
+    ibex::Function f(x, Return(x2,
+                                    (8.0/25.0*pow(x1,5)-4.0/3.0*pow(x1,3)+4.0/5.0*x1)));
+    ibex::Function f2(x, Return(x2,
+                                    (8.0/25.0*pow(x1,5)-4.0/3.0*pow(x1,3)+4.0/5.0*x1)));
     DynamicsFunction dyn(&f, FWD); // Duplicate because of simultaneous access of f (semaphore on DynamicsFunction)
     DynamicsFunction dyn_basin(&f2, FWD);
 
@@ -117,7 +117,4 @@ int main(int argc, char *argv[]){
 //    position_info[1] = ibex::Interval(-0.64, -0.59);
 //    v_maze.show_room_info(&maze_outer, position_info);
     vibes::endDrawing();
-
-
-
 }

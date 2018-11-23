@@ -455,7 +455,7 @@ void Domain<_Tp>::contract_initialization_inter_maze(Maze<_Tp> *maze){
     return;
 
   std::vector<Room<_Tp> *> room_list;
-  m_subpaving->get_tree()->get_all_child_rooms_not_full_private(room_list, maze);
+  m_subpaving->get_tree()->get_all_child_rooms(room_list, maze);
   for(Maze<_Tp> *maze_union:m_maze_list_initialization_inter){
     if(maze_union->get_contract_once()){
       for(size_t i=0; i<room_list.size(); i++){
