@@ -205,6 +205,30 @@ public:
     void add_maze_union(std::vector<Maze<_Tp>*> maze_list);
 
     /**
+     * @brief add maze for domain union
+     * @param maze
+     */
+    void add_maze_initialization_union(Maze<_Tp> *maze);
+
+    /**
+     * @brief add maze list for domain union
+     * @param maze_list
+     */
+    void add_maze_initialization_union(std::vector<Maze<_Tp>*> maze_list);
+
+    /**
+     * @brief add maze for domain union
+     * @param maze
+     */
+    void add_maze_initialization_inter(Maze<_Tp> *maze);
+
+    /**
+     * @brief add maze list for domain union
+     * @param maze_list
+     */
+    void add_maze_initialization_inter(std::vector<Maze<_Tp>*> maze_list);
+
+    /**
      * @brief Get the initialization condition of Rooms (Full Door or Full Wall)
      * @return
      */
@@ -252,6 +276,18 @@ private:
     void contract_union_maze(Maze<_Tp> *maze);
 
     /**
+     * @brief Contract the domain by union with maze list
+     * @param maze
+     */
+    void contract_initialization_union_maze(Maze<_Tp> *maze);
+
+    /**
+     * @brief Contract the domain by union with maze list
+     * @param maze
+     */
+    void contract_initialization_inter_maze(Maze<_Tp> *maze);
+
+    /**
      * @brief Contract doors according to a virtual door inside the room
      * @param box
      * @param output
@@ -283,6 +319,9 @@ private:
     std::vector<Maze<_Tp> *> m_maze_list_inter_father_hull;
     std::vector<Maze<_Tp> *> m_maze_list_inter_initial_condition;
     std::vector<Maze<_Tp> *> m_maze_list_union;
+
+    std::vector<Maze<_Tp> *> m_maze_list_initialization_union;
+    std::vector<Maze<_Tp> *> m_maze_list_initialization_inter;
 
     omp_lock_t m_list_room_access;
     omp_lock_t m_lock_sep;
@@ -376,6 +415,26 @@ inline void Domain<_Tp>::add_maze_inter_father_hull(Maze<_Tp> *maze){
 template<typename _Tp>
 inline void Domain<_Tp>::add_maze_union(std::vector<Maze<_Tp> *> maze_list){
     m_maze_list_union.insert(m_maze_list_union.end(), maze_list.begin(), maze_list.end());
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::add_maze_initialization_union(Maze<_Tp> *maze){
+    m_maze_list_initialization_union.push_back(maze);
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::add_maze_initialization_union(std::vector<Maze<_Tp> *> maze_list){
+    m_maze_list_initialization_union.insert(m_maze_list_initialization_union.end(), maze_list.begin(), maze_list.end());
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::add_maze_initialization_inter(Maze<_Tp> *maze){
+    m_maze_list_initialization_inter.push_back(maze);
+}
+
+template<typename _Tp>
+inline void Domain<_Tp>::add_maze_initialization_inter(std::vector<Maze<_Tp> *> maze_list){
+    m_maze_list_initialization_inter.insert(m_maze_list_initialization_inter.end(), maze_list.begin(), maze_list.end());
 }
 
 template <typename _Tp>

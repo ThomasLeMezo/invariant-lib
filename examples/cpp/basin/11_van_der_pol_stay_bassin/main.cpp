@@ -81,12 +81,12 @@ int main(int argc, char *argv[]){
     invariant::BooleanTreeInterIBEX bisect_graph(&outer_graph, &inner_graph);
     subpaving.set_bisection_tree(&bisect_graph);
 
-//    dom_inner_basin.add_maze_inter_initials_condition(&maze_inner);
-    dom_outer_basin.add_maze_union(&maze_outer);
+    dom_inner_basin.add_maze_initialization_inter(&maze_inner);
+    dom_outer_basin.add_maze_initialization_union(&maze_outer);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    omp_set_num_threads(1);
+//    omp_set_num_threads(1);
 
     for(int i=0; i<14; i++){
         cout << i << endl;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]){
         maze_inner.contract();
 
         maze_outer_basin.contract();
-//        maze_inner_basin.contract();
+        maze_inner_basin.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
