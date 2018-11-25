@@ -25,16 +25,16 @@ int main(int argc, char *argv[])
     ibex::Variable x(2);
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-3,3);
-    space[1] = ibex::Interval(-3,3);
+    space[0] = ibex::Interval(-2,2);
+    space[1] = ibex::Interval(-2,2);
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> paving(space);
 
     double x1_c, x2_c, r;
-    x1_c = 0.0;
-    x2_c = 0.5;
-    r = 0.2;
+    x1_c = -0.3;
+    x2_c = 0.0;
+    r = 1.0;
     Function f_sep(x, pow(x[0]-x1_c, 2)+pow(x[1]-x2_c, 2)-pow(r, 2));
 
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x, Return(x[1],
-                                    (8.0/25.0*pow(x[0],5)-4.0/3.0*pow(x[0],3)+4.0/5.0*x[0])));
-    DynamicsFunction dyn(&f, BWD);
+    ibex::Function f(x, -Return(x[1],
+                                    (8.0/25.0*pow(x[0],5)-4.0/3.0*pow(x[0],3)+4.0/5.0*x[0]-0.3*x[1])));
+    DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
 //    vibes::beginDrawing();
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
         paving.bisect();
         cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
         cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
@@ -72,8 +72,9 @@ int main(int argc, char *argv[])
 
     VibesMaze v_maze("Zang Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
+    v_maze.drawCircle(x1_c, x2_c, r, "black[r]");
 
     vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/zang_basin.svg", "Zang Basin");
 

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<19; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
 
@@ -96,13 +96,13 @@ int main(int argc, char *argv[])
         maze_outer.set_enable_contract_domain(false);
         cout << " ==> Outer back" << endl;
         maze_outer.contract(30000);
-        vtkMazePPL_outer.show_maze(&maze_outer);
+//        vtkMazePPL_outer.show_maze(&maze_outer);
 
         cout << " ==> Inner" << endl;
         maze_inner.contract(paving.size_active()*3);
-        vtkMazePPL_inner.show_maze(&maze_inner, "", true);
+//        vtkMazePPL_inner.show_maze(&maze_inner, "", true);
 
-        vtkMazePPL_outer.show_subpaving(&maze_outer);
+//        vtkMazePPL_outer.show_subpaving(&maze_outer);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
     cout << paving << endl;
