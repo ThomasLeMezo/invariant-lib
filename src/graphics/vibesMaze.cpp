@@ -386,12 +386,12 @@ void VibesMaze::show_maze_outer_inner() const{
                 vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
         }
 
-        //        if(!r_inner->is_removed() && !r_inner->is_empty()){
-        //            if(r_inner->is_initial_door_input())
-        //                vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
-        //            if(r_inner->is_initial_door_output())
-        //                vibes::drawBox(r_inner->get_initial_door_output(), "[#FF8C8C]");
-        //        }
+//                if(!r_inner->is_removed() && !r_inner->is_empty()){
+//                    if(r_inner->is_initial_door_input())
+//                        vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
+//                    if(r_inner->is_initial_door_output())
+//                        vibes::drawBox(r_inner->get_initial_door_output(), "[#FF8C8C]");
+//                }
     }
 
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
