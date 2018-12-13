@@ -98,8 +98,8 @@ cmake_minimum_required(VERSION 3.2.2)
 
 # Netcdf
 if(WITH_NETCDF)
-#    find_package(NetCDF REQUIRED)
-    pkg_search_module(NETCDF REQUIRED libnetcdf-dev)
+    set(ENV{PKG_CONFIG_PATH}  "$ENV{PKG_CONFIG_PATH}:${NETCDF_ROOT}")
+    pkg_search_module(NETCDF REQUIRED netcdf-cxx4)
     if(NETCDF_FOUND)
         include_directories(${NETCDF_INCLUDE_DIRS})
         set(LIBS_NETCDF ${LIBS_NETCDF} ${NETCDF_LIBRARIES})

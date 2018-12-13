@@ -11,6 +11,7 @@ cd ..
 sh $INVARIANTLIB_DIR/cmake/build_Ibex4pyIbex.sh # Benoit Desrochers version
 sh $INVARIANTLIB_DIR/cmake/build_VTK.sh
 sh $INVARIANTLIB_DIR/cmake/build_ppl.sh
+sh $INVARIANTLIB_DIR/cmake/build_netcdf.sh
 cd $INVARIANTLIB_DIR
 
 mkdir build/build-debug -p
@@ -20,6 +21,7 @@ cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
 	  -DVTK_ROOT=${HOME}/vtk \
 	  -DPPL_ROOT=${HOME}/ppl \
 	  -DGMP_ROOT=${HOME}/gmp \
+	  -DNETCDF_ROOT=${HOME}/netcdf \
 	  -DCMAKE_BUILD_TYPE=DEBUG \
 	  -DBUILD_TESTS=OFF \
 	  -DWITH_PYTHON=ON \
