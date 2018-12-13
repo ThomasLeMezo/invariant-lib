@@ -50,10 +50,6 @@ int main(int argc, char *argv[])
     eulerian_maze.get_maze_inner(0)->get_domain()->set_sep_zero(&sep_B_not);
     eulerian_maze.get_maze_outer(1)->get_domain()->set_sep_zero(&sep_B_not);
     eulerian_maze.get_maze_inner(1)->get_domain()->set_sep_zero(&sep_B_not);
-<<<<<<< HEAD
-
-=======
->>>>>>> 4fe387570f39eb9e6f3ed281a07447b68ebe0a31
 
     // ****** Contractions *******
     double time_start = omp_get_wtime();

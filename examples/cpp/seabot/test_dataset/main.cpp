@@ -10,6 +10,15 @@
 using namespace std;
 using namespace invariant;
 
+std::array<std::array<double, 2>, 2> get_empty_data(){
+    std::array<std::array<double, 2>, 2> data;
+    data[0][0] = std::numeric_limits<double>::max();
+    data[0][1] = std::numeric_limits<double>::min();
+    data[1][0] = std::numeric_limits<double>::max();
+    data[1][1] = std::numeric_limits<double>::min();
+    return data;
+}
+
 int main(int argc, char *argv[]){
 
     std::vector<std::array<int, 2>> position;
@@ -47,7 +56,9 @@ int main(int argc, char *argv[]){
 //    data[0][0] = 10.0; data[0][1] = 11.0;
 //    data[1][0] = 1.0; data[1][1] = 2.0;
 
-    test.eval_invert(target, position, data);
+    array<array<double, 2>, 2> data_return = get_empty_data();
+    test.eval_invert(target, position, data, data_return);
+//    eval_invert(std::vector<std::array<int, 2>> &target, const std::vector<std::array<int, 2>> &position, const std::array<std::array<_Tp, 2>, _n> &data, std::array<std::array<_Tp, 2>, _n> &data_return) const;
 
     cout << test.get_number_node() << endl;
     cout << test.get_number_leaf() << endl;

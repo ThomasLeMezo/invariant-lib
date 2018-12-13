@@ -36,7 +36,7 @@ using namespace ibex;
        .value("FWD_BWD", invariant::DYNAMICS_SENS::FWD_BWD)
        .export_values();
 
-  // ********* Graphs *********
+  // ********* Paving *********
   py::class_<invariant::SmartSubPavingIBEX>(m, "SmartSubPaving")
           .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
           .def("bisect", &invariant::SmartSubPavingIBEX::bisect)
@@ -77,7 +77,7 @@ using namespace ibex;
           .def(py::init<invariant::DomainIBEX*, invariant::Dynamics*>(),
                "domain"_a,
                "dynamics"_a)
-          .def("contract", &invariant::MazeIBEX::contract)
+          .def("contract", &invariant::MazeIBEX::contract, "Contract the maze", "nb_operations"_a=0)
     ;
 
   // SepMaze
