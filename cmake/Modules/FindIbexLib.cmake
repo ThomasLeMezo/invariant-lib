@@ -7,7 +7,7 @@
 
 find_package(PkgConfig)
 #pkg_check_modules(PC_IBEXLIB QUIET ibex)
-message(STATUS "IBEX_ROOT ${IBEX_ROOT}")
+message(STATUS "[IBEX] IBEX_ROOT ${IBEX_ROOT}")
 
 if(IbexLib_USE_STATIC)
   SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)

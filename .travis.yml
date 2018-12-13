@@ -9,7 +9,7 @@ matrix:
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, ]
+        packages: [g++-4.8, cmake, cmake-data, pkg-config, proj-bin, libproj-dev, libnetcdf-c++4-dev]
   - os: linux
     language: python
     env: PYTHON=3.4 CPP_VERSION=11 GCC=4.8
@@ -17,7 +17,7 @@ matrix:
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, ]
+        packages: [g++-4.8, cmake, cmake-data, pkg-config, proj-bin, libproj-dev, libnetcdf-c++4-dev]
   - os: linux
     language: python
     env: PYTHON=3.5 CPP_VERSION=11 GCC=4.8
@@ -25,7 +25,7 @@ matrix:
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, ]
+        packages: [g++-4.8, cmake, cmake-data, pkg-config, proj-bin, libproj-dev, libnetcdf-c++4-dev]
   - os: linux
     language: python
     env: PYTHON=3.6 CPP_VERSION=11 GCC=4.8
@@ -33,7 +33,7 @@ matrix:
     addons:
       apt:
         sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, ]
+        packages: [g++-4.8, cmake, cmake-data, pkg-config, proj-bin, libproj-dev, libnetcdf-c++4-dev]
   # - os: osx
   #   osx_image: xcode7.3
   #   env: PYTHON=2.7 CPP_VERSION=11 GCC=4.8
