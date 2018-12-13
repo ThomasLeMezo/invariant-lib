@@ -99,7 +99,7 @@ cmake_minimum_required(VERSION 3.2.2)
 # Netcdf
 if(WITH_NETCDF)
 #    find_package(NetCDF REQUIRED)
-    pkg_search_module(NETCDF REQUIRED netcdf-cxx4)
+    pkg_search_module(NETCDF REQUIRED libnetcdf-dev)
     if(NETCDF_FOUND)
         include_directories(${NETCDF_INCLUDE_DIRS})
         set(LIBS_NETCDF ${LIBS_NETCDF} ${NETCDF_LIBRARIES})
@@ -146,18 +146,6 @@ if(WITH_PPL)
 endif()
 
 # Sources
-#    message(STATUS "Include directories")
-#    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-#    foreach(dir ${dirs})
-#      message(STATUS "dir='${dir}'")
-#    endforeach()
-
-#    message(STATUS "Link directories")
-#    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-#    foreach(dir ${dirs})
-#      message(STATUS "dir='${dir}'")
-#    endforeach()
-
     add_subdirectory(src)
 
 # Pybind11
