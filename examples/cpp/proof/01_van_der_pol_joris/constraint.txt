@@ -1,0 +1,20 @@
+/* constraint.txt */
+function f(x_r, y_r)
+
+  L_r = 0.5;
+  max_angle = 0.785;
+
+  dx_r = y_r;
+  dy_r = -(1*x_r^2 - 1)*y_r - x_r;
+  cos_theta_r = dx_r / sqrt(dx_r^2+dy_r^2);
+  sin_theta_r = dy_r / sqrt(dx_r^2+dy_r^2);
+  ddx_r = dy_r;
+  ddy_r = (-2*x_r*y_r-1)*dx_r - (1*x_r^2-1)*dy_r;
+  dtheta_r = (ddy_r*dx_r - ddx_r*dy_r) / (dx_r^2+dy_r^2);
+  dx = dx_r - L_r*dtheta_r*sin_theta_r;
+  dy = dy_r + L_r*dtheta_r*cos_theta_r;
+  cos_theta = dx / sqrt(dx^2+dy^2);
+  sin_theta = dy / sqrt(dx^2+dy^2);
+  cos_theta_tilde = cos_theta*cos_theta_r + sin_theta*sin_theta_r;
+  return cos_theta_tilde - cos(max_angle);
+end

@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
-    ibex::Function f_joris_outer("/home/lemezoth/Documents/ensta/other/joris/constraint.txt");
+    ibex::Function f_joris_outer("./constraint.txt");
     ibex::SepFwdBwd sep_joris_outer(f_joris_outer, LEQ);
     dom_outer.set_sep(&sep_joris_outer);
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
 
-    for(int i=0; i<15; i++){
+    for(int i=0; i<20; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-//    v_maze.set_enable_cone(false);
+    v_maze.set_enable_cone(false);
     v_maze.show();
 
 //    IntervalVector position_info(2);
