@@ -15,11 +15,14 @@
 #include "vtkMaze3D.h"
 #include <string>
 
+#include <omp.h>
+
 namespace py = pybind11;
 using namespace pybind11::literals;
 
 using namespace invariant;
 using namespace ibex;
+
 
  PYBIND11_MODULE(pyinvariant, m){
    m.doc() = "Python binding of invariant-lib";
@@ -112,6 +115,7 @@ using namespace ibex;
           .def("drawCircle", &VibesMaze::drawCircle)
           .def("drawBox", (void (VibesMaze::*)(const ibex::IntervalVector &box, std::string params) const) &VibesMaze::drawBox)
           .def("drawBox", (void (VibesMaze::*)(double x_min, double x_max, double y_min, double y_max, std::string params) const) &VibesMaze::drawBox)
+          .def("set_enable_cone", &VibesMaze::set_enable_cone)
   ;
 
   py::class_<VtkMaze3D>(m, "VtkMaze3D")

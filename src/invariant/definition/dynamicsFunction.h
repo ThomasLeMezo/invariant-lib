@@ -19,14 +19,14 @@ public:
      * @brief Dynamics constructor
      * @param functions
      */
-    DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief Dynamics constructor
      * @param functions
      */
-    DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool taylor=false);
-    DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD);
+    DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief Dynamics destructor
@@ -39,7 +39,7 @@ public:
      * @param sens
      * @param taylor
      */
-    void init(const std::vector<ibex::Function*> functions, const DYNAMICS_SENS sens, bool taylor);
+    void init(const std::vector<ibex::Function*> functions);
 
     /**
      * @brief Eval the vector field from the state space

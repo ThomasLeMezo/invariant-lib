@@ -5,13 +5,13 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-DynamicsFunction::DynamicsFunction(const vector<Function*> functions, const DYNAMICS_SENS sens, bool taylor):
+DynamicsFunction::DynamicsFunction(const vector<Function*> functions, const DYNAMICS_SENS sens):
     Dynamics(sens)
 {
-    init(functions, sens, taylor);
+    init(functions);
 }
 
-void DynamicsFunction::init(const vector<Function*> functions, const DYNAMICS_SENS sens, bool taylor){
+void DynamicsFunction::init(const vector<Function*> functions){
     m_num_threads = omp_get_max_threads();
     for(int n = 0; n<m_num_threads; n++){
         m_functions.push_back(vector<Function*>());
@@ -21,25 +21,25 @@ void DynamicsFunction::init(const vector<Function*> functions, const DYNAMICS_SE
         }
     }
 
-    compute_taylor(taylor);
+    //compute_taylor(taylor);
 //    omp_init_lock(&m_lock_dynamics);
 }
 
-DynamicsFunction::DynamicsFunction(Function *f, const DYNAMICS_SENS sens, bool taylor):
+DynamicsFunction::DynamicsFunction(Function *f, const DYNAMICS_SENS sens):
     Dynamics(sens)
 {
-    vector<Function*> functions;
-    functions.push_back(f);
-    init(functions, sens, taylor);
+    vector<Function*> functions{f};
+//    functions.push_back(f);
+    init(functions);
 }
 
-DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SENS sens, bool taylor):
+DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SENS sens):
     Dynamics(sens)
 {
     vector<Function*> functions;
     functions.push_back(f1);
     functions.push_back(f2);
-    init(functions, sens, taylor);
+    init(functions);
 }
 
 void DynamicsFunction::compute_taylor(bool taylor){

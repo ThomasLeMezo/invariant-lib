@@ -12,7 +12,7 @@ if [ ! -e "$HOME/netcdf/lib/libnetcdf_c++4.a" ]; then
 
   cd netcdf-cxx4
   autoreconf -if
-  ./configure --prefix=$HOME/netcdf
+  ./configure --prefix=$HOME/netcdf --with-gnu-ld
 
   make -j2
   make check
