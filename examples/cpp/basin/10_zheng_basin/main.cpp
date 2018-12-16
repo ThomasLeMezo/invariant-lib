@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     f.push_back(&f2, &D2);
     f.push_back(&f3, &D3);
 
-    DynamicsFunction dyn(&f, FWD);
+    DynamicsFunction dyn(&f, FWD, false);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);

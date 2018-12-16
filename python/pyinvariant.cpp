@@ -11,6 +11,7 @@
 #include "sepmaze.h"
 #include "dynamics.h"
 #include "dynamicsFunction.h"
+#include "spacefunction.h"
 #include "vibesMaze.h"
 #include "vtkMaze3D.h"
 #include <string>
@@ -63,16 +64,23 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-  py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
+//  py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
+//  ;
+
+  py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
+          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(),
+               "f"_a,
+               "DYNAMICS_SENS"_a=FWD,
+               "multi_threaded"_a=false)
+          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(),
+               "f_list"_a,
+               "DYNAMICS_SENS"_a=FWD,
+               "multi_threaded"_a=false)
   ;
 
-  py::class_<invariant::DynamicsFunction>(m, "DynamicsFunction", dynamics)
-          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS>(),
-               "f"_a,
-               "DYNAMICS_SENS"_a)
-          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS>(),
-               "f_list"_a,
-               "DYNAMICS_SENS"_a)
+  py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")
+          .def(py::init<>())
+          .def("push_back", &invariant::SpaceFunction::push_back)
   ;
 
   // ********* Maze *********

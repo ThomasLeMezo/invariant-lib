@@ -19,14 +19,14 @@ public:
      * @brief Dynamics constructor
      * @param functions
      */
-    DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD);
+    DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
      * @brief Dynamics constructor
      * @param functions
      */
-    DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD);
-    DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD);
+    DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+    DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
      * @brief Dynamics destructor
@@ -102,6 +102,7 @@ protected:
     omp_lock_t  m_lock_dynamics; // Lock
 
     int m_num_threads = 1;
+    bool m_multi_threaded = true;
 };
 
 inline std::vector<ibex::Sep*> DynamicsFunction::get_hybrid_guard(){

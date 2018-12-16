@@ -23,6 +23,7 @@ include_directories(../src/invariant/definition/netcdf)
 include_directories(../src/invariant/definition/dataSet)
 include_directories(../src/graphics)
 
+set(PYBIND11_CPP_STANDARD -std=c++11)
 pybind11_add_module(pyinvariant
     pyinvariant.cpp
 )
@@ -48,13 +49,21 @@ add_custom_command(TARGET pyinvariant POST_BUILD
 #       WORKING_DIRECTORY ${PYTHON_PACKAGE_DIR}
 # )
 
-#install( DIRECTORY "${PYTHON_PACKAGE_DIR}/pyinvariant" DESTINATION "${PYTHON_INSTDIR}")
+install( DIRECTORY "${PYTHON_PACKAGE_DIR}/pyinvariant" DESTINATION "${PYTHON_INSTDIR}")
 
 add_custom_target(pip_package)
 add_custom_command(TARGET pip_package PRE_BUILD
    COMMAND ${PYTHON_EXECUTABLE} ARGS setup.py bdist_wheel -d ${CMAKE_BINARY_DIR}
    WORKING_DIRECTORY ${PYTHON_PACKAGE_DIR}
 )
+
+add_custom_target(install_python)
+add_custom_command(TARGET install_python PRE_BUILD
+    COMMAND pip install --upgrade .
+    WORKING_DIRECTORY ${PYTHON_PACKAGE_DIR}
+)
+
+add_dependencies(install_python pyinvariant)
 
 # --build-purelib
 
@@ -64,4 +73,4 @@ add_custom_command(TARGET pip_package PRE_BUILD
 #    COMMAND pip install --upgrade .
 #    WORKING_DIRECTORY ${PYTHON_PACKAGE_DIR}
 #)
-#add_dependencies(install_python invariant)
+

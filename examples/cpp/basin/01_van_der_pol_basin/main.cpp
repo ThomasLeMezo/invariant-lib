@@ -46,8 +46,9 @@ int main(int argc, char *argv[])
     dom_inner.set_sep_input(&s_inner);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x, Return(x[1],
-                                    (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
+//    ibex::Function f(x, Return(x[1],
+//                                    (1.0*(1.0-pow(x[0], 2))*x[1]-x[0])));
+    ibex::Function f("x[2]", "(x[1], (1-x[0]^2)*x[1]-x[0])");
     DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze ********* //
