@@ -64,8 +64,8 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-//  py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
-//  ;
+  py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
+  ;
 
   py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(),
