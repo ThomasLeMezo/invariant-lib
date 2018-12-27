@@ -1,4 +1,5 @@
 from pyinvariant import *
+import time
 
 # Define the search space
 space = IntervalVector([[-3.0, 3.0],[-3.0,3.0]])
@@ -49,12 +50,17 @@ dyn = DynamicsFunction(f, BWD)
 maze_inner = Maze(dom_inner, dyn)
 maze_outer = Maze(dom_outer, dyn)
 
+start_time = time.time()
+
 # Contract the system
 for i in range(15):
 	print(i)
 	subpaving.bisect()
 	maze_outer.contract()
 	maze_inner.contract()
+
+elapsed_time = time.time() - start_time
+print("elapsed_time = ", elapsed_time)
 
 # Visualization
 visu = VibesMaze("Van Der Pol Basin of Capture", maze_outer, maze_inner)
