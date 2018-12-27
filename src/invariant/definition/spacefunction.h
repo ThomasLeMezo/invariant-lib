@@ -16,6 +16,7 @@ class SpaceFunction : public ibex::Function
 {
 public:
     SpaceFunction();
+    SpaceFunction(const SpaceFunction&sf, copy_mode mode=COPY);
 
     ~SpaceFunction(){}
 
@@ -36,11 +37,21 @@ public:
      */
     void push_back(ibex::Function *f, ibex::Sep *sep);
 
+    const std::vector<ibex::Function *> get_functions_list() const;
+    const std::vector<ibex::Sep *> get_separator_list() const;
+
 private:
 
     std::vector<ibex::Function *> m_functions_list;
     std::vector<ibex::Sep *> m_separator_list;
 };
+
+inline const std::vector<ibex::Function *> SpaceFunction::get_functions_list() const{
+    return m_functions_list;
+}
+inline const std::vector<ibex::Sep *> SpaceFunction::get_separator_list() const{
+    return m_separator_list;
+}
 
 }
 

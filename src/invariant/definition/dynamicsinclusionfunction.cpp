@@ -4,13 +4,13 @@ using namespace std;
 using namespace ibex;
 
 namespace invariant {
-DynamicsInclusionFunction::DynamicsInclusionFunction(const std::vector<ibex::Function *> functions, const ibex::IntervalVector &inclusion_parameter, const DYNAMICS_SENS sens, bool taylor):
-DynamicsFunction(functions, sens, taylor), m_inclusion_parameter(inclusion_parameter)
+DynamicsInclusionFunction::DynamicsInclusionFunction(const std::vector<ibex::Function *> functions, const ibex::IntervalVector &inclusion_parameter, const DYNAMICS_SENS sens):
+    DynamicsFunction(functions, sens), m_inclusion_parameter(inclusion_parameter)
 {
 }
 
-DynamicsInclusionFunction::DynamicsInclusionFunction(ibex::Function *f,  const ibex::IntervalVector& inclusion_parameter, const DYNAMICS_SENS sens, bool taylor):
-DynamicsFunction(f, sens, taylor), m_inclusion_parameter(inclusion_parameter)
+DynamicsInclusionFunction::DynamicsInclusionFunction(ibex::Function *f,  const ibex::IntervalVector& inclusion_parameter, const DYNAMICS_SENS sens):
+DynamicsFunction(f, sens), m_inclusion_parameter(inclusion_parameter)
 {
 
 }

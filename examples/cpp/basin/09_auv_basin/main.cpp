@@ -98,7 +98,7 @@ int main(int argc, char *argv[]){
     dom_outer.set_border_path_out(false);
 
     // ****** Dynamics ******* //
-    DynamicsFunction dyn(&sm, FWD_BWD, false);
+    DynamicsFunction dyn(&sm, FWD_BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);

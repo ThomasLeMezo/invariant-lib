@@ -9,7 +9,7 @@ find_package(PkgConfig)
 #pkg_check_modules(PC_NETCDFLIB QUIET ibex)
 message(STATUS "[NETCDF] NETCDF_ROOT ${NETCDF_ROOT}")
 
-if(NETCDF_USE_STATIC)
+if(NetCDF_USE_STATIC)
   SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)
 endif()
 

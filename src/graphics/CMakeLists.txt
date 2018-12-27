@@ -30,6 +30,7 @@ if(WITH_3D)
         ${SRC_3D}
         ${HEADERS_3D}
     )
+
     target_link_libraries(invariant-graphics-3D
         ${LIBS}
         ${LIBS_VTK}

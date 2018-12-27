@@ -22,8 +22,8 @@ s_inner = SepFwdBwd(f_sep, GEQ) # possible options : LT, LEQ, EQ, GEQ, GT
 dom_inner.set_sep_input(s_inner)
 
 # Create the Dynamics
-f = Function("x[2]", "-(x[1],(1.0-(x[0]^2))*x[1]-x[0])") # Repulsive cycle
-dyn = DynamicsFunction(f, BWD)
+f = Function("x[2]", "(x[1],(1-x[0]^2)*x[1]-x[0])")
+dyn = DynamicsFunction(f, FWD)
 
 # Create the two Maze associated with the Domain and the dynamics
 maze_inner = Maze(dom_inner, dyn)

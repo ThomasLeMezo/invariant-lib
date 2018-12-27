@@ -9,6 +9,15 @@ namespace invariant {
 SpaceFunction::SpaceFunction(){
 }
 
+SpaceFunction::SpaceFunction(const SpaceFunction &sf, copy_mode mode){
+    for(ibex::Function *f:sf.get_functions_list()){
+        m_functions_list.push_back(new Function(*f));
+    }
+    for(ibex::Sep *s:sf.get_separator_list()){
+        m_separator_list.push_back(s);
+    }
+}
+
 ibex::IntervalVector SpaceFunction::eval_vector(const ibex::IntervalVector &position) const{
     ibex::IntervalVector vect(position.size(), ibex::Interval::EMPTY_SET);
     for(size_t i=0; i<m_functions_list.size(); i++){

@@ -20,7 +20,7 @@ public:
      * @param sens
      * @param taylor
      */
-    DynamicsInclusionFunction(const std::vector<ibex::Function *> functions, const ibex::IntervalVector &inclusion_parameter, const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsInclusionFunction(const std::vector<ibex::Function *> functions, const ibex::IntervalVector &inclusion_parameter, const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief DynamicsInclusionFunction
@@ -29,7 +29,7 @@ public:
      * @param sens
      * @param taylor
      */
-    DynamicsInclusionFunction(ibex::Function *f, const ibex::IntervalVector &inclusion_parameter,  const DYNAMICS_SENS sens=FWD, bool taylor=false);
+    DynamicsInclusionFunction(ibex::Function *f, const ibex::IntervalVector &inclusion_parameter,  const DYNAMICS_SENS sens=FWD);
 
     /**
      * @brief Destructor

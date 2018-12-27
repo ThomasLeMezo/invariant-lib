@@ -11,15 +11,19 @@
 #include "sepmaze.h"
 #include "dynamics.h"
 #include "dynamicsFunction.h"
+#include "spacefunction.h"
 #include "vibesMaze.h"
 #include "vtkMaze3D.h"
 #include <string>
+
+#include <omp.h>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
 using namespace invariant;
 using namespace ibex;
+
 
  PYBIND11_MODULE(pyinvariant, m){
    m.doc() = "Python binding of invariant-lib";
@@ -63,13 +67,20 @@ using namespace ibex;
   py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
   ;
 
-  py::class_<invariant::DynamicsFunction>(m, "DynamicsFunction", dynamics)
-          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS>(),
+  py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
+          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(),
                "f"_a,
-               "DYNAMICS_SENS"_a)
-          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS>(),
+               "DYNAMICS_SENS"_a=FWD,
+               "multi_threaded"_a=false)
+          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(),
                "f_list"_a,
-               "DYNAMICS_SENS"_a)
+               "DYNAMICS_SENS"_a=FWD,
+               "multi_threaded"_a=false)
+  ;
+
+  py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")
+          .def(py::init<>())
+          .def("push_back", &invariant::SpaceFunction::push_back)
   ;
 
   // ********* Maze *********
@@ -112,6 +123,7 @@ using namespace ibex;
           .def("drawCircle", &VibesMaze::drawCircle)
           .def("drawBox", (void (VibesMaze::*)(const ibex::IntervalVector &box, std::string params) const) &VibesMaze::drawBox)
           .def("drawBox", (void (VibesMaze::*)(double x_min, double x_max, double y_min, double y_max, std::string params) const) &VibesMaze::drawBox)
+          .def("set_enable_cone", &VibesMaze::set_enable_cone)
   ;
 
   py::class_<VtkMaze3D>(m, "VtkMaze3D")
