@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     VibesMaze v_maze("Cordeliere", &maze_outer/*, &maze_inner*/);
     v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/cordeliere_invariant.svg");
 

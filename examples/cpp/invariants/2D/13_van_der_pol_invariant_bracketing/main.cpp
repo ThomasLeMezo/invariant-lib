@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
     invariant::Domain<> dom_outer(&subpaving, FULL_DOOR);
     dom_outer.set_border_path_in(false);
-    dom_outer.set_border_path_out(false);
+    dom_outer.set_border_path_out(true);
 
     invariant::Domain<> dom_inner(&subpaving, FULL_WALL);
     dom_inner.set_border_path_in(true);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
     ibex::Function f2(x1, x2, Return(x2,
                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    DynamicsFunction dyn_outer(&f, FWD_BWD); // Duplicate because of simultaneous access of f (semaphore on DynamicsFunction)
+    DynamicsFunction dyn_outer(&f, FWD); // Duplicate because of simultaneous access of f (semaphore on DynamicsFunction)
     DynamicsFunction dyn_inner(&f2, FWD);
 
     // ******* Maze ********* //
@@ -80,6 +80,10 @@ int main(int argc, char *argv[])
 //    position_info[0] = ibex::Interval(0);
 //    position_info[1] = ibex::Interval(-1);
 //    v_maze.get_room_info(&maze, position_info);
+
+    std::string file = "/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/";
+    file += "van_der_pol_largest_negative_invariant.svg";
+    vibes::saveImage(file);
     vibes::endDrawing();
 
 }

@@ -37,10 +37,10 @@ int main(int argc, char *argv[])
     // ****** Dynamics ******* //
     ibex::Interval e1(0);
     ibex::Interval e2(0);
-    ibex::Interval beta(0.01/M_PI_2);
+    ibex::Interval beta(0.04/M_PI_2);
     ibex::Interval B(2.61);
-    ibex::Function f(x1, x2, Return(-beta*atan(x2)-x1*B,
-                                    x1+e1));
+    ibex::Function f(x1, x2, Return(beta*atan(x2),
+                                    1.0+0.0*x1));
 
     ibex::Function f1(x1, x2, Return(-beta*atan(x2)+e2.lb(),
                                      x1+e1));

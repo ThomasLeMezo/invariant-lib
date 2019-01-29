@@ -84,11 +84,13 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 512, 512);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[]");
-    v_maze.drawCircle(1, -3, 0.1, "red[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
+    v_maze.drawCircle(1, -3, 0.1, "black[red]");
     v_maze.drawCircle(0.0, 1.0, 9.0/100.0, "black[green]");
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/safety_fwd.svg");
 
 //    VibesMaze v_maze_inner("SmartSubPaving", &maze_inner);
 //    v_maze_inner.setProperties(0, 0, 1024, 1024);

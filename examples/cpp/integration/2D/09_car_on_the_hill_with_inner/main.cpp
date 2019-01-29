@@ -25,15 +25,17 @@ int main(int argc, char *argv[])
     IntervalVector space(2);
 //    space[0] = ibex::Interval(-2, 5);
 //    space[1] = ibex::Interval(-3, 3);
-    space[0] = ibex::Interval(-1, 6.0);
-    space[1] = ibex::Interval(-4, 4);
+//    space[0] = ibex::Interval(-1, 6.0);
+//    space[1] = ibex::Interval(-4, 4);
+    space[0] = ibex::Interval(-2, 13.0);
+    space[1] = ibex::Interval(-3, 5);
 
     invariant::SmartSubPaving<> paving(space);
 
     double x1_c, x2_c, r;
     x1_c = 0.0;
     x2_c = 0.0;
-    r = 0.5;
+    r = 1.0;
 
     // ****** Domain Outer ******* //
     invariant::Domain<> dom_outer(&paving, FULL_WALL);
@@ -51,18 +53,19 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics Outer & Inner ******* //
-    double u= 1;
+    double u= 2;
+//    ibex::Function f(x1, x2, Return(x2,
+//                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
     ibex::Function f(x1, x2, Return(x2,
-                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u, u)));
-//    ibex::Function f(x1, x2, -Return(x2,
-//                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
+                                    -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
     DynamicsFunction dyn(&f, FWD);
 
     ibex::Function f1(x1, x2, Return(x2,
                                       -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
-    ibex::Function f2(x1, x2, Return(x2,
-                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
-    DynamicsFunction dyn_u(&f1, &f2, FWD);
+//    ibex::Function f2(x1, x2, Return(x2,
+//                                      -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(-u)));
+//    DynamicsFunction dyn_u(&f1, &f2, FWD);
+    DynamicsFunction dyn_u(&f1, FWD);
 
     // ******* Mazes ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
@@ -75,7 +78,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
-    for(int i=0; i<14; i++){
+    for(int i=0; i<16; i++){
         cout << i << endl;
         paving.bisect();
         maze_outer.contract();
@@ -94,18 +97,19 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMaze v_maze("car_on_the_hill_fwd", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(true);
+    v_maze.set_enable_cone(false);
     v_maze.show();
     //    v_maze.drawCircle(0.0, 0.0, 1, "black[red]");
     v_maze.drawCircle(0.0, 0.0, r, "red[red]");
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
-    IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(2.84);
-    position_info[1] = ibex::Interval(0.84);
-    v_maze.setProperties(0, 0, 512, 512);
-    v_maze.show_room_info(&maze_inner, position_info);
+//    IntervalVector position_info(2);
+//    position_info[0] = ibex::Interval(2.84);
+//    position_info[1] = ibex::Interval(0.84);
+//    v_maze.setProperties(0, 0, 512, 512);
+//    v_maze.show_room_info(&maze_inner, position_info);
 
     vibes::endDrawing();
 }
