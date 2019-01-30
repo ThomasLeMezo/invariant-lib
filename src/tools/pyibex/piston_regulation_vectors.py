@@ -1,5 +1,6 @@
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 from pyibex import *
 import numpy as np
@@ -41,47 +42,54 @@ def u(x1, x2, x3):
 def f(x1, x2, x3):
 	return [-A*(x3-alpha*x2)-B*np.abs(x1)*x1, x1, u(x1, x2, x3)]
 
-
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-
 n_x1 = 15
-n_x3 = 15
 n_x2 = 1
+n_x3 = 15
 
 x1_ls = np.linspace(-0.02, 0.02, n_x1)	# Velocity
-x2_ls = 0.2*np.ones(1)
+x2_ls = 0.1*np.ones(1)
 x3_ls = np.linspace(-1.7e-4/2.0, 1.7e-4/2.0, n_x3)
 
-x1, x2, x3 = np.meshgrid(x1_ls, x3_ls, x2_ls)
+x1, x2, x3 = np.meshgrid(x1_ls, x2_ls, x3_ls, indexing='ij')
 
-vec_x1 = x1
-vec_x2 = x2
-vec_x3 = x3
+vec_x1 = np.zeros((n_x1, n_x2, n_x3))
+vec_x2 = np.zeros((n_x1, n_x2, n_x3))
+vec_x3 = np.zeros((n_x1, n_x2, n_x3))
 
-for i in range(0,n_x1):
-	for j in range(0,n_x3):
-		for k in range(0,n_x2):
+for i in range(0, n_x1):
+	for j in range(0, n_x2):
+		for k in range(0, n_x3):
 			tmp = f(x1[i, j, k], x2[i, j, k], x3[i, j, k])
 			vec_x1[i, j, k] = tmp[0]
 			vec_x2[i, j, k] = tmp[1]
 			vec_x3[i, j, k] = tmp[2] 
 
-# Plot a basic wireframe.
-# ax.plot_wireframe(x1, x3, x2, rstride=10, cstride=10)
 
-# ax.plot_surface(x1, x2, x3)
-# ax.plot_surface(x1, zero_plane, x3)
+fig = plt.figure()
+ax = fig.gca(projection='3d')
 ax.set_xlabel('x1')
 ax.set_ylabel('x2')
 ax.set_zlabel('x3')
 
+# ax.set_xlim([x1_ls[0], x1_ls[-1]])
+# ax.set_ylim([x2_ls[0], x2_ls[-1]])
+# ax.set_zlim([x3_ls[0], x3_ls[-1]])
 
-ax.quiver(x1, x2, x3, vec_x1, vec_x2, vec_x3,length=1e-6, arrow_length_ratio=0.1)
+# Plot a basic wireframe.
+# ax.plot_wireframe(x1, x3, x2, rstride=10, cstride=10)
+
+ax.quiver(x1, x2, x3, vec_x1, vec_x2, vec_x3,length=1e-3, normalize=True)
+print(x2)
+
+# fig2 = plt.figure()
+# ax2 = fig2.gca(projection='3d')
+# ax2.plot_surface(x1[:,0,:], x3[:,0,:], np.zeros((n_x1, n_x3)))
+# ax2.plot_surface(x1[:,0,:], x3[:,0,:], vec_x2[:,0,:], cmap=cm.coolwarm)
+# ax2.set_xlabel('x1')
+# ax2.set_ylabel('x3')
+# ax2.set_zlabel('x2')
 
 plt.show()
 
-# print(f(-0.1, 0.3, -1.7e-4/2.0))
-# print(f(-0.1, 0.3, 1.7e-4/2.0))
-# print(f(0.1, 0.3, -1.7e-4/2.0))
-# print(f(0.1, 0.3, 1.7e-4/2.0))
+
+print(f(-0.1, 0.3, -1.7e-4/2.0))
