@@ -12,7 +12,7 @@ using namespace std;
         m_root = new DataSetNode<Type, nb>(m_root_position, m_leaf_list);\
         break;
 #define DATASETFUNCTION_SWITCH_INIT(Type) \
-    switch(cell_dim){\
+    switch(m_cell_dim){\
         DATASETFUNCTION_CASE_INIT(Type, 1)\
         DATASETFUNCTION_CASE_INIT(Type, 2)\
         DATASETFUNCTION_CASE_INIT(Type, 3)\
@@ -20,7 +20,6 @@ using namespace std;
         DATASETFUNCTION_CASE_INIT(Type, 5)\
         break;\
     }\
-    break;
 
 #define DATASETFUNCTION_CASE_FILE(Type, nb) \
     case nb:\
@@ -35,9 +34,25 @@ using namespace std;
         DATASETFUNCTION_CASE_FILE(Type, 5)\
         break;\
     }\
-    break;
 
 namespace invariant {
+
+DataSetFunction::DataSetFunction(ibex::Fnc *f, const ibex::IntervalVector& space, const size_t nb_step_bisection){
+  m_root_real_position = new ibex::IntervalVector(space);
+  const size_t dim = f->image_dim();
+  const size_t nb_element_axis = pow(2, floor(nb_step_bisection/(double)dim));
+
+  for(size_t n=0; n<dim; n++){
+    std::array<int, 2> tmp{0, (int)nb_element_axis};
+    m_root_position.push_back(tmp);
+  }
+
+  m_cell_dim = dim;
+  m_type = TYPE_DOUBLE;
+
+  // BUILD THE TREE
+  DATASETFUNCTION_SWITCH_INIT(double);
+}
 
 DataSetFunction::DataSetFunction(const ibex::IntervalVector& root_real_position, const std::vector<std::array<int, 2>> &root_position, const size_t cell_dim, const DataSetFunction_TYPE type){
     m_root_position = root_position;

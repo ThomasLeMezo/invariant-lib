@@ -20,6 +20,14 @@ public:
     DataSetFunction(const ibex::IntervalVector &node_root_position, const std::vector<std::array<int, 2> > &root_position, const size_t cell_dim, const DataSetFunction_TYPE type);
 
     /**
+     * @brief DataSetFunction
+     * @param f
+     * @param space
+     * @param nb_step_bisection
+     */
+    DataSetFunction(ibex::Fnc *f, const ibex::IntervalVector& space, const size_t nb_step_bisection);
+
+    /**
      * @brief DataSetFunction destructor
      */
     ~DataSetFunction();

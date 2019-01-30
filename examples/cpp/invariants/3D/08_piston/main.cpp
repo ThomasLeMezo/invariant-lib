@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2, x3;
 
     IntervalVector space(3);
-    space[0] = ibex::Interval(-1, 1); // Velocity
-    space[1] = ibex::Interval(0, 30); // Position
+    space[0] = ibex::Interval(-0.1, 0.1); // Velocity
+    space[1] = ibex::Interval(0.3, 0.5); // Position
     space[2] = -1.7e-4/2.0*ibex::Interval(-1, 1); // Piston volume (m3)
 
     // ****** Domain ******* //
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     ibex::Interval alpha(1.432e-06);
 
     // Regulation parameters
-    ibex::Interval x2_target(10.0); // Desired depth
+    ibex::Interval x2_target(0.4); // Desired depth
     ibex::Interval beta(0.04/ibex::Interval::HALF_PI);
     ibex::Interval l1(0.1);
     ibex::Interval l2(0.1);
@@ -71,28 +71,32 @@ int main(int argc, char *argv[])
 
     DynamicsFunction dyn(&f, FWD_BWD);
 
+    // Test
+    ibex::IntervalVector iv_test(3);
+    iv_test[0] = ibex::Interval(1e-5, 1e-4);
+    iv_test[1] = ibex::Interval(0.1, 0.2);
+    iv_test[2] = ibex::Interval(1e-6, 1e-5);
+    cout << f.eval_vector(iv_test) << endl;
+
     // ******* Maze ********* //
     invariant::MazePPL maze_outer(&dom, &dyn);
 //    invariant::MazePPL maze_inner(&dom, &dyn);
-    maze_outer.set_widening_limit(5);
+    maze_outer.set_enable_contraction_limit(true);
+    maze_outer.set_contraction_limit(5);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("Piston");
 
-    for(int i=0; i<28; i++){
+    for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
-        maze_outer.contract(3*paving.size_active());
+        maze_outer.contract(5*paving.size_active());
         vtkMazePPL.show_maze(&maze_outer);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
-
-//    VtkMaze3D vtkMaze3D("torus", false);
-//    vtkMaze3D.show_graph(&paving);
-//    vtkMaze3D.show_maze(&maze);
 
 //    IntervalVector position_info(3);
 //    position_info[0] = ibex::Interval(0.5);
