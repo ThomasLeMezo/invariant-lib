@@ -193,8 +193,10 @@ int main(int argc, char *argv[]){
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("Piston");
 
-#if 0
-    double n_traj = 3.0;
+#if 1
+    double n_traj = 7.0;
+    double t_max = 20.0;
+    double dt = 0.01;
     size_t k=0;
 #if COMPUTE_INV
     for(double x_traj=space[0].lb(); x_traj<=space[0].ub(); x_traj+=space[0].diam()/(n_traj-1)){
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]){
     for(double x_traj=init[0].lb(); x_traj<=init[0].ub(); x_traj+=init[0].diam()/(n_traj-1)){
         for(double y_traj=init[1].lb(); y_traj<=init[1].ub(); y_traj+=init[1].diam()/(n_traj-1)){
             for(double z_traj=init[2].lb(); z_traj<=init[2].ub(); z_traj+=init[2].diam()/(n_traj-1)){
-                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, 500.0, 0.01, vector<double>{1.0, 1.0, 1000.0});
+                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, t_max, dt, vector<double>{1.0, 1.0, 1000.0});
                 cout << k++ << endl;
             }
         }
@@ -217,13 +219,15 @@ int main(int argc, char *argv[]){
 #endif
 #endif
 
+
+
+#if 0
     // ******* Maze ********* //
     invariant::MazePPL maze_outer(&dom, &dyn);
     maze_outer.set_enable_contraction_limit(true);
     maze_outer.set_contraction_limit(3);
     maze_outer.set_widening_limit(5);
 
-#if 1
     for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
