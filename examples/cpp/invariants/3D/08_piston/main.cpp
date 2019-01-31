@@ -88,25 +88,58 @@ void write_vector_field(ibex::Function *f, const ibex::IntervalVector &space, co
     writer->Write ();
 }
 
+#define COMPUTE_INV 0
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
+
+    double screw_thread = 1.75e-3;
+    double tick_per_turn = 48;
+    double piston_diameter = 0.05;
+    double tick_to_volume = (screw_thread/tick_per_turn)*pow(piston_diameter/2.0, 2)*M_PI;
+
+    // Physical parameters
+    double g = 9.81;
+    double rho = 1025.0;
+    double m = 9.045;
+    double diam = 0.24;
+    double alpha = tick_to_volume*20.0;
+
+    // Regulation parameters
+    double x2_target = 0.0; // Desired depth
+    double beta = 0.04/M_PI_2;
+    double l1 =0.1;
+    double l2 =0.1;
+
+    double Cf = M_PI*pow(diam/2.0,2);
+
+    // Command
+    double A = g*rho/m;
+    double B = 0.5*rho*Cf/m;
+
+    //****************************************************//
+
     ibex::Variable x1, x2, x3;
-
     IntervalVector space(3);
-    space[0] = ibex::Interval(-0.1, 0.1); // Velocity
-    space[1] = ibex::Interval(0.3, 0.5); // Position
-    space[2] = -1.7e-4/2.0*ibex::Interval(-1, 1); // Piston volume (m3)
+
+#if COMPUTE_INV
+    space[0] = 0.01*ibex::Interval(-1, 1); // Velocity
+    space[1] = 0.01*ibex::Interval(-1, 1); // Position
+    space[2] = 1.0*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
 
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
 
-#if 0
     invariant::DomainPPL dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 #else
+    space[0] = 2*0.003*ibex::Interval(-1, 1); // Velocity
+    space[1] = 0.04*ibex::Interval(-1, 1); // Position
+    space[2] = 5*8e-4*1e-3*ibex::Interval(-1, 1); // Piston volume (m3)
+
+    // ****** Domain ******* //
+    invariant::SmartSubPavingPPL paving(space);
 
     invariant::DomainPPL dom(&paving, FULL_WALL);
 
@@ -114,9 +147,9 @@ int main(int argc, char *argv[])
     dom.set_border_path_out(false);
 
     IntervalVector init(3);
-    init[0] = ibex::Interval(-1e-3, 1e-3); // Velocity
-    init[1] = 0.4+ibex::Interval(1e-3, 1e-3); // Position
-    init[2] = 1e-3*-1.7e-4/2.0*ibex::Interval(-1, 1); // Piston volume (m3)
+    init[0] = 0.001*ibex::Interval(-1, 1); // Velocity
+    init[1] = 0.01*ibex::Interval(-1, 1); // Position
+    init[2] = 10*tick_to_volume*ibex::Interval(-1, 1);
     Function f_sep(x1, x2, x3, Return(x1, x2, x3));
     SepFwdBwd s(f_sep, init); // LT, LEQ, EQ, GEQ, GT
     dom.set_sep(&s);
@@ -124,40 +157,26 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics ******* //
 
-    // Physical parameters
-    ibex::Interval g(9.81);
-    ibex::Interval rho(1025.0);
-    ibex::Interval m(8.8);
-    ibex::Interval diam(0.24);
-    ibex::Interval alpha(1.432e-06);
-
-    // Regulation parameters
-    ibex::Interval x2_target(0.4); // Desired depth
-    ibex::Interval beta(0.04/ibex::Interval::HALF_PI);
-    ibex::Interval l1(0.1);
-    ibex::Interval l2(0.1);
-
-    ibex::Interval Cf(ibex::Interval::PI*pow(diam/2.0,2));
-
-    // Command
-    ibex::Interval A(g*rho/m);
-    ibex::Interval B(0.5*rho*Cf/m);
-
-    ibex::Function y(x1, x2, (x1+beta*atan(x2_target-x2)));
-    ibex::Function dx1(x1, x2, x3, (-A*(x3-alpha*x2)-B*abs(x1)*x1));
     ibex::Function e(x2, (x2_target-x2));
+    ibex::Function y(x1, x2, (x1-beta*atan(e(x2))));
+    ibex::Function dx1(x1, x2, x3, (-A*(x3-alpha*x2)-B*abs(x1)*x1));
     ibex::Function D(x2, (1+pow(e(x2), 2)));
-    ibex::Function dy(x1, x2, x3, (dx1(x1, x2, x3)-beta*x1/D(x2)));
+    ibex::Function dy(x1, x2, x3, (dx1(x1, x2, x3)+beta*x1/D(x2)));
 
-    ibex::Function u(x1, x2, x3, (1.0/A*(l1*dy(x1, x2, x3)+l2*y(x1, x2)+beta*(2*e(x2)*pow(x1,2)-dx1(x1, x2, x3)*D(x2))/(pow(D(x2),2))-2*B*abs(x1)*x1)+alpha*x1));
+    ibex::Function u(x1, x2, x3, ((l1*dy(x1, x2, x3)+l2*y(x1, x2)
+                                   +beta*(dx1(x1, x2, x3)*D(x2)+2*e(x2)*pow(x1,2))/(pow(D(x2),2))-2*B*abs(x1)*dx1(x1, x2, x3))/A+alpha*x1));
 
     // Evolution function
-    ibex::Function f(x1, x2, x3, Return(-A*(x3-alpha*x2)-B*abs(x1)*x1,
+    ibex::Function f(x1, x2, x3, Return(dx1(x1, x2, x3),
                                         x1,
                                         u(x1, x2, x3)));
 
-//    DynamicsFunction dyn(&f, FWD_BWD);
+
+#if COMPUTE_INV
+    DynamicsFunction dyn(&f, FWD_BWD);
+#else
     DynamicsFunction dyn(&f, FWD);
+#endif
 
     // Test
 //    ibex::IntervalVector iv_test(3);
@@ -168,22 +187,53 @@ int main(int argc, char *argv[])
 
 //    write_vector_field(&f, iv_test, 5, "vector_field.vtk");
 
-    // ******* Maze ********* //
-    invariant::MazePPL maze_outer(&dom, &dyn);
-//    invariant::MazePPL maze_inner(&dom, &dyn);
-//    maze_outer.set_enable_contraction_limit(true);
-//    maze_outer.set_contraction_limit(5);
-    maze_outer.set_widening_limit(20);
+
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("Piston");
 
+#if 0
+    double n_traj = 3.0;
+    size_t k=0;
+#if COMPUTE_INV
+    for(double x_traj=space[0].lb(); x_traj<=space[0].ub(); x_traj+=space[0].diam()/(n_traj-1)){
+        for(double y_traj=space[1].lb(); y_traj<=space[1].ub(); y_traj+=space[1].diam()/(n_traj-1)){
+            for(double z_traj=space[2].lb(); z_traj<=space[2].ub(); z_traj+=space[2].diam()/(n_traj-1)){
+                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, 500.0, 0.01, vector<double>{1.0, 1.0, 1000.0});
+                cout << k++ << endl;
+            }
+        }
+    }
+#else
+    for(double x_traj=init[0].lb(); x_traj<=init[0].ub(); x_traj+=init[0].diam()/(n_traj-1)){
+        for(double y_traj=init[1].lb(); y_traj<=init[1].ub(); y_traj+=init[1].diam()/(n_traj-1)){
+            for(double z_traj=init[2].lb(); z_traj<=init[2].ub(); z_traj+=init[2].diam()/(n_traj-1)){
+                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, 500.0, 0.01, vector<double>{1.0, 1.0, 1000.0});
+                cout << k++ << endl;
+            }
+        }
+    }
+#endif
+#endif
+
+    // ******* Maze ********* //
+    invariant::MazePPL maze_outer(&dom, &dyn);
+    maze_outer.set_enable_contraction_limit(true);
+    maze_outer.set_contraction_limit(3);
+    maze_outer.set_widening_limit(5);
+
+#if 1
     for(int i=0; i<18; i++){
         cout << i << endl;
         paving.bisect();
-//        maze_outer.contract(5*paving.size_active());
 
+        // Invariant +/-
+#if COMPUTE_INV
+        maze_outer.contract(10*paving.size_active());
+
+#else
+        // Reach set
         maze_outer.get_domain()->set_init(FULL_WALL);
         maze_outer.set_enable_contract_domain(true);
         cout << " ==> Outer widening" << endl;
@@ -193,15 +243,25 @@ int main(int argc, char *argv[])
         maze_outer.reset_nb_operations();
         maze_outer.set_enable_contract_domain(false);
         cout << " ==> Outer back" << endl;
-        maze_outer.contract(30000);
+        maze_outer.contract(1.1*paving.size_active());
+#endif
+        vtkMazePPL.show_maze(&maze_outer);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
+////    IntervalVector position_info(3);
+////    position_info[0] = ibex::Interval(0.1);
+////    position_info[1] = ibex::Interval(0.499);
+////    position_info[2] = ibex::Interval(-0.07/1e3);
+////    vtkMazePPL.show_room_info(&maze_outer, position_info);
+
 //    IntervalVector position_info(3);
-//    position_info[0] = ibex::Interval(0.5);
+//    position_info[0] = ibex::Interval(0);
 //    position_info[1] = ibex::Interval(0.5);
-//    position_info[2] = ibex::Interval(0.2);
-//    vtkMaze3D.show_room_info(&maze, position_info);
+//    position_info[2] = ibex::Interval(0.0);
+////    vtkMazePPL.show_room_info(&maze_outer, position_info);
+
+#endif
 }

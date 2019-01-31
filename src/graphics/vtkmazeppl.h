@@ -40,12 +40,22 @@ public:
      */
     void show_room_info(invariant::MazePPL *maze, ibex::IntervalVector position);
 
+    /**
+     * @brief simu_trajectory
+     * @param f
+     * @param position_init
+     * @param t_max
+     * @param dt
+     */
+    void simu_trajectory(ibex::Function *f, const std::vector<double>& position_init, const double &t_max, const double &dt, const std::vector<double>& visu_scale=std::vector<double>{1.0, 1.0, 1.0});
+
 private:
 
     std::string         m_file_name = "";
     int                 m_number_export = 0;
     int                 m_number_export_paves = 0;
     int                 m_number_export_vector_field = 0;
+    size_t              m_traj_num = 0;
 };
 
 #endif // VTKMAZEPPL_H

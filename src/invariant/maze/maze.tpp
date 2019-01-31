@@ -189,6 +189,7 @@ template<typename _Tp>
 void Maze<_Tp>::reset_nb_operations(){
     m_nb_operations = 0;
     m_contract_once = false;
+    m_deque_rooms.clear();
 }
 
 template<typename _Tp>
