@@ -70,6 +70,8 @@ ax = fig.gca(projection='3d')
 ax.set_xlabel('x1')
 ax.set_ylabel('x2')
 ax.set_zlabel('x3')
+ax.quiver(x1, x2, x3, vec_x1, vec_x2, vec_x3,length=1e-3, normalize=True)
+print(x2)
 
 # ax.set_xlim([x1_ls[0], x1_ls[-1]])
 # ax.set_ylim([x2_ls[0], x2_ls[-1]])
@@ -78,8 +80,9 @@ ax.set_zlabel('x3')
 # Plot a basic wireframe.
 # ax.plot_wireframe(x1, x3, x2, rstride=10, cstride=10)
 
-ax.quiver(x1, x2, x3, vec_x1, vec_x2, vec_x3,length=1e-3, normalize=True)
-print(x2)
+fig1, ax1 = plt.subplots()
+ax1.quiver(x1[:,0,:], x3[:,0,:], vec_x1[:,0,:], vec_x3[:,0,:])
+
 
 # fig2 = plt.figure()
 # ax2 = fig2.gca(projection='3d')

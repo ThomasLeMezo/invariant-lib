@@ -66,7 +66,7 @@ void write_vector_field(ibex::Function *f, const ibex::IntervalVector &space, co
 
                 ibex::IntervalVector vec = f->eval_vector(X);
 //                cout << vec << endl;
-                double factor = 1e-2;
+                double factor = 1/(pow(vec[0].mid(), 2) + pow(vec[1].mid(), 2) + pow(vec[2].mid(), 2));
                 u->SetTuple3(k, factor*vec[0].mid(), factor*vec[1].mid(), factor*vec[2].mid());
                 k++;
                 z += space[2].diam()/n_axis[2];
@@ -100,14 +100,27 @@ int main(int argc, char *argv[])
 
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
-    invariant::DomainPPL dom(&paving, FULL_DOOR);
 
-//    Function f_sep(x, y, z, pow(x, 2)+pow(y, 2)+pow(z, 2)-pow(0.5, 2));
-//    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
-//    dom.set_sep(&s);
+#if 0
+    invariant::DomainPPL dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
+#else
+
+    invariant::DomainPPL dom(&paving, FULL_WALL);
+
+    dom.set_border_path_in(false);
+    dom.set_border_path_out(false);
+
+    IntervalVector init(3);
+    init[0] = ibex::Interval(-1e-3, 1e-3); // Velocity
+    init[1] = 0.4+ibex::Interval(1e-3, 1e-3); // Position
+    init[2] = 1e-3*-1.7e-4/2.0*ibex::Interval(-1, 1); // Piston volume (m3)
+    Function f_sep(x1, x2, x3, Return(x1, x2, x3));
+    SepFwdBwd s(f_sep, init); // LT, LEQ, EQ, GEQ, GT
+    dom.set_sep(&s);
+#endif
 
     // ****** Dynamics ******* //
 
@@ -143,36 +156,48 @@ int main(int argc, char *argv[])
                                         x1,
                                         u(x1, x2, x3)));
 
-    DynamicsFunction dyn(&f, FWD_BWD);
+//    DynamicsFunction dyn(&f, FWD_BWD);
+    DynamicsFunction dyn(&f, FWD);
 
     // Test
-    ibex::IntervalVector iv_test(3);
-    iv_test[0] = ibex::Interval(1e-5, 1e-4);
-    iv_test[1] = ibex::Interval(0.1, 0.1+1e-5);
-    iv_test[2] = ibex::Interval(1e-6, 1e-5);
-    cout << f.eval_vector(iv_test) << endl;
+//    ibex::IntervalVector iv_test(3);
+//    iv_test[0] = ibex::Interval(-0.01, 0.01); // Velocity
+//    iv_test[1] = ibex::Interval(0.0, 0.02); // Position
+//    iv_test[2] = ibex::Interval(-1e-6, 1e-6); // Volume
+//    cout << f.eval_vector(iv_test) << endl;
 
-    write_vector_field(&f, iv_test, 5, "vector_field.vtk");
+//    write_vector_field(&f, iv_test, 5, "vector_field.vtk");
 
     // ******* Maze ********* //
-//    invariant::MazePPL maze_outer(&dom, &dyn);
-////    invariant::MazePPL maze_inner(&dom, &dyn);
+    invariant::MazePPL maze_outer(&dom, &dyn);
+//    invariant::MazePPL maze_inner(&dom, &dyn);
 //    maze_outer.set_enable_contraction_limit(true);
 //    maze_outer.set_contraction_limit(5);
+    maze_outer.set_widening_limit(20);
 
-//    // ******* Algorithm ********* //
-//    double time_start = omp_get_wtime();
-//    VtkMazePPL vtkMazePPL("Piston");
+    // ******* Algorithm ********* //
+    double time_start = omp_get_wtime();
+    VtkMazePPL vtkMazePPL("Piston");
 
-//    for(int i=0; i<18; i++){
-//        cout << i << endl;
-//        paving.bisect();
+    for(int i=0; i<18; i++){
+        cout << i << endl;
+        paving.bisect();
 //        maze_outer.contract(5*paving.size_active());
-//        vtkMazePPL.show_maze(&maze_outer);
-//    }
-//    cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-//    cout << paving << endl;
+        maze_outer.get_domain()->set_init(FULL_WALL);
+        maze_outer.set_enable_contract_domain(true);
+        cout << " ==> Outer widening" << endl;
+        maze_outer.contract();
+
+        maze_outer.get_domain()->set_init(FULL_DOOR);
+        maze_outer.reset_nb_operations();
+        maze_outer.set_enable_contract_domain(false);
+        cout << " ==> Outer back" << endl;
+        maze_outer.contract(30000);
+    }
+    cout << "TIME = " << omp_get_wtime() - time_start << endl;
+
+    cout << paving << endl;
 
 //    IntervalVector position_info(3);
 //    position_info[0] = ibex::Interval(0.5);
