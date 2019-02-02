@@ -107,8 +107,12 @@ int main(int argc, char *argv[]){
     // Regulation parameters
     double x2_target = 0.0; // Desired depth
     double beta = 0.04/M_PI_2;
-    double l1 =0.1;
-    double l2 =0.1;
+
+    double r = -1.0;
+    double l1 = -2.0*r;
+    double l2 = pow(r, 2);
+    cout << "l1 = " << l1 << endl;
+    cout << "l2 = " << l2 << endl;
 
     double Cf = M_PI*pow(diam/2.0,2);
 
@@ -122,9 +126,9 @@ int main(int argc, char *argv[]){
     IntervalVector space(3);
 
 #if COMPUTE_INV
-    space[0] = 0.01*ibex::Interval(-1, 1); // Velocity
-    space[1] = 0.01*ibex::Interval(-1, 1); // Position
-    space[2] = 1.0*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
+    space[0] = beta*atan(0.01)*ibex::Interval(-1, 1); // Velocity
+    space[1] = 0.01*ibex::Interval(-1e-3, 1); // Position
+    space[2] = 10*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
 
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
@@ -164,7 +168,7 @@ int main(int argc, char *argv[]){
     ibex::Function dy(x1, x2, x3, (dx1(x1, x2, x3)+beta*x1/D(x2)));
 
     ibex::Function u(x1, x2, x3, ((l1*dy(x1, x2, x3)+l2*y(x1, x2)
-                                   +beta*(dx1(x1, x2, x3)*D(x2)+2*e(x2)*pow(x1,2))/(pow(D(x2),2))-2*B*abs(x1)*dx1(x1, x2, x3))/A+alpha*x1));
+                                   +beta*(dx1(x1, x2, x3)*D(x2)+2.0*e(x2)*pow(x1,2))/(pow(D(x2),2))-2.0*B*abs(x1)*dx1(x1, x2, x3))/A+alpha*x1));
 
     // Evolution function
     ibex::Function f(x1, x2, x3, Return(dx1(x1, x2, x3),
@@ -194,15 +198,15 @@ int main(int argc, char *argv[]){
     VtkMazePPL vtkMazePPL("Piston");
 
 #if 1
-    double n_traj = 7.0;
-    double t_max = 20.0;
+    double n_traj = 3.0;
+    double t_max = 100.0;
     double dt = 0.01;
     size_t k=0;
 #if COMPUTE_INV
     for(double x_traj=space[0].lb(); x_traj<=space[0].ub(); x_traj+=space[0].diam()/(n_traj-1)){
         for(double y_traj=space[1].lb(); y_traj<=space[1].ub(); y_traj+=space[1].diam()/(n_traj-1)){
             for(double z_traj=space[2].lb(); z_traj<=space[2].ub(); z_traj+=space[2].diam()/(n_traj-1)){
-                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, 500.0, 0.01, vector<double>{1.0, 1.0, 1000.0});
+                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, t_max, dt, vector<double>{1.0, 1.0, 1000.0});
                 cout << k++ << endl;
             }
         }
@@ -219,16 +223,14 @@ int main(int argc, char *argv[]){
 #endif
 #endif
 
-
-
-#if 0
+#if 1
     // ******* Maze ********* //
     invariant::MazePPL maze_outer(&dom, &dyn);
     maze_outer.set_enable_contraction_limit(true);
-    maze_outer.set_contraction_limit(3);
+    maze_outer.set_contraction_limit(5);
     maze_outer.set_widening_limit(5);
 
-    for(int i=0; i<18; i++){
+    for(int i=0; i<22; i++){
         cout << i << endl;
         paving.bisect();
 
