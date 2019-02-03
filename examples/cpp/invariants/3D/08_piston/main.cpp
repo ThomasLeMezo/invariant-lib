@@ -146,9 +146,12 @@ int main(int argc, char *argv[]){
     invariant::SmartSubPavingPPL paving(space);
 
     invariant::DomainPPL dom(&paving, FULL_WALL);
-
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
+
+    invariant::DomainPPL dom_inner(&paving, FULL_DOOR);
+    dom_inner.set_border_path_in(true);
+    dom_inner.set_border_path_out(true);
 
     IntervalVector init(3);
     init[0] = 0.001*ibex::Interval(-1, 1); // Velocity
@@ -156,7 +159,10 @@ int main(int argc, char *argv[]){
     init[2] = 10*tick_to_volume*ibex::Interval(-1, 1);
     Function f_sep(x1, x2, x3, Return(x1, x2, x3));
     SepFwdBwd s(f_sep, init); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep(&s);
+    dom.set_sep_output(&s);
+
+    SepNot s_inner(s);
+    dom_inner.set_sep_output(&s_inner);
 #endif
 
     // ****** Dynamics ******* //
@@ -171,7 +177,7 @@ int main(int argc, char *argv[]){
                                    +beta*(dx1(x1, x2, x3)*D(x2)+2.0*e(x2)*pow(x1,2))/(pow(D(x2),2))-2.0*B*abs(x1)*dx1(x1, x2, x3))/A+alpha*x1));
 
     // Evolution function
-    ibex::Function f(x1, x2, x3, Return(dx1(x1, x2, x3),
+    ibex::Function f(x1, x2, x3, -Return(dx1(x1, x2, x3),
                                         x1,
                                         u(x1, x2, x3)));
 
@@ -196,6 +202,7 @@ int main(int argc, char *argv[]){
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("Piston");
+    VtkMazePPL vtkMazePPL_inner("Piston_inner");
 
 #if 1
     double n_traj = 3.0;
@@ -225,10 +232,15 @@ int main(int argc, char *argv[]){
 
 #if 1
     // ******* Maze ********* //
-    invariant::MazePPL maze_outer(&dom, &dyn);
-    maze_outer.set_enable_contraction_limit(true);
-    maze_outer.set_contraction_limit(5);
-    maze_outer.set_widening_limit(5);
+//    invariant::MazePPL maze_outer(&dom, &dyn);
+//    maze_outer.set_enable_contraction_limit(true);
+//    maze_outer.set_contraction_limit(5);
+//    maze_outer.set_widening_limit(5);
+
+    invariant::MazePPL maze_inner(&dom_inner, &dyn);
+    maze_inner.set_enable_contraction_limit(true);
+    maze_inner.set_contraction_limit(15);
+    maze_inner.set_widening_limit(15);
 
     for(int i=0; i<22; i++){
         cout << i << endl;
@@ -240,18 +252,21 @@ int main(int argc, char *argv[]){
 
 #else
         // Reach set
-        maze_outer.get_domain()->set_init(FULL_WALL);
-        maze_outer.set_enable_contract_domain(true);
-        cout << " ==> Outer widening" << endl;
-        maze_outer.contract();
+//        maze_outer.get_domain()->set_init(FULL_WALL);
+//        maze_outer.set_enable_contract_domain(true);
+//        cout << " ==> Outer widening" << endl;
+//        maze_outer.contract();
 
-        maze_outer.get_domain()->set_init(FULL_DOOR);
-        maze_outer.reset_nb_operations();
-        maze_outer.set_enable_contract_domain(false);
-        cout << " ==> Outer back" << endl;
-        maze_outer.contract(1.1*paving.size_active());
+//        maze_outer.get_domain()->set_init(FULL_DOOR);
+//        maze_outer.reset_nb_operations();
+//        maze_outer.set_enable_contract_domain(false);
+//        cout << " ==> Outer back" << endl;
+//        maze_outer.contract(1.1*paving.size_active());
+
+        maze_inner.contract(10*paving.size_active());
 #endif
-        vtkMazePPL.show_maze(&maze_outer);
+//        vtkMazePPL.show_maze(&maze_outer);
+        vtkMazePPL_inner.show_maze(&maze_inner, "", true);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
