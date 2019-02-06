@@ -24,71 +24,7 @@ using namespace std;
 using namespace ibex;
 using namespace invariant;
 
-void write_vector_field(ibex::Function *f, const ibex::IntervalVector &space, const size_t &n, const string filename){
-
-    size_t n_axis[3] = {n, n ,n};
-    size_t nb_points =1;
-    for(size_t i=0; i<3; i++){
-        if(space[i].is_degenerated())
-            n_axis[i] = 1;
-        nb_points *= n_axis[i];
-    }
-    cout << "Nb_points = " << nb_points << endl;
-
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(nb_points);
-
-    vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
-    vertices->SetNumberOfCells(nb_points);
-
-    vtkSmartPointer<vtkDoubleArray> u = vtkSmartPointer<vtkDoubleArray>::New();
-    u->SetName("u");
-    u->SetNumberOfComponents(3);
-    u->SetNumberOfTuples(nb_points);
-
-    size_t k=0;
-    double x = space[0].lb();
-    for(size_t nb_x=0; nb_x<n_axis[0]; nb_x++){
-        double y = space[1].lb();
-        for(size_t nb_y=0; nb_y<n_axis[1]; nb_y++){
-            double z = space[2].lb();
-            for(size_t nb_z=0; nb_z<n_axis[2]; nb_z++){
-                points->SetPoint(k, x, y*10, z*10);
-
-                vtkSmartPointer<vtkVertex> vertex = vtkSmartPointer<vtkVertex>::New();
-                vertex->GetPointIds()->SetId(0, k);
-                vertices->InsertNextCell(vertex);
-
-                ibex::IntervalVector X(3);
-                X[0] = ibex::Interval(x);
-                X[1] = ibex::Interval(y);
-                X[2] = ibex::Interval(z);
-
-                ibex::IntervalVector vec = f->eval_vector(X);
-//                cout << vec << endl;
-                double factor = 1/(pow(vec[0].mid(), 2) + pow(vec[1].mid(), 2) + pow(vec[2].mid(), 2));
-                u->SetTuple3(k, factor*vec[0].mid(), factor*vec[1].mid(), factor*vec[2].mid());
-                k++;
-                z += space[2].diam()/n_axis[2];
-            }
-            y += space[1].diam()/n_axis[1];
-        }
-        x += space[0].diam()/n_axis[0];
-    }
-    cout << k << endl;
-    cout << space[2] << endl;
-    vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
-    polydata->SetPoints(points);
-    polydata->SetVerts(vertices);
-    polydata->GetPointData()->SetVectors(u);
-
-    vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-    writer->SetFileName(filename.c_str());
-    writer->SetInputData(polydata);
-    writer->Write ();
-}
-
-#define COMPUTE_INV 0
+#define COMPUTE_INV 1
 
 int main(int argc, char *argv[]){
 
@@ -126,9 +62,10 @@ int main(int argc, char *argv[]){
     IntervalVector space(3);
 
 #if COMPUTE_INV
-    space[0] = beta*atan(0.01)*ibex::Interval(-1, 1); // Velocity
-    space[1] = 0.01*ibex::Interval(-1e-3, 1); // Position
-    space[2] = 10*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
+//    space[0] = beta*atan(0.01)*ibex::Interval(-1, 1); // Velocity
+    space[0] = 2e-4*ibex::Interval(-1, 1); // Velocity
+    space[1] = 0.001*ibex::Interval(-1e-3, 1); // Position
+    space[2] = 5*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
 
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
@@ -138,9 +75,11 @@ int main(int argc, char *argv[]){
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 #else
-    space[0] = 2*0.003*ibex::Interval(-1, 1); // Velocity
-    space[1] = 0.04*ibex::Interval(-1, 1); // Position
-    space[2] = 5*8e-4*1e-3*ibex::Interval(-1, 1); // Piston volume (m3)
+    space[0] = 0.1*ibex::Interval(-1, 1); // Velocity
+    space[1] = 1.0*ibex::Interval(-1, 1); // Position
+    space[2] = 300*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
+
+    cout << "Space = " << space << endl;
 
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
@@ -154,12 +93,13 @@ int main(int argc, char *argv[]){
     dom_inner.set_border_path_out(true);
 
     IntervalVector init(3);
-    init[0] = 0.001*ibex::Interval(-1, 1); // Velocity
-    init[1] = 0.01*ibex::Interval(-1, 1); // Position
-    init[2] = 10*tick_to_volume*ibex::Interval(-1, 1);
+    init[0] = 0.01*ibex::Interval(-1, 1); // Velocity
+    init[1] = 0.1*ibex::Interval(-1, 1); // Position
+    init[2] = 50*tick_to_volume*ibex::Interval(-1, 1);
+    cout << "Init = " << init << endl;
     Function f_sep(x1, x2, x3, Return(x1, x2, x3));
     SepFwdBwd s(f_sep, init); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep_output(&s);
+    dom.set_sep(&s);
 
     SepNot s_inner(s);
     dom_inner.set_sep_output(&s_inner);
@@ -177,7 +117,7 @@ int main(int argc, char *argv[]){
                                    +beta*(dx1(x1, x2, x3)*D(x2)+2.0*e(x2)*pow(x1,2))/(pow(D(x2),2))-2.0*B*abs(x1)*dx1(x1, x2, x3))/A+alpha*x1));
 
     // Evolution function
-    ibex::Function f(x1, x2, x3, -Return(dx1(x1, x2, x3),
+    ibex::Function f(x1, x2, x3, Return(dx1(x1, x2, x3),
                                         x1,
                                         u(x1, x2, x3)));
 
@@ -205,42 +145,27 @@ int main(int argc, char *argv[]){
     VtkMazePPL vtkMazePPL_inner("Piston_inner");
 
 #if 1
-    double n_traj = 3.0;
+    double n_traj = 5.0;
     double t_max = 100.0;
     double dt = 0.01;
-    size_t k=0;
 #if COMPUTE_INV
-    for(double x_traj=space[0].lb(); x_traj<=space[0].ub(); x_traj+=space[0].diam()/(n_traj-1)){
-        for(double y_traj=space[1].lb(); y_traj<=space[1].ub(); y_traj+=space[1].diam()/(n_traj-1)){
-            for(double z_traj=space[2].lb(); z_traj<=space[2].ub(); z_traj+=space[2].diam()/(n_traj-1)){
-                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, t_max, dt, vector<double>{1.0, 1.0, 1000.0});
-                cout << k++ << endl;
-            }
-        }
-    }
+    vtkMazePPL.simu_trajectory(dyn, space, n_traj, t_max, dt, vector<double>{1.0, 1.0, 1000.0});
 #else
-    for(double x_traj=init[0].lb(); x_traj<=init[0].ub(); x_traj+=init[0].diam()/(n_traj-1)){
-        for(double y_traj=init[1].lb(); y_traj<=init[1].ub(); y_traj+=init[1].diam()/(n_traj-1)){
-            for(double z_traj=init[2].lb(); z_traj<=init[2].ub(); z_traj+=init[2].diam()/(n_traj-1)){
-                vtkMazePPL.simu_trajectory(&f, vector<double>{x_traj, y_traj, z_traj}, t_max, dt, vector<double>{1.0, 1.0, 1000.0});
-                cout << k++ << endl;
-            }
-        }
-    }
+    vtkMazePPL.simu_trajectory(dyn, init, n_traj, t_max, dt, vector<double>{1.0, 1.0, 1000.0});
 #endif
 #endif
 
 #if 1
     // ******* Maze ********* //
-//    invariant::MazePPL maze_outer(&dom, &dyn);
-//    maze_outer.set_enable_contraction_limit(true);
-//    maze_outer.set_contraction_limit(5);
-//    maze_outer.set_widening_limit(5);
+    invariant::MazePPL maze_outer(&dom, &dyn);
+    maze_outer.set_enable_contraction_limit(true);
+    maze_outer.set_contraction_limit(5);
+    maze_outer.set_widening_limit(5);
 
-    invariant::MazePPL maze_inner(&dom_inner, &dyn);
-    maze_inner.set_enable_contraction_limit(true);
-    maze_inner.set_contraction_limit(15);
-    maze_inner.set_widening_limit(15);
+//    invariant::MazePPL maze_inner(&dom_inner, &dyn);
+//    maze_inner.set_enable_contraction_limit(true);
+//    maze_inner.set_contraction_limit(15);
+//    maze_inner.set_widening_limit(15);
 
     for(int i=0; i<22; i++){
         cout << i << endl;
@@ -252,10 +177,10 @@ int main(int argc, char *argv[]){
 
 #else
         // Reach set
-//        maze_outer.get_domain()->set_init(FULL_WALL);
-//        maze_outer.set_enable_contract_domain(true);
-//        cout << " ==> Outer widening" << endl;
-//        maze_outer.contract();
+        maze_outer.get_domain()->set_init(FULL_WALL);
+        maze_outer.set_enable_contract_domain(true);
+        cout << " ==> Outer widening" << endl;
+        maze_outer.contract();
 
 //        maze_outer.get_domain()->set_init(FULL_DOOR);
 //        maze_outer.reset_nb_operations();
@@ -263,10 +188,10 @@ int main(int argc, char *argv[]){
 //        cout << " ==> Outer back" << endl;
 //        maze_outer.contract(1.1*paving.size_active());
 
-        maze_inner.contract(10*paving.size_active());
+//        maze_inner.contract(10*paving.size_active());
 #endif
-//        vtkMazePPL.show_maze(&maze_outer);
-        vtkMazePPL_inner.show_maze(&maze_inner, "", true);
+        vtkMazePPL.show_maze(&maze_outer);
+//        vtkMazePPL_inner.show_maze(&maze_inner, "", true);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 

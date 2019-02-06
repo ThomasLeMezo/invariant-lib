@@ -47,7 +47,9 @@ public:
      * @param t_max
      * @param dt
      */
-    void simu_trajectory(ibex::Function *f, const std::vector<double>& position_init, const double &t_max, const double &dt, const std::vector<double>& visu_scale=std::vector<double>{1.0, 1.0, 1.0});
+//    void simu_trajectory(ibex::Function *f, const std::vector<double>& position_init, const double &t_max, const double &dt, const std::vector<double>& visu_scale=std::vector<double>{1.0, 1.0, 1.0});
+
+    void simu_trajectory(invariant::Dynamics &d, const ibex::IntervalVector &space, const size_t &nb_traj, const double &t_max, const double &dt, const std::vector<double> &visu_scale=std::vector<double>{1.0, 1.0, 1.0});
 
 private:
 
