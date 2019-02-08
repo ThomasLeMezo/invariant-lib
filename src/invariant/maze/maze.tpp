@@ -218,6 +218,11 @@ bool Maze<_Tp>::is_escape_trajectories(){
 }
 
 template<typename _Tp>
+bool Maze<_Tp>::is_enable_father_hull() const{
+    return m_enable_father_hull;
+}
+
+template<typename _Tp>
 void Maze<_Tp>::add_rooms(const std::vector<Room<_Tp> *>& list_rooms){
     for(Room<_Tp> *r:list_rooms){
         bool valid = r->set_in_queue();

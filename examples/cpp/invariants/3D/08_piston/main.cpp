@@ -25,8 +25,12 @@ using namespace ibex;
 using namespace invariant;
 
 #define COMPUTE_INV 1
+#define INVARIANT_FATHER_HULL 1
 
 int main(int argc, char *argv[]){
+    omp_set_num_threads(48);
+
+    cout << "omp_get_max_threads = " << omp_get_max_threads() << endl;
 
     double screw_thread = 1.75e-3;
     double tick_per_turn = 48;
@@ -47,8 +51,8 @@ int main(int argc, char *argv[]){
     double r = -1.0;
     double l1 = -2.0*r;
     double l2 = pow(r, 2);
-    cout << "l1 = " << l1 << endl;
-    cout << "l2 = " << l2 << endl;
+//    cout << "l1 = " << l1 << endl;
+//    cout << "l2 = " << l2 << endl;
 
     double Cf = M_PI*pow(diam/2.0,2);
 
@@ -67,6 +71,11 @@ int main(int argc, char *argv[]){
     space[1] = 0.001*ibex::Interval(-1e-3, 1); // Position
     space[2] = 5*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
 
+//    space[0] = ibex::Interval(-2.98521e-5, 8.7575e-7);
+//    space[1] = ibex::Interval(0.00094869, 0.000998352);
+//    space[2] = ibex::Interval(-1.64115e-9, 1.11853e-8);
+
+
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
 
@@ -78,8 +87,6 @@ int main(int argc, char *argv[]){
     space[0] = 0.1*ibex::Interval(-1, 1); // Velocity
     space[1] = 1.0*ibex::Interval(-1, 1); // Position
     space[2] = 300*tick_to_volume*ibex::Interval(-1, 1); // Piston volume (m3)
-
-    cout << "Space = " << space << endl;
 
     // ****** Domain ******* //
     invariant::SmartSubPavingPPL paving(space);
@@ -104,6 +111,7 @@ int main(int argc, char *argv[]){
     SepNot s_inner(s);
     dom_inner.set_sep_output(&s_inner);
 #endif
+    cout << "Space = " << space << endl;
 
     // ****** Dynamics ******* //
 
@@ -142,7 +150,7 @@ int main(int argc, char *argv[]){
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     VtkMazePPL vtkMazePPL("Piston");
-    VtkMazePPL vtkMazePPL_inner("Piston_inner");
+//    VtkMazePPL vtkMazePPL_inner("Piston_inner");
 
 #if 1
     double n_traj = 5.0;
@@ -159,21 +167,23 @@ int main(int argc, char *argv[]){
     // ******* Maze ********* //
     invariant::MazePPL maze_outer(&dom, &dyn);
     maze_outer.set_enable_contraction_limit(true);
-    maze_outer.set_contraction_limit(5);
-    maze_outer.set_widening_limit(5);
+    maze_outer.set_contraction_limit(20);
+    maze_outer.set_widening_limit(20);
+
+//    maze_outer.set_enable_father_hull(true);
 
 //    invariant::MazePPL maze_inner(&dom_inner, &dyn);
 //    maze_inner.set_enable_contraction_limit(true);
 //    maze_inner.set_contraction_limit(15);
 //    maze_inner.set_widening_limit(15);
 
-    for(int i=0; i<22; i++){
+    for(int i=0; i<30; i++){
         cout << i << endl;
         paving.bisect();
 
         // Invariant +/-
 #if COMPUTE_INV
-        maze_outer.contract(10*paving.size_active());
+        maze_outer.contract(20*paving.size_active());
 
 #else
         // Reach set

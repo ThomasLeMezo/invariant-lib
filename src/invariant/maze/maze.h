@@ -102,6 +102,12 @@ public:
     bool is_empty();
 
     /**
+     * @brief is_enable_father_hull
+     * @return
+     */
+    bool is_enable_father_hull() const;
+
+    /**
      * @brief get the bounding box
      * @return
      */
@@ -158,6 +164,12 @@ public:
      * @param val
      */
     void set_enable_contract_domain(bool val);
+
+    /**
+     * @brief set_enable_father_hull
+     * @param val
+     */
+    void set_enable_father_hull(bool val);
 
     /**
      * @brief add_initial_room
@@ -248,6 +260,7 @@ private:
     bool    m_contract_once = false;
     bool m_empty = false;
     int m_contraction_step = 0;
+    bool m_enable_father_hull = false;
 
     size_t m_nb_operations=0;
     size_t m_widening_limit=1000;
@@ -300,6 +313,11 @@ inline void Maze<_Tp>::set_enable_contraction_limit(bool val){
 template <typename _Tp>
 inline void Maze<_Tp>::set_enable_contract_domain(bool val){
     m_enable_contract_domain = val;
+}
+
+template <typename _Tp>
+inline void Maze<_Tp>::set_enable_father_hull(bool val){
+    m_enable_father_hull = val;
 }
 
 template <typename _Tp>
