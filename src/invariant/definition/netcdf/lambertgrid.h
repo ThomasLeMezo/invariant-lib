@@ -50,7 +50,7 @@ public:
     /**
      * @brief eval
      */
-    bool eval(const double &x, const double &y, const double &t, double &u, double &v) const;
+    int eval(const double &x, const double &y, const double &t, double &u, double &v) const;
 
     /**
      * @brief get_H0_Fill_Value
@@ -131,7 +131,7 @@ private:
     std::vector<std::vector<std::vector<short int>>> m_U, m_V;
     std::vector<std::vector<short int>> m_H0;
     std::vector<double> m_time;
-    double m_time_dt;
+    double m_time_dt, m_time_min, m_time_max;
 
     double m_distance_max_U_X, m_distance_max_U_Y, m_distance_max_U;
     double m_distance_max_V_X, m_distance_max_V_Y, m_distance_max_V;
@@ -175,11 +175,11 @@ inline const std::vector<std::vector<short> >& LambertGrid::get_H0() const{
 }
 
 inline const double& LambertGrid::get_time_max() const{
-  return m_time[m_time.size()-1];
+  return m_time_max;
 }
 
 inline const double& LambertGrid::get_time_min() const{
-  return m_time[0];
+  return m_time_min;
 }
 
 }

@@ -4,6 +4,7 @@
 #include <proj_api.h>
 #include <iostream>
 #include <vector>
+#include <iterator>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -342,18 +343,23 @@ LambertGrid::LambertGrid(const std::string &file_xml){
     }
     cout << "Number files read = " << file_id << endl;
 
+//    for(double &t:m_time)
+//      cout << t << endl;
+
     if(m_time.size()>1){
+        m_time_min = m_time[0];
+        m_time_max = m_time[m_time.size()-1];
         m_time_dt = m_time[1]-m_time[0];
     }
 }
 
 size_t LambertGrid::get_time_grid(const double &t) const{
-    if(t<m_time[0])
+    if(t<m_time_min)
         return 0;
-    else if(t>m_time[m_time.size()-1])
+    else if(t>m_time_max)
         return m_time.size()-1;
     else
-        return (size_t)floor((t-m_time[0])/m_time_dt);
+        return (size_t) max(0, (int)(std::upper_bound(m_time.begin(), m_time.end(), t) - m_time.begin()-1));
 }
 
 bool sort_pair(const std::pair<double, std::array<int, 2>> &d1, const std::pair<double, std::array<int, 2>> &d2){return (d1.first<d2.first);}
@@ -376,13 +382,15 @@ double compute_ponderation(const std::vector<std::pair<double, std::array<int, 2
     return u;
 }
 
-bool LambertGrid::eval(const double &x, const double &y, const double &t, double &u, double &v) const{
+int LambertGrid::eval(const double &x, const double &y, const double &t, double &u, double &v) const{
     // Find corresponding Data
     bool data_found = true;
 
     const size_t t1 = get_time_grid(t);
-    if(abs(t-m_time[t1])>m_time_dt)
+    if(abs(t-m_time[t1])>m_time_dt*2.0){
+        cout << "invalid time" << endl;
         return false;
+    }
 
     int thread_id = omp_get_thread_num();
 
@@ -439,7 +447,7 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
         if(vector_distance_U.empty() || vector_distance_V.empty()){
             u=0.0;
             v=0.0;
-            return false;
+            return -1;
         }
 
         // Sort distances
@@ -451,7 +459,7 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
         double v_t1 = compute_ponderation(vector_distance_V, m_V, t1, m_V_scale_factor, m_V_add_offset);
 
         const size_t t2 = t1+1;
-        if(t2<m_U.size() && (t-m_time[t1]>0)){
+        if(t2<m_time.size() && (t-m_time[t1]>0)){ // Check if t is between m_time[t1] and m_time[t2]
             double u_t2 = u_t1;
             double v_t2 = v_t1;
             const double d_t1_t = abs(m_time[t1]-t);
@@ -469,12 +477,12 @@ bool LambertGrid::eval(const double &x, const double &y, const double &t, double
             u = u_t1;
             v = v_t1;
         }
-        return true;
+        return 0;
     }
     else{
         u=0.0;
         v=0.0;
-        return false;
+        return -2;
     }
 }
 

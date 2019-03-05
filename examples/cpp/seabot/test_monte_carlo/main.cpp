@@ -53,6 +53,7 @@ void draw_Ouessant(LambertGrid &g){
 
 
 int main(int argc, char *argv[]){
+//    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
     LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     // Draw Ouessant
@@ -68,8 +69,13 @@ int main(int argc, char *argv[]){
     t_init = 3708553500; //
     x_init = 97339+250*3;
     y_init = 6848741;
-
     double t_end = 3600*20.0;
+
+//    t_init = 1294866240; //
+//    x_init = 95759;
+//    y_init = 6847047;
+//    double t_end = 3000.0;
+
 //    double t_end = 50;
 
     vector<array<double, 3>> init_conditions;

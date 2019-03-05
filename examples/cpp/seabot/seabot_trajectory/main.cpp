@@ -15,6 +15,7 @@
 #include <vtkDataSetSurfaceFilter.h>
 
 #include <vtkUnstructuredGrid.h>
+#include <vtkPolyDataCollection.h>
 
 #include <vtkFloatArray.h>
 #include <vtkVertexGlyphFilter.h>
@@ -30,8 +31,13 @@ using namespace std;
 using namespace invariant;
 
 int main(int argc, char *argv[]){
-    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
+//    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
+//    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
+
+    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_irene.xml");
+
+//    omp_set_num_threads(1);
 //    draw_map(g);
 
     double time_start = omp_get_wtime();
@@ -39,23 +45,30 @@ int main(int argc, char *argv[]){
     // Compute trajectories
     double x_init, y_init, t_init;
     double dt = 1.0;
-    t_init = 1541394000; //
-    x_init = 149357;
-    y_init = 6828729;
+//    t_init = 1541394000; //
+//    x_init = 149357;
+//    y_init = 6828729;
+//    double t_end = 3600*6.0;
 
-    double t_end = 3600*6.0;
+    t_init = 1294866240; //
+    x_init = 95759;
+    y_init = 6846047;
+    double t_end = 25.0*3600.0;
+    cout << "time_min = " << std::setprecision(10) << g.get_time_min() << endl;
+    cout << "time_max = " << g.get_time_max() << endl;
+
     bool plot_unfinished_trajectories = true;
 
     vector<array<double, 3>> init_conditions;
     for(double x=-1; x<=1; x++){
         for(double y=-1; y<=1; y++){
             for(double t=-1; t<=1; t++){
-                init_conditions.push_back(array<double, 3>{x_init+5.0*x, y_init+5*y, t_init+t*3*60.});
+                init_conditions.push_back(array<double, 3>{x_init+5.0*x, y_init+5*y, t_init+t*60.});
             }
         }
     }
 
-    vtkSmartPointer<vtkAppendPolyData> appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
+    vtkSmartPointer<vtkAppendPolyData> trajectories = vtkSmartPointer<vtkAppendPolyData>::New();
 
     const size_t nb_conditions = init_conditions.size();
 #pragma omp parallel for
@@ -69,7 +82,7 @@ int main(int argc, char *argv[]){
             cout << "> Compute Traj " << k << endl;
             }
 
-            vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
+            vtkSmartPointer<vtkPolyData> trajectory = vtkSmartPointer<vtkPolyData>::New();
             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
             for(double t=t_tmp; t<t_tmp+t_end; t+=dt){
                 // RK2 scheme
@@ -78,8 +91,11 @@ int main(int argc, char *argv[]){
                 double x_r = x_tmp + (dt/2.0)*u;
                 double y_r = y_tmp + (dt/2.0)*v;
 
-                if(!g.eval(x_r, y_r, t+(dt/2.0), u, v))
+                int err = g.eval(x_r, y_r, t+(dt/2.0), u, v);
+                if(err !=0){
                     valid = false;
+                    cout << "Error " << err << endl;
+                }
 
                 x_tmp+=u*dt;
                 y_tmp+=v*dt;
@@ -88,7 +104,7 @@ int main(int argc, char *argv[]){
                 if(!valid)
                     break;
             }
-            linesPolyData->SetPoints(points);
+            trajectory->SetPoints(points);
 
             vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
             for(unsigned int i = 0; i < points->GetNumberOfPoints()-1; i++){
@@ -97,21 +113,29 @@ int main(int argc, char *argv[]){
                 line->GetPointIds()->SetId(1,i+1);
                 lines->InsertNextCell(line);
             }
-            linesPolyData->SetLines(lines);
+            trajectory->SetLines(lines);
+
+//            vtkSmartPointer<vtkIntArray> intValue = vtkSmartPointer<vtkIntArray>::New();
+//            intValue->SetNumberOfComponents(1);
+//            intValue->SetName("TrajId");
+//            intValue->InsertNextValue(k);
+//            trajectory->GetFieldData()->AddArray(intValue);
 
 #pragma omp critical
             {
-                if(valid || plot_unfinished_trajectories)
-                    appendFilter->AddInputData(linesPolyData);
+                if(valid || plot_unfinished_trajectories){
+                    trajectories->AddInputData(trajectory);
+                }
             }
         }
-    appendFilter->Update();
+
+    trajectories->Update();
 
     vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
     stringstream file_name;
     file_name << "trajectories.vtp";
     outputWriter->SetFileName(file_name.str().c_str());
-    outputWriter->SetInputData(appendFilter->GetOutput());
+    outputWriter->SetInputData(trajectories->GetOutput());
     outputWriter->Write();
 
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
