@@ -36,6 +36,7 @@ using namespace std;
 using namespace invariant;
 
 int main(int argc, char *argv[]){
+//  omp_set_num_threads(1);
   // Load files
   if(argc<2){
     cout << "No file" << endl;

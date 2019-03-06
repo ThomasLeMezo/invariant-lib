@@ -1,10 +1,11 @@
 #include "lambertgrid.h"
 #include <netcdf>
 #include <omp.h>
-#include <proj_api.h>
+#include <proj.h>
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <math.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -29,7 +30,7 @@ void load_raw_data(const NcFile &dataFile, const string &var_name, double *data,
     var.getVar(raw);
 
     for(size_t i=0; i<data_size; i++)
-        data[i] = (scale_factor*raw[i]+add_offset)*DEG_TO_RAD;
+        data[i] = proj_torad(scale_factor*raw[i]+add_offset);
 
     delete[] raw;
 }
@@ -41,7 +42,7 @@ void load_raw_data_double(const NcFile &dataFile, const string &var_name, double
     var.getVar(raw);
 
     for(size_t i=0; i<data_size; i++)
-        data[i] = raw[i]*DEG_TO_RAD;
+        data[i] = proj_torad(raw[i]);
 
     delete[] raw;
 }
@@ -184,21 +185,63 @@ void LambertGrid::compute_grid_proj(NcFile &dataFile){
     /// *************************** Proj *****************************
 
     // Init proj
-    projPJ pj_lambert, pj_latlong;
-    if (!(pj_lambert = pj_init_plus("+init=epsg:2154"))){
-        cout << "[Lambert_node] Error Lambert" << endl;
-        exit(1);
-    }
-    if (!(pj_latlong = pj_init_plus("+init=epsg:4326"))){
-        cout << "[Lambert_node] Error LatLong" << endl;
-        exit(1);
+    PJ_CONTEXT *C;
+    C = proj_context_create();
+
+
+    PJ *pj_lambert2latlong = proj_create(C, "+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ");
+//    PJ *pj_lambert2latlong = proj_create(C, "+proj=epsg:2154");
+//    PJ *pj_lambert2latlong = proj_create_crs_to_crs(C, "epsg:4326", "epsg:2154", 0);
+//    PJ *pj_lambert2latlong = proj_create(C, "+init=urn:ogc:def:crs:epsg::2154");
+//    PJ *pj_latlong = proj_create(C, "+init=epsg:4326");
+
+    if(pj_lambert2latlong==0){
+      cout << "[Lambert_node] Error Lambert " << proj_errno_string(proj_errno(pj_lambert2latlong)) << endl;
+      exit(1);
     }
 
-    pj_transform(pj_latlong, pj_lambert, nij_u_size, 1, longitude_u, latitude_u, nullptr);
-    pj_transform(pj_latlong, pj_lambert, nij_v_size, 1, longitude_v, latitude_v, nullptr);
-    pj_transform(pj_latlong, pj_lambert, nij_size, 1, longitude, latitude, nullptr);
-    pj_free(pj_lambert);
-    pj_free(pj_latlong);
+    PJ_COORD *coord_u = new PJ_COORD[nij_u_size];
+    for(size_t i=0; i<nij_u_size; i++){
+      coord_u[i].lp.lam = longitude_u[i];
+      coord_u[i].lp.phi = latitude_u[i];
+    }
+
+    PJ_COORD *coord_v = new PJ_COORD[nij_v_size];
+    for(size_t i=0; i<nij_v_size; i++){
+      coord_v[i].lp.lam = longitude_v[i];
+      coord_v[i].lp.phi = latitude_v[i];
+    }
+
+    PJ_COORD *coord = new PJ_COORD[nij_size];
+    for(size_t i=0; i<nij_size; i++){
+      coord[i].lp.lam = longitude[i];
+      coord[i].lp.phi = latitude[i];
+    }
+
+
+    proj_trans_array(pj_lambert2latlong, PJ_FWD, nij_size, coord);
+    proj_trans_array(pj_lambert2latlong, PJ_FWD, nij_u_size, coord_u);
+    proj_trans_array(pj_lambert2latlong, PJ_FWD, nij_v_size, coord_v);
+
+    for(size_t i=0; i<nij_u_size; i++){
+      longitude_u[i] = coord_u[i].xy.x;
+      latitude_u[i] = coord_u[i].xy.y;
+    }
+
+    for(size_t i=0; i<nij_v_size; i++){
+      longitude_v[i] = coord_v[i].xy.x;
+      latitude_v[i] = coord_v[i].xy.y;
+    }
+
+    for(size_t i=0; i<nij_size; i++){
+      longitude[i] = coord[i].xy.x;
+      latitude[i] = coord[i].xy.y;
+    }
+
+    proj_destroy(pj_lambert2latlong);
+    delete[] coord_u;
+    delete[] coord_v;
+    delete[] coord;
 
     fill_vector(m_U_X, m_U_Y, longitude_u, latitude_u, ni_u_size, nj_u_size);
     fill_vector(m_V_X, m_V_Y, longitude_v, latitude_v, ni_v_size, nj_v_size);

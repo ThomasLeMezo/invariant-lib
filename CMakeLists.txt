@@ -115,7 +115,10 @@ endif()
 #####################################################
 # Proj4
 if(WITH_PROJ4)
- find_package(Proj4)
+	find_package(PROJ4 REQUIRED
+		PATHS ${PROJ4_ROOT}
+		NO_DEFAULT_PATH
+		)
  if(PROJ4_FOUND)
   include_directories(${PROJ4_INCLUDE_DIRS})
   set(LIBS_PROJ4 ${LIBS_PROJ4} ${PROJ4_LIBRARIES})
