@@ -6,6 +6,7 @@
 #include "dataSet/datasetnode.h"
 #include "dataSet/datasetvirtualnode.h"
 #include <netcdf>
+#include <proj.h>
 
 namespace invariant {
 
@@ -140,6 +141,15 @@ private:
     mutable std::vector<array<array<double, 2>, 2>> m_last_data_V_return;
     mutable std::vector<std::vector<std::array<int, 2>>> m_last_target_U;
     mutable std::vector<std::vector<std::array<int, 2>>> m_last_target_V;
+
+    double m_convergence_angle = 0.0;
+    double m_conv_cos = 0.0;
+    double m_conv_sin = 0.0;
+
+    PJ_CONTEXT *m_C;
+    PJ *m_pj_lambert2latlong;
+
+    const double m_lambda_0 = proj_torad(3.0);
 };
 
 inline const std::vector<std::vector<double>>& LambertGrid::get_U_X() const{
