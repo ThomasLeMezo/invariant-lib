@@ -26,3 +26,5 @@ add_subdirectory(17_non_linear_system)
 
 add_subdirectory(18_piston_regulation)
 
+add_subdirectory(19_pendulum)
+
