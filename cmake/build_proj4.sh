@@ -13,7 +13,7 @@ if [ ! -e "$HOME/proj4/lib/libproj.a" ]; then
   echo 'Installing Proj4...';
   PROJ4_VERSION="6.0.0"
   PROJ4_FILE_NAME=proj-${PROJ4_VERSION}
-  PROJ4_ARCHIVE_NAME=${PROJ4_FILE_NAME}.tar.xz
+  PROJ4_ARCHIVE_NAME=${PROJ4_FILE_NAME}.tar.gz
 
   wget https://download.osgeo.org/proj/${PROJ4_ARCHIVE_NAME}
 
@@ -24,7 +24,7 @@ if [ ! -e "$HOME/proj4/lib/libproj.a" ]; then
   mkdir build
   cd build
   cmake -DBUILD_LIBPROJ_SHARED=off \
-        -DCMAKE_INSTALL_PREFIX=$HOME/proj4 \
+        -DCMAKE_INSTALL_PREFIX=${HOME}/proj4 \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DBUILD_CCT=OFF \
         -DBUILD_CS2CS=OFF \
@@ -35,7 +35,7 @@ if [ ! -e "$HOME/proj4/lib/libproj.a" ]; then
         -DBUILD_PROJ=OFF \
         -DBUILD_PROJINFO=OFF \
          ..
-  cmake --build .
-
+  cmake --build . -- -j 4
   cd ..
+  make install
 fi

@@ -16,18 +16,27 @@
 #
 ###############################################################################
 
-# Try to use OSGeo4W installation
-if(WIN32)
-    set(PROJ4_OSGEO4W_HOME "C:/OSGeo4W") 
+find_package(PkgConfig)
+#pkg_check_modules(PC_NETCDFLIB QUIET ibex)
+message(STATUS "[PROJ4] PROJ4_ROOT ${PROJ4_ROOT}")
 
-    if($ENV{OSGEO4W_HOME})
-        set(PROJ4_OSGEO4W_HOME "$ENV{OSGEO4W_HOME}") 
-    endif()
+if(Proj4_USE_STATIC)
+  SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)
 endif()
 
-find_path(PROJ4_INCLUDE_DIR proj_api.h
-    PATHS ${PROJ4_OSGEO4W_HOME}/include
-    DOC "Path to PROJ.4 library include directory")
+
+find_path(PROJ4_INCLUDE_DIR proj
+          HINTS ${PROJ4_ROOT}
+          PATH_SUFFIXES include
+          NO_DEFAULT_PATH)
+
+find_library(PROJ4_LIBRARY NAMES proj
+            HINTS ${PROJ4_ROOT}
+            PATH_SUFFIXES lib
+            NO_DEFAULT_PATH)
+
+set(PROJ4_LIBRARIES ${PROJ4_LIBRARY})
+set(PROJ4_INCLUDE_DIRS ${PROJ4_INCLUDE_DIR})
 
 if (PROJ4_INCLUDE_DIR)
 	# Extract version from proj_api.h (ex: 480)
@@ -40,19 +49,10 @@ if (PROJ4_INCLUDE_DIR)
 	set(PROJ4_VERSION ${PJ_VERSIONSTR})
 endif()
 
-set(PROJ4_NAMES ${PROJ4_NAMES} proj proj_i)
-find_library(PROJ4_LIBRARY
-    NAMES ${PROJ4_NAMES}
-    PATHS ${PROJ4_OSGEO4W_HOME}/lib
-    DOC "Path to PROJ.4 library file")
-
-if(PROJ4_LIBRARY)
-  set(PROJ4_LIBRARIES ${PROJ4_LIBRARY})
-endif()
-
 # Handle the QUIETLY and REQUIRED arguments and set PROJ4_FOUND to TRUE
 # if all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(PROJ4 DEFAULT_MSG
-	PROJ4_LIBRARY
-PROJ4_INCLUDE_DIR)
+find_package_handle_standard_args(PROJ4  DEFAULT_MSG
+                                  PROJ4_LIBRARY PROJ4_INCLUDE_DIR)
+
+mark_as_advanced(PROJ4_INCLUDE_DIR PROJ4_LIBRARY )

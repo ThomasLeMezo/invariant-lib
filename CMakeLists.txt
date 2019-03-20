@@ -13,8 +13,8 @@ project(${PACKAGE_NAME})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
 
 # debug/release options
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0 -Wno-reorder -Wno-unknown-pragmas")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder -Wno-unknown-pragmas")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0 -Wno-reorder -Wno-unknown-pragmas -Wunused-variable")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -Wno-reorder -Wno-unknown-pragmas -Wunused-variable")
 
 # Options
 option(WITH_EXAMPLES "Build examples" ON)
@@ -115,13 +115,27 @@ endif()
 #####################################################
 # Proj4
 if(WITH_PROJ4)
-	find_package(PROJ4 REQUIRED
-		PATHS ${PROJ4_ROOT}
-		NO_DEFAULT_PATH
+
+	find_package (SQLite3 REQUIRED)
+	if (SQLITE3_FOUND)
+			include_directories(${SQLITE3_INCLUDE_DIRS})
+			set(LIBS_PROJ4 ${LIBS_PROJ4} ${SQLITE3_LIBRARIES})
+			message (STATUS "[SQLITE3] SQLITE3_INCLUDE_DIRS  = ${SQLITE3_INCLUDE_DIRS}")
+			message (STATUS "[SQLITE3] SQLITE3_LIBRARIES = ${SQLITE3_LIBRARIES}")
+			message(STATUS "[SQLITE3] OK")
+	endif (SQLITE3_FOUND)
+
+	set(Proj4_USE_STATIC 1)
+	find_package(Proj4 REQUIRED
+#		PATHS ${PROJ4_ROOT}
+#		NO_DEFAULT_PATH
 		)
  if(PROJ4_FOUND)
-  include_directories(${PROJ4_INCLUDE_DIRS})
+  include_directories(${PROJ4_INCLUDE_DIR})
   set(LIBS_PROJ4 ${LIBS_PROJ4} ${PROJ4_LIBRARIES})
+  message (STATUS "[PROJ4] PROJ4_INCLUDE_DIRS  = ${PROJ4_INCLUDE_DIR}")
+  message (STATUS "[PROJ4] LIBS_PROJ4 = ${LIBS_PROJ4}")
+  message (STATUS "[PROJ4] PJ_VERSIONSTR = ${PJ_VERSIONSTR}")
   message(STATUS "[PROJ4] OK")
  else()
   message(FATAL_ERROR "[PROJ4] NO")
