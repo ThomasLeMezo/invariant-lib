@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     // Physical parameters
     double g = 9.81;
     double rho = 1025.0;
-    double m = 9.045;
+    double m = 9.045*2.;
     double diam = 0.24;
     double alpha = tick_to_volume*20.0;
 

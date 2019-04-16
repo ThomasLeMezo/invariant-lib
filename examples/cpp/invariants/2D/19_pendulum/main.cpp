@@ -79,5 +79,4 @@ int main(int argc, char *argv[])
     file += "pendulum_invariant.svg";
     vibes::saveImage(file);
     vibes::endDrawing();
-
 }
