@@ -60,12 +60,11 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     VibesMaze v_maze("Van Der Pol Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    vector<double> memory_time, memory_volume_outer, memory_volume_inner;
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     
-    for(int i=0; i<21; i++){ // 13
+    for(int i=0; i<20; i++){ // 13
         cout << i << endl;
         double time_local = omp_get_wtime();
 
@@ -76,7 +75,7 @@ int main(int argc, char *argv[])
         // Stat
         double t = omp_get_wtime() - time_local;
         double v_outer =  v_maze.get_volume();
-        double v_inner =  v_maze.get_volume(true);
+        double v_inner = v_maze.get_volume(true);
         v_maze.add_stat(i, t, v_outer, v_inner);
     }
     cout << "TIME TOTAL = " << omp_get_wtime() - time_start << endl;

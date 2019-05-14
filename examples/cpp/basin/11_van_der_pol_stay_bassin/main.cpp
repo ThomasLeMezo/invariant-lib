@@ -84,33 +84,43 @@ int main(int argc, char *argv[]){
     dom_inner_basin.add_maze_initialization_inter(&maze_inner);
     dom_outer_basin.add_maze_initialization_union(&maze_outer);
 
+    vibes::beginDrawing();
+    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    VibesMaze v_maze_basin("Basin", &maze_outer_basin, &maze_inner_basin);
+    v_maze_basin.setProperties(0, 0, 1024, 1024);
+
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    omp_set_num_threads(1);
 
-    for(int i=0; i<14; i++){
+    for(int i=0; i<20; i++){
         cout << i << endl;
+        double time_local = omp_get_wtime();
+
         subpaving.bisect();
         maze_outer.contract();
         maze_inner.contract();
 
         maze_outer_basin.contract();
         maze_inner_basin.contract();
+
+        // Stat
+        double t = omp_get_wtime() - time_local;
+        double v_outer =  v_maze_basin.get_volume();
+        double v_inner = v_maze_basin.get_volume(true);
+        v_maze_basin.add_stat(i, t, v_outer, v_inner);
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << subpaving << endl;
 
-    vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "r[]");
 
-    VibesMaze v_maze_basin("Basin", &maze_outer_basin, &maze_inner_basin);
-    v_maze_basin.setProperties(0, 0, 1024, 1024);
     v_maze_basin.show();
     v_maze_basin.drawCircle(x1_c, x2_c, r, "r[]");
+    v_maze_basin.save_stat_to_file("stat.txt");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(-0.5);

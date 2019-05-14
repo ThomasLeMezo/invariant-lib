@@ -42,6 +42,7 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::EulerianMazeIBEX
 }
 
 void VibesMaze::show() const{
+    vibes::selectFigure(m_name);
     show_graph();
     if(m_maze_outer != nullptr && m_maze_inner == nullptr)
         show_maze_outer();
@@ -180,6 +181,13 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
 }
 
 double VibesMaze::get_volume_pave(PaveIBEX *p, const bool inner) const{
+    if(p->get_rooms()[(inner)?m_maze_inner:m_maze_outer]->is_full())
+        return p->get_position().volume();
+    if(!inner && p->get_rooms()[m_maze_outer]->is_empty())
+        return 0.;
+    if(inner && p->get_rooms()[m_maze_outer]->is_empty())
+        return p->get_position().volume();
+
     vector<double> pt_x, pt_y;
     for(const tuple<int, int, bool> &t:m_oriented_path){
         IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
@@ -201,16 +209,29 @@ double VibesMaze::get_volume_pave(PaveIBEX *p, const bool inner) const{
             }
         }
     }
-    if(!pt_x.empty()){
-        double A=0.;
-        for(size_t i=0; i<pt_x.size()-1;i++){
-            A+= pt_x[i]*pt_y[i+1]-pt_x[i+1]*pt_y[i];
-        }
-        return abs(0.5*A);
-    }
-    else{
+    if(pt_x.empty())
         return 0.;
+
+    // Clean list
+    for(size_t i=0; i<pt_x.size()-1; i++){
+        if(pt_x[i]==pt_x[i+1] && pt_y[i]==pt_y[i+1]){
+            pt_x.erase(pt_x.begin()+(i+1));
+            pt_y.erase(pt_y.begin()+(i+1));
+        }
     }
+    if(pt_x[0]==pt_x[pt_x.size()-1] && pt_y[0]==pt_y[pt_y.size()-1]){
+        pt_x.pop_back();
+        pt_y.pop_back();
+    }
+    pt_x.push_back(pt_x[0]);
+    pt_y.push_back(pt_y[0]);
+
+    // Compute Area
+    double A=0.;
+    for(size_t i=0; i<pt_x.size()-1;i++){
+        A+= (pt_x[i]*pt_y[i+1]-pt_x[i+1]*pt_y[i]);
+    }
+    return abs(0.5*A);
 }
 
 double VibesMaze::get_volume(const bool inner) const{
@@ -222,7 +243,7 @@ double VibesMaze::get_volume(const bool inner) const{
         double a = get_volume_pave(m_subpaving->get_paves()[i],inner);
 #pragma omp critical
         {
-        A+=a;
+            A+=a;
         }
     }
 
@@ -231,7 +252,7 @@ double VibesMaze::get_volume(const bool inner) const{
         double a = get_volume_pave(m_subpaving->get_paves_not_bisectable()[i],inner);
 #pragma omp critical
         {
-        A+=a;
+            A+=a;
         }
     }
 
