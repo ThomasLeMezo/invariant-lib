@@ -39,22 +39,32 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze(&dom, &dyn);
     maze.set_enable_contract_vector_field(true);
 
+    // ******* Display ********* //
+    vibes::beginDrawing();
+    VibesMaze v_maze("VanDerPolInvariant", &maze);
+    v_maze.setProperties(0, 0, 1024, 1024);
+
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 //    
 //    omp_set_num_threads(1);
     for(int i=0; i<12; i++){
         cout << i << endl;
+
+        double time_local = omp_get_wtime();
+
         paving.bisect();
         maze.contract();
+
+        // Stat
+        double v_outer =  v_maze.get_volume();
+        cout << "time " << omp_get_wtime() - time_local << endl;
+        cout << "volume outer = " << v_outer << endl;
     }
-    cout << "TIME = " << omp_get_wtime() - time_start << endl;
+    cout << "TIME TOTAL = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    vibes::beginDrawing();
-    VibesMaze v_maze("VanDerPolInvariant", &maze);
-    v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 
 //    IntervalVector position_info(2);

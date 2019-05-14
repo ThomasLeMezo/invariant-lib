@@ -55,35 +55,38 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_outer(&dom_outer, &dyn);
     invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
-    // ******* Algorithm ********* //
-    double time_start = omp_get_wtime();
-    
-    for(int i=0; i<13; i++){
-        paving.bisect();
-        cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
-        cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
-    }
-    cout << "TIME = " << omp_get_wtime() - time_start << endl;
-
-    cout << paving << endl;
+    // ******* Visu ********* //
 
     vibes::beginDrawing();
     VibesMaze v_maze("Van Der Pol Basin", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
+    vector<double> memory_time, memory_volume_outer, memory_volume_inner;
+
+    // ******* Algorithm ********* //
+    double time_start = omp_get_wtime();
+    
+    for(int i=0; i<21; i++){ // 13
+        cout << i << endl;
+        double time_local = omp_get_wtime();
+
+        paving.bisect();
+        maze_outer.contract();
+        maze_inner.contract();
+
+        // Stat
+        double t = omp_get_wtime() - time_local;
+        double v_outer =  v_maze.get_volume();
+        double v_inner =  v_maze.get_volume(true);
+        v_maze.add_stat(i, t, v_outer, v_inner);
+    }
+    cout << "TIME TOTAL = " << omp_get_wtime() - time_start << endl;
+
+    cout << paving << endl;
+
     v_maze.show();
+    v_maze.save_stat_to_file("stat.txt");
 
-//    VibesMaze v_maze_inner("graph_inner",&maze_inner, VibesMaze::VIBES_MAZE_INNER);
-//    v_maze_inner.setProperties(0, 0, 512, 512);
-//    v_maze_inner.show();
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-0.4);
-//    position_info[1] = ibex::Interval(1.34);
-//    v_maze.get_room_info(&maze_inner, position_info);
-
-//    position_info[0] = ibex::Interval(-0.34);
-//    position_info[1] = ibex::Interval(1.34);
-//    v_maze.get_room_info(&maze_inner, position_info);
 
     v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
     vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol_basin.svg", "Van Der Pol Basin");

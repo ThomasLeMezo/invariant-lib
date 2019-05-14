@@ -179,6 +179,70 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
     }
 }
 
+double VibesMaze::get_volume_pave(PaveIBEX *p, const bool inner) const{
+    vector<double> pt_x, pt_y;
+    for(const tuple<int, int, bool> &t:m_oriented_path){
+        IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
+        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[(inner)?m_maze_inner:m_maze_outer];
+        d_iv = d->get_input() | d->get_output();
+
+        if(!d_iv.is_empty()){
+            if(get<2>(t)){
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+            }
+            else{
+                pt_x.push_back(d_iv[0].ub());
+                pt_y.push_back(d_iv[1].ub());
+                pt_x.push_back(d_iv[0].lb());
+                pt_y.push_back(d_iv[1].lb());
+            }
+        }
+    }
+    if(!pt_x.empty()){
+        double A=0.;
+        for(size_t i=0; i<pt_x.size()-1;i++){
+            A+= pt_x[i]*pt_y[i+1]-pt_x[i+1]*pt_y[i];
+        }
+        return abs(0.5*A);
+    }
+    else{
+        return 0.;
+    }
+}
+
+double VibesMaze::get_volume(const bool inner) const{
+    if(inner && m_maze_inner==nullptr)
+        return 0.;
+    double A=0.;
+#pragma omp parallel for
+    for(size_t i=0; i<m_subpaving->get_paves().size(); i++){
+        double a = get_volume_pave(m_subpaving->get_paves()[i],inner);
+#pragma omp critical
+        {
+        A+=a;
+        }
+    }
+
+#pragma omp parallel for
+    for(size_t i=0; i<m_subpaving->get_paves_not_bisectable().size(); i++){
+        double a = get_volume_pave(m_subpaving->get_paves_not_bisectable()[i],inner);
+#pragma omp critical
+        {
+        A+=a;
+        }
+    }
+
+    if(!inner)
+        return A;
+    else{
+        return m_subpaving->get_position().volume() - A;
+    }
+}
+
+
 void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     // Draw backward
     //    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
@@ -386,12 +450,12 @@ void VibesMaze::show_maze_outer_inner() const{
                 vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
         }
 
-//                if(!r_inner->is_removed() && !r_inner->is_empty()){
-//                    if(r_inner->is_initial_door_input())
-//                        vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
-//                    if(r_inner->is_initial_door_output())
-//                        vibes::drawBox(r_inner->get_initial_door_output(), "[#FF8C8C]");
-//                }
+        //                if(!r_inner->is_removed() && !r_inner->is_empty()){
+        //                    if(r_inner->is_initial_door_input())
+        //                        vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
+        //                    if(r_inner->is_initial_door_output())
+        //                        vibes::drawBox(r_inner->get_initial_door_output(), "[#FF8C8C]");
+        //                }
     }
 
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
@@ -581,6 +645,31 @@ void VibesMaze::drawBox(double x_min, double x_max, double y_min, double y_max, 
 
 void VibesMaze::drawBox(const ibex::IntervalVector &box, std::string params) const{
     vibes::drawBox(box, params);
+}
+
+void VibesMaze::add_stat(size_t step, double time, double volume_outer, double volume_inner){
+    m_memory_step.push_back(step);
+    m_memory_time.push_back(time);
+    m_memory_volume_outer.push_back(volume_outer);
+    m_memory_volume_inner.push_back(volume_inner);
+}
+
+void VibesMaze::save_stat_to_file(string namefile){
+    ofstream stat_file;
+    stat_file.open(namefile);
+    for(double &d:m_memory_step)
+        stat_file << d << " ";
+    stat_file << endl;
+    for(double &d:m_memory_time)
+        stat_file << d << " ";
+    stat_file << endl;
+    for(double &d:m_memory_volume_outer)
+        stat_file << d << " ";
+    stat_file << endl;
+    for(double &d:m_memory_volume_inner)
+        stat_file << d << " ";
+    stat_file << endl;
+    stat_file.close();
 }
 
 namespace vibes{

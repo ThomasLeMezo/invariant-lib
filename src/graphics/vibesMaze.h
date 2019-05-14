@@ -66,6 +66,35 @@ public:
      */
     void set_enable_cone(bool val);
 
+    /**
+     * @brief get_volume
+     * @return
+     */
+    double get_volume(const bool inner=false) const;
+
+    /**
+     * @brief get_volume_pave
+     * @param p
+     * @param inner
+     * @return
+     */
+    double get_volume_pave(invariant::PaveIBEX *p, const bool inner=false) const;
+
+    /**
+     * @brief add_stat
+     * @param step
+     * @param time
+     * @param volume_outer
+     * @param volume_inner
+     */
+    void add_stat(size_t step, double time, double volume_outer, double volume_inner);
+
+    /**
+     * @brief save_stat_to_file
+     * @param namefile
+     */
+    void save_stat_to_file(std::string namefile);
+
 private:
     void show_graph() const;
     void show_maze_outer() const;
@@ -95,6 +124,9 @@ private:
 
     bool m_both_wall = false;
     bool m_enable_cones = true;
+
+    // Stat
+    std::vector<double> m_memory_step, m_memory_time, m_memory_volume_outer, m_memory_volume_inner;
 
 };
 
