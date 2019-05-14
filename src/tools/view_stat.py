@@ -32,7 +32,7 @@ ax1.semilogy(step, time, "-o", color=color)
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 color = 'tab:blue'
-ax2.set_ylabel('Border volume', color=color)  # we already handled the x-label with ax1
+ax2.set_ylabel('Uncertainty layer volume', color=color)  # we already handled the x-label with ax1
 ax2.semilogy(step, volume_border, "-o", color=color)
 # ax2.set_ylim([0, 70])
 ax2.axhline(y=0, color='k')
