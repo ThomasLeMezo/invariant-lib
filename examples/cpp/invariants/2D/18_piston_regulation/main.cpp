@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     IntervalVector space(2);
     space[0] = ibex::Interval(-0.1, 0.1);
-    space[1] = ibex::Interval(-2, 80);
+    space[1] = ibex::Interval(0., 80);
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> subpaving(space);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<15; i++){
+    for(int i=0; i<10; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -100,10 +100,15 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("Piston", &maze_outer, &maze_inner);
+    VibesMaze v_maze("piston_regulation", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(true);
+    ibex::IntervalVector white_space(2);
+    white_space[0] = ibex::Interval(-0.01, 0.01);
+    white_space[1] = ibex::Interval::ZERO;
+    v_maze.drawBox(space, "white[white]");
     v_maze.show();
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 
     vibes::endDrawing();
