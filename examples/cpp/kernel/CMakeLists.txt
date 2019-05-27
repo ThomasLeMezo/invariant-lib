@@ -9,4 +9,5 @@ add_subdirectory(03_van_der_pol_kernel)
 add_subdirectory(04_car_on_the_hill_kernel)
 add_subdirectory(05_damien)
 add_subdirectory(06_rayleigh_kernel)
+add_subdirectory(07_piston_kernel)
 

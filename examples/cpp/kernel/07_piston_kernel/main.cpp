@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-1.5e-2, 1.5e-2);
-    space[1] = ibex::Interval(14.7, 15.3);
+    space[0] = ibex::Interval(0, 80.0);
+    space[1] = ibex::Interval(-0.4, 0.4);
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> subpaving(space);
@@ -77,19 +77,13 @@ int main(int argc, char *argv[])
     ibex::Interval z_noise(-1e-3, 1e-3);
     ibex::Interval dz_noise(-5e-3, 5e-3);
 
-    ibex::Function f(x1, x2, Return((-A*(u(x1+dz_noise,x2+z_noise)-chi*x2)-B*abs(x1)*x1),
-                                    x1));
+    ibex::Function f(x2, x1, Return(x1,
+                                    (-A*(Vp-chi*x2)-B*abs(x1)*x1)));
 
-//    ibex::Interval dz_noise1(-5e-3, -4.99e-3);
-//    ibex::Interval dz_noise2(-4.99e-3, 4.99e-3);
-//    ibex::Interval dz_noise3(4.99e-3, 5e-3);
-
-    ibex::Function f_inner1(x1, x2, Return((-A*(u(x1+dz_noise.lb(),x2+z_noise.lb())-chi*x2)-B*abs(x1)*x1),
-                                    x1));
-    ibex::Function f_inner2(x1, x2, Return((-A*(u(x1,x2)-chi*x2)-B*abs(x1)*x1),
-                                    x1));
-//    ibex::Function f_inner3(x1, x2, Return((-A*(u(x1+dz_noise.mid(),x2+z_noise)-chi*x2)-B*abs(x1)*x1),
-//                                    x1));
+    ibex::Function f_inner1(x2, x1, Return(x1,
+                                    (-A*(Vp.lb()-chi*x2)-B*abs(x1)*x1)));
+    ibex::Function f_inner2(x2, x1, Return(x1,
+                                    (-A*(Vp.ub()-chi*x2)-B*abs(x1)*x1)));
 
     std::vector<ibex::Function *> f_inner{&f_inner1, &f_inner2/*, &f_inner3*//*, &f_inner4*/};
 
@@ -103,7 +97,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<9; i++){
+    for(int i=0; i<18; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -114,13 +108,13 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("piston_uncertainty", /*&maze_outer,*/ &maze_inner);
+    VibesMaze v_maze("piston_kernel", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(true);
-    ibex::IntervalVector white_space(2);
-    white_space[0] = ibex::Interval(-0.01, 0.01);
-    white_space[1] = ibex::Interval::ZERO;
-    v_maze.drawBox(space, "white[white]");
+    v_maze.set_enable_cone(false);
+//    ibex::IntervalVector white_space(2);
+//    white_space[0] = ibex::Interval(-0.01, 0.01);
+//    white_space[1] = ibex::Interval::ZERO;
+//    v_maze.drawBox(space, "white[white]");
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
