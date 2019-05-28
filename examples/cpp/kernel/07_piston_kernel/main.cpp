@@ -17,10 +17,10 @@ using namespace invariant;
 
 int main(int argc, char *argv[])
 {
-    ibex::Variable x1, x2;
+    ibex::Variable dz, z;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(0, 80.0);
+    space[0] = ibex::Interval(-20, 80.0);
     space[1] = ibex::Interval(-0.4, 0.4);
 
     // ****** Domain ******* //
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     double chi = tick_to_volume*30.0;
 
     // Regulation parameters
-    double x2_target = 15.0; // Desired depth
+    double z_target = 15.0; // Desired depth
     double beta = 0.04/M_PI_2;
     double alpha = 1.0;
     double gamma = beta/alpha;
@@ -59,36 +59,36 @@ int main(int argc, char *argv[])
     ibex::Interval Vp(-2.148e-5, 1.503e-4);
 //    ibex::Interval Vp(-2.148e-10, 1.503e-10);
 
-    ibex::Function e(x2, (x2_target-x2)/alpha);
-    ibex::Function y(x1, x2, (x1-beta*atan(e(x2))));
-    ibex::Function D(x2, (1+pow(e(x2), 2)));
+    ibex::Function e(z, (z_target-z)/alpha);
+    ibex::Function y(dz, z, (dz-beta*atan(e(z))));
+    ibex::Function D(z, (1+pow(e(z), 2)));
 
-    ibex::Function u(x1, x2, min(max((1/A*(l*y(x1,x2)-(B*abs(x1)+gamma/D(x2))*x1)+chi*x2),Vp.lb()),Vp.ub()));
+//    ibex::Function u(dz, z, min(max((1/A*(l*y(dz,z)-(B*abs(dz)+gamma/D(z))*dz)+chi*z),Vp.lb()),Vp.ub()));
 
     invariant::Domain<> dom_outer(&subpaving, FULL_DOOR);
-    dom_outer.set_border_path_in(false);
+    dom_outer.set_border_path_in(true);
     dom_outer.set_border_path_out(false);
 
     invariant::Domain<> dom_inner(&subpaving, FULL_WALL);
-    dom_inner.set_border_path_in(true);
-    dom_inner.set_border_path_out(false);
+    dom_inner.set_border_path_in(false);
+    dom_inner.set_border_path_out(true);
 
     // Evolution function
-    ibex::Interval z_noise(-1e-3, 1e-3);
-    ibex::Interval dz_noise(-5e-3, 5e-3);
+//    ibex::Interval z_noise(-1e-3, 1e-3);
+//    ibex::Interval dz_noise(-5e-3, 5e-3);
 
-    ibex::Function f(x2, x1, Return(x1,
-                                    (-A*(Vp-chi*x2)-B*abs(x1)*x1)));
+    ibex::Function f(z, dz, Return(dz,
+                                   (-A*(Vp-chi*z)-B*abs(dz)*dz)));
 
-    ibex::Function f_inner1(x2, x1, Return(x1,
-                                    (-A*(Vp.lb()-chi*x2)-B*abs(x1)*x1)));
-    ibex::Function f_inner2(x2, x1, Return(x1,
-                                    (-A*(Vp.ub()-chi*x2)-B*abs(x1)*x1)));
+    ibex::Function f_inner1(z, dz, Return(dz,
+                                    (-A*(Vp.lb()-chi*z)-B*abs(dz)*dz)));
+    ibex::Function f_inner2(z, dz, Return(dz,
+                                    (-A*(Vp.ub()-chi*z)-B*abs(dz)*dz)));
 
     std::vector<ibex::Function *> f_inner{&f_inner1, &f_inner2/*, &f_inner3*//*, &f_inner4*/};
 
-    DynamicsFunction dyn_outer(&f, FWD);
-    DynamicsFunction dyn_inner(f_inner, FWD);
+    DynamicsFunction dyn_outer(&f, BWD);
+    DynamicsFunction dyn_inner(f_inner, BWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     VibesMaze v_maze("piston_kernel", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(false);
+    v_maze.set_enable_cone(true);
 //    ibex::IntervalVector white_space(2);
 //    white_space[0] = ibex::Interval(-0.01, 0.01);
 //    white_space[1] = ibex::Interval::ZERO;
