@@ -24,6 +24,7 @@ public:
     VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g);
     VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type=VIBES_MAZE_OUTER);
     VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner, bool both_wall=false);
+    VibesMaze(const std::string& figure_name, std::vector<invariant::MazeIBEX*> &outer, std::vector<invariant::MazeIBEX*> &inner, bool both_wall=false);
     VibesMaze(const std::string& figure_name, invariant::EulerianMazeIBEX* e);
     ~VibesMaze(){}
 
@@ -114,8 +115,11 @@ private:
     invariant::SmartSubPavingIBEX*   m_subpaving = nullptr;
     double              m_overhead_factor;
 
-    invariant::MazeIBEX*    m_maze_outer = nullptr;
-    invariant::MazeIBEX*    m_maze_inner = nullptr;
+
+    std::vector<invariant::MazeIBEX*> m_maze_outer;
+    std::vector<invariant::MazeIBEX*> m_maze_inner;
+//    invariant::MazeIBEX*    m_maze_outer = nullptr;
+//    invariant::MazeIBEX*    m_maze_inner = nullptr;
     invariant::EulerianMazeIBEX* m_eulerian_maze = nullptr;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;

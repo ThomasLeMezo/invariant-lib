@@ -20,16 +20,23 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIB
 
 VibesMaze::VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type): VibesMaze(figure_name, maze->get_subpaving()){
     if(type == VIBES_MAZE_OUTER){
-        m_maze_outer = maze;
+        m_maze_outer.push_back(maze);
         m_type = VIBES_MAZE_OUTER;
     }
     else{
-        m_maze_inner = maze;
+        m_maze_inner.push_back(maze);
         m_type = VIBES_MAZE_INNER;
     }
 }
 
 VibesMaze::VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner, bool both_wall): VibesMaze(figure_name, outer->get_subpaving()){
+    m_maze_outer.push_back(outer);
+    m_maze_inner.push_back(inner);
+    m_type = VIBES_MAZE_OUTER_AND_INNER;
+    m_both_wall = both_wall;
+}
+
+VibesMaze::VibesMaze(const std::string& figure_name, std::vector<invariant::MazeIBEX*> &outer, std::vector<invariant::MazeIBEX*> &inner, bool both_wall): VibesMaze(figure_name, outer[0]->get_subpaving()){
     m_maze_outer = outer;
     m_maze_inner = inner;
     m_type = VIBES_MAZE_OUTER_AND_INNER;
@@ -44,11 +51,11 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::EulerianMazeIBEX
 void VibesMaze::show() const{
     vibes::selectFigure(m_name);
     show_graph();
-    if(m_maze_outer != nullptr && m_maze_inner == nullptr)
+    if(m_maze_outer.size()!=0 && m_maze_inner.size()==0)
         show_maze_outer();
-    else if(m_maze_outer == nullptr && m_maze_inner != nullptr)
+    else if(m_maze_outer.size()==0 && m_maze_inner.size()!=0)
         show_maze_inner();
-    else if(m_maze_outer != nullptr && m_maze_inner != nullptr)
+    else if(m_maze_outer.size()!=0 && m_maze_inner.size()!=0)
         show_maze_outer_inner();
     else if(m_eulerian_maze != nullptr)
         show_eulerian_maze();
@@ -64,14 +71,17 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
     vector<double> pt_x, pt_y;
 
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        invariant::DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
-        IntervalVector d_iv(d->get_input() | d->get_output());
+        IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
+        for(invariant::MazeIBEX* maze:m_maze_inner){
+            invariant::DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[maze];
+            d_iv |= (d->get_input() | d->get_output());
+        }
         IntervalVector* d_iv_list;
         int nb_vec = 1;
         if(m_both_wall)
             d_iv_list = new ibex::IntervalVector(d_iv);
         else
-            nb_vec = d->get_face()->get_position().diff(d_iv, d_iv_list);
+            nb_vec = p->get_faces()[get<0>(t)][get<1>(t)]->get_position().diff(d_iv, d_iv_list);
 
         if(nb_vec == 1){
             IntervalVector d_iv_c(d_iv_list[0]);
@@ -100,12 +110,15 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
 
     if(!m_both_wall){
         pt_x.clear(); pt_y.clear();
-        for(const tuple<int, int, bool> &t:m_oriented_path){
-            DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
-            IntervalVector d_iv(d->get_input() | d->get_output());
+        for(const tuple<int, int, bool> &pt:m_oriented_path){
+            IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
+            for(invariant::MazeIBEX* maze:m_maze_inner){
+                invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
+                d_iv |= (d->get_input() | d->get_output());
+            }
 
             if(!d_iv.is_empty()){
-                if(get<2>(t)){
+                if(get<2>(pt)){
                     pt_x.push_back(d_iv[0].lb());
                     pt_y.push_back(d_iv[1].lb());
                     pt_x.push_back(d_iv[0].ub());
@@ -124,7 +137,8 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
     }
 
     // Draw Cone
-    show_theta(p, m_maze_inner);
+    for(invariant::MazeIBEX* maze:m_maze_inner)
+        show_theta(p, maze);
 }
 
 void VibesMaze::draw_room_outer(PaveIBEX *p) const{
@@ -134,14 +148,25 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
     // Draw Polygon
     vector<double> pt_x, pt_y;
 
-    invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
-    if(!r->is_removed() && r->get_contain_zero() && m_maze_outer->get_contraction_step()==0){ // Begining issue
+    bool display_yellow = true;
+    for(invariant::MazeIBEX* maze:m_maze_outer){
+        invariant::RoomIBEX *r = p->get_rooms()[maze];
+        if(!(!r->is_removed() && r->get_contain_zero() && maze->get_contraction_step()==0)){ // Begining issue
+            display_yellow = false;
+            break;
+        }
+    }
+
+    if(display_yellow){ // Begining issue
         vibes::drawBox(p->get_position(), "black[yellow]");
     }
     else{
         for(const tuple<int, int, bool> &pt:m_oriented_path){
-            DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_maze_outer];
-            IntervalVector d_iv(d->get_input() | d->get_output());
+            IntervalVector d_iv(2);
+            for(invariant::MazeIBEX* maze:m_maze_outer){
+                invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
+                d_iv &= (d->get_input() | d->get_output());
+            }
 
             if(!d_iv.is_empty()){
                 if(get<2>(pt)){
@@ -170,29 +195,46 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
     }
 
     // Draw Cone
-    show_theta(p, m_maze_outer);
+    for(invariant::MazeIBEX* maze:m_maze_outer)
+        show_theta(p, maze);
 
     // Hybrid
-    if(!r->get_hybrid_door_guards().empty()){
-        for(std::pair<ibex::Sep*, ibex::IntervalVector> g:r->get_hybrid_door_guards()){
-            vibes::drawBox(g.second, "black[g]");
+    for(invariant::MazeIBEX* maze:m_maze_outer){
+        invariant::RoomIBEX *r = p->get_rooms()[maze];
+        if(!r->get_hybrid_door_guards().empty()){
+            for(std::pair<ibex::Sep*, ibex::IntervalVector> g:r->get_hybrid_door_guards()){
+                vibes::drawBox(g.second, "black[g]");
+            }
         }
     }
 }
 
 double VibesMaze::get_volume_pave(PaveIBEX *p, const bool inner) const{
-    if(p->get_rooms()[(inner)?m_maze_inner:m_maze_outer]->is_full())
-        return p->get_position().volume();
-    if(!inner && p->get_rooms()[m_maze_outer]->is_empty())
-        return 0.;
-    if(inner && p->get_rooms()[m_maze_outer]->is_empty())
-        return p->get_position().volume();
+    /// ToDo Update for multiple maze
+    //    if(p->get_rooms()[(inner)?m_maze_inner:m_maze_outer]->is_full())
+    //        return p->get_position().volume();
+    //    if(!inner && p->get_rooms()[m_maze_outer]->is_empty())
+    //        return 0.;
+    //    if(inner && p->get_rooms()[m_maze_outer]->is_empty())
+    //        return p->get_position().volume();
 
     vector<double> pt_x, pt_y;
     for(const tuple<int, int, bool> &t:m_oriented_path){
-        IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
-        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[(inner)?m_maze_inner:m_maze_outer];
-        d_iv = d->get_input() | d->get_output();
+
+        IntervalVector d_iv(2);
+        if(inner)
+            d_iv = IntervalVector(2, ibex::Interval::EMPTY_SET);
+        for(invariant::MazeIBEX* maze:(inner)?m_maze_inner:m_maze_outer){
+            invariant::DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[maze];
+            if(!inner)
+                d_iv &= (d->get_input() | d->get_output());
+            else
+                d_iv |= (d->get_input() | d->get_output());
+        }
+
+        //        IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
+        //        DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[(inner)?m_maze_inner:m_maze_outer];
+        //        d_iv = d->get_input() | d->get_output();
 
         if(!d_iv.is_empty()){
             if(get<2>(t)){
@@ -235,7 +277,7 @@ double VibesMaze::get_volume_pave(PaveIBEX *p, const bool inner) const{
 }
 
 double VibesMaze::get_volume(const bool inner) const{
-    if(inner && m_maze_inner==nullptr)
+    if(inner && m_maze_inner.size()==0)
         return 0.;
     double A=0.;
 #pragma omp parallel for
@@ -271,24 +313,29 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
 
     /// **************** DRAW OUTER **************** ///
     vector<double> pt_x, pt_y;
-    for(const tuple<int, int, bool> &t:m_oriented_path){
+    for(const tuple<int, int, bool> &pt:m_oriented_path){
         IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
-        if(m_type != VIBES_MAZE_EULERIAN){
-            DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
-            d_iv = d->get_input() | d->get_output();
-        }
-        else{
+        switch(m_type){
+        case VIBES_MAZE_EULERIAN:
             for(size_t i=0; i<m_eulerian_maze->get_maze_outer_fwd().size(); i++){
-                DoorIBEX *d= p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_fwd()[i]];
+                DoorIBEX *d= p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_eulerian_maze->get_maze_outer_fwd()[i]];
                 IntervalVector d_tmp = d->get_input() | d->get_output();
-                d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_bwd()[m_eulerian_maze->get_maze_outer_bwd().size()-1-i]];
+                d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_eulerian_maze->get_maze_outer_bwd()[m_eulerian_maze->get_maze_outer_bwd().size()-1-i]];
                 d_tmp &= d->get_input() | d->get_output();
                 d_iv |= d_tmp;
             }
+            break;
+        default:
+            IntervalVector d_iv = IntervalVector(2, ibex::Interval::ALL_REALS);
+            for(invariant::MazeIBEX* maze:m_maze_outer){
+                invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
+                d_iv &= (d->get_input() | d->get_output());
+            }
+            break;
         }
 
         if(!d_iv.is_empty()){
-            if(get<2>(t)){
+            if(get<2>(pt)){
                 pt_x.push_back(d_iv[0].lb());
                 pt_y.push_back(d_iv[1].lb());
                 pt_x.push_back(d_iv[0].ub());
@@ -307,31 +354,35 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
 
     /// **************** DRAW INNER **************** ///
     pt_x.clear(); pt_y.clear();
-    for(const tuple<int, int, bool> &t:m_oriented_path){
+    for(const tuple<int, int, bool> &pt:m_oriented_path){
         IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
-        if(m_type != VIBES_MAZE_EULERIAN){
-            DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_inner];
-            d_iv = d->get_input() | d->get_output();
-        }
-        else{
+        switch(m_type){
+        case VIBES_MAZE_EULERIAN:
             d_iv = IntervalVector(2);
             for(size_t i=0; i<m_eulerian_maze->get_maze_inner_fwd().size(); i++){
-                DoorIBEX *d= p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_inner_fwd()[i]];
+                DoorIBEX *d= p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_eulerian_maze->get_maze_inner_fwd()[i]];
                 IntervalVector d_tmp = d->get_input() | d->get_output();
-                d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_inner_bwd()[m_eulerian_maze->get_maze_inner_bwd().size()-1-i]];
+                d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_eulerian_maze->get_maze_inner_bwd()[m_eulerian_maze->get_maze_inner_bwd().size()-1-i]];
                 d_tmp |= d->get_input() | d->get_output();
                 d_iv &= d_tmp;
             }
+            break;
+        default:
+            d_iv = IntervalVector(2, ibex::Interval::EMPTY_SET);
+            for(invariant::MazeIBEX* maze:m_maze_inner){
+                invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
+                d_iv |= (d->get_input() | d->get_output());
+            }
+            break;
         }
 
-
         IntervalVector* d_iv_list;
-        int nb_vec = p->get_faces()[get<0>(t)][get<1>(t)]->get_position().diff(d_iv, d_iv_list);
+        int nb_vec = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_position().diff(d_iv, d_iv_list);
 
         if(nb_vec == 1){
             IntervalVector d_iv_c(d_iv_list[0]);
             if(!d_iv_c.is_empty()){
-                if(get<2>(t)){
+                if(get<2>(pt)){
                     pt_x.push_back(d_iv_c[0].lb());
                     pt_y.push_back(d_iv_c[1].lb());
                     pt_x.push_back(d_iv_c[0].ub());
@@ -350,31 +401,41 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
         vibes::drawPolygon(pt_x, pt_y, "black[#FF00FF]");
 
     /// **************** DRAW EMPTY **************** ///
-    if(!p->get_rooms()[m_maze_outer]->is_full()){
+    bool full_outer = true;
+    for(invariant::MazeIBEX* maze:m_maze_outer){
+        if(!p->get_rooms()[maze]->is_full()){
+            full_outer = false;
+            break;
+        }
+    }
 
+    if(!full_outer){
         pt_x.clear(); pt_y.clear();
-        for(const tuple<int, int, bool> &t:m_oriented_path){
+        for(const tuple<int, int, bool> &pt:m_oriented_path){
             IntervalVector d_iv(2, ibex::Interval::EMPTY_SET);
             if(m_type != VIBES_MAZE_EULERIAN){
-                DoorIBEX *d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_maze_outer];
-                d_iv = d->get_input() | d->get_output();
+                d_iv = IntervalVector(2, ibex::Interval::ALL_REALS);
+                for(invariant::MazeIBEX* maze:m_maze_outer){
+                    invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
+                    d_iv &= (d->get_input() | d->get_output());
+                }
             }
             else{
                 for(size_t i=0; i<m_eulerian_maze->get_maze_outer_fwd().size(); i++){
-                    DoorIBEX *d= p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_fwd()[i]];
+                    DoorIBEX *d= p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_eulerian_maze->get_maze_outer_fwd()[i]];
                     IntervalVector d_tmp = d->get_input() | d->get_output();
-                    d = p->get_faces()[get<0>(t)][get<1>(t)]->get_doors()[m_eulerian_maze->get_maze_outer_bwd()[m_eulerian_maze->get_maze_outer_bwd().size()-1-i]];
+                    d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[m_eulerian_maze->get_maze_outer_bwd()[m_eulerian_maze->get_maze_outer_bwd().size()-1-i]];
                     d_tmp &= d->get_input() | d->get_output();
                     d_iv |= d_tmp;
                 }
             }
             IntervalVector* d_iv_list;
-            int nb_vec = p->get_faces()[get<0>(t)][get<1>(t)]->get_position().diff(d_iv, d_iv_list);
+            int nb_vec = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_position().diff(d_iv, d_iv_list);
 
             if(nb_vec == 1){
                 IntervalVector d_iv_c(d_iv_list[0]);
                 if(!d_iv_c.is_empty()){
-                    if(get<2>(t)){
+                    if(get<2>(pt)){
                         pt_x.push_back(d_iv_c[0].lb());
                         pt_y.push_back(d_iv_c[1].lb());
                         pt_x.push_back(d_iv_c[0].ub());
@@ -395,8 +456,10 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     }
 
     // Draw Cone
-    if(m_type!=VIBES_MAZE_EULERIAN)
-        show_theta(p, m_maze_inner);
+    if(m_type!=VIBES_MAZE_EULERIAN){
+        for(invariant::MazeIBEX* maze:m_maze_outer)
+            show_theta(p, maze);
+    }
     else
         show_theta(p, m_eulerian_maze->get_maze_outer(0));
 }
@@ -407,12 +470,12 @@ void VibesMaze::show_maze_outer() const{
     }
     for(PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-        invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
+        //        invariant::RoomIBEX *r = p->get_rooms()[m_maze_outer];
         //            if(!r->is_removed()){
         draw_room_outer(p);
         //            }
-        if(r->is_empty())
-            vibes::drawBox(p->get_position(), "[blue]");
+        //        if(r->is_empty())
+        //            vibes::drawBox(p->get_position(), "[blue]");
         //        }
     }
 }
@@ -423,12 +486,12 @@ void VibesMaze::show_maze_inner() const{
     }
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-        invariant::RoomIBEX *r = p->get_rooms()[m_maze_inner];
+        //        invariant::RoomIBEX *r = p->get_rooms()[m_maze_inner];
         //            if(!r->is_removed()){
         draw_room_inner(p);
         //            }
-        if(r->is_empty())
-            vibes::drawBox(p->get_position(), "[#FF00FF]");
+        //        if(r->is_empty())
+        //            vibes::drawBox(p->get_position(), "[#FF00FF]");
         //        }
     }
 }
@@ -441,10 +504,16 @@ void VibesMaze::show_eulerian_maze() const{
 
 void VibesMaze::show_maze_outer_inner() const{
     for(PaveIBEX *p:m_subpaving->get_paves()){
-        invariant::RoomIBEX *r_inner = p->get_rooms()[m_maze_inner];
-        invariant::RoomIBEX *r_outer = p->get_rooms()[m_maze_outer];
+        bool full_union_inner = false;
+        for(invariant::MazeIBEX* maze:m_maze_inner){
+            if(p->get_rooms()[maze]->is_full_union()){
+                full_union_inner = true;
+                break;
+            }
+        }
+
         if(m_both_wall){
-            if(r_inner->is_full_union()){
+            if(full_union_inner){
                 draw_room_inner(p);
             }
             else{
@@ -453,8 +522,16 @@ void VibesMaze::show_maze_outer_inner() const{
             }
         }
         else{
-            if(!r_inner->is_full_union()){
-                if(r_outer->is_full_union())
+            if(!full_union_inner){
+                bool full_union_outer = true;
+                for(invariant::MazeIBEX* maze:m_maze_outer){
+                    if(!p->get_rooms()[maze]->is_full_union()){
+                        full_union_inner = false;
+                        break;
+                    }
+                }
+
+                if(full_union_outer)
                     draw_room_inner(p);
                 else
                     draw_room_inner_outer(p);
@@ -464,13 +541,15 @@ void VibesMaze::show_maze_outer_inner() const{
             }
         }
 
-        if(!r_outer->is_removed() && !r_outer->is_empty()){
-            if(r_outer->is_initial_door_input())
-                vibes::drawBox(r_outer->get_initial_door_input(), "[#FF8C8C]");
-            if(r_outer->is_initial_door_output())
-                vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
+        for(invariant::MazeIBEX* maze:m_maze_outer){
+            invariant::RoomIBEX *r_outer = p->get_rooms()[maze];
+            if(!r_outer->is_removed() && !r_outer->is_empty()){
+                if(r_outer->is_initial_door_input())
+                    vibes::drawBox(r_outer->get_initial_door_input(), "[#FF8C8C]");
+                if(r_outer->is_initial_door_output())
+                    vibes::drawBox(r_outer->get_initial_door_output(), "[#FF8C8C]");
+            }
         }
-
         //                if(!r_inner->is_removed() && !r_inner->is_empty()){
         //                    if(r_inner->is_initial_door_input())
         //                        vibes::drawBox(r_inner->get_initial_door_input(), "[#FF8C8C]");
@@ -481,12 +560,33 @@ void VibesMaze::show_maze_outer_inner() const{
 
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
-        invariant::RoomIBEX *r_outer = p->get_rooms()[m_maze_outer];
-        invariant::RoomIBEX *r_inner = p->get_rooms()[m_maze_inner];
-        if(r_outer->is_empty())
+
+
+        bool empty_outer = false;
+        for(invariant::MazeIBEX* maze:m_maze_outer){
+            invariant::RoomIBEX *r_outer = p->get_rooms()[maze];
+            if(r_outer->is_empty()){
+                empty_outer = true;
+                break;
+            }
+        }
+
+        if(empty_outer)
             vibes::drawBox(p->get_position(), "black[blue]");
-        if(r_inner->is_empty() && !m_both_wall)
-            vibes::drawBox(p->get_position(), "black[#FF00FF]");
+
+        if(!m_both_wall){
+            bool empty_inner = true;
+            for(invariant::MazeIBEX* maze:m_maze_inner){
+                invariant::RoomIBEX *r_inner = p->get_rooms()[maze];
+                if(!r_inner->is_empty()){
+                    empty_inner = false;
+                    break;
+                }
+            }
+
+            if(empty_inner)
+                vibes::drawBox(p->get_position(), "black[#FF00FF]");
+        }
         //        }
     }
 }
@@ -623,10 +723,18 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         //        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave
-        if(m_maze_inner != nullptr && !p->get_rooms()[m_maze_inner]->is_full_union()){ //maze->get_domain()->get_init() == FULL_WALL){
-            draw_room_inner(p);
+        if(m_maze_inner.size()!=0){
+            bool full_union = false;
+            for(invariant::MazeIBEX* maze:m_maze_inner){
+                if(p->get_rooms()[maze]->is_full_union()){
+                    full_union=true;
+                    break;
+                }
+            }
+            if(!full_union)
+                draw_room_inner(p);
         }
-        if(m_maze_outer != nullptr){//maze->get_domain()->get_init() == FULL_DOOR){
+        if(m_maze_outer.size()!=0){//maze->get_domain()->get_init() == FULL_DOOR){
             draw_room_outer(p);
         }
         //        else{
