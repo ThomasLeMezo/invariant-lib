@@ -37,7 +37,8 @@ int main(int argc, char *argv[])
     double rho = 1025.0;
     double m = 9.045*2.;
     double diam = 0.24;
-    double chi = tick_to_volume*30.0;
+//    double chi = tick_to_volume*30.0;
+    double chi = -tick_to_volume*10.0;
     double Cf = M_PI*pow(diam/2.0,2);
 
     double A = g*rho/m;
@@ -92,7 +93,7 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
 
-    for(int i=0; i<15; i++){
+    for(int i=0; i<16; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -108,17 +109,17 @@ int main(int argc, char *argv[])
     vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
     VibesMaze v_maze("piston_kernel", list_outer, list_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(true);
+    v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
-    VibesMaze v_maze_inner_fwd("piston_kernel_inner_fwd", &maze_inner_fwd);
-    v_maze_inner_fwd.setProperties(0, 0, 512, 512);
-    v_maze_inner_fwd.show();
+//    VibesMaze v_maze_inner_fwd("piston_kernel_inner_fwd", &maze_inner_fwd);
+//    v_maze_inner_fwd.setProperties(0, 0, 512, 512);
+//    v_maze_inner_fwd.show();
 
-    VibesMaze v_maze_inner_bwd("piston_kernel_inner_bwd", &maze_inner_bwd);
-    v_maze_inner_bwd.setProperties(0, 0, 512, 512);
-    v_maze_inner_bwd.show();
+//    VibesMaze v_maze_inner_bwd("piston_kernel_inner_bwd", &maze_inner_bwd);
+//    v_maze_inner_bwd.setProperties(0, 0, 512, 512);
+//    v_maze_inner_bwd.show();
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(68.);

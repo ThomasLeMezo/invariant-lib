@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-1.5e-2, 1.5e-2);
-    space[1] = ibex::Interval(14.7, 15.3);
+    space[0] = ibex::Interval(14.7, 15.3); // depth
+    space[1] = ibex::Interval(-1.5e-2, 1.5e-2); // velocity
 
     // ****** Domain ******* //
     invariant::SmartSubPaving<> subpaving(space);
@@ -69,61 +69,55 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
-    invariant::Domain<> dom_inner(&subpaving, FULL_WALL);
-    dom_inner.set_border_path_in(true);
-    dom_inner.set_border_path_out(false);
+    invariant::Domain<> dom_inner_fwd(&subpaving, FULL_WALL);
+    dom_inner_fwd.set_border_path_in(true);
+    dom_inner_fwd.set_border_path_out(false);
 
     // Evolution function
     ibex::Interval z_noise(-1e-3, 1e-3);
     ibex::Interval dz_noise(-5e-3, 5e-3);
 
-    ibex::Function f(x1, x2, Return((-A*(u(x1+dz_noise,x2+z_noise)-chi*x2)-B*abs(x1)*x1),
-                                    x1));
+    ibex::Function f(x2, x1, Return(x1,(-A*(u(x1+dz_noise,x2+z_noise)-chi*x2)-B*abs(x1)*x1)));
 
 //    ibex::Interval dz_noise1(-5e-3, -4.99e-3);
 //    ibex::Interval dz_noise2(-4.99e-3, 4.99e-3);
 //    ibex::Interval dz_noise3(4.99e-3, 5e-3);
 
-    ibex::Function f_inner1(x1, x2, Return((-A*(u(x1+dz_noise.lb(),x2+z_noise.lb())-chi*x2)-B*abs(x1)*x1),
-                                    x1));
-    ibex::Function f_inner2(x1, x2, Return((-A*(u(x1,x2)-chi*x2)-B*abs(x1)*x1),
-                                    x1));
-//    ibex::Function f_inner3(x1, x2, Return((-A*(u(x1+dz_noise.mid(),x2+z_noise)-chi*x2)-B*abs(x1)*x1),
-//                                    x1));
+    ibex::Function f_inner1_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise.lb(),x2+z_noise.lb())-chi*x2)-B*abs(x1)*x1)));
+//    ibex::Function f_inner2_fwd(x2, x1, Return(x1,(-A*(u(x1,x2)-chi*x2)-B*abs(x1)*x1)));
+    ibex::Function f_inner3_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise.ub(),x2+z_noise.ub())-chi*x2)-B*abs(x1)*x1)));
 
-    std::vector<ibex::Function *> f_inner{&f_inner1, &f_inner2/*, &f_inner3*//*, &f_inner4*/};
+    std::vector<ibex::Function *> f_inner_fwd{&f_inner1_fwd/*, &f_inner2_fwd*/, &f_inner3_fwd};
 
-    DynamicsFunction dyn_outer(&f, FWD);
-    DynamicsFunction dyn_inner(f_inner, FWD);
+    DynamicsFunction dyn_outer(&f, FWD_BWD);
+    DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
 
     // ******* Maze ********* //
     invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+    invariant::Maze<> maze_inner_fwd(&dom_inner_fwd, &dyn_inner_fwd);
 
     // ******* Algorithm ********* //
+    omp_set_num_threads(1);
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<9; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
-        maze_inner.contract();
+        maze_inner_fwd.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("piston_uncertainty", /*&maze_outer,*/ &maze_inner);
+
+    VibesMaze v_maze("piston_uncertainty", &maze_outer, &maze_inner_fwd);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(true);
-    ibex::IntervalVector white_space(2);
-    white_space[0] = ibex::Interval(-0.01, 0.01);
-    white_space[1] = ibex::Interval::ZERO;
-    v_maze.drawBox(space, "white[white]");
+    v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
-
+    // ToDo: issue with dimension of figure
 
     vibes::endDrawing();
 
