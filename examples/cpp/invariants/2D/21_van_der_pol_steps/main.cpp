@@ -48,15 +48,15 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
     std::string file = "/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/";
-    file += "van_der_pol_largest_negative_invariant";
+    file += "van_der_pol_largest_positive_invariant";
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<20; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
 
         subpaving.bisect();

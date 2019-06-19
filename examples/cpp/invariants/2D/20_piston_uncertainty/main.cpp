@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 //    ibex::Function f_inner2_fwd(x2, x1, Return(x1,(-A*(u(x1,x2)-chi*x2)-B*abs(x1)*x1)));
     ibex::Function f_inner3_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise.ub(),x2+z_noise.ub())-chi*x2)-B*abs(x1)*x1)));
 
-    std::vector<ibex::Function *> f_inner_fwd{&f_inner1_fwd/*, &f_inner2_fwd*/, &f_inner3_fwd};
+    std::vector<ibex::Function *> f_inner_fwd{&f_inner1_fwd, /*&f_inner2_fwd, */&f_inner3_fwd};
 
     DynamicsFunction dyn_outer(&f, FWD_BWD);
     DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
