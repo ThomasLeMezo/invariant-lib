@@ -35,9 +35,9 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_out(true);
 
     // ****** Dynamics ******* //
-    ibex::Function f(x1, x2, Return(x2,
+    ibex::Function f(x1, x2, -Return(x2,
                                      (1.0*(1.0-pow(x1, 2))*x2-x1)));
-    ibex::Function f2(x1, x2, Return(x2,
+    ibex::Function f2(x1, x2, -Return(x2,
                                       (1.0*(1.0-pow(x1, 2))*x2-x1)));
     DynamicsFunction dyn_outer(&f, FWD); // Duplicate because of simultaneous access of f (semaphore on DynamicsFunction)
     DynamicsFunction dyn_inner(&f2, FWD);
@@ -47,32 +47,28 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
 
     vibes::beginDrawing();
+    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 1000, 800);
+    v_maze.set_enable_cone(false);
+    std::string file = "/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/";
+    file += "van_der_pol_largest_positive_invariant";
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<14; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
 
         subpaving.bisect();
         maze_outer.contract();
         maze_inner.contract();
+
+        v_maze.drawBox(space, "white[white]");
+        v_maze.show();
+        vibes::saveImage(file + to_string(i) + ".svg");
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 1000, 800);
-    v_maze.set_enable_cone(false);
-    v_maze.drawBox(space, "white[white]");
-    v_maze.show();
-
-    //    IntervalVector position_info(2);
-    //    position_info[0] = ibex::Interval(-1);
-    //    position_info[1] = ibex::Interval(2.5);
-    ////    v_maze.show_room_info(&maze_outer, position_info);
-
-    std::string file = "/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/";
-    file += "van_der_pol_largest_positive_invariant.svg";
-    vibes::saveImage(file);
     vibes::endDrawing();
+
 }

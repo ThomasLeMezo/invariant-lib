@@ -30,3 +30,6 @@ add_subdirectory(19_pendulum)
 
 add_subdirectory(20_piston_uncertainty)
 
+add_subdirectory(21_van_der_pol_steps)
+add_subdirectory(22_van_der_pol_invariant_bracketing_stats)
+
