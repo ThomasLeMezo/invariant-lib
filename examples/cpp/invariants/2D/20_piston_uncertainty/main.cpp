@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 //    ibex::Function f_inner3(x1, x2, Return((-A*(u(x1+dz_noise.mid(),x2+z_noise)-chi*x2)-B*abs(x1)*x1),
 //                                    x1));
 
-    std::vector<ibex::Function *> f_inner{&f_inner1, &f_inner2/*, &f_inner3*//*, &f_inner4*/};
+    std::vector<ibex::Function *> f_inner{&f_inner1/*, &f_inner2*//*, &f_inner3*//*, &f_inner4*/};
 
     DynamicsFunction dyn_outer(&f, FWD);
     DynamicsFunction dyn_inner(f_inner, FWD);
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<9; i++){
+    for(int i=0; i<16; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("piston_uncertainty", /*&maze_outer,*/ &maze_inner);
+    VibesMaze v_maze("piston_uncertainty", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(true);
     ibex::IntervalVector white_space(2);

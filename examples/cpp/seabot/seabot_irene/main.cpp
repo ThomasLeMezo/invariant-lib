@@ -43,6 +43,8 @@ int main(int argc, char *argv[]){
     return -1;
   }
 
+  vector<array<double, 3>> init_conditions;
+
   pt::ptree tree;
   string file_xml = argv[1];
 
@@ -54,23 +56,53 @@ int main(int argc, char *argv[]){
     cout << " READ file_xml = " << file_xml << endl;
 
   pt::read_xml(file_xml, tree);
-  auto node = tree.get_child("RADAR");
-  string file_name = node.get<string>("file");
-  string file_output = node.get<string>("file_output");
-  double x_init = node.get<double>("x");
-  double y_init = node.get<double>("y");
-  double t_init = node.get<double>("t_start");
-  double t_end = node.get<double>("t_duration");
-  double dt = node.get<double>("dt");
+  auto radar = tree.get_child("RADAR");
+  string file_name = radar.get<string>("file");
+  string file_output = radar.get<string>("file_output");
+  double t_end = radar.get<double>("t_duration");
+  double dt = radar.get<double>("dt");
 
-  double delta_x = node.get<double>("delta_x");
-  double delta_y = node.get<double>("delta_y");
-  double delta_t = node.get<double>("delta_t");
-  double nb_x = node.get<double>("nb_x");
-  double nb_y = node.get<double>("nb_y");
-  double nb_t = node.get<double>("nb_t");
+  try{
+    auto grid = radar.get_child("GRID");
+
+    double x_init = grid.get<double>("x");
+    double y_init = grid.get<double>("y");
+    double t_init = grid.get<double>("t_start");
+
+    double delta_x = grid.get<double>("delta_x");
+    double delta_y = grid.get<double>("delta_y");
+    double delta_t = grid.get<double>("delta_t");
+    double nb_x = grid.get<double>("nb_x");
+    double nb_y = grid.get<double>("nb_y");
+    double nb_t = grid.get<double>("nb_t");
+
+    for(double x=-nb_x; x<=nb_x; x++){
+      for(double y=-nb_y; y<=nb_y; y++){
+        for(double t=-nb_t; t<=nb_t; t++){
+          init_conditions.push_back(array<double, 3>{x_init+delta_x*x, y_init+delta_y*y, t_init+delta_t*t});
+        }
+      }
+    }
+
+  } catch (std::exception const&  ex){
+    cout << "No grid define (" << ex.what() << ")" << endl;
+  }
+
+  try{
+    auto grid = radar.get_child("BUOY");
+    BOOST_FOREACH(pt::ptree::value_type &v, grid.get_child("POINT")){
+      auto point = v.second;
+      init_conditions.push_back(array<double, 3>{point.get<double>("x"), point.get<double>("y"), point.get<double>("t_start")});
+    }
+  } catch (std::exception const&  ex){
+    cout << "No Buoy found (" << ex.what() << ")" << endl;
+  }
 
   cout << "file_name = " << file_name << endl;
+
+  cout << "Initial conditions" << endl;
+  for(array<double, 3> &i:init_conditions)
+    cout << std::setprecision(10) << "> x=" << i[0] << ", y=" << i[1] << ", t=" << i[2] << endl;
 
   LambertGrid g(file_name);
 
@@ -84,14 +116,6 @@ int main(int argc, char *argv[]){
 
   bool plot_unfinished_trajectories = true;
 
-  vector<array<double, 3>> init_conditions;
-  for(double x=-nb_x; x<=nb_x; x++){
-    for(double y=-nb_y; y<=nb_y; y++){
-      for(double t=-nb_t; t<=nb_t; t++){
-        init_conditions.push_back(array<double, 3>{x_init+delta_x*x, y_init+delta_y*y, t_init+delta_t*t});
-      }
-    }
-  }
 
   vtkSmartPointer<vtkAppendPolyData> trajectories = vtkSmartPointer<vtkAppendPolyData>::New();
 
@@ -125,7 +149,7 @@ int main(int argc, char *argv[]){
       x_tmp+=u*dt;
       y_tmp+=v*dt;
 
-      points->InsertNextPoint(x_tmp, y_tmp, t+dt-t_init);
+      points->InsertNextPoint(x_tmp, y_tmp, t+dt);
       if(!valid)
         break;
     }

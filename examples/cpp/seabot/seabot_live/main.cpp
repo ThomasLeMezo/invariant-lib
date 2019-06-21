@@ -14,7 +14,7 @@ using namespace invariant;
 bool array_sort (array<double, 3> i,array<double, 3> j) { return (i[2]<j[2]); }
 
 int main(int argc, char *argv[]){
-    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files_rade.xml");
+    LambertGrid g("/home/lemezoth/Documents/ensta/flotteur/data_ifremer/files.xml");
 
     double time_start = omp_get_wtime();
 
