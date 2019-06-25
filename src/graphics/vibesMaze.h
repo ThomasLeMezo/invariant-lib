@@ -96,6 +96,13 @@ public:
      */
     void save_stat_to_file(std::string namefile);
 
+    /**
+     * @brief set_scale
+     * @param scale_x
+     * @param scale_y
+     */
+    void set_scale(double scale_x, double scale_y);
+
 private:
     void show_graph() const;
     void show_maze_outer() const;
@@ -129,6 +136,8 @@ private:
     bool m_both_wall = false;
     bool m_enable_cones = true;
 
+    ibex::IntervalVector m_scale_factor;
+
     // Stat
     std::vector<double> m_memory_step, m_memory_time, m_memory_volume_outer, m_memory_volume_inner;
 
@@ -144,6 +153,11 @@ namespace vibes{
 
 inline void VibesMaze::set_enable_cone(bool val){
     m_enable_cones = val;
+}
+
+inline void VibesMaze::set_scale(double scale_x, double scale_y){
+    m_scale_factor[0] = ibex::Interval(scale_x);
+    m_scale_factor[1] = ibex::Interval(scale_y);
 }
 
 #endif // VibesMaze_H

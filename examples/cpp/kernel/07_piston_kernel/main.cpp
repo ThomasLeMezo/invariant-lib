@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
     double rho = 1025.0;
     double m = 9.045*2.;
     double diam = 0.24;
-//    double chi = tick_to_volume*30.0;
-    double chi = -tick_to_volume*10.0;
+    double chi = tick_to_volume*30.0;
+//    double chi = -tick_to_volume*10.0;
     double Cf = M_PI*pow(diam/2.0,2);
 
     double A = g*rho/m;
@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
     VibesMaze v_maze("piston_kernel", list_outer, list_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_scale(1., 10.);
     v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
