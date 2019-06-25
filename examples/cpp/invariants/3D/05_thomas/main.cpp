@@ -11,7 +11,8 @@
 #include <cstring>
 #include "graphiz_graph.h"
 #include <omp.h>
-#include "vtkMaze3D.h"
+//#include "vtkMaze3D.h"
+#include "vtkmazeppl.h"
 
 using namespace std;
 using namespace ibex;
@@ -22,13 +23,17 @@ int main(int argc, char *argv[])
     ibex::Variable x, y, z;
 
     IntervalVector space(3);
-    space[0] = ibex::Interval(-10, 10);
-    space[1] = ibex::Interval(-10, 10);
-    space[2] = ibex::Interval(-10, 10);
+//    space[0] = ibex::Interval(-10, 10);
+//    space[1] = ibex::Interval(-10, 10);
+//    space[2] = ibex::Interval(-10, 10);
+
+    space[0] = ibex::Interval(-4, 4);
+    space[1] = ibex::Interval(-4, 4);
+    space[2] = ibex::Interval(-4, 4);
 
     // ****** Domain ******* //
-    invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, FULL_DOOR);
+    invariant::SmartSubPavingPPL paving(space);
+    invariant::DomainPPL dom(&paving, FULL_DOOR);
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -47,12 +52,12 @@ int main(int argc, char *argv[])
 //    SepFwdBwd s3(f_sep3, GEQ); // LT, LEQ, EQ, GEQ, GT
 //    array_sep.add(s3);
 
-    SepInter sep_total(array_sep);
-    dom.set_sep(&sep_total);
+//    SepInter sep_total(array_sep);
+//    dom.set_sep(&sep_total);
 
     // ****** Dynamics ******* //
-//    Interval b = ibex::Interval(0.32899);
-//    Interval b = ibex::Interval(0.208186);
+//    ibex::Interval b = ibex::Interval(0.32899);
+//    ibex::Interval b = ibex::Interval(0.208186);
     ibex::Interval b = ibex::Interval(0.1998);
 
     ibex::Function f(x, y, z, Return(sin(y)-b*x,
@@ -61,22 +66,22 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze(&dom, &dyn);
+    invariant::MazePPL maze(&dom, &dyn);
+    maze.set_enable_contraction_limit(true);
+    maze.set_contraction_limit(20);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-    for(int i=0; i<20; i++){
-        cout << "-----" << i << "-----" << endl;
+    for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << "nb contractions = " << maze.contract() << " - ";
-        cout << "paving size = " << paving.size() << endl;
+        maze.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
-    VtkMaze3D vtkMaze3D("thomas", true);
-//     vtkMaze3D.show_graph(&paving);
+    VtkMazePPL vtkMaze3D("thomas");
     vtkMaze3D.show_maze(&maze);
 
     //    IntervalVector position_info(2);

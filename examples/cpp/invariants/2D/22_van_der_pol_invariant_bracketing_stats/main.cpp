@@ -28,9 +28,10 @@ void save_stat_to_file(string namefile, vector<array<double,5>> &memory){
 
 int main(int argc, char *argv[])
 {
+    omp_set_num_threads(5);
     vector<array<double,5>> memory;
 
-    for(int k=0; k<1; k++){
+    for(int k=0; k<30; k++){
         cout << "****** STEP " << k << " *****" << endl;
 
         ibex::Variable x1, x2;
