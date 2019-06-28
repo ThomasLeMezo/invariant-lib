@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     vector<invariant::MazeIBEX*> list_outer{&maze_outer};
     vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
     VibesMaze v_maze("piston_kernel", list_outer, list_inner);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_scale(1., 10.);
     v_maze.set_enable_cone(false);
     v_maze.show();

@@ -76,6 +76,10 @@ int main(int argc, char *argv[])
     // Evolution function
     ibex::Interval z_noise(-1e-3, 1e-3);
     ibex::Interval dz_noise(-5e-3, 5e-3);
+    ibex::Interval z_noise_1(-1e-3, 1e-3);
+    ibex::Interval dz_noise_1(-5e-3, 5e-3);
+    ibex::Interval z_noise_2(-1e-3, 1e-3);
+    ibex::Interval dz_noise_2(-5e-3, 5e-3);
 
     ibex::Function f(x2, x1, Return(x1,(-A*(u(x1+dz_noise,x2+z_noise)-chi*x2)-B*abs(x1)*x1)));
 
@@ -83,13 +87,13 @@ int main(int argc, char *argv[])
 //    ibex::Interval dz_noise2(-4.99e-3, 4.99e-3);
 //    ibex::Interval dz_noise3(4.99e-3, 5e-3);
 
-    ibex::Function f_inner1_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise.lb(),x2+z_noise.lb())-chi*x2)-B*abs(x1)*x1)));
+    ibex::Function f_inner1_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise_1.lb(),x2+z_noise_1.lb())-chi*x2)-B*abs(x1)*x1)));
 //    ibex::Function f_inner2_fwd(x2, x1, Return(x1,(-A*(u(x1,x2)-chi*x2)-B*abs(x1)*x1)));
-    ibex::Function f_inner3_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise.ub(),x2+z_noise.ub())-chi*x2)-B*abs(x1)*x1)));
+    ibex::Function f_inner3_fwd(x2, x1, Return(x1,(-A*(u(x1+dz_noise_2.ub(),x2+z_noise_2.ub())-chi*x2)-B*abs(x1)*x1)));
 
-    std::vector<ibex::Function *> f_inner_fwd{&f_inner1_fwd, /*&f_inner2_fwd, */&f_inner3_fwd};
+    std::vector<ibex::Function *> f_inner_fwd{&f_inner1_fwd, &f_inner3_fwd};
 
-    DynamicsFunction dyn_outer(&f, FWD_BWD);
+    DynamicsFunction dyn_outer(&f, FWD);
     DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
 
     // ******* Maze ********* //
@@ -97,10 +101,10 @@ int main(int argc, char *argv[])
     invariant::Maze<> maze_inner_fwd(&dom_inner_fwd, &dyn_inner_fwd);
 
     // ******* Algorithm ********* //
-    omp_set_num_threads(1);
+//    omp_set_num_threads(1);
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<15; i++){
+    for(int i=0; i<14; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -111,11 +115,18 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     VibesMaze v_maze("piston_uncertainty", &maze_outer, &maze_inner_fwd);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.setProperties(0, 0, 100, 80);
     v_maze.set_enable_cone(false);
+    v_maze.set_scale(10., 1e2);
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     // ToDo: issue with dimension of figure
+
+//    ibex::IntervalVector test(2);
+//    test[0] = ibex::Interval(15.28);
+//    test[1] = ibex::Interval(-3e-3);
+//    v_maze.set_enable_cone(true);
+//    v_maze.show_room_info(&maze_inner_fwd, test);
 
     vibes::endDrawing();
 

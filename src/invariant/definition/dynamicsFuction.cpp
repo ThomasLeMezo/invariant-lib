@@ -16,6 +16,7 @@ DynamicsFunction::DynamicsFunction(const vector<Function*> functions, const DYNA
 void DynamicsFunction::init(const vector<Function*> functions){
     if(m_multi_threaded){
         m_num_threads = omp_get_max_threads();
+        cout << "Maximum nb thread = " << m_num_threads << endl;
         //    cout << "[DynamicsFunction] " << m_num_threads << " threads" << endl;
         for(int n = 0; n<m_num_threads; n++){
             m_functions.push_back(vector<Function*>());

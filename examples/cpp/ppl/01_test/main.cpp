@@ -347,6 +347,27 @@ void plot_helicoidal_example(){
     plot_vf(box4, "box4_vf.vtp");
 }
 
+void plot_box(double x_lb, double x_ub, double y_lb, double y_ub, double z_lb, double z_ub, string name){
+    IntervalVector box1(3);
+    box1[0] = ibex::Interval(x_lb, x_ub);
+    box1[1] = ibex::Interval(y_lb, y_ub);
+    box1[2] = ibex::Interval(z_lb, z_ub);
+    C_Polyhedron ph_box1 = iv_2_polyhedron(box1);
+    write_VTK(ph_box1, name);
+}
+
+void plot_escape_set(){
+    plot_box(0, 1, 0, 0.5, -1, 0, "b0");
+    plot_box(-1, 1, 0.5, 2, -1, 0, "b1");
+    plot_box(0, 0.7, 2, 3.5, -1, 0, "b2");
+
+    plot_box(0, 1, 0, 1, 0, 1, "b3");
+    plot_box(0, 1, 1, 2, 0, 1, "b4");
+    plot_box(0, 1, 2, 2.5, 0, 1, "b5");
+
+    plot_box(0, 1, 1, 2, -1e-3, 1e-3, "door0");
+}
+
 int main(){
     //    int dimension = 3;
 
@@ -423,7 +444,8 @@ int main(){
     //    cout << "test" << endl;
 
 //    plot_bisection_example();
-    plot_helicoidal_example();
+//    plot_helicoidal_example();
+    plot_escape_set();
 
     return 0;
 }
