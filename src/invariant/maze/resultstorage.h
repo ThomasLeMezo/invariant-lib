@@ -32,13 +32,17 @@ public:
 
     _Tp get_output(const size_t &face, const size_t &sens);
     _Tp get_output2(const size_t &face, const size_t &sens);
+    _Tp get_output3(const size_t &face, const size_t &sens);
     _Tp get_input(const size_t &face, const size_t &sens);
     _Tp get_input2(const size_t &face, const size_t &sens);
+    _Tp get_input3(const size_t &face, const size_t &sens);
 
 private:
     //
     typedef std::vector< std::array<std::vector<_Tp>, 2>> sub_tab_type;
     typedef std::vector< std::array<sub_tab_type, 2>> tab_type;
+
+    std::vector<std::vector<std::array<size_t, 2>>> m_intersection_list;
 
     tab_type m_input2output;
     tab_type m_output2input;

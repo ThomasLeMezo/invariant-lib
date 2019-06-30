@@ -67,6 +67,11 @@ ibex::IntervalVector get_empty_door_container<ibex::IntervalVector>(int dim){
 }
 
 template <>
+ibex::IntervalVector get_full_door_container<ibex::IntervalVector>(int dim){
+    return IntervalVector(dim, ibex::Interval::ALL_REALS);
+}
+
+template <>
 void set_empty<ibex::IntervalVector>(ibex::IntervalVector &T){
     T.set_empty();
 }
@@ -158,6 +163,11 @@ void Room<ppl::C_Polyhedron>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhe
 template <>
 ppl::C_Polyhedron get_empty_door_container<ppl::C_Polyhedron>(int dim){
     return ppl::C_Polyhedron(dim, Parma_Polyhedra_Library::EMPTY);
+}
+
+template <>
+ppl::C_Polyhedron get_full_door_container<ppl::C_Polyhedron>(int dim){
+    return ppl::C_Polyhedron(dim, Parma_Polyhedra_Library::UNIVERSE);
 }
 
 template <>

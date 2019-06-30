@@ -592,7 +592,7 @@ void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) co
     IntervalVector position(hadamard_product(p->get_position(), m_scale_factor));
 //    double size = 0.8*sqrt(pow(position[0].diam()/2.,2)+ pow(position[1].diam()/2., 2));
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.;
-    cout << "size = " << size << endl;
+//    cout << "size = " << size << endl;
     invariant::RoomIBEX *r = p->get_rooms()[maze];
     //    invariant::DYNAMICS_SENS sens = r->get_maze()->get_dynamics()->get_sens();
 
@@ -719,7 +719,7 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
         ostringstream name;
         name << p_position;
         vibes::newFigure(name.str());
-        vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height, "x", m_x,"y", m_y));
+        vibes::setFigureProperties(vibesParams("width", m_width,"height", m_height, "x", m_x+100,"y", m_y+100));
         //        setProperties(m_x+m_width, m_y, m_width, m_height);
 
         // Draw Pave

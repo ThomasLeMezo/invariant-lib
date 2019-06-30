@@ -1084,11 +1084,11 @@ bool Room<_Tp>::contract(){
 
 template<typename _Tp>
 bool Room<_Tp>::get_private_doors_info(std::string message, bool cout_message){
-    if(m_maze->get_domain()->get_init() == FULL_DOOR){
+    if(m_maze->get_domain()->get_init() == FULL_WALL){
 
         ibex::IntervalVector position(2);
-        position[0] = ibex::Interval(0.662109375, 0.66796875);
-        position[1] = ibex::Interval(3.515625, 3.521484375);
+        position[0] = ibex::Interval(14.7, 14.737499999999999);
+        position[1] = ibex::Interval(0.0075, 0.009375);
 
         //    ibex::IntervalVector position(3);
         //    position[0] = ibex::Interval(0, 450);

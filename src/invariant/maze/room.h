@@ -3,6 +3,9 @@
 namespace invariant {
 template <typename _Tp>
 _Tp get_empty_door_container(int dim);
+
+template <typename _Tp>
+_Tp get_full_door_container(int dim);
 }
 #endif
 
