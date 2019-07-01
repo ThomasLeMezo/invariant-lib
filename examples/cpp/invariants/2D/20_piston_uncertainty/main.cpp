@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     omp_set_num_threads(1);
     double time_start = omp_get_wtime();
 
-    for(int i=0; i<10; i++){
+    for(int i=0; i<12; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
     cout << subpaving << endl;
 
-    VibesMaze v_maze("piston_uncertainty", /*&maze_outer,*/ &maze_inner_fwd);
+    VibesMaze v_maze("piston_uncertainty", &maze_outer, &maze_inner_fwd);
     v_maze.setProperties(0, 0, 500, 400);
 //    v_maze.set_enable_cone(false);
     v_maze.set_scale(10., 1e2);
