@@ -19,12 +19,10 @@ int main(int argc, char *argv[])
 {
     ibex::Variable z, dz;
 
+#if 0
     IntervalVector space(2);
     space[0] = ibex::Interval(-20, 80.0);
     space[1] = ibex::Interval(-0.4,0.4);
-
-    // ****** Domain ******* //
-    invariant::SmartSubPaving<> subpaving(space);
 
     // ****** Dynamics ******* //
     double screw_thread = 1.75e-3;
@@ -46,6 +44,42 @@ int main(int argc, char *argv[])
 
     // Command
     ibex::Interval Vp(-2.148e-5, 1.503e-4);
+#else
+    IntervalVector space(2);
+    space[0] = ibex::Interval(0, 870.0);
+    space[1] = ibex::Interval(-0.07,0.07);
+
+    // ****** Dynamics ******* //
+    // Physical parameters
+    double g = 9.81;
+    double rho = 1025.0;
+
+    // Float parameters
+    double m = 11.630;
+    double mv = m*2.;
+    double d_c = 0.5; //m
+    double K_float = 3.94819e-11; // Pa^-1
+    double K_water = 4.27e-10;
+    double chi = m*(K_float-K_water)*g;
+    cout << "chi = " << chi;
+
+    double Cf = M_PI*pow(d_c/2.0,2);
+
+    double A = g*rho/mv;
+    double B = 0.5*rho*Cf/mv;
+
+    // Command
+    double r_piston = 0.00975; // m
+    double l_piston = 0.12; //m
+    double v_piston = M_PI*pow(r_piston,2.)*l_piston;
+//    ibex::Interval Vp(-v_piston/2., v_piston/2.);
+//    ibex::Interval Vp(-v_piston, 0.);
+    double p = 0.5;
+    ibex::Interval Vp(-v_piston*p, v_piston*(1-p));
+#endif
+
+    // ****** Domain ******* //
+    invariant::SmartSubPaving<> subpaving(space);
 
     invariant::Domain<> dom_outer(&subpaving, FULL_DOOR);
     dom_outer.set_border_path_in(false);
@@ -93,7 +127,7 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     omp_set_num_threads(1);
 
-    for(int i=0; i<16; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         subpaving.bisect();
         maze_outer.contract();
@@ -107,9 +141,10 @@ int main(int argc, char *argv[])
     vibes::beginDrawing();
     vector<invariant::MazeIBEX*> list_outer{&maze_outer};
     vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
-    VibesMaze v_maze("piston_kernel", list_outer, list_inner);
+//    VibesMaze v_maze("piston_kernel", list_outer, list_inner);
+    VibesMaze v_maze("ifremer_float", list_outer, list_inner);
     v_maze.setProperties(0, 0, 1000, 800);
-    v_maze.set_scale(1., 10.);
+    v_maze.set_scale(1., 100.);
     v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
