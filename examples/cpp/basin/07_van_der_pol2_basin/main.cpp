@@ -67,36 +67,25 @@ int main(int argc, char *argv[])
     double time_start = omp_get_wtime();
     
     for(int i=0; i<15; i++){
+        cout << i << endl;
         paving.bisect();
-        cout << i << " - " << maze_outer.contract() << " - " << paving.size() << endl;
-        cout << i << " - " << maze_inner.contract() << " - " << paving.size() << endl;
+        maze_outer.contract();
+        maze_inner.contract();
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("Van Der Pol 2 Basin", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    VibesMaze v_maze("vdp_basin_2", &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 1000, 800);
+    v_maze.set_enable_cone(false);
     v_maze.show();
 
-//    VibesMaze v_maze_inner("graph_inner",&maze_inner, VibesMaze::VIBES_MAZE_INNER);
-//    v_maze_inner.setProperties(0, 0, 512, 512);
-//    v_maze_inner.show();
-
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-1);
-//    position_info[1] = ibex::Interval(0.68);
-//    v_maze.show_room_info(&maze_inner, position_info);
-
-//    position_info[0] = ibex::Interval(-0.34);
-//    position_info[1] = ibex::Interval(1.34);
-//    v_maze.get_room_info(&maze_inner, position_info);
-
-////    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
-    v_maze.drawBox(box1, "red[]");
-    v_maze.drawBox(box2, "red[]");
-    vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol2_basin.svg", "Van Der Pol 2 Basin");
+    v_maze.drawBox(box1, "black[red]");
+    v_maze.drawBox(box2, "black[red]");
+    v_maze.saveImage();
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 
 }

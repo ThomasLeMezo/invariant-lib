@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     double m = V_float*rho; //11.630;
     double mv = m*2.;
     double d_c = 0.35; //m
-    double K_float = 3.94819e-11; // Pa^-1
+    double K_float = 3.94819e-10; // Pa^-1
     double K_water = 4.27e-10;
     double chi = m*(K_float-K_water)*g;
     cout << "chi = " << chi;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     double v_piston = M_PI*pow(r_piston,2.)*l_piston;
 //    ibex::Interval Vp(-v_piston/2., v_piston/2.);
 //    ibex::Interval Vp(-v_piston, 0.);
-    double p = 0.95;
+    double p = 0.5;
     ibex::Interval Vp(-v_piston*p, v_piston*(1-p));
 #endif
 
