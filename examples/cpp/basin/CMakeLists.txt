@@ -14,3 +14,6 @@ add_subdirectory(09_auv_basin)
 add_subdirectory(10_zheng_basin)
 add_subdirectory(11_van_der_pol_stay_bassin)
 add_subdirectory(12_zang_stay_bassin)
+add_subdirectory(13_buckling_stay_bassin)
+add_subdirectory(14_buckling_basin)
+
