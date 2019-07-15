@@ -15,9 +15,7 @@ using namespace std;
 using namespace ibex;
 using namespace invariant;
 
-int main(int argc, char *argv[])
-{
-    ibex::Variable x1, x2, x3;
+int main(int argc, char *argv[]){
 
     IntervalVector space(2);
     space[0] = -ibex::Interval::HALF_PI | ibex::Interval::HALF_PI;
@@ -36,41 +34,33 @@ int main(int argc, char *argv[])
 
     double g = 9.81;
     double l = 1; // Length of pendulum
-    double m = 1;
-    double k = 10.0;
+    double kt = 10.0;
+
+    double kd = 10.0;
     double L = 2.5; // distance between pendulum
-    double k_mag = 0.4;
+    double d0 = 1.5;
 
     // ****** Dynamics ******* //
-    ibex::Variable theta1, theta2;
-    ibex::Function xA(theta1, l*sin(theta1));
-    ibex::Function yA(theta1, -l*cos(theta1));
-    ibex::Function xB(theta2, l*sin(theta2)+L);
-    ibex::Function yB(theta2, -l*cos(theta2));
+    ibex::Variable t1, t2, dt1, dt2;
+    ibex::Function x1(t1, l*cos(t1));
+    ibex::Function y1(t1, l*sin(t1));
+    ibex::Function x2(t2, l*cos(t2));
+    ibex::Function y2(t2, l*sin(t2)+L);
 
-    ibex::Function r(theta1, theta2, pow(xB(theta2)-xA(theta1),2)+pow(yB(theta2)-yA(theta2),2));
-    ibex::Function alpha_thetaA(theta1, theta2, atan2(yB(theta2)-yA(theta1),xB(theta2)-xA(theta1))+theta1);
-    ibex::Function alpha_thetaB(theta1, theta2, atan2(yA(theta1)-yB(theta2),xA(theta1)-xB(theta2))+theta2);
+    ibex::Function d(t1,t2, sqrt(pow(x2(t2)-x1(t1),2)+pow(y2(t2)-y1(t1),2)));
+    ibex::Function gamma1(t1,t2,atan2(y2(t2)-y1(t1),x2(t2)-x1(t1)));
+    ibex::Function gamma2(t1,t2,atan2(y1(t1)-y2(t2),x1(t1)-x2(t2)));
 
-    ibex::Function f_attractionA(theta1, theta2, k_mag*r(theta1, theta2)*cos(alpha_thetaA(theta1, theta2)));
-    ibex::Function f_attractionB(theta1, theta2, k_mag*r(theta1, theta2)*cos(alpha_thetaB(theta1, theta2)));
+    ibex::Function df1(t1, t2, dt1, g*sin(t1)+kd*(d(t1,t2)-d0)*sin(gamma1(t1,t2)-t1)-kt*dt1);
+    ibex::Function df2(t1, t2, dt2, g*sin(t2)+kd*(d(t1,t2)-d0)*sin(gamma2(t1,t2)-t2)-kt*dt2);
 
-    ibex::IntervalVector theta_bounds(2, space[0]);
-    ibex::Interval force_boundsA = f_attractionA.eval(theta_bounds);
-    ibex::Interval force_boundsB = f_attractionB.eval(theta_bounds);
-    cout << "Force_boundsA = " << force_boundsA << endl;
-    cout << "Force_boundsB = " << force_boundsB << endl;
+    ibex::Function f1(dt1, t1, t2, Return(t1,
+                                          df1(t1,t2,dt1)));
+    DynamicsInclusionFunction dyn1(&f1, ibex::IntervalVector(1, space[0]), FWD_BWD);
 
-    ibex::Function f1(x1, x2, x3, Return(x2,
-                                         -(g/l)*sin(x1)-(k/m)*x2+x3));
-    DynamicsInclusionFunction dyn1(&f1, ibex::IntervalVector(1, force_boundsA), FWD_BWD);
-
-    ibex::Function f2(x1, x2, x3, Return(x2,
-                                         -(g/l)*sin(x1)-(k/m)*x2+x3));
-    DynamicsInclusionFunction dyn2(&f2, ibex::IntervalVector(1, force_boundsB), FWD_BWD);
-
-
-//    ibex::Function f_attraction(theta1, theta2, 0.0*theta1);
+    ibex::Function f2(dt2, t2, t1, Return(t2,
+                                          df2(t1,t2,dt2)));
+    DynamicsInclusionFunction dyn2(&f2, ibex::IntervalVector(1, space[0]), FWD_BWD);
 
     // ******* Maze ********* //
     invariant::MazeIBEX maze1(&dom1, &dyn1);
@@ -79,9 +69,6 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
 
-    IntervalVector theta(2);
-    ibex::Interval force;
-    //
 //    omp_set_num_threads(1);
     for(int i=0; i<20; i++){
         paving1.bisect();
@@ -94,26 +81,20 @@ int main(int argc, char *argv[])
         IntervalVector bounding_box_1_old = maze1.get_bounding_box();
         IntervalVector bounding_box_2_old = maze2.get_bounding_box();
 
-        while(bounding_box_1_old != bounding_box_1 && bounding_box_2_old != bounding_box_2 && step <4){
+        while(bounding_box_1_old != bounding_box_1 && bounding_box_2_old != bounding_box_2 && step <5){
             cout << "step = " << step << endl;
             step++;
             maze1.contract();
 
             bounding_box_1 = maze1.get_bounding_box();
-            theta[0] = bounding_box_1[0];
-            theta[1] = bounding_box_2[0];
-            force = f_attractionB.eval(theta);
-            cout << "forceB = " << force << endl;
-            dyn2.set_inclusion_parameter(force);
+            cout << "theta1 = " << bounding_box_1[0] << endl;
+            dyn2.set_inclusion_parameter(bounding_box_1[0]);
             maze2.compute_vector_field();
             maze2.contract();
 
             bounding_box_2 = maze2.get_bounding_box();
-            theta[0] = bounding_box_1[0];
-            theta[1] = bounding_box_2[0];
-            force = f_attractionA.eval(theta);
-            cout << "forceA = " << force << endl;
-            dyn1.set_inclusion_parameter(force);
+            cout << "theta2 = " << bounding_box_2[0] << endl;
+            dyn1.set_inclusion_parameter(bounding_box_2[0]);
             maze1.compute_vector_field();
         }
     }

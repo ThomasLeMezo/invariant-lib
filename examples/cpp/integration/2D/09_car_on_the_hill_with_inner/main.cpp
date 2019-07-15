@@ -23,11 +23,14 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(-2, 13.0);
-    space[1] = ibex::Interval(-5, 5);
+//    space[0] = ibex::Interval(-2, 13.0);
+//    space[1] = ibex::Interval(-5, 5);
 
 //    space[0] = ibex::Interval(-2, 18.0);
 //    space[1] = ibex::Interval(-4, 5);
+
+    space[0] = ibex::Interval(-2, 18.0);
+    space[1] = ibex::Interval(-5, 5);
 
     invariant::SmartSubPaving<> paving(space);
 
@@ -53,8 +56,8 @@ int main(int argc, char *argv[])
 
     // ****** Dynamics Outer & Inner ******* //
 
-//    ibex::Interval u(-2,2);
-    ibex::Interval u(2);
+    ibex::Interval u(-2,2);
+//    ibex::Interval u(2);
     ibex::Function f(x1, x2, Return(x2, -9.81*sin((1.1*sin(1.2*x1)-1.2*sin(1.1*x1))/2.0)-0.7*x2+ibex::Interval(u)));
     DynamicsFunction dyn(&f, FWD);
 
@@ -81,7 +84,8 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("car_on_the_hill_fwd", &maze_outer, &maze_inner);
+//    VibesMaze v_maze("car_on_the_hill_fwd", &maze_outer, &maze_inner);
+    VibesMaze v_maze("car_on_the_hill_fwd_input", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
     v_maze.show();
