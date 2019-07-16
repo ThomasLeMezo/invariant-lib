@@ -33,12 +33,13 @@ int main(int argc, char *argv[]){
     dom2.set_border_path_out(false);
 
     double g = 9.81;
+    double m = 1.0;
     double l = 1; // Length of pendulum
-    double kt = 10.0;
+    double kt = 100.0;
 
     double kd = 10.0;
     double L = 2.5; // distance between pendulum
-    double d0 = 1.5;
+    double d0 = 1.0;
 
     // ****** Dynamics ******* //
     ibex::Variable t1, t2, dt1, dt2;
@@ -51,8 +52,8 @@ int main(int argc, char *argv[]){
     ibex::Function gamma1(t1,t2,atan2(y2(t2)-y1(t1),x2(t2)-x1(t1)));
     ibex::Function gamma2(t1,t2,atan2(y1(t1)-y2(t2),x1(t1)-x2(t2)));
 
-    ibex::Function df1(t1, t2, dt1, g*sin(t1)+kd*(d(t1,t2)-d0)*sin(gamma1(t1,t2)-t1)-kt*dt1);
-    ibex::Function df2(t1, t2, dt2, g*sin(t2)+kd*(d(t1,t2)-d0)*sin(gamma2(t1,t2)-t2)-kt*dt2);
+    ibex::Function df1(t1, t2, dt1, g*sin(t1)+(kd*(d(t1,t2)-d0)*sin(t1-gamma1(t1,t2))-kt*dt1)/m);
+    ibex::Function df2(t1, t2, dt2, g*sin(t2)+(kd*(d(t1,t2)-d0)*sin(t2-gamma2(t1,t2))-kt*dt2)/m);
 
     ibex::Function f1(dt1, t1, t2, Return(t1,
                                           df1(t1,t2,dt1)));
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]){
     double time_start = omp_get_wtime();
 
 //    omp_set_num_threads(1);
-    for(int i=0; i<20; i++){
+    for(int i=0; i<13; i++){
         paving1.bisect();
         paving2.bisect();
         size_t step = 0;
@@ -87,13 +88,13 @@ int main(int argc, char *argv[]){
             maze1.contract();
 
             bounding_box_1 = maze1.get_bounding_box();
-            cout << "theta1 = " << bounding_box_1[0] << endl;
+            cout << " => theta1 = " << bounding_box_1[0] << endl;
             dyn2.set_inclusion_parameter(bounding_box_1[0]);
             maze2.compute_vector_field();
             maze2.contract();
 
             bounding_box_2 = maze2.get_bounding_box();
-            cout << "theta2 = " << bounding_box_2[0] << endl;
+            cout << " => theta2 = " << bounding_box_2[0] << endl;
             dyn1.set_inclusion_parameter(bounding_box_2[0]);
             maze1.compute_vector_field();
         }
@@ -103,7 +104,7 @@ int main(int argc, char *argv[]){
     vibes::beginDrawing();
     VibesMaze v_maze1("pendulum1", &maze1);
     v_maze1.setProperties(0, 0, 1000, 800);
-    v_maze1.set_enable_cone(false);
+    v_maze1.set_enable_cone(true);
     v_maze1.show();
     IntervalVector bounding_box = maze1.get_bounding_box();
     v_maze1.drawBox(bounding_box, "green[]");
@@ -111,7 +112,7 @@ int main(int argc, char *argv[]){
 
     VibesMaze v_maze2("pendulum2", &maze2);
     v_maze2.setProperties(0, 0, 1000, 800);
-    v_maze2.set_enable_cone(false);
+    v_maze2.set_enable_cone(true);
     v_maze2.show();
     bounding_box = maze2.get_bounding_box();
     v_maze2.drawBox(bounding_box, "green[]");

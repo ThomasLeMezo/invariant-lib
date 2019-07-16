@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     // ****** Visu *******
 
     VibesMaze v_maze_eulerian("Eulerian", &eulerian_maze);
-    v_maze_eulerian.setProperties(0, 0, 1024, 1024);
+    v_maze_eulerian.setProperties(0, 0, 800, 1000);
     v_maze_eulerian.set_enable_cone(false);
     v_maze_eulerian.show();
     v_maze_eulerian.drawBox(box_C, "r[]");
