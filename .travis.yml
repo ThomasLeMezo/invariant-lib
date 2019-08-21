@@ -50,6 +50,7 @@ cache:
   - "$HOME/gmp"
   - "$HOME/vtk"
   - "$HOME/netcdf"
+  - "$HOME/proj4"
 notifications:
   email: false
 before_install:
@@ -89,6 +90,7 @@ install:
 - sh ./cmake/build_ppl.sh
 - sh ./cmake/build_VTK.sh
 - sh ./cmake/build_netcdf.sh
+- sh ./cmake/build_proj4.sh
 # - sh ./travis_script/build_patchelf.sh
 script:
 - cd ${TRAVIS_BUILD_DIR}
@@ -101,6 +103,7 @@ script:
         -DPPL_ROOT=${HOME}/ppl 
         -DGMP_ROOT=${HOME}/gmp 
         -DNETCDF_ROOT=${HOME}/netcdf 
+        -DPROJ4_ROOT=${HOME}/proj4 
         -DPYBIND11_PYTHON_VERSION=$PYTHON 
         -DPYBIND11_CPP_STANDARD=$CPP_VERSION 
         -DCMAKE_BUILD_TYPE=RELEASE 
@@ -111,6 +114,7 @@ script:
         -DWITH_NETCDF=ON 
         -DWITH_PYIBEX_VERSION=ON 
         -DWITH_PPL=ON 
+        -DWITH_PROJ4=ON
         -DWITH_EXAMPLES=OFF 
         ${TRAVIS_BUILD_DIR}
 - make -j2
