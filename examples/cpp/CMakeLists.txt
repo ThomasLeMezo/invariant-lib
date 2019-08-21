@@ -16,3 +16,5 @@ add_subdirectory(capture)
 add_subdirectory(hybrid)
 add_subdirectory(seabot)
 add_subdirectory(proof)
+
+add_subdirectory(sandbox)
