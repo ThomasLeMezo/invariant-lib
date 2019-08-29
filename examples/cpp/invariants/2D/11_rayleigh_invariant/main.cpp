@@ -34,5 +34,5 @@ int main(int argc, char *argv[])
     ibex::Function f(x1, x2, -Return(x2,
                                     -1.0*(x1+pow(x2,3)-x2)));
 
-    largest_positive_invariant(space, &f, 18, "rayleigh_positive_invariant");
+    largest_positive_invariant(space, &f, 15, "rayleigh_positive_invariant");
 }

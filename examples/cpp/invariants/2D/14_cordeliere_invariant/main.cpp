@@ -12,28 +12,18 @@
 #include "graphiz_graph.h"
 #include <omp.h>
 
+#include "language.h"
+
 using namespace std;
 using namespace ibex;
 using namespace invariant;
 
-int main(int argc, char *argv[])
-{
+void bathy1(){
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
     space[0] = ibex::Interval(-6, 6);
     space[1] = ibex::Interval(-6, 6);
-
-    // ****** Domain ******* //
-    invariant::SmartSubPaving<> paving(space);
-
-    invariant::Domain<> dom_outer(&paving, FULL_DOOR);
-    dom_outer.set_border_path_in(false);
-    dom_outer.set_border_path_out(false);
-
-//    invariant::Domain<> dom_inner(&paving, FULL_WALL);
-//    dom_inner.set_border_path_in(true);
-//    dom_inner.set_border_path_out(true);
 
     Function f_sep(x1, x2, sqr(x1-1.78129)+sqr(x2-1.78129)-0.5);
     Function f_sep2(x1, x2, sqr(x1+1.78129)+sqr(x2+1.78129)-0.5);
@@ -42,51 +32,61 @@ int main(int argc, char *argv[])
     SepFwdBwd sep2(f_sep2, GEQ);
     SepFwdBwd sep3(f_sep3, GEQ);
     SepInter sep_i(sep, sep2, sep3);
-    dom_outer.set_sep(&sep_i);
 
     // ****** Dynamics ******* //
     double h0 = -9;
     ibex::Function h(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
     ibex::Function hdiff(h, Function::DIFF);
     ibex::Function psi(x1, x2, tanh(h(x1, x2)-h0)+ibex::Interval::PI/2.0);
+    ibex::Function f(x1, x2, -Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
+                                    (hdiff(x1, x2)[1]*cos(psi(x1, x2))+hdiff(x1, x2)[0]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0]))));
+
+
+    largest_positive_invariant(space, &f, 16, "bathymetry_positive_invariant", &sep_i);
+}
+
+void bathy2(){
+    ibex::Variable x1, x2;
+
+    IntervalVector space(2);
+    space[0] = ibex::Interval(-6, 6);
+    space[1] = ibex::Interval(-6, 6);
+
+    Function f_sep(x1, x2, sqr(x1-1.78129)+sqr(x2-1.78129)-0.5);
+    Function f_sep2(x1, x2, sqr(x1+1.78129)+sqr(x2+1.78129)-0.5);
+    Function f_sep3(x1, x2, sqr(x1)+sqr(x2)-0.5);
+    SepFwdBwd sep(f_sep, GEQ);
+    SepFwdBwd sep2(f_sep2, GEQ);
+    SepFwdBwd sep3(f_sep3, GEQ);
+    SepInter sep_i(sep, sep2, sep3);
+
+    // ****** Dynamics ******* //
+    double h0 = -9.0;
+    ibex::Interval error(-0.2, 0.2);
+    ibex::Function h_1(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
+    ibex::Function hdiff_1(h_1, Function::DIFF);
+    ibex::Function psi_1(x1, x2, tanh(h_1(x1, x2)-h0+error.lb())+ibex::Interval::PI/2.0);
+    ibex::Function f_1(x1, x2, Return((hdiff_1(x1, x2)[0]*cos(psi_1(x1, x2))-hdiff_1(x1, x2)[1]*sin(psi_1(x1, x2)))/sqrt(sqr(hdiff_1(x1, x2)[1])+sqr(hdiff_1(x1, x2)[0])),
+                                    (hdiff_1(x1, x2)[1]*cos(psi_1(x1, x2))+hdiff_1(x1, x2)[0]*sin(psi_1(x1, x2)))/sqrt(sqr(hdiff_1(x1, x2)[1])+sqr(hdiff_1(x1, x2)[0]))));
+
+    ibex::Function h_2(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
+    ibex::Function hdiff_2(h_2, Function::DIFF);
+    ibex::Function psi_2(x1, x2, tanh(h_2(x1, x2)-h0+error.ub())+ibex::Interval::PI/2.0);
+    ibex::Function f_2(x1, x2, Return((hdiff_2(x1, x2)[0]*cos(psi_2(x1, x2))-hdiff_2(x1, x2)[1]*sin(psi_2(x1, x2)))/sqrt(sqr(hdiff_2(x1, x2)[1])+sqr(hdiff_2(x1, x2)[0])),
+                                    (hdiff_2(x1, x2)[1]*cos(psi_2(x1, x2))+hdiff_2(x1, x2)[0]*sin(psi_2(x1, x2)))/sqrt(sqr(hdiff_2(x1, x2)[1])+sqr(hdiff_2(x1, x2)[0]))));
+
+    ibex::Function h(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
+    ibex::Function hdiff(h, Function::DIFF);
+    ibex::Function psi(x1, x2, tanh(h(x1, x2)-h0+error)+ibex::Interval::PI/2.0);
     ibex::Function f(x1, x2, Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
                                     (hdiff(x1, x2)[1]*cos(psi(x1, x2))+hdiff(x1, x2)[0]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0]))));
 
-    DynamicsFunction dyn(&f, FWD);
+    std::vector<ibex::Function *> f_list_inner{&f_1, &f_2};
+    largest_positive_invariant(space, &f, f_list_inner, 16, "bathymetry_positive_invariant_uncertain", &sep_i);
+}
 
-    // ******* Maze ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn);
-//    invariant::Maze<> maze_inner(&dom_inner, &dyn);
 
-    // ******* Algorithm ********* //
-    double time_start = omp_get_wtime();
-
-    for(int i=0; i<16; i++){
-        cout << i << endl;
-        paving.bisect();
-        maze_outer.contract();
-//        cout << maze_inner.contract() << endl;
-    }
-    cout << "TIME = " << omp_get_wtime() - time_start << endl;
-
-    cout << paving << endl;
-
-    vibes::beginDrawing();
-    VibesMaze v_maze("Cordeliere", &maze_outer/*, &maze_inner*/);
-    v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(false);
-    v_maze.show();
-    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/cordeliere_invariant.svg");
-
-//    v_maze.drawCircle(0, 0, 0.5, "black[red]");
-//    v_maze.drawCircle(1.78129, 1.78129, 0.5, "black[red]");
-//    v_maze.drawCircle(-1.78129, -1.78129, 0.5, "black[red]");
-
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(2.22);
-//    position_info[1] = ibex::Interval(1.97);
-//    v_maze.get_room_info(&maze, position_info);
-//    v_maze.show_room_info(&maze, position_info);
-
-    vibes::endDrawing();
+int main(int argc, char *argv[]){
+    bathy1();
+//    bathy2();
 }

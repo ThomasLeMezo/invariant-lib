@@ -3,12 +3,40 @@
 
 #include "ibex_IntervalVector.h"
 #include "ibex_Function.h"
+#include "ibex_Sep.h"
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace invariant {
  int largest_positive_invariant(ibex::IntervalVector &space,
-                                ibex::Function *f_dyn, size_t nb_steps=0, std::string file_name="positiveInvariant", ibex::Function* f_dom=nullptr);
+                                ibex::Function *f_dyn,
+                                size_t nb_steps,
+                                std::string file_name,
+                                ibex::Function* f_dom
+                                );
+
+ int largest_positive_invariant(ibex::IntervalVector &space,
+                                ibex::Function *f_dyn,
+                                size_t nb_steps,
+                                std::string file_name
+                                );
+
+ int largest_positive_invariant(ibex::IntervalVector &space,
+                                ibex::Function *f_dyn,
+                                size_t nb_steps,
+                                std::string file_name,
+                                ibex::Sep* sep_outer
+                                );
+
+ int largest_positive_invariant(ibex::IntervalVector &space,
+                                ibex::Function* f_outer,
+                                std::vector<ibex::Function*> &f_inner,
+                                size_t nb_steps,
+                                std::string file_name,
+                                ibex::Sep* sep_outer
+                                );
+
 }
 
 #endif // LANGUAGE_H
