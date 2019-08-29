@@ -4,6 +4,7 @@
 #include "dynamicsFunction.h"
 #include "maze.h"
 #include "vibesMaze.h"
+#include "language.h"
 
 #include "ibex_SepFwdBwd.h"
 
@@ -25,47 +26,13 @@ int main(int argc, char *argv[])
     space[0] = ibex::Interval(-2,2);
     space[1] = ibex::Interval(-2,2);
 
-    // ****** Domain ******* //
-    invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, FULL_DOOR);
 
     Function f_sep(x1, x2, pow(x1, 2)+pow(x2, 2)-pow(0.3, 2));
-    SepFwdBwd s(f_sep, GEQ); // LT, LEQ, EQ, GEQ, GT
-    dom.set_sep(&s);
 
-    dom.set_border_path_in(false);
-    dom.set_border_path_out(false);
 
-    // ****** Dynamics ******* //
-    ibex::Function f(x1, x2, Return(x2,
+//    // ****** Dynamics ******* //
+    ibex::Function f(x1, x2, -Return(x2,
                                     -1.0*(x1+pow(x2,3)-x2)));
-    DynamicsFunction dyn(&f, FWD_BWD);
 
-    // ******* Maze ********* //
-    invariant::Maze<> maze(&dom, &dyn);
-
-    // ******* Algorithm ********* //
-    double time_start = omp_get_wtime();
-    for(int i=0; i<18; i++){
-        paving.bisect();
-        cout << i << " - " << maze.contract() << " - ";
-        cout << paving.size() << endl;
-    }
-    cout << "TIME = " << omp_get_wtime() - time_start << endl;
-
-    cout << paving << endl;
-
-    vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze);
-    v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.show();
-
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(-2);
-//    position_info[1] = ibex::Interval(-2.9);
-//    v_maze.get_room_info(&maze, position_info);
-//    v_maze.show_room_info(&maze, position_info);
-
-    vibes::endDrawing();
-
+    largest_positive_invariant(space, &f, 18, "rayleigh_positive_invariant");
 }

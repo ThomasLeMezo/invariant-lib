@@ -26,6 +26,7 @@ option(WITH_NETCDF "Build netcdf src and examples" ON)
 option(WITH_PYIBEX_VERSION "Build with ibex version of pyibex" ON)
 option(WITH_PPL "Build with ppl" ON)
 option(WITH_PROJ4 "Build with Proj4 lib" ON)
+option(WITH_LANGUAGE "Build Language" ON)
 
 if(NOT WIN32)
  set(CMAKE_CXX_FLAGS " -fPIC ${CMAKE_CXX_FLAGS}")
