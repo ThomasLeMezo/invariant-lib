@@ -5,44 +5,95 @@ matrix:
   - os: linux
     language: pyhton
     env: PYTHON=2.7 CPP_VERSION=11 GCC=4.8
-    python: "2.7"
+    python: '2.7'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, libboost-all-dev, sqlite3]
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
   - os: linux
     language: python
     env: PYTHON=3.4 CPP_VERSION=11 GCC=4.8
-    python: "3.4"
+    python: '3.4'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, libboost-all-dev, sqlite3]
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
   - os: linux
     language: python
     env: PYTHON=3.5 CPP_VERSION=11 GCC=4.8
-    python: "3.5"
+    python: '3.5'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, libboost-all-dev, sqlite3]
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
   - os: linux
     language: python
     env: PYTHON=3.6 CPP_VERSION=11 GCC=4.8
-    python: "3.6"
+    python: '3.6'
     addons:
       apt:
-        sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes, george-edison55-precise-backports]
-        packages: [g++-4.8, cmake, cmake-data, pkg-config, netcdf-bin, proj-bin, libnetcdf-dev, libproj-dev, libboost-all-dev, sqlite3]
-  # - os: osx
-  #   osx_image: xcode7.3
-  #   env: PYTHON=2.7 CPP_VERSION=11 GCC=4.8
-  # - os: osx
-  #   osx_image: xcode7.3
-  #   env: PYTHON=3.6 CPP_VERSION=11 GCC=4.8
-  # - os: osx
-  #   osx_image: xcode7.3
-  #   env: PYTHON=3.5 CPP_VERSION=11 GCC=4.8
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
 cache:
   directories:
   - "$HOME/ibex"
@@ -84,50 +135,32 @@ before_install:
     python$PY -m virtualenv venv;
     source venv/bin/activate;
   fi
-
 install:
 - sh ./cmake/build_Ibex4pyIbex.sh
 - sh ./cmake/build_ppl.sh
 - sh ./cmake/build_VTK.sh
 - sh ./cmake/build_netcdf.sh
 - sh ./cmake/build_proj4.sh
-# - sh ./travis_script/build_patchelf.sh
 script:
 - cd ${TRAVIS_BUILD_DIR}
 - echo ${TRAVIS_BUILD_DIR}
 - mkdir -p build/build-release
 - cd build/build-release
-- cmake -DCMAKE_INSTALL_PREFIX=${HOME} 
-        -DIBEX_ROOT=${HOME}/ibex 
-        -DVTK_ROOT=${HOME}/vtk 
-        -DPPL_ROOT=${HOME}/ppl 
-        -DGMP_ROOT=${HOME}/gmp 
-        -DNETCDF_ROOT=${HOME}/netcdf 
-        -DPROJ4_ROOT=${HOME}/proj4 
-        -DPYBIND11_PYTHON_VERSION=$PYTHON 
-        -DPYBIND11_CPP_STANDARD=$CPP_VERSION 
-        -DCMAKE_BUILD_TYPE=RELEASE 
-        -DBUILD_TESTS=OFF 
-        -DWITH_PYTHON=ON 
-        -DWITH_3D=ON 
-        -DWITH_GRAPHIZ=OFF 
-        -DWITH_NETCDF=ON 
-        -DWITH_PYIBEX_VERSION=ON 
-        -DWITH_PPL=ON 
-        -DWITH_PROJ4=ON
-        -DWITH_EXAMPLES=OFF 
-        ${TRAVIS_BUILD_DIR}
+- cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DVTK_ROOT=${HOME}/vtk
+  -DPPL_ROOT=${HOME}/ppl -DGMP_ROOT=${HOME}/gmp -DNETCDF_ROOT=${HOME}/netcdf -DPROJ4_ROOT=${HOME}/proj4
+  -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP_VERSION -DCMAKE_BUILD_TYPE=RELEASE
+  -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=ON -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=ON
+  -DWITH_PYIBEX_VERSION=ON -DWITH_PPL=ON -DWITH_PROJ4=ON -DWITH_EXAMPLES=OFF ${TRAVIS_BUILD_DIR}
 - make -j2
 - make pip_package
-
 deploy:
   provider: releases
   api_key:
-    secure: NAXVYKKCCBMzCaHEsF9miYaKUMl2H7RZoniXdXx8de96emKsB8MHL2ItqJB+H8MaIr/h68f5KX4614oi6I3LLvI+H7V9clJ77sDR87ZMPmo/LX0rViW3Ijh4ZQ123xw+jtNJCBk9rON8TNNxM9CKmfrEdZjTM+S/48gqcFYDZdCMIPRAJolD2SPGT2eMx3PzKk8OW9te97QjIpRuG67KXV78zet5XGdhp9mQ6DMA+453XiyHb3rh26c9qGm9SFAQstLv0/OfOJ/GaZAKA1toUiJbnk2OAUhI0QUXIMhKH/fZzzajJTfr4rOL2CtDDp677cWmubqctPc8gfXBmu4hI9HV2+vtp7Gj0XP/NkUgv0zYjSnz929saFJ+dHpl3XenxIJkUj7coU8oDzsoKX/Uz5/yNCY1LXZvt7lAKa8j//qpMYUXfSTblSdClSnQ5oGG7nhpPlXVU90GLai1ACR3rI6CFeyuOZlZAG0OcpVA37pQJ18Zl+BIeR6Jsbu0FO3YQ/udQ0mC71++yXFpYnOExFNPAYd/na+JDaDQKf34/GK6x2z4/5qMaivjAtE65Og/ImzejOmw/pwmS47xOxfPRYnkeuSIxi/7a91vujqowIyhGk61knez4xOGlYzAAPG/u0zXVRY99gqVmzfZzcftc/flnyCzuZu4una1P0Pqalw=
+    secure: Fun0CbX8ZNFwBhkvjNfYx07H7IzQACHrabfopimImqQM8FkPfiQqFFvcjsYe18MqB2+s0nqUsoas3JHzJ1zjOTlnhd6CkiEgIDH5I63WemzEKDaOU4F2LVNl5kgVdxnpcs2LNxKHgcMQfcK9gaAKp/qkHVsbHcxwpQ1kcX/XOF0KI7rEx4c97F+xCCn0rBiqO9PDBCSxpg1N7xGkVLpo5AZ7n53L3HO082awToyza4KvTZwWSITrV9w2CsNytFroLS8AGOXvstT5GUEWUBehu9HNQodcu3ZfIxZsPrqIhDe3kru59sF7j5hOuGuaWVYWjstCYyaQkGlkuF7LSAOhgG+9Iq1DUL2TIVMl0B9tTy/D14oaOPenLuogriuKdeQ0jQlbX6CTu5oiWLxKhc7j80VyFw8BG5vgJDpyGvM6iwpC6R1+ODnxY2FaYQqXxdPkStPZVL07ZKKlDd9Z2qQRkh6rBCl5yyuEmUijO6C/fSVo1Uo0lID1LHI7+yR9UWMJa9+cHF5VQ/y9jFvdNW3g5qK+xCfin9IRLr2EDR2FSuN4QmpJMC87VL0RWCnu3E243DeoM1Z79jWZYqnDnAj+HqZlAApUmui/ENKUkvmt8PpWpteq6HxG99LQ1ofNAyhKgHzFRdQs7M9+cWxbeV9sucq3/a5WkZGDcGuIoWtsi2M=
   file_glob: true
-  file: ${TRAVIS_BUILD_DIR}/build/build-release/pyinvariant-*.whl
+  file: "${TRAVIS_BUILD_DIR}/build/build-release/pyinvariant-*.whl"
   skip_cleanup: true
   overwrite: true
   on:
     repo: ThomasLeMezo/invariant-lib
-    tags: true
+    # tags: true
