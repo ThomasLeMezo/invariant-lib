@@ -1,4 +1,4 @@
-# Invariant library [![Build Status](https://travis-ci.com/ThomasLeMezo/invariant-lib.svg?token=7MJCVqaTjrQSyfdwcBiM&branch=master)](https://travis-ci.com/ThomasLeMezo/invariant-lib)
+# Invariant library [![Build Status](https://travis-ci.org/ThomasLeMezo/invariant-lib.svg?branch=master)](https://travis-ci.org/ThomasLeMezo/invariant-lib)
 
 *Invariant* is a guaranteed C++ library to compute invariant associated to a dynamical system.
 
