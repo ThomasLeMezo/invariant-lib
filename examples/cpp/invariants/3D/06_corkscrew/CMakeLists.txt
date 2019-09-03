@@ -18,8 +18,8 @@ if(WITH_3D)
   target_link_libraries(3D_invariant_corkscrew
     ${LIBS}
     invariant-core
-    
     invariant-graphics-3D
+				invariant-language
   )
 endif()
 

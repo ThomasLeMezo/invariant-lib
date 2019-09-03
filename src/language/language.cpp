@@ -12,11 +12,45 @@
 
 #include "vibes/vibes.h"
 #include "graphiz_graph.h"
+#include "vtkmazeppl.h"
 using namespace std;
 
 namespace invariant {
 
 // To improve...
+
+int invariant_PPL(ibex::IntervalVector &space, ibex::Function *f_dyn, size_t nb_steps, string file_name, size_t contraction_limit){
+  // ****** Domain ******* //
+  invariant::SmartSubPavingPPL paving(space);
+  invariant::DomainPPL dom(&paving, FULL_DOOR);
+
+  dom.set_border_path_in(false);
+  dom.set_border_path_out(false);
+
+  DynamicsFunction dyn(f_dyn, FWD_BWD);
+
+  // ******* Maze ********* //
+  invariant::MazePPL maze(&dom, &dyn);
+
+  maze.set_enable_contraction_limit(true);
+  maze.set_contraction_limit(contraction_limit);
+
+  // ******* Algorithm ********* //
+  double time_start = omp_get_wtime();
+  for(size_t i=0; i<nb_steps; i++){
+      cout << i << endl;
+      paving.bisect();
+      maze.contract();
+  }
+  cout << "TIME = " << omp_get_wtime() - time_start << endl;
+
+  cout << paving << endl;
+
+  VtkMazePPL vtkMazePPL(file_name);
+  vtkMazePPL.show_maze(&maze);
+
+  return 0;
+}
 
 int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dyn, size_t nb_steps, string file_name, ibex::Function *f_dom){
     // ****** Domain ******* //

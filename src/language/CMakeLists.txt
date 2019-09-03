@@ -31,6 +31,7 @@ if(WITH_LANGUAGE)
     target_link_libraries(invariant-language
         invariant-core
         invariant-graphics
+								invariant-graphics-3D
     )
 
     install(FILES ${HEADERS_LANGUAGE} DESTINATION "include/invariant-lib")

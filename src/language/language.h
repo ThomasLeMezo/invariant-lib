@@ -37,6 +37,12 @@ namespace invariant {
                                 ibex::Sep* sep_outer
                                 );
 
+ int invariant_PPL(ibex::IntervalVector &space,
+                   ibex::Function *f_dyn,
+                   size_t nb_steps,
+                   std::string file_name,
+                   size_t contraction_limit=15);
+
 }
 
 #endif // LANGUAGE_H
