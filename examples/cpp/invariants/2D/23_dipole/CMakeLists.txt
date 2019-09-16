@@ -12,14 +12,14 @@
 
   )
 
-  add_executable(2D_invariant_zang ${SRC})
+		add_executable(2D_invariant_electric_dipole ${SRC})
 
-  target_link_libraries(2D_invariant_zang
+		target_link_libraries(2D_invariant_electric_dipole
     ${LIBS}
     invariant-core
     
     invariant-graphics
-				invariant-language
+	invariant-language
   )
 
 

@@ -63,14 +63,15 @@ int main(int argc, char *argv[])
 
     // ****** Visu *******
 
-    VibesMaze v_maze_eulerian("Eulerian", &eulerian_maze);
-    v_maze_eulerian.setProperties(0, 0, 800, 1000);
+    VibesMaze v_maze_eulerian("eulerian_avoid", &eulerian_maze);
+    v_maze_eulerian.setProperties(0, 0, 1000, 800);
     v_maze_eulerian.set_enable_cone(false);
     v_maze_eulerian.show();
     v_maze_eulerian.drawBox(box_C, "r[]");
     v_maze_eulerian.drawBox(box_B, "r[]");
     v_maze_eulerian.drawCircle(xc_1, yc_1, r_1, "r[]");
     vibes::drawBox(space, "black[]");
+    v_maze_eulerian.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 
     vibes::endDrawing();

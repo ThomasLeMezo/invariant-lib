@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     double time_start = omp_get_wtime();
     //    omp_set_num_threads(1);
-    for(int i=0; i<18; i++){
+    for(int i=0; i<16; i++){
         cout << i << endl;
         eulerian_maze.bisect();
         eulerian_maze.contract(1);

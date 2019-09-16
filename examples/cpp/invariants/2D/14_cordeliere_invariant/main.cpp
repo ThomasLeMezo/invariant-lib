@@ -38,11 +38,11 @@ void bathy1(){
     ibex::Function h(x1, x2, 2.0*exp((sqr(x1+2)+sqr(x2+2))/-10.0) + 2.0*exp((sqr(x1-2)+sqr(x2-2))/-10.0) - 10.0);
     ibex::Function hdiff(h, Function::DIFF);
     ibex::Function psi(x1, x2, tanh(h(x1, x2)-h0)+ibex::Interval::PI/2.0);
-    ibex::Function f(x1, x2, -Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
+    ibex::Function f(x1, x2, Return((hdiff(x1, x2)[0]*cos(psi(x1, x2))-hdiff(x1, x2)[1]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0])),
                                     (hdiff(x1, x2)[1]*cos(psi(x1, x2))+hdiff(x1, x2)[0]*sin(psi(x1, x2)))/sqrt(sqr(hdiff(x1, x2)[1])+sqr(hdiff(x1, x2)[0]))));
 
 
-    largest_positive_invariant(space, &f, 16, "bathymetry_positive_invariant", &sep_i);
+    largest_positive_invariant(space, &f, 16, "bathymetry_negative_invariant", &sep_i);
 }
 
 void bathy2(){
