@@ -43,6 +43,11 @@ namespace invariant {
                    std::string file_name,
                    size_t contraction_limit=15);
 
+ int largest_invariant(ibex::IntervalVector &space,
+                       ibex::Function *f_dyn_positive,
+                       ibex::Function *f_dyn_negative,
+                       size_t nb_steps,
+                       std::string file_name);
 }
 
 #endif // LANGUAGE_H
