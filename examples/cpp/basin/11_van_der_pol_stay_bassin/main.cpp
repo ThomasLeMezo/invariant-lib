@@ -86,9 +86,9 @@ int main(int argc, char *argv[]){
 
     vibes::beginDrawing();
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.setProperties(0, 0, 1000, 800);
     VibesMaze v_maze_basin("Basin", &maze_outer_basin, &maze_inner_basin);
-    v_maze_basin.setProperties(0, 0, 1024, 1024);
+    v_maze_basin.setProperties(0, 0, 1000, 800);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();

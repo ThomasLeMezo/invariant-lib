@@ -117,7 +117,7 @@ class VibesFigure
   protected:
 
     mutable std::string m_name;
-    double m_x, m_y, m_width, m_height;
+    double m_x=0, m_y=0, m_width=1000, m_height=800;
     static bool m_begin_drawing;
 };
 

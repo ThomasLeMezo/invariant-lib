@@ -82,9 +82,9 @@ int main(int argc, char *argv[])
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
     for(int i=0; i<18; i++){
-        cout << "-----" << i << "-----" << endl;
+        cout << i << endl;
         paving.bisect();
-        cout << "nb contractions = " << maze.contract() << " - " << "paving size = " << paving.size() << endl;
+        maze.contract();
         //        vtkMaze3D.show_maze(&maze, std::to_string(i));
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;

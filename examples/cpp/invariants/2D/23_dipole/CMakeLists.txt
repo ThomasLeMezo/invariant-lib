@@ -4,7 +4,6 @@
 
 # Sources
 
-if(WITH_3D)
   set(SRC
 	main.cpp
   )
@@ -13,15 +12,16 @@ if(WITH_3D)
 
   )
 
-  add_executable(3D_invariant_corkscrew ${SRC})
+		add_executable(2D_invariant_electric_dipole ${SRC})
 
-  target_link_libraries(3D_invariant_corkscrew
+		target_link_libraries(2D_invariant_electric_dipole
     ${LIBS}
     invariant-core
-    invariant-graphics-3D
-				invariant-language
+    
+    invariant-graphics
+	invariant-language
   )
-endif()
+
 
 # Tests
 

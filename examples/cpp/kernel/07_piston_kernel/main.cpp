@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 {
     ibex::Variable z, dz;
 
-#if 0
+#if 1
     IntervalVector space(2);
     space[0] = ibex::Interval(-20, 80.0);
     space[1] = ibex::Interval(-0.4,0.4);
@@ -35,7 +35,10 @@ int main(int argc, char *argv[])
     double rho = 1025.0;
     double m = 9.045*2.;
     double diam = 0.24;
-    double chi = tick_to_volume*30.0;
+
+//    double chi = tick_to_volume*30.0;
+    double chi = 2.15e-6;
+    cout << "chi = " << tick_to_volume*30.0 << " | " << chi << endl;
 //    double chi = -tick_to_volume*10.0;
     double Cf = M_PI*pow(diam/2.0,2);
 
@@ -114,7 +117,7 @@ int main(int argc, char *argv[])
     std::vector<ibex::Function *> f_inner_fwd{&f_inner_fwd_1, &f_inner_fwd_2};
     std::vector<ibex::Function *> f_inner_bwd{&f_inner_bwd_1, &f_inner_bwd_2};
 
-    DynamicsFunction dyn_outer(&f, FWD_BWD);
+    DynamicsFunction dyn_outer(&f, BWD);
     DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
     DynamicsFunction dyn_inner_bwd(f_inner_bwd, FWD);
 
@@ -144,9 +147,9 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     vector<invariant::MazeIBEX*> list_outer{&maze_outer};
-    vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
-//    VibesMaze v_maze("piston_kernel", list_outer, list_inner);
-    VibesMaze v_maze("ifremer_float", list_outer, list_inner);
+    vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd/*, &maze_inner_bwd*/};
+    VibesMaze v_maze("piston_kernel", list_outer, list_inner);
+//    VibesMaze v_maze("ifremer_float", list_outer, list_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_scale(1., 100);
     v_maze.set_enable_cone(false);

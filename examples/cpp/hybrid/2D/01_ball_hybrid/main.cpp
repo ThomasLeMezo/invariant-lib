@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(0,3);
-    space[1] = ibex::Interval(-10,10);
+    space[0] = ibex::Interval(0,2.2);
+    space[1] = ibex::Interval(-5,5);
 
     // ****** Domain *******
     invariant::SmartSubPaving<> paving(space);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     double x1_c, x2_c, r;
     x1_c = 2.0;
     x2_c = 0.0;
-    r = 0.1;
+    r = 0.05;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LT); // LT, LEQ, EQ, GEQ, GT)
     dom.set_sep(&s);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     omp_set_num_threads(1);
     double time_start = omp_get_wtime();
-    for(int i=0; i<18; i++){
+    for(int i=0; i<15; i++){
         cout << i << endl;
         paving.bisect();
         maze.contract();
@@ -68,15 +68,15 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("Hybrid Ball", &maze);
-    v_maze.setProperties(0, 0, 512, 512);
+    VibesMaze v_maze("hybrid_ball", &maze);
+    v_maze.setProperties(0, 0, 1000, 800);
+    v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(0.05);
 //    position_info[1] = ibex::Interval(-5.8);
 //    v_maze.show_room_info(&maze, position_info);
-
-
 }

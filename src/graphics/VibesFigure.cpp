@@ -26,6 +26,12 @@ VibesFigure::VibesFigure(const string& figure_name){
     }
     m_name = figure_name;
     vibes::newFigure(m_name);
+    vibes::setFigureProperties(
+                vibesParams("figure", m_name,
+                            "x", m_x,
+                            "y", m_y,
+                            "width", m_width,
+                            "height", m_height));
 }
 
 VibesFigure::~VibesFigure()
