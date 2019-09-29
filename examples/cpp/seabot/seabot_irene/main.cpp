@@ -106,7 +106,15 @@ int main(int argc, char *argv[]){
 
   LambertGrid g(file_name);
 
-  //    draw_map(g);
+  try{
+      bool test_draw_map = radar.get<bool>("draw_map");
+      if(test_draw_map){
+        draw_map(g);
+        cout << "Map drawn" << endl;
+      }
+  } catch (std::exception const&  ex){
+    cout << "No map drawing define (" << ex.what() << ")" << endl;
+  }
 
   double time_start = omp_get_wtime();
 
@@ -150,8 +158,10 @@ int main(int argc, char *argv[]){
       y_tmp+=v*dt;
 
       points->InsertNextPoint(x_tmp, y_tmp, t+dt);
-      if(!valid)
+      if(!valid){
+        t=t_end+t_tmp;
         break;
+      }
     }
     trajectory->SetPoints(points);
 

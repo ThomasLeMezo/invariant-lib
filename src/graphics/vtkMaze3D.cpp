@@ -532,7 +532,7 @@ void draw_map(LambertGrid &g){
     for(size_t i=0; i<g.get_X().size(); i++){
         for(size_t j=0; j<g.get_X()[0].size(); j++){
             if(g.get_H0()[i][j]==g.get_H0_Fill_Value()){
-                vtkIdType id= points_grid->InsertNextPoint(g.get_X()[i][j], g.get_Y()[i][j], 0.0);
+                vtkIdType id= points_grid->InsertNextPoint(g.get_X()[i][j], g.get_Y()[i][j], g.get_time_min());
                 cellArray->InsertNextCell(1, &id);
             }
         }
