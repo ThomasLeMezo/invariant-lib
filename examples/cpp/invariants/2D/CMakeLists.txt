@@ -35,3 +35,6 @@ add_subdirectory(22_van_der_pol_invariant_bracketing_stats)
 
 add_subdirectory(23_dipole)
 
+add_subdirectory(24_piston_stability)
+add_subdirectory(25_piston_uncertainty2)
+add_subdirectory(26_piston_stability2)

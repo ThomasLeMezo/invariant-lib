@@ -6,7 +6,8 @@ using namespace invariant;
 using namespace ibex;
 using namespace std;
 
-VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g): VibesFigure(figure_name), m_scale_factor(2, ibex::Interval(1)){
+VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g):
+  VibesFigure(figure_name), m_scale_factor(2, ibex::Interval(1)), m_offset(2, ibex::Interval::ZERO){
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/VibesMaze()] dim of paving is not equal to 2");
     m_subpaving = g;
@@ -84,7 +85,7 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
 
         if(nb_vec == 1){
             IntervalVector d_iv_c(d_iv_list[0]);
-            d_iv_c = hadamard_product(d_iv_c,m_scale_factor);
+            d_iv_c = hadamard_product(d_iv_c+m_offset,m_scale_factor);
             if(!d_iv_c.is_empty()){
                 if(get<2>(t)){
                     pt_x.push_back(d_iv_c[0].lb());
@@ -118,7 +119,7 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
             }
 
             if(!d_iv.is_empty()){
-                d_iv = hadamard_product(d_iv, m_scale_factor);
+                d_iv = hadamard_product(d_iv+m_offset, m_scale_factor);
                 if(get<2>(pt)){
                     pt_x.push_back(d_iv[0].lb());
                     pt_y.push_back(d_iv[1].lb());
@@ -144,7 +145,7 @@ void VibesMaze::draw_room_inner(PaveIBEX *p) const{
 
 void VibesMaze::draw_room_outer(PaveIBEX *p) const{
     // Draw backward
-    vibes::drawBox(hadamard_product(p->get_position(),m_scale_factor), "black[blue]");
+    vibes::drawBox(hadamard_product(p->get_position()+m_offset,m_scale_factor), "black[blue]");
 
     // Draw Polygon
     vector<double> pt_x, pt_y;
@@ -159,7 +160,7 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
     }
 
     if(display_yellow){ // Begining issue
-        vibes::drawBox(hadamard_product(p->get_position(),m_scale_factor), "black[yellow]");
+        vibes::drawBox(hadamard_product(p->get_position()+m_offset,m_scale_factor), "black[yellow]");
     }
     else{
         for(const tuple<int, int, bool> &pt:m_oriented_path){
@@ -170,7 +171,7 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
             }
 
             if(!d_iv.is_empty()){
-                d_iv = hadamard_product(d_iv, m_scale_factor);
+                d_iv = hadamard_product(d_iv+m_offset, m_scale_factor);
                 if(get<2>(pt)){
                     pt_x.push_back(d_iv[0].lb());
                     pt_y.push_back(d_iv[1].lb());
@@ -198,7 +199,7 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
         invariant::RoomIBEX *r = p->get_rooms()[maze];
         if(!r->get_hybrid_door_guards().empty()){
             for(std::pair<ibex::Sep*, ibex::IntervalVector> g:r->get_hybrid_door_guards()){
-                vibes::drawBox(hadamard_product(g.second,m_scale_factor), "black[g]");
+                vibes::drawBox(hadamard_product(g.second+m_offset,m_scale_factor), "black[g]");
             }
         }
     }
@@ -331,7 +332,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
         }
 
         if(!d_iv.is_empty()){
-            d_iv = hadamard_product(d_iv, m_scale_factor);
+            d_iv = hadamard_product(d_iv+m_offset, m_scale_factor);
             if(get<2>(pt)){
                 pt_x.push_back(d_iv[0].lb());
                 pt_y.push_back(d_iv[1].lb());
@@ -348,7 +349,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     }
 
     if(m_type==VIBES_MAZE_EULERIAN && !full_outer_eulerian)
-        vibes::drawBox(hadamard_product(p->get_position(),m_scale_factor), "black[blue]");
+        vibes::drawBox(hadamard_product(p->get_position()+m_offset,m_scale_factor), "black[blue]");
     if(!pt_x.empty())
         vibes::drawPolygon(pt_x, pt_y, "black[yellow]");
 
@@ -380,7 +381,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
 
         if(nb_vec == 1){
             IntervalVector d_iv_c(d_iv_list[0]);
-            d_iv_c = hadamard_product(d_iv_c, m_scale_factor);
+            d_iv_c = hadamard_product(d_iv_c+m_offset, m_scale_factor);
             if(!d_iv_c.is_empty()){
                 if(get<2>(pt)){
                     pt_x.push_back(d_iv_c[0].lb());
@@ -434,7 +435,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
 
             if(nb_vec == 1){
                 IntervalVector d_iv_c(d_iv_list[0]);
-                d_iv_c = hadamard_product(d_iv_c, m_scale_factor);
+                d_iv_c = hadamard_product(d_iv_c+m_offset, m_scale_factor);
                 if(!d_iv_c.is_empty()){
                     if(get<2>(pt)){
                         pt_x.push_back(d_iv_c[0].lb());
@@ -513,9 +514,9 @@ void VibesMaze::show_maze_outer_inner() const{
             invariant::RoomIBEX *r_outer = p->get_rooms()[maze];
             if(!r_outer->is_removed() && !r_outer->is_empty()){
                 if(r_outer->is_initial_door_input())
-                    vibes::drawBox(hadamard_product(r_outer->get_initial_door_input(),m_scale_factor), "[#FF8C8C]");
+                    vibes::drawBox(hadamard_product(r_outer->get_initial_door_input()+m_offset,m_scale_factor), "[#FF8C8C]");
                 if(r_outer->is_initial_door_output())
-                    vibes::drawBox(hadamard_product(r_outer->get_initial_door_output(),m_scale_factor), "[#FF8C8C]");
+                    vibes::drawBox(hadamard_product(r_outer->get_initial_door_output()+m_offset,m_scale_factor), "[#FF8C8C]");
             }
         }
         //                if(!r_inner->is_removed() && !r_inner->is_empty()){
@@ -539,7 +540,7 @@ void VibesMaze::show_maze_outer_inner() const{
         }
 
         if(empty_outer)
-            vibes::drawBox(hadamard_product(p->get_position(),m_scale_factor), "black[blue]");
+            vibes::drawBox(hadamard_product(p->get_position()+m_offset,m_scale_factor), "black[blue]");
 
         if(!m_both_wall){
             bool empty_inner = true;
@@ -552,7 +553,7 @@ void VibesMaze::show_maze_outer_inner() const{
             }
 
             if(empty_inner)
-                vibes::drawBox(hadamard_product(p->get_position(),m_scale_factor), "black[#FF00FF]");
+                vibes::drawBox(hadamard_product(p->get_position()+m_offset,m_scale_factor), "black[#FF00FF]");
         }
         //        }
     }
@@ -561,7 +562,7 @@ void VibesMaze::show_maze_outer_inner() const{
 void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) const{
     if(!m_enable_cones)
         return;
-    IntervalVector position(hadamard_product(p->get_position(), m_scale_factor));
+    IntervalVector position(hadamard_product(p->get_position()+m_offset, m_scale_factor));
 //    double size = 0.8*sqrt(pow(position[0].diam()/2.,2)+ pow(position[1].diam()/2., 2));
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.;
 //    cout << "size = " << size << endl;
@@ -578,7 +579,7 @@ void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) co
             if(r == empty)
                 vibes::drawBox(position[0].mid()+ibex::Interval(-size, +size), position[1].mid()+ibex::Interval(-size, +size), "black[gray]");
             else{
-                for(ibex::Interval i:compute_theta(r[0]*m_scale_factor[0], r[1]*m_scale_factor[1])){
+                for(ibex::Interval i:compute_theta((r[0]+m_offset[0])*m_scale_factor[0], (r[1]+m_offset[1])*m_scale_factor[1])){
                     vibes::drawSector(position[0].mid(), position[1].mid(), size, size, (-i.lb())*180.0/M_PI, (-i.ub())*180.0/M_PI, "black[#8080807F]");
                 }
             }
@@ -636,15 +637,15 @@ void VibesMaze::show_graph() const{
     //    params_not_bisectable = vibesParams("figure", m_name, "group", "graph_not_bisectable", "FaceColor","none","EdgeColor","lightGray");
 
     for(PaveIBEX*p:m_subpaving->get_paves()){
-//        ibex::IntervalVector box(hadamard_product(p->get_position(),m_scale_factor));
+//        ibex::IntervalVector box(hadamard_product(p->get_position()+m_offset,m_scale_factor));
         //        vibes::drawBox(box, params_bisectable);
-        bounding_box |= hadamard_product(p->get_position(),m_scale_factor);
+        bounding_box |= hadamard_product(p->get_position()+m_offset,m_scale_factor);
 
     }
     for(PaveIBEX*p:m_subpaving->get_paves_not_bisectable()){
         if(!p->get_position().is_unbounded()){
             //            vibes::drawBox(p->get_position(), params_not_bisectable);
-            bounding_box |= hadamard_product(p->get_position(),m_scale_factor);
+            bounding_box |= hadamard_product(p->get_position()+m_offset,m_scale_factor);
         }
     }
 
@@ -677,13 +678,13 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
     std::cout.precision(15);
     m_subpaving->get_room_info(maze, position, pave_list);
     for(invariant::PaveIBEX* p:pave_list){
-        ibex::IntervalVector p_tmp = hadamard_product(p->get_position(), m_scale_factor);
+        ibex::IntervalVector p_tmp = hadamard_product(p->get_position()+m_offset, m_scale_factor);
         vibes::drawEllipse(p_tmp[0].mid(), p_tmp[1].mid(),
                 0.6*p_tmp[0].diam()/2.0, 0.6*p_tmp[1].diam()/2.0, 0., "[green]", vibesParams("figure", m_name));
     }
 
     for(invariant::PaveIBEX* p:pave_list){
-        IntervalVector p_position = hadamard_product(p->get_position(), m_scale_factor);
+        IntervalVector p_position = hadamard_product(p->get_position()+m_offset, m_scale_factor);
         double p_diam[2] = {p_position[0].diam(), p_position[1].diam()};
         double offset[2] = {p_diam[0]*0.05, p_diam[1]*0.05};
 
@@ -712,8 +713,8 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
                 invariant::FaceIBEX *f=p->get_faces()[face][sens];
                 invariant::DoorIBEX *d = f->get_doors()[maze];
 
-                IntervalVector input = hadamard_product(d->get_input(), m_scale_factor);
-                IntervalVector output = hadamard_product(d->get_output(), m_scale_factor);
+                IntervalVector input = hadamard_product(d->get_input()+m_offset, m_scale_factor);
+                IntervalVector output = hadamard_product(d->get_output()+m_offset, m_scale_factor);
 
                 input[face] += 1.0*ibex::Interval((sens==1)?(offset[face]):(-offset[face])) + ibex::Interval(-offset[face]/4.0, offset[face]/4.0);
                 output[face] += 2.0*ibex::Interval((sens==1)?(offset[face]):(-offset[face])) + ibex::Interval(-offset[face]/4.0, offset[face]/4.0);

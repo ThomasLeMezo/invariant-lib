@@ -84,7 +84,6 @@ int main(int argc, char *argv[])
 
     v_maze.drawBox(box1, "black[red]");
     v_maze.drawBox(box2, "black[red]");
-    v_maze.saveImage();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 

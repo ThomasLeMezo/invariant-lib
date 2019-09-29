@@ -95,7 +95,7 @@ int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dy
     v_maze.set_enable_cone(false);
     v_maze.drawBox(space, "white[white]");
     v_maze.show();
-    v_maze.saveImage();
+
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 
@@ -140,7 +140,6 @@ int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dy
     v_maze.set_enable_cone(false);
     v_maze.drawBox(space, "white[white]");
     v_maze.show();
-    v_maze.saveImage();
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 
@@ -198,7 +197,7 @@ int largest_invariant(ibex::IntervalVector &space, ibex::Function *f_dyn_positiv
     v_maze.set_enable_cone(false);
     v_maze.drawBox(space, "white[white]");
     v_maze.show();
-    v_maze.saveImage();
+
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 
@@ -252,7 +251,7 @@ int largest_positive_invariant(ibex::IntervalVector &space,
     v_maze.set_enable_cone(false);
     v_maze.drawBox(space, "white[white]");
     v_maze.show();
-    v_maze.saveImage();
+
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 
@@ -308,7 +307,7 @@ int largest_positive_invariant(ibex::IntervalVector &space,
     v_maze.set_enable_cone(false);
     v_maze.drawBox(space, "white[white]");
     v_maze.show();
-    v_maze.saveImage();
+
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
 
