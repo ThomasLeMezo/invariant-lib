@@ -96,6 +96,11 @@ class VibesFigure
     void saveImage(const std::string& prefix = "", const std::string& extension = ".svg") const;
 
     /**
+     * @brief clear the figure
+     */
+    void clear();
+
+    /**
      * \brief Display the figure.
      *
      * This is a virtual method to overload.

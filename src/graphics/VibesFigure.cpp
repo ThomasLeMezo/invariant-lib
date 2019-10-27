@@ -66,6 +66,10 @@ void VibesFigure::saveImage(const string& prefix, const string& extension) const
     std::cout << "Saved to : " << prefix << m_name << extension << std::endl;
 }
 
+void VibesFigure::clear(){
+    vibes::clearFigure(m_name);
+}
+
 double VibesFigure::x() const
 {
     return m_x;

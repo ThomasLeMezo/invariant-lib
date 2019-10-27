@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
         maze_outer.contract();
         maze_inner.contract();
 
+        v_maze.clear();
         v_maze.drawBox(space, "white[white]");
         v_maze.show();
         vibes::saveImage(file + to_string(i) + ".svg");

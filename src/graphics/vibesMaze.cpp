@@ -7,7 +7,7 @@ using namespace ibex;
 using namespace std;
 
 VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g):
-  VibesFigure(figure_name), m_scale_factor(2, ibex::Interval(1)), m_offset(2, ibex::Interval::ZERO){
+  VibesFigure(figure_name), m_scale_factor(2), m_offset(2){
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/VibesMaze()] dim of paving is not equal to 2");
     m_subpaving = g;
@@ -17,6 +17,10 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIB
     m_oriented_path.push_back(std::make_tuple(1, 1, true));
     m_oriented_path.push_back(std::make_tuple(0, 1, false));
     m_oriented_path.push_back(std::make_tuple(1, 0, false));
+    m_scale_factor[0] = ibex::Interval(1);
+    m_scale_factor[1] = ibex::Interval(1);
+    m_offset[0] = ibex::Interval::ZERO;
+    m_offset[1] = ibex::Interval::ZERO;
 }
 
 VibesMaze::VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type): VibesMaze(figure_name, maze->get_subpaving()){
@@ -737,7 +741,7 @@ void VibesMaze::drawBox(double x_min, double x_max, double y_min, double y_max, 
 }
 
 void VibesMaze::drawBox(const ibex::IntervalVector &box, std::string params) const{
-    vibes::drawBox(box, params);
+    vibes::drawBox(hadamard_product((box+m_offset), m_scale_factor), params);
 }
 
 void VibesMaze::add_stat(size_t step, double time, double volume_outer, double volume_inner){
