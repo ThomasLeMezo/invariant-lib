@@ -15,6 +15,7 @@
 #include "vibesMaze.h"
 #include "vtkMaze3D.h"
 #include <string>
+#include "language.h"
 
 #include <omp.h>
 
@@ -78,7 +79,8 @@ using namespace ibex;
                "multi_threaded"_a=false)
   ;
 
-  py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")
+  py::object function = (py::object) py::module::import("pyibex").attr("Function");
+  py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function)
           .def(py::init<>())
           .def("push_back", &invariant::SpaceFunction::push_back)
   ;
@@ -139,4 +141,12 @@ using namespace ibex;
           .def("serialize_maze", &VtkMaze3D::serialize_maze)
     ;
 
+//  m.def("largest_positive_invariant", &largest_positive_invariant_python,
+//        "space"_a,
+//        "f_outer"_a,
+//        "nb_steps"_a,
+//        "file_name"_a,
+//        py::arg("sep_outer") = (ibex::Sep*)nullptr,
+//        py::arg("f_inner") = std::vector<ibex::Function*>()
+//        );
 }

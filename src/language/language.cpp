@@ -314,4 +314,22 @@ int largest_positive_invariant(ibex::IntervalVector &space,
     return 0;
 }
 
+int largest_positive_invariant_python(ibex::IntervalVector &space,
+                                      ibex::Function* f_outer,
+                                      size_t nb_steps,
+                                      std::string file_name,
+                                      std::vector<ibex::Function*> &f_inner,
+                                      ibex::Sep* sep_outer){
+    if(f_inner.size()==0 && sep_outer == nullptr){
+        largest_positive_invariant(space, f_outer, nb_steps, file_name);
+    }
+    else if(f_inner.size()==0){
+        largest_positive_invariant(space, f_outer, nb_steps, file_name, sep_outer);
+    }
+    else{
+        largest_positive_invariant(space, f_outer, f_inner, nb_steps, file_name, sep_outer);
+    }
+    return 0;
+}
+
 }

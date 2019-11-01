@@ -21,6 +21,7 @@ include_directories(../src/invariant/maze)
 include_directories(../src/invariant/definition)
 include_directories(../src/invariant/definition/netcdf)
 include_directories(../src/invariant/definition/dataSet)
+include_directories(../src/language)
 include_directories(../src/graphics)
 
 set(PYBIND11_CPP_STANDARD -std=c++11)
@@ -32,6 +33,7 @@ target_link_libraries(pyinvariant PRIVATE
     invariant-core
     invariant-graphics
     invariant-graphics-3D
+    invariant-language
 )
 
 target_include_directories(pyinvariant

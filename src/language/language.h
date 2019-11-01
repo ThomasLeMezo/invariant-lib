@@ -37,6 +37,13 @@ namespace invariant {
                                 ibex::Sep* sep_outer
                                 );
 
+ int largest_positive_invariant_python(ibex::IntervalVector &space,
+                                       ibex::Function* f_outer,
+                                       size_t nb_steps,
+                                       std::string file_name,
+                                       std::vector<ibex::Function*> &f_inner,
+                                       ibex::Sep* sep_outer);
+
  int invariant_PPL(ibex::IntervalVector &space,
                    ibex::Function *f_dyn,
                    size_t nb_steps,

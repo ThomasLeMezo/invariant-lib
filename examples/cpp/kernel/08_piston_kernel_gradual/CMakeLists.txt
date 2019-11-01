@@ -12,11 +12,12 @@
 
   )
 
-  add_executable(2D_invariant_piston_kernel ${SRC})
+  add_executable(2D_invariant_piston_kernel_gradual ${SRC})
 
-  target_link_libraries(2D_invariant_piston_kernel
+  target_link_libraries(2D_invariant_piston_kernel_gradual
     ${LIBS}
     invariant-core
+    
     invariant-graphics
   )
 
