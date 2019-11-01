@@ -43,10 +43,10 @@ using namespace ibex;
 
   // ********* Paving *********
   py::class_<invariant::SmartSubPavingIBEX>(m, "SmartSubPaving")
-          .def(py::init<const IntervalVector&>(), "IntervalVector"_a)
+          .def(py::init<const ibex::IntervalVector&>(), "IntervalVector"_a)
           .def("bisect", &invariant::SmartSubPavingIBEX::bisect)
           .def("size", &invariant::SmartSubPavingIBEX::size)
-  ;  
+  ;
 
   // ********* Domain *********
   py::class_<invariant::DomainIBEX>(m, "Domain")
@@ -65,9 +65,7 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-  py::class_<invariant::Dynamics> dynamics(m, "Dynamics")
-  ;
-
+  py::class_<invariant::Dynamics> dynamics(m, "Dynamics");
   py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(),
                "f"_a,
@@ -79,11 +77,10 @@ using namespace ibex;
                "multi_threaded"_a=false)
   ;
 
-  py::object function = (py::object) py::module::import("pyibex").attr("Function");
-  py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function)
-          .def(py::init<>())
-          .def("push_back", &invariant::SpaceFunction::push_back)
-  ;
+  py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")
+            .def(py::init<>())
+            .def("push_back", &invariant::SpaceFunction::push_back)
+    ;
 
   // ********* Maze *********
   py::class_<invariant::MazeIBEX>(m, "Maze")
@@ -94,13 +91,13 @@ using namespace ibex;
     ;
 
   // SepMaze
-  py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
-  py::class_<invariant::SepMazeIBEX>(m, "SepMaze", sep)
-          .def(py::init<invariant::MazeIBEX*>(),"maze"_a)
-          .def("separate", &invariant::SepMazeIBEX::separate)
-  ;
+   py::object sep = (py::object) py::module::import("pyibex").attr("Sep");
+   py::class_<invariant::SepMazeIBEX>(m, "SepMaze", sep)
+           .def(py::init<invariant::MazeIBEX*>(),"maze"_a)
+           .def("separate", &invariant::SepMazeIBEX::separate)
+   ;
 
-  // ********* VibesMaze *********
+//  // ********* VibesMaze *********
   py::enum_<VibesMaze::VIBES_MAZE_TYPE>(m, "VIBES_MAZE_TYPE")
       .value("VIBES_MAZE_INNER", VibesMaze::VIBES_MAZE_INNER)
       .value("VIBES_MAZE_OUTER", VibesMaze::VIBES_MAZE_OUTER)
@@ -141,12 +138,12 @@ using namespace ibex;
           .def("serialize_maze", &VtkMaze3D::serialize_maze)
     ;
 
-//  m.def("largest_positive_invariant", &largest_positive_invariant_python,
-//        "space"_a,
-//        "f_outer"_a,
-//        "nb_steps"_a,
-//        "file_name"_a,
-//        py::arg("sep_outer") = (ibex::Sep*)nullptr,
-//        py::arg("f_inner") = std::vector<ibex::Function*>()
-//        );
+  m.def("largest_positive_invariant", &largest_positive_invariant_python,
+        "space"_a,
+        "f_outer"_a,
+        "nb_steps"_a,
+        "file_name"_a,
+        py::arg("sep_outer") = (ibex::Sep*)nullptr,
+        py::arg("f_inner") = std::vector<ibex::Function*>()
+        );
 }
