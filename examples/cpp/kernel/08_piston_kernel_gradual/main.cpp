@@ -65,42 +65,46 @@ int main(int argc, char *argv[])
 
     invariant::Domain<> dom_inner_fwd(&subpaving, FULL_WALL);
     dom_inner_fwd.set_border_path_in(true);
-    dom_inner_fwd.set_border_path_out(false);
+    dom_inner_fwd.set_border_path_out(true);
     dom_inner_fwd.set_sep(&sep_dom_inner);
 
     invariant::Domain<> dom_inner_bwd(&subpaving, FULL_WALL);
     dom_inner_bwd.set_border_path_in(true);
-    dom_inner_bwd.set_border_path_out(false);
+    dom_inner_bwd.set_border_path_out(true);
     dom_inner_bwd.set_sep(&sep_dom_inner);
 
     // State vector: (z, dz)
     ibex::Function f(z, dz, Return(dz,
                                    (-A*Vp+A*chi*z-B*abs(dz)*dz)));
 
-    ibex::Function f_inner_fwd_1(z, dz, -Return(dz,
+    ibex::Function f_inner_fwd_1(z, dz, Return(dz,
                                                 -A*(Vp.lb()-chi*z)-B*abs(dz)*dz));
-    ibex::Function f_inner_fwd_2(z, dz, -Return(dz,
+    ibex::Function f_inner_fwd_2(z, dz, Return(dz,
                                                 -A*(Vp.ub()-chi*z)-B*abs(dz)*dz));
 
-    ibex::Function f_inner_bwd_1(z, dz, Return(dz,
+    ibex::Function f_inner_bwd_1(z, dz, -Return(dz,
                                                 -A*(Vp.lb()-chi*z)-B*abs(dz)*dz));
-    ibex::Function f_inner_bwd_2(z, dz, Return(dz,
+    ibex::Function f_inner_bwd_2(z, dz, -Return(dz,
                                                 -A*(Vp.ub()-chi*z)-B*abs(dz)*dz));
 
     std::vector<ibex::Function *> f_inner_fwd{&f_inner_fwd_1, &f_inner_fwd_2};
     std::vector<ibex::Function *> f_inner_bwd{&f_inner_bwd_1, &f_inner_bwd_2};
 
-    DynamicsFunction dyn_outer(&f, FWD_BWD);
+    DynamicsFunction dyn_outer_fwd(&f, FWD);
+    DynamicsFunction dyn_outer_bwd(&f, BWD);
     DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
     DynamicsFunction dyn_inner_bwd(f_inner_bwd, FWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_outer_fwd(&dom_outer, &dyn_outer_fwd);
+    invariant::Maze<> maze_outer_bwd(&dom_outer, &dyn_outer_bwd);
+//    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
     invariant::Maze<> maze_inner_fwd(&dom_inner_fwd, &dyn_inner_fwd);
     invariant::Maze<> maze_inner_bwd(&dom_inner_bwd, &dyn_inner_bwd);
 
-    BooleanTreeUnion<> *bisection_inner = new BooleanTreeUnion<>(&maze_inner_fwd, &maze_inner_bwd);
-    BooleanTreeInter<> *bisection = new BooleanTreeInter<>(&maze_outer, bisection_inner);
+    BooleanTreeUnion<> *bisection_fwd = new BooleanTreeUnion<>(&maze_outer_fwd, &maze_inner_fwd);
+    BooleanTreeUnion<> *bisection_bwd = new BooleanTreeUnion<>(&maze_outer_bwd, &maze_inner_bwd);
+    BooleanTreeInter<> *bisection = new BooleanTreeInter<>(bisection_fwd, bisection_bwd);
     subpaving.set_bisection_tree(bisection);
 
     // ******* Algorithm ********* //
@@ -110,7 +114,8 @@ int main(int argc, char *argv[])
     for(int i=0; i<15; i++){
         cout << i << endl;
         subpaving.bisect();
-        maze_outer.contract();
+        maze_outer_fwd.contract();
+        maze_outer_bwd.contract();
         maze_inner_fwd.contract();
         maze_inner_bwd.contract();
     }
@@ -119,16 +124,39 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    vector<invariant::MazeIBEX*> list_outer{&maze_outer};
+    vector<invariant::MazeIBEX*> list_outer{&maze_outer_fwd, &maze_outer_bwd};
     vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
     VibesMaze v_maze("piston_kernel_gradual", list_outer, list_inner);
-//    VibesMaze v_maze("piston_kernel_gradual", &maze_outer);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_scale(1., 100);
     v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.drawBox(no_go_zone, "red[]");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+
+    VibesMaze v_maze_debug_fwd("debug_inner_fwd", &maze_inner_fwd);
+    v_maze_debug_fwd.setProperties(0, 0, 1000, 800);
+    v_maze_debug_fwd.set_scale(1., 100);
+    v_maze_debug_fwd.show();
+    v_maze_debug_fwd.drawBox(no_go_zone, "red[]");
+
+    VibesMaze v_maze_debug_bwd("debug_inner_bwd", &maze_inner_bwd);
+    v_maze_debug_bwd.setProperties(0, 0, 1000, 800);
+    v_maze_debug_bwd.set_scale(1., 100);
+    v_maze_debug_bwd.show();
+    v_maze_debug_bwd.drawBox(no_go_zone, "red[]");
+
+    VibesMaze v_maze_outer_fwd("debug_outer_fwd", &maze_outer_fwd);
+    v_maze_outer_fwd.setProperties(0, 0, 1000, 800);
+    v_maze_outer_fwd.set_scale(1., 100);
+    v_maze_outer_fwd.show();
+    v_maze_outer_fwd.drawBox(no_go_zone, "red[]");
+
+    VibesMaze v_maze_outer_bwd("debug_outer_bwd", &maze_outer_bwd);
+    v_maze_outer_bwd.setProperties(0, 0, 1000, 800);
+    v_maze_outer_bwd.set_scale(1., 100);
+    v_maze_outer_bwd.show();
+    v_maze_outer_bwd.drawBox(no_go_zone, "red[]");
 
 
     vibes::endDrawing();

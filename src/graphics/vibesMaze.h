@@ -141,7 +141,7 @@ private:
     VIBES_MAZE_TYPE    m_type = VIBES_MAZE_OUTER;
 
     bool m_both_wall = false;
-    bool m_enable_cones = true;
+    bool m_enable_cones = false;
 
     ibex::IntervalVector m_scale_factor;
     ibex::IntervalVector m_offset;
