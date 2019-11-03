@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     double c = 0.01;
     ibex::Interval u(-3.0, 1.0);
-    int constraint = 2; // 0, 1, 2, 3
+    int constraint = 1; // 0, 1, 2, 3
 
     if(constraint>=3)
         u=ibex::Interval(-2.5, 1.0);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     // Constraints
     ibex::IntervalVector min_velocity(2);
     min_velocity[0] = ibex::Interval(-30,-5.0);
-    min_velocity[1] = ibex::Interval(-1.0, 1.0);
+    min_velocity[1] = ibex::Interval(0.0, 1.0);
     Function f_id("x[2]", "(x[0], x[1])");
     SepFwdBwd s_min_velocity(f_id, min_velocity);
     SepNot s_min_velocity_not(s_min_velocity);
@@ -55,13 +55,13 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_in(true);
     dom_outer.set_border_path_out(false);
     switch (constraint) {
+    case 0:
+        break;
     case 1:
         dom_outer.set_sep_output(&s_min_velocity_not);
         break;
-    case 2:
-        dom_outer.set_sep_output(&s_inter_not);
-        break;
     default:
+        dom_outer.set_sep_output(&s_inter_not);
         break;
     }
 
@@ -70,13 +70,13 @@ int main(int argc, char *argv[])
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(false);
     switch (constraint) {
+    case 0:
+        break;
     case 1:
         dom_inner.set_sep_input(&s_min_velocity);
         break;
-    case 2:
-        dom_inner.set_sep_input(&s_inter);
-        break;
     default:
+        dom_inner.set_sep_input(&s_inter);
         break;
     }
 
