@@ -23,13 +23,13 @@ int main(int argc, char *argv[])
 
     IntervalVector space(2);
     space[0] = ibex::Interval(-30, 0.0);
-    space[1] = ibex::Interval(-1.0, 14.0);
+    space[1] = ibex::Interval(-0.0, 14.0);
 
     invariant::SmartSubPaving<> paving(space);
 
     double c = 0.01;
     ibex::Interval u(-3.0, 1.0);
-    int constraint = 0; // 0, 1, 2, 3
+    int constraint = 2; // 0, 1, 2, 3
 
     if(constraint>=3)
         u=ibex::Interval(-2.5, 1.0);
@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
     limit1[0] = ibex::Interval(-5.0, 0.0);
     limit1[1] = ibex::Interval(3.0, 14.0);
     SepFwdBwd s_limit1(f_id, limit1);
-    SepNot s_limit1_not(s_limit1);
 
     SepUnion s_inter(s_limit1, s_min_velocity);
     SepNot  s_inter_not(s_inter);
@@ -111,12 +110,14 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
-    VibesMaze v_maze("car_kernel", &maze_outer, &maze_inner);
+    VibesMaze v_maze("car_kernel_"+to_string(constraint), &maze_outer, &maze_inner);
 //    v_maze.set_enable_cone(true);
     v_maze.show();
-    v_maze.drawBox(min_velocity, "red[]");
-    v_maze.drawBox(limit1, "red[]");
-//    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    if(constraint>0)
+        v_maze.drawBox(min_velocity, "red[]");
+    if(constraint>1)
+        v_maze.drawBox(limit1, "red[]");
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
     vibes::endDrawing();
 }

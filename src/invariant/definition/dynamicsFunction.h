@@ -6,6 +6,7 @@
 #include <ibex_IntervalVector.h>
 #include <ibex_Function.h>
 #include <ibex_Sep.h>
+#include "spacefunction.h"
 
 #include <map>
 
@@ -20,6 +21,7 @@ public:
      * @param functions
      */
     DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+//    DynamicsFunction(const std::vector<SpaceFunction *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
      * @brief Dynamics constructor
@@ -27,6 +29,8 @@ public:
      */
     DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
     DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+//    DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+//    DynamicsFunction(SpaceFunction *f1, SpaceFunction *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
      * @brief Dynamics destructor

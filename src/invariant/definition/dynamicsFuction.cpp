@@ -21,7 +21,11 @@ void DynamicsFunction::init(const vector<Function*> functions){
         for(int n = 0; n<m_num_threads; n++){
             m_functions.push_back(vector<Function*>());
             for(Function* f:functions){
-                Function *f_new = new Function(*f);
+                Function *f_new;
+                if(dynamic_cast<SpaceFunction*>(f) == nullptr)
+                    f_new = new Function(*f);
+                else
+                    f_new = new SpaceFunction(*dynamic_cast<SpaceFunction*>(f));
                 m_functions[n].push_back(f_new);
             }
         }
@@ -36,6 +40,12 @@ void DynamicsFunction::init(const vector<Function*> functions){
 
     //compute_taylor(taylor);
 }
+
+//DynamicsFunction::DynamicsFunction(const vector<SpaceFunction *> functions, const DYNAMICS_SENS sens, bool multi_threaded):
+//Dynamics(sens)
+//{
+
+//}
 
 DynamicsFunction::DynamicsFunction(Function *f, const DYNAMICS_SENS sens, bool multi_threaded):
     Dynamics(sens)
@@ -54,6 +64,24 @@ DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SE
     functions.push_back(f2);
     init(functions);
 }
+
+//DynamicsFunction::DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens, bool multi_threaded):
+//    Dynamics(sens)
+//{
+//    m_multi_threaded = multi_threaded;
+//    vector<Function*> functions{f};
+//    init(functions);
+//}
+
+//DynamicsFunction::DynamicsFunction(SpaceFunction *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
+//    Dynamics(sens)
+//{
+//    m_multi_threaded = multi_threaded;
+//    vector<Function*> functions;
+//    functions.push_back(f1);
+//    functions.push_back(f2);
+//    init(functions);
+//}
 
 void DynamicsFunction::compute_taylor(bool taylor){
     if(taylor){
@@ -95,8 +123,14 @@ inline const std::vector<ibex::IntervalVector> DynamicsFunction::eval(const Inte
         omp_set_lock(&m_lock_dynamics);
 
     for(Function*f:m_functions[thread_id]){
-        ibex::IntervalVector result = f->eval_vector(position);
-        vector_field.push_back(result);
+        if(dynamic_cast<SpaceFunction*>(f)==nullptr){
+            ibex::IntervalVector result = f->eval_vector(position);
+            vector_field.push_back(result);
+        }
+        else{
+            ibex::IntervalVector result = dynamic_cast<SpaceFunction*>(f)->eval_vector(position);
+            vector_field.push_back(result);
+        }
     }
 
     if(!m_multi_threaded)
