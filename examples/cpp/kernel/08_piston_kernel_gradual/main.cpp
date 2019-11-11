@@ -48,8 +48,9 @@ int main(int argc, char *argv[])
     ibex::Interval Vp(-2.148e-5, 1.503e-4);
 
     // No Go zone
+    double constraint = -10; // From 0 to 15
     ibex::IntervalVector no_go_zone(2);
-    no_go_zone[0] = ibex::Interval(65.0, 75.0);
+    no_go_zone[0] = ibex::Interval(70.0-constraint, 75.0);
     no_go_zone[1] = ibex::Interval(-0.05, 0.05);
     Function f_no_go_zone("x[2]", "(x[0], x[1])");
     SepFwdBwd sep_dom_inner(f_no_go_zone, no_go_zone);
@@ -90,32 +91,27 @@ int main(int argc, char *argv[])
     std::vector<ibex::Function *> f_inner_fwd{&f_inner_fwd_1, &f_inner_fwd_2};
     std::vector<ibex::Function *> f_inner_bwd{&f_inner_bwd_1, &f_inner_bwd_2};
 
-    DynamicsFunction dyn_outer_fwd(&f, FWD);
-    DynamicsFunction dyn_outer_bwd(&f, BWD);
+    DynamicsFunction dyn_outer(&f, FWD_BWD);
     DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
     DynamicsFunction dyn_inner_bwd(f_inner_bwd, FWD);
 
     // ******* Maze ********* //
-    invariant::Maze<> maze_outer_fwd(&dom_outer, &dyn_outer_fwd);
-    invariant::Maze<> maze_outer_bwd(&dom_outer, &dyn_outer_bwd);
-//    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
     invariant::Maze<> maze_inner_fwd(&dom_inner_fwd, &dyn_inner_fwd);
     invariant::Maze<> maze_inner_bwd(&dom_inner_bwd, &dyn_inner_bwd);
 
-    BooleanTreeUnion<> *bisection_fwd = new BooleanTreeUnion<>(&maze_outer_fwd, &maze_inner_fwd);
-    BooleanTreeUnion<> *bisection_bwd = new BooleanTreeUnion<>(&maze_outer_bwd, &maze_inner_bwd);
-    BooleanTreeInter<> *bisection = new BooleanTreeInter<>(bisection_fwd, bisection_bwd);
+    BooleanTreeInter<> *bisection_inner = new BooleanTreeInter<>(&maze_inner_fwd, &maze_inner_bwd);
+    BooleanTreeUnion<> *bisection = new BooleanTreeUnion<>(&maze_outer, bisection_inner);
     subpaving.set_bisection_tree(bisection);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
-//    omp_set_num_threads(1);
+    omp_set_num_threads(1);
 
     for(int i=0; i<15; i++){
         cout << i << endl;
         subpaving.bisect();
-        maze_outer_fwd.contract();
-        maze_outer_bwd.contract();
+        maze_outer.contract();
         maze_inner_fwd.contract();
         maze_inner_bwd.contract();
     }
@@ -124,40 +120,15 @@ int main(int argc, char *argv[])
     cout << subpaving << endl;
 
     vibes::beginDrawing();
-    vector<invariant::MazeIBEX*> list_outer{&maze_outer_fwd, &maze_outer_bwd};
+    vector<invariant::MazeIBEX*> list_outer{&maze_outer};
     vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
-    VibesMaze v_maze("piston_kernel_gradual", list_outer, list_inner);
+    VibesMaze v_maze("piston_kernel_gradual_"+to_string(constraint), list_outer, list_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_scale(1., 100);
     v_maze.set_enable_cone(false);
     v_maze.show();
     v_maze.drawBox(no_go_zone, "red[]");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
-
-    VibesMaze v_maze_debug_fwd("debug_inner_fwd", &maze_inner_fwd);
-    v_maze_debug_fwd.setProperties(0, 0, 1000, 800);
-    v_maze_debug_fwd.set_scale(1., 100);
-    v_maze_debug_fwd.show();
-    v_maze_debug_fwd.drawBox(no_go_zone, "red[]");
-
-    VibesMaze v_maze_debug_bwd("debug_inner_bwd", &maze_inner_bwd);
-    v_maze_debug_bwd.setProperties(0, 0, 1000, 800);
-    v_maze_debug_bwd.set_scale(1., 100);
-    v_maze_debug_bwd.show();
-    v_maze_debug_bwd.drawBox(no_go_zone, "red[]");
-
-    VibesMaze v_maze_outer_fwd("debug_outer_fwd", &maze_outer_fwd);
-    v_maze_outer_fwd.setProperties(0, 0, 1000, 800);
-    v_maze_outer_fwd.set_scale(1., 100);
-    v_maze_outer_fwd.show();
-    v_maze_outer_fwd.drawBox(no_go_zone, "red[]");
-
-    VibesMaze v_maze_outer_bwd("debug_outer_bwd", &maze_outer_bwd);
-    v_maze_outer_bwd.setProperties(0, 0, 1000, 800);
-    v_maze_outer_bwd.set_scale(1., 100);
-    v_maze_outer_bwd.show();
-    v_maze_outer_bwd.drawBox(no_go_zone, "red[]");
-
 
     vibes::endDrawing();
 }

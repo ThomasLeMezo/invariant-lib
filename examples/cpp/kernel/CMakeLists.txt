@@ -12,4 +12,5 @@ add_subdirectory(06_rayleigh_kernel)
 add_subdirectory(07_piston_kernel)
 add_subdirectory(08_piston_kernel_gradual)
 add_subdirectory(09_kernel_car)
+add_subdirectory(10_kernel_car2)
 
