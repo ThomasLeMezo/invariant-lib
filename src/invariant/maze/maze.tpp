@@ -177,12 +177,12 @@ int Maze<_Tp>::contract(size_t nb_operations){
     m_contraction_step++;
     m_contract_once = true;
 
-    int return_nb_operations = m_nb_operations-nb_operations;
+    int return_remain_nb_operations = m_nb_operations; //std::max(0, (int)(m_nb_operations)-(int)nb_operations); // To be improved (with ssize_t ?)
     if(m_deque_rooms.empty())
         m_nb_operations = 0;
     else
         std::cout << " => limit number of operation reached (" << nb_operations << ")" << std::endl;
-    return return_nb_operations;
+    return return_remain_nb_operations;
 }
 
 template<typename _Tp>

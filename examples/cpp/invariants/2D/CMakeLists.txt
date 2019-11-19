@@ -38,3 +38,5 @@ add_subdirectory(23_dipole)
 add_subdirectory(24_piston_stability)
 add_subdirectory(25_piston_uncertainty2)
 add_subdirectory(26_piston_stability2)
+
+add_subdirectory(27_van_der_pol_positive_invariant_video)

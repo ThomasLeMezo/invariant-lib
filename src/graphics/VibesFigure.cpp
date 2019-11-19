@@ -19,19 +19,24 @@ using namespace std;
 
 bool VibesFigure::m_begin_drawing = false;
 
-VibesFigure::VibesFigure(const string& figure_name){
+VibesFigure::VibesFigure(const string& figure_name, const bool &enable_show)
+{
+    m_enable_show = enable_show;
     if(m_begin_drawing==false){
         vibes::beginDrawing();
         m_begin_drawing = true;
     }
     m_name = figure_name;
-    vibes::newFigure(m_name);
-    vibes::setFigureProperties(
-                vibesParams("figure", m_name,
-                            "x", m_x,
-                            "y", m_y,
-                            "width", m_width,
-                            "height", m_height));
+    if(m_enable_show)
+    {
+        vibes::newFigure(m_name);
+        vibes::setFigureProperties(
+                    vibesParams("figure", m_name,
+                                "x", m_x,
+                                "y", m_y,
+                                "width", m_width,
+                                "height", m_height));
+    }
 }
 
 VibesFigure::~VibesFigure()

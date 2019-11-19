@@ -24,7 +24,7 @@ class VibesFigure
      *
      * \param figure_name a reference to the figure that will be displayed in the window's title
      */
-    VibesFigure(const std::string& figure_name);
+    VibesFigure(const std::string& figure_name, const bool& enable_show=true);
 
     /**
      * \brief Delete this figure.
@@ -124,6 +124,7 @@ class VibesFigure
     mutable std::string m_name;
     double m_x=0, m_y=0, m_width=1000, m_height=800;
     static bool m_begin_drawing;
+    bool m_enable_show = true;
 };
 
 #endif

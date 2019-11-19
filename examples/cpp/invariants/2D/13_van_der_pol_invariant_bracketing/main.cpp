@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
     v_maze.set_ipe_ratio(112,63,true);
     v_maze.set_axis_limits(-3, 1.0, -3, 1.0);
     v_maze.set_enable_white_boundary(false);
+    v_maze.set_thickness_pen_factor(1e-4);
 #endif
 
     v_maze.show();
@@ -81,7 +82,7 @@ int main(int argc, char *argv[])
     //    position_info[1] = ibex::Interval(2.5);
     ////    v_maze.show_room_info(&maze_outer, position_info);
 
-    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    v_maze.saveIpe("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/");
     vibes::endDrawing();
 
 }

@@ -723,15 +723,31 @@ void VibesMaze::show_room_info(invariant::MazeIBEX *maze, const IntervalVector& 
 }
 
 void VibesMaze::drawCircle(const double x_center, const double y_center, const double radius, const std::string &color_stroke, const std::string &color_fill) const{
-    vibes::drawCircle(x_center, y_center, radius, concat_color(color_stroke, color_fill));
+    if(m_enable_show)
+        vibes::drawCircle(x_center, y_center, radius, concat_color(color_stroke, color_fill));
+
+#ifdef WITH_IPEGENERATOR
+    ipe::TPathMode mode=ipe::EStrokedOnly;
+    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
+    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
+    m_ipe_figure->draw_circle(x_center, y_center, radius, color_stroke_tmp, color_fill_tmp, mode);
+#endif
 }
 
 void VibesMaze::drawEllipse(const double &cx, const double &cy, const double &a, const double &b, const double &rot, const std::string &color_stroke, const std::string &color_fill) const{
-    vibes::drawEllipse(cx, cy, a, b, rot, concat_color(color_stroke, color_fill));
+    if(m_enable_show)
+        vibes::drawEllipse(cx, cy, a, b, rot, concat_color(color_stroke, color_fill));
+#ifdef WITH_IPEGENERATOR
+    ipe::TPathMode mode=ipe::EStrokedOnly;
+    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
+    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
+    m_ipe_figure->draw_ellipse(cx, cy, a, b, color_stroke_tmp, color_fill_tmp, mode);
+#endif
 }
 
 void VibesMaze::drawBox(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string &color_fill) const{
-    vibes::drawBox(box, concat_color(color_stroke, color_fill));
+    if(m_enable_show)
+        vibes::drawBox(box, concat_color(color_stroke, color_fill));
 #ifdef WITH_IPEGENERATOR
     ipe::TPathMode mode=ipe::EStrokedOnly;
     string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
@@ -759,11 +775,19 @@ void VibesMaze::drawBox_with_scale(const ibex::IntervalVector &box, const std::s
 }
 
 void VibesMaze::drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke, const std::string &color_fill) const{
-    vibes::drawPolygon(x, y, concat_color(color_stroke, color_fill));
+    if(m_enable_show)
+        vibes::drawPolygon(x, y, concat_color(color_stroke, color_fill));
+#ifdef WITH_IPEGENERATOR
+    ipe::TPathMode mode=ipe::EStrokedOnly;
+    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
+    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
+    m_ipe_figure->draw_polygon(x, y, color_stroke_tmp, color_fill_tmp, mode);
+#endif
 }
 
 void VibesMaze::drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke, const std::string &color_fill) const{
-    vibes::drawSector(x, y, s_x, s_y, theta_min, theta_max, concat_color(color_stroke, color_fill));
+    if(m_enable_show)
+        vibes::drawSector(x, y, s_x, s_y, theta_min, theta_max, concat_color(color_stroke, color_fill));
 }
 
 std::string VibesMaze::concat_color(const std::string &color_stroke, const std::string &color_fill) const{
@@ -771,11 +795,13 @@ std::string VibesMaze::concat_color(const std::string &color_stroke, const std::
 }
 
 void VibesMaze::selectFigure() const{
-    vibes::selectFigure(m_name);
+    if(m_enable_show)
+        vibes::selectFigure(m_name);
 }
 
 void VibesMaze::axisLimits(const ibex::IntervalVector &box) const{
-    vibes::axisLimits(box[0].lb(), box[0].ub(), box[1].lb(), box[1].ub(),m_name);
+    if(m_enable_show)
+        vibes::axisLimits(box[0].lb(), box[0].ub(), box[1].lb(), box[1].ub(),m_name);
 }
 
 void VibesMaze::add_stat(size_t step, double time, double volume_outer, double volume_inner){
@@ -804,10 +830,8 @@ void VibesMaze::save_stat_to_file(string namefile){
 }
 
 #ifdef WITH_IPEGENERATOR
-void VibesMaze::saveImage(const std::string& prefix, const std::string& extension) const{
-    vibes::selectFigure(m_name);
-    vibes::saveImage(prefix + m_name + extension, m_name);
-    std::cout << "Saved to : " << prefix << m_name << extension << std::endl;
+void VibesMaze::saveIpe(const std::string& prefix) const{
+    std::cout << "Saved to : " << prefix << m_name << ".ipe" << std::endl;
     m_ipe_figure->save_ipe(prefix+m_name+".ipe");
 }
 
@@ -816,6 +840,10 @@ void VibesMaze::set_axis_limits(const double start_x, const double inter_x, cons
 }
 void VibesMaze::draw_axis(const std::string &name_x, const std::string &name_y){
     m_ipe_figure->draw_axis("x_1", "x_2");
+}
+
+void VibesMaze::draw_text(const std::string &text, const double x, const double y){
+    m_ipe_figure->draw_text(text, x, y);
 }
 
 #endif

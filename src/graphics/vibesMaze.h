@@ -115,12 +115,16 @@ public:
 
     void set_enable_white_boundary(const bool &enable);
 
+    void set_enable_vibes(const bool &enable);
+
 #ifdef WITH_IPEGENERATOR
     void set_ipe_ratio(const double width, const double height, const bool keep_ratio = false);
-    void saveImage(const std::string& prefix, const std::string& extension) const;
+    void set_thickness_pen_factor(const double val);
+    void saveIpe(const std::string& prefix) const;
     void ipe_color_converter(std::string &color_stroke, std::string &color_fill, ipe::TPathMode &mode) const;
     void set_axis_limits(const double start_x, const double inter_x, const double start_y, const double inter_y);
     void draw_axis(const std::string &name_x, const std::string &name_y);
+    void draw_text(const std::string &text, const double x, const double y);
 #endif
 
 private:
@@ -196,9 +200,17 @@ inline void VibesMaze::set_enable_white_boundary(const bool &enable){
     m_enable_white_boundary = enable;
 }
 
+inline void VibesMaze::set_enable_vibes(const bool &enable){
+    m_enable_show = enable;
+}
+
 #ifdef WITH_IPEGENERATOR
 inline void VibesMaze::set_ipe_ratio(const double width, const double height, const bool keep_ratio){
     m_ipe_figure->reset_scale(width, height, keep_ratio);
+}
+
+inline void VibesMaze::set_thickness_pen_factor(const double val){
+    m_ipe_figure->set_thickness_pen_factor(val);
 }
 #endif
 
