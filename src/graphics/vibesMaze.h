@@ -15,6 +15,10 @@
 #include "VibesFigure.h"
 #include "vibes/vibes.h"
 
+#ifdef WITH_IPEGENERATOR
+    #include <ipegenerator/figure.h>
+#endif
+
 class VibesMaze: public VibesFigure
 {
 
@@ -26,7 +30,7 @@ public:
     VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner, bool both_wall=false);
     VibesMaze(const std::string& figure_name, std::vector<invariant::MazeIBEX*> &outer, std::vector<invariant::MazeIBEX*> &inner, bool both_wall=false);
     VibesMaze(const std::string& figure_name, invariant::EulerianMazeIBEX* e);
-    ~VibesMaze(){}
+    ~VibesMaze();
 
     virtual void show() const;
 
@@ -42,24 +46,23 @@ public:
      * @param radius
      * @param params
      */
-    void drawCircle(double x_center, double y_center, double radius, std::string params) const;
+    void drawCircle(double x_center, const double y_center, const double radius, const std::string& color_stroke, const std::string& color_fill) const;
 
-    /**
-     * @brief drawBox for easier integration with the python binding
-     * @param x_min
-     * @param x_max
-     * @param y_min
-     * @param y_max
-     * @param params
-     */
-    void drawBox(double x_min, double x_max, double y_min, double y_max, std::string params) const;
+    void drawEllipse(const double &cx, const double &cy, const double &a, const double &b, const double &rot, const std::string &color_stroke, const std::string& color_fill) const;
 
     /**
      * @brief drawBox for easier integration with the python binding
      * @param box
      * @param params
      */
-    void drawBox(const ibex::IntervalVector &box, std::string params) const;
+    void drawBox(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string &color_fill) const;
+    void drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string& color_fill) const;
+    void drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke, const std::string& color_fill) const;
+    void drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke, const std::string& color_fill) const;
+
+
+    void selectFigure() const;
+    void axisLimits(const ibex::IntervalVector &box) const;
 
     /**
      * @brief set_enable_cone
@@ -101,14 +104,24 @@ public:
      * @param scale_x
      * @param scale_y
      */
-    void set_scale(double scale_x, double scale_y);
+    void set_scale(double scale_x, const double scale_y);
 
     /**
      * @brief set_offset
      * @param offset_x
      * @param offset_y
      */
-    void set_offset(double offset_x, double offset_y);
+    void set_offset(const double offset_x, const double offset_y);
+
+    void set_enable_white_boundary(const bool &enable);
+
+#ifdef WITH_IPEGENERATOR
+    void set_ipe_ratio(const double width, const double height, const bool keep_ratio = false);
+    void saveImage(const std::string& prefix, const std::string& extension) const;
+    void ipe_color_converter(std::string &color_stroke, std::string &color_fill, ipe::TPathMode &mode) const;
+    void set_axis_limits(const double start_x, const double inter_x, const double start_y, const double inter_y);
+    void draw_axis(const std::string &name_x, const std::string &name_y);
+#endif
 
 private:
     void show_graph() const;
@@ -124,6 +137,8 @@ private:
     void draw_room_inner(invariant::PaveIBEX *p) const;
     void draw_room_inner_outer(invariant::PaveIBEX *p) const;
 
+    std::string concat_color(const std::string &color_stroke, const std::string &color_fill) const;
+
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
     invariant::SmartSubPavingIBEX*   m_subpaving = nullptr;
@@ -132,8 +147,6 @@ private:
 
     std::vector<invariant::MazeIBEX*> m_maze_outer;
     std::vector<invariant::MazeIBEX*> m_maze_inner;
-//    invariant::MazeIBEX*    m_maze_outer = nullptr;
-//    invariant::MazeIBEX*    m_maze_inner = nullptr;
     invariant::EulerianMazeIBEX* m_eulerian_maze = nullptr;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;
@@ -142,6 +155,7 @@ private:
 
     bool m_both_wall = false;
     bool m_enable_cones = false;
+    bool m_enable_white_boundary = true;
 
     ibex::IntervalVector m_scale_factor;
     ibex::IntervalVector m_offset;
@@ -149,28 +163,43 @@ private:
     // Stat
     std::vector<double> m_memory_step, m_memory_time, m_memory_volume_outer, m_memory_volume_inner;
 
+#ifdef WITH_IPEGENERATOR
+    private:
+    ipegenerator::Figure *m_ipe_figure;
+#endif
+
 };
 
-namespace vibes{
-    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::SmartSubPavingIBEX &, g)
-    VIBES_FUNC_COLOR_PARAM_1(drawPave,const invariant::PaveIBEX &, p)
-    VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::FaceIBEX &, f)
-    VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::PaveIBEX*> &, l_p)
-    VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::FaceIBEX*> &, l_f)
-}
+//namespace vibes{
+//    VIBES_FUNC_COLOR_PARAM_1(drawGraph,const invariant::SmartSubPavingIBEX &, g)
+//    VIBES_FUNC_COLOR_PARAM_1(drawPave,const invariant::PaveIBEX &, p)
+//    VIBES_FUNC_COLOR_PARAM_1(drawFace,const invariant::FaceIBEX &, f)
+//    VIBES_FUNC_COLOR_PARAM_1(drawPave,const std::vector<invariant::PaveIBEX*> &, l_p)
+//    VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::FaceIBEX*> &, l_f)
+//}
 
 inline void VibesMaze::set_enable_cone(bool val){
     m_enable_cones = val;
 }
 
-inline void VibesMaze::set_scale(double scale_x, double scale_y){
+inline void VibesMaze::set_scale(const double scale_x, const double scale_y){
     m_scale_factor[0] = ibex::Interval(scale_x);
     m_scale_factor[1] = ibex::Interval(scale_y);
 }
 
-inline void VibesMaze::set_offset(double offset_x, double offset_y){
+inline void VibesMaze::set_offset(const double offset_x, const double offset_y){
     m_offset[0] = ibex::Interval(offset_x);
     m_offset[1] = ibex::Interval(offset_y);
 }
+
+inline void VibesMaze::set_enable_white_boundary(const bool &enable){
+    m_enable_white_boundary = enable;
+}
+
+#ifdef WITH_IPEGENERATOR
+inline void VibesMaze::set_ipe_ratio(const double width, const double height, const bool keep_ratio){
+    m_ipe_figure->reset_scale(width, height, keep_ratio);
+}
+#endif
 
 #endif // VibesMaze_H

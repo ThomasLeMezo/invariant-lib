@@ -28,6 +28,16 @@ option(WITH_PPL "Build with ppl" ON)
 option(WITH_PROJ4 "Build with Proj4 lib" ON)
 option(WITH_LANGUAGE "Build Language" ON)
 
+option(WITH_IPEGENERATOR "Export figure with ipegenerator" ON)
+
+if(WITH_IPEGENERATOR)
+ find_package(ipegenerator REQUIRED)
+ message(STATUS "[Ipegenerator] OK")
+ set(LIBS ${LIBS} ${IPEGENERATOR_LIBRARIES})
+ include_directories(${IPEGENERATOR_INCLUDE_DIRS})
+ add_definitions(-DWITH_IPEGENERATOR=${WITH_IPEGENERATOR})
+endif()
+
 if(NOT WIN32)
  set(CMAKE_CXX_FLAGS " -fPIC ${CMAKE_CXX_FLAGS}")
 endif()

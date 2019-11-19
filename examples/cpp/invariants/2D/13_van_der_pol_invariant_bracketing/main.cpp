@@ -63,16 +63,25 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
-    v_maze.drawBox(space, "white[white]");
+
+#ifdef WITH_IPEGENERATOR
+    v_maze.set_ipe_ratio(112,63,true);
+    v_maze.set_axis_limits(-3, 1.0, -3, 1.0);
+    v_maze.set_enable_white_boundary(false);
+#endif
+
     v_maze.show();
+
+#ifdef WITH_IPEGENERATOR
+    v_maze.draw_axis("x_1", "x_2");
+#endif
 
     //    IntervalVector position_info(2);
     //    position_info[0] = ibex::Interval(-1);
     //    position_info[1] = ibex::Interval(2.5);
     ////    v_maze.show_room_info(&maze_outer, position_info);
 
-    std::string file = "/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/";
-    file += "van_der_pol_largest_positive_invariant.svg";
-    vibes::saveImage(file);
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
     vibes::endDrawing();
+
 }
