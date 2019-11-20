@@ -7,7 +7,8 @@ using namespace ibex;
 using namespace std;
 
 VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g):
-  VibesFigure(figure_name), m_scale_factor(2), m_offset(2){
+  VibesFigure(figure_name), m_scale_factor(2), m_offset(2)
+{
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/VibesMaze()] dim of paving is not equal to 2");
     m_subpaving = g;

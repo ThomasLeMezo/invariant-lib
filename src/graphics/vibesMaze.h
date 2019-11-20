@@ -55,10 +55,10 @@ public:
      * @param box
      * @param params
      */
-    void drawBox(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string &color_fill) const;
-    void drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string& color_fill) const;
-    void drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke, const std::string& color_fill) const;
-    void drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke, const std::string& color_fill) const;
+    void drawBox(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string &color_fill="") const;
+    void drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string& color_fill="") const;
+    void drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke="", const std::string& color_fill="") const;
+    void drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke="", const std::string& color_fill="") const;
 
 
     void selectFigure() const;
