@@ -55,7 +55,7 @@ public:
      * @param box
      * @param params
      */
-    void drawBox(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string &color_fill="") const;
+    void drawBox(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string& color_fill="") const;
     void drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string& color_fill="") const;
     void drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke="", const std::string& color_fill="") const;
     void drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke="", const std::string& color_fill="") const;
@@ -121,7 +121,8 @@ public:
     void set_ipe_ratio(const double width, const double height, const bool keep_ratio = false);
     void set_thickness_pen_factor(const double val);
     void saveIpe(const std::string& prefix) const;
-    void ipe_color_converter(std::string &color_stroke, std::string &color_fill, ipe::TPathMode &mode) const;
+    void savePdf(const std::string& prefix) const;
+    void ipe_color_converter(const std::string& color_stroke, const std::string& color_fill) const;
     void set_axis_limits(const double start_x, const double inter_x, const double start_y, const double inter_y);
     void draw_axis(const std::string &name_x, const std::string &name_y);
     void draw_text(const std::string &text, const double x, const double y);

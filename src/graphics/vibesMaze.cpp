@@ -25,6 +25,10 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIB
 
 #ifdef WITH_IPEGENERATOR
     m_ipe_figure = new ipegenerator::Figure(m_subpaving->get_position(), 210, 297, true);
+//    m_ipe_figure->add_layer("outer");
+//    m_ipe_figure->add_layer("inner");
+//    m_ipe_figure->add_layer("uncertain");
+//    m_ipe_figure->set_visible("outer", true);
 #endif
 }
 
@@ -318,7 +322,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     //    if(m_type == VIBES_MAZE_INNER) // Otherwise draw box only when outer
     //        this->drawBox_with_scale(p->get_position(), "black[]");
 
-    /// **************** DRAW OUTER **************** ///
+    /// **************** DRAW UNCERTAIN **************** ///
     vector<double> pt_x, pt_y;
     bool full_outer_eulerian = true;
     for(const tuple<int, int, bool> &pt:m_oriented_path){
@@ -340,6 +344,16 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
                 invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
                 d_iv &= (d->get_input() | d->get_output());
             }
+
+            // *****************
+            // Test
+            IntervalVector d_iv_inner = IntervalVector(2, ibex::Interval::EMPTY_SET);
+            for(invariant::MazeIBEX* maze:m_maze_inner){
+                invariant::DoorIBEX *d = p->get_faces()[get<0>(pt)][get<1>(pt)]->get_doors()[maze];
+                d_iv_inner |= (d->get_input() | d->get_output());
+            }
+            d_iv &= d_iv_inner;
+            // *****************
         }
 
         if(!d_iv.is_empty()){
@@ -412,7 +426,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
     if(!pt_x.empty())
         this->drawPolygon(pt_x, pt_y, "black","#FF00FF");
 
-    /// **************** DRAW EMPTY **************** ///
+    /// **************** DRAW OUTER **************** ///
     bool full_outer = true;
     for(invariant::MazeIBEX* maze:m_maze_outer){
         if(!p->get_rooms()[maze]->is_full()){
@@ -728,10 +742,8 @@ void VibesMaze::drawCircle(const double x_center, const double y_center, const d
         vibes::drawCircle(x_center, y_center, radius, concat_color(color_stroke, color_fill));
 
 #ifdef WITH_IPEGENERATOR
-    ipe::TPathMode mode=ipe::EStrokedOnly;
-    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
-    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
-    m_ipe_figure->draw_circle(x_center, y_center, radius, color_stroke_tmp, color_fill_tmp, mode);
+    ipe_color_converter(color_stroke, color_fill);
+    m_ipe_figure->draw_circle(x_center, y_center, radius);
 #endif
 }
 
@@ -739,10 +751,8 @@ void VibesMaze::drawEllipse(const double &cx, const double &cy, const double &a,
     if(m_enable_show)
         vibes::drawEllipse(cx, cy, a, b, rot, concat_color(color_stroke, color_fill));
 #ifdef WITH_IPEGENERATOR
-    ipe::TPathMode mode=ipe::EStrokedOnly;
-    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
-    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
-    m_ipe_figure->draw_ellipse(cx, cy, a, b, color_stroke_tmp, color_fill_tmp, mode);
+    ipe_color_converter(color_stroke, color_fill);
+    m_ipe_figure->draw_ellipse(cx, cy, a, b);
 #endif
 }
 
@@ -750,45 +760,63 @@ void VibesMaze::drawBox(const ibex::IntervalVector &box, const std::string &colo
     if(m_enable_show)
         vibes::drawBox(box, concat_color(color_stroke, color_fill));
 #ifdef WITH_IPEGENERATOR
-    ipe::TPathMode mode=ipe::EStrokedOnly;
-    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
-    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
-    m_ipe_figure->draw_box(box, color_stroke_tmp, color_fill_tmp, mode);
+    ipe_color_converter(color_stroke, color_fill);
+    m_ipe_figure->draw_box(box);
 #endif
 }
 
 #ifdef WITH_IPEGENERATOR
-void VibesMaze::ipe_color_converter(std::string &color_stroke, std::string &color_fill, ipe::TPathMode &mode) const{
-    if(color_stroke=="#FF00FF")
-        color_stroke="magenta";
-    if(color_fill=="#FF00FF")
-        color_fill="magenta";
+void VibesMaze::ipe_color_converter(const std::string &color_stroke, const std::string &color_fill) const{
+    std::string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
+    if(color_stroke_tmp=="#FF00FF")
+        color_stroke_tmp="magenta";
+    if(color_fill_tmp=="#FF00FF"){
+        color_fill_tmp="magenta";
+        m_ipe_figure->set_current_layer("inner");
+    }
+    else if(color_fill_tmp=="blue"){
+        m_ipe_figure->set_current_layer("outer");
+    }
+    else if(color_fill_tmp=="yellow"){
+        m_ipe_figure->set_current_layer("uncertain");
+    }
 
-    if(color_fill!="" && color_stroke!="")
-        mode=ipe::EStrokedAndFilled;
-    else if(color_stroke=="")
-        mode=ipe::EFilledOnly;
+    if(color_stroke_tmp!="" && color_stroke_tmp!="")
+        m_ipe_figure->set_color_type(ipegenerator::Figure::STROKE_AND_FILL);
+    else if(color_stroke_tmp=="")
+        m_ipe_figure->set_color_type(ipegenerator::Figure::FILL_ONLY);
+    else if(color_fill_tmp=="")
+        m_ipe_figure->set_color_type(ipegenerator::Figure::STROKE_ONLY);
+
+    if(color_fill_tmp!="")
+        m_ipe_figure->set_color_fill(color_fill_tmp);
+
+    if(color_stroke_tmp!="")
+        m_ipe_figure->set_color_stroke(color_stroke_tmp);
 }
 #endif
 
 void VibesMaze::drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string &color_fill) const{
-    this->drawBox(hadamard_product((box+m_offset), m_scale_factor), color_stroke, color_fill);
+    ipe_color_converter(color_stroke, color_fill);
+    this->drawBox(hadamard_product((box+m_offset), m_scale_factor));
 }
 
 void VibesMaze::drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke, const std::string &color_fill) const{
     if(m_enable_show)
         vibes::drawPolygon(x, y, concat_color(color_stroke, color_fill));
 #ifdef WITH_IPEGENERATOR
-    ipe::TPathMode mode=ipe::EStrokedOnly;
-    string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
-    ipe_color_converter(color_stroke_tmp, color_fill_tmp, mode);
-    m_ipe_figure->draw_polygon(x, y, color_stroke_tmp, color_fill_tmp, mode);
+    ipe_color_converter(color_stroke, color_fill);
+    m_ipe_figure->draw_polygon(x, y);
 #endif
 }
 
 void VibesMaze::drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke, const std::string &color_fill) const{
     if(m_enable_show)
         vibes::drawSector(x, y, s_x, s_y, theta_min, theta_max, concat_color(color_stroke, color_fill));
+#ifdef WITH_IPEGENERATOR
+    ipe_color_converter(color_stroke, color_fill);
+    m_ipe_figure->draw_sector(x, y, s_x, s_y, theta_min, theta_max);
+#endif
 }
 
 std::string VibesMaze::concat_color(const std::string &color_stroke, const std::string &color_fill) const{
@@ -834,6 +862,11 @@ void VibesMaze::save_stat_to_file(string namefile){
 void VibesMaze::saveIpe(const std::string& prefix) const{
     std::cout << "Saved to : " << prefix << m_name << ".ipe" << std::endl;
     m_ipe_figure->save_ipe(prefix+m_name+".ipe");
+}
+
+void VibesMaze::savePdf(const std::string& prefix) const{
+    std::cout << "Saved to : " << prefix << m_name << ".ipe" << std::endl;
+    m_ipe_figure->save_pdf(prefix+m_name+".ipe");
 }
 
 void VibesMaze::set_axis_limits(const double start_x, const double inter_x, const double start_y, const double inter_y){

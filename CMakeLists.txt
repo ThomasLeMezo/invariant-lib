@@ -30,6 +30,14 @@ option(WITH_LANGUAGE "Build Language" ON)
 
 option(WITH_IPEGENERATOR "Export figure with ipegenerator" ON)
 
+if(NOT WIN32)
+ set(CMAKE_CXX_FLAGS " -fPIC ${CMAKE_CXX_FLAGS}")
+endif()
+
+FIND_PACKAGE(PkgConfig)
+
+#####################################################
+# IPE
 if(WITH_IPEGENERATOR)
  find_package(ipegenerator REQUIRED)
  message(STATUS "[Ipegenerator] OK")
@@ -37,12 +45,6 @@ if(WITH_IPEGENERATOR)
  include_directories(${IPEGENERATOR_INCLUDE_DIRS})
  add_definitions(-DWITH_IPEGENERATOR=${WITH_IPEGENERATOR})
 endif()
-
-if(NOT WIN32)
- set(CMAKE_CXX_FLAGS " -fPIC ${CMAKE_CXX_FLAGS}")
-endif()
-
-FIND_PACKAGE(PkgConfig)
 
 #####################################################
 # OpenMP library

@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMaze v_maze("van_der_pol_positive", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
 
@@ -75,14 +75,7 @@ int main(int argc, char *argv[])
 
 #ifdef WITH_IPEGENERATOR
     v_maze.draw_axis("x_1", "x_2");
+    v_maze.saveIpe("/home/lemezoth/Desktop/");
 #endif
-
-    //    IntervalVector position_info(2);
-    //    position_info[0] = ibex::Interval(-1);
-    //    position_info[1] = ibex::Interval(2.5);
-    ////    v_maze.show_room_info(&maze_outer, position_info);
-
-    v_maze.saveIpe("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/");
-    vibes::endDrawing();
 
 }
