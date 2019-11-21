@@ -782,11 +782,11 @@ void VibesMaze::ipe_color_converter(const std::string &color_stroke, const std::
     }
 
     if(color_stroke_tmp!="" && color_stroke_tmp!="")
-        m_ipe_figure->set_color_type(ipegenerator::Figure::STROKE_AND_FILL);
+        m_ipe_figure->set_color_type(ipegenerator::STROKE_AND_FILL);
     else if(color_stroke_tmp=="")
-        m_ipe_figure->set_color_type(ipegenerator::Figure::FILL_ONLY);
+        m_ipe_figure->set_color_type(ipegenerator::FILL_ONLY);
     else if(color_fill_tmp=="")
-        m_ipe_figure->set_color_type(ipegenerator::Figure::STROKE_ONLY);
+        m_ipe_figure->set_color_type(ipegenerator::STROKE_ONLY);
 
     if(color_fill_tmp!="")
         m_ipe_figure->set_color_fill(color_fill_tmp);
