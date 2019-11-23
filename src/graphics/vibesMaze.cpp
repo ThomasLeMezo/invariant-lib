@@ -781,7 +781,7 @@ void VibesMaze::ipe_color_converter(const std::string &color_stroke, const std::
         m_ipe_figure->set_current_layer("uncertain");
     }
 
-    if(color_stroke_tmp!="" && color_stroke_tmp!="")
+    if(color_stroke_tmp!="" && color_fill_tmp!="")
         m_ipe_figure->set_color_type(ipegenerator::STROKE_AND_FILL);
     else if(color_stroke_tmp=="")
         m_ipe_figure->set_color_type(ipegenerator::FILL_ONLY);
@@ -797,8 +797,7 @@ void VibesMaze::ipe_color_converter(const std::string &color_stroke, const std::
 #endif
 
 void VibesMaze::drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke, const std::string &color_fill) const{
-    ipe_color_converter(color_stroke, color_fill);
-    this->drawBox(hadamard_product((box+m_offset), m_scale_factor));
+    this->drawBox(hadamard_product((box+m_offset), m_scale_factor),color_stroke, color_fill);
 }
 
 void VibesMaze::drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke, const std::string &color_fill) const{

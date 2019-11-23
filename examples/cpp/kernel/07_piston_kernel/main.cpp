@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     std::vector<ibex::Function *> f_inner_fwd{&f_inner_fwd_1, &f_inner_fwd_2};
     std::vector<ibex::Function *> f_inner_bwd{&f_inner_bwd_1, &f_inner_bwd_2};
 
-    DynamicsFunction dyn_outer(&f, BWD);
+    DynamicsFunction dyn_outer(&f, FWD_BWD);
     DynamicsFunction dyn_inner_fwd(f_inner_fwd, FWD);
     DynamicsFunction dyn_inner_bwd(f_inner_bwd, FWD);
 
@@ -147,14 +147,25 @@ int main(int argc, char *argv[])
 
     vibes::beginDrawing();
     vector<invariant::MazeIBEX*> list_outer{&maze_outer};
-    vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd/*, &maze_inner_bwd*/};
+    vector<invariant::MazeIBEX*> list_inner{&maze_inner_fwd, &maze_inner_bwd};
     VibesMaze v_maze("piston_kernel", list_outer, list_inner);
 //    VibesMaze v_maze("ifremer_float", list_outer, list_inner);
     v_maze.setProperties(0, 0, 1000, 800);
-    v_maze.set_scale(1., 100);
+//    v_maze.set_scale(1., 100);
     v_maze.set_enable_cone(false);
+
+#ifdef WITH_IPEGENERATOR
+    v_maze.set_ipe_ratio(112,63);
+    v_maze.set_axis_limits(-20., 10., -0.4, 0.2);
+    v_maze.set_enable_white_boundary(false);
+    v_maze.set_thickness_pen_factor(1e-4);
+    v_maze.set_thickness_axis(1e-3);
+    v_maze.set_number_digits_x(1);
+    v_maze.set_number_digits_y(1);
+#endif
+
     v_maze.show();
-    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+//    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 //    VibesMaze v_maze_inner_fwd("piston_kernel_inner_fwd", &maze_inner_fwd);
 //    v_maze_inner_fwd.setProperties(0, 0, 512, 512);
@@ -168,6 +179,11 @@ int main(int argc, char *argv[])
 //    position_info[0] = ibex::Interval(68.);
 //    position_info[1] = ibex::Interval(0.382, 0.392);
 //    v_maze.show_room_info(&maze_outer, position_info);
+
+#ifdef WITH_IPEGENERATOR
+    v_maze.draw_axis("z", "\\dot{z}");
+    v_maze.saveIpe("/home/lemezoth/Desktop/");
+#endif
 
     vibes::endDrawing();
 

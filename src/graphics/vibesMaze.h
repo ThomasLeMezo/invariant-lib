@@ -120,6 +120,9 @@ public:
 #ifdef WITH_IPEGENERATOR
     void set_ipe_ratio(const double width, const double height, const bool keep_ratio = false);
     void set_thickness_pen_factor(const double val);
+    void set_thickness_axis(const double val);
+    void set_number_digits_x(const size_t &val);
+    void set_number_digits_y(const size_t &val);
     void saveIpe(const std::string& prefix) const;
     void savePdf(const std::string& prefix) const;
     void ipe_color_converter(const std::string& color_stroke, const std::string& color_fill) const;
@@ -212,6 +215,18 @@ inline void VibesMaze::set_ipe_ratio(const double width, const double height, co
 
 inline void VibesMaze::set_thickness_pen_factor(const double val){
     m_ipe_figure->set_thickness_pen_factor(val);
+}
+
+inline void VibesMaze::set_thickness_axis(const double val){
+    m_ipe_figure->set_thickness_axis(val);
+}
+
+inline void VibesMaze::set_number_digits_x(const size_t &val){
+    m_ipe_figure->set_number_digits_axis_x(val);
+}
+
+inline void VibesMaze::set_number_digits_y(const size_t &val){
+    m_ipe_figure->set_number_digits_axis_y(val);
 }
 #endif
 
