@@ -62,11 +62,13 @@ void example1()
     u2_log.push_back(u);
 
     size_t k = 0;
+    bool reached_limit = false;
     for(double t=0.0; t<global_t_max; t+=dt)
     {
-        if(x(0)>69){
+        if(x(0)>69)
+            reached_limit |= true;
+        if(reached_limit)
             u=Vp.ub();
-        }
 
         x += f(x, u)*dt;
         cout << k << " " << x(0) << " " << x(1) << endl;
