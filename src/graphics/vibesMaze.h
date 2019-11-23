@@ -117,6 +117,10 @@ public:
 
     void set_enable_vibes(const bool &enable);
 
+    void set_enable_export_outer(const bool &enable);
+    void set_enable_export_inner(const bool &enable);
+    void set_enable_export_uncertain(const bool &enable);
+
 #ifdef WITH_IPEGENERATOR
     void set_ipe_ratio(const double width, const double height, const bool keep_ratio = false);
     void set_thickness_pen_factor(const double val);
@@ -167,6 +171,10 @@ private:
 
     ibex::IntervalVector m_scale_factor;
     ibex::IntervalVector m_offset;
+
+    bool m_export_inner = true;
+    bool m_export_outer = true;
+    bool m_export_uncertain = true;
 
     // Stat
     std::vector<double> m_memory_step, m_memory_time, m_memory_volume_outer, m_memory_volume_inner;
@@ -228,6 +236,19 @@ inline void VibesMaze::set_number_digits_x(const size_t &val){
 inline void VibesMaze::set_number_digits_y(const size_t &val){
     m_ipe_figure->set_number_digits_axis_y(val);
 }
+
+inline void VibesMaze::set_enable_export_outer(const bool &enable){
+    m_export_outer = enable;
+}
+
+inline void VibesMaze::set_enable_export_inner(const bool &enable){
+    m_export_inner = enable;
+}
+
+inline void VibesMaze::set_enable_export_uncertain(const bool &enable){
+    m_export_uncertain = enable;
+}
+
 #endif
 
 #endif // VibesMaze_H

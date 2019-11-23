@@ -7,7 +7,7 @@ using namespace ibex;
 using namespace std;
 
 VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g):
-  VibesFigure(figure_name), m_scale_factor(2), m_offset(2)
+    VibesFigure(figure_name), m_scale_factor(2), m_offset(2)
 {
     if(g->dim() != 2)
         throw std::runtime_error("in [vibes_graph.cpp/VibesMaze()] dim of paving is not equal to 2");
@@ -25,10 +25,10 @@ VibesMaze::VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIB
 
 #ifdef WITH_IPEGENERATOR
     m_ipe_figure = new ipegenerator::Figure(m_subpaving->get_position(), 210, 297, true);
-//    m_ipe_figure->add_layer("outer");
-//    m_ipe_figure->add_layer("inner");
-//    m_ipe_figure->add_layer("uncertain");
-//    m_ipe_figure->set_visible("outer", true);
+    //    m_ipe_figure->add_layer("outer");
+    //    m_ipe_figure->add_layer("inner");
+    //    m_ipe_figure->add_layer("uncertain");
+    //    m_ipe_figure->set_visible("outer", true);
 #endif
 }
 
@@ -72,7 +72,7 @@ void VibesMaze::show() const{
     this->selectFigure();
     show_graph();
     if(m_eulerian_maze != nullptr)
-      show_eulerian_maze();
+        show_eulerian_maze();
     else if(m_maze_outer.size()!=0 && m_maze_inner.size()==0)
         show_maze_outer();
     else if(m_maze_outer.size()==0 && m_maze_inner.size()!=0)
@@ -336,7 +336,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
                 d_iv |= d_tmp;
             }
             if(d_iv != p->get_faces()[get<0>(pt)][get<1>(pt)]->get_position())
-              full_outer_eulerian = false;
+                full_outer_eulerian = false;
         }
         else{
             d_iv = IntervalVector(2, ibex::Interval::ALL_REALS);
@@ -375,7 +375,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
 
     if(m_type==VIBES_MAZE_EULERIAN && !full_outer_eulerian)
         this->drawBox_with_scale(p->get_position(), "black","blue");
-    if(!pt_x.empty())
+    if(m_export_uncertain && !pt_x.empty())
         this->drawPolygon(pt_x, pt_y, "black","yellow");
 
 
@@ -423,7 +423,7 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
             }
         }
     }
-    if(!pt_x.empty())
+    if(m_export_inner && !pt_x.empty())
         this->drawPolygon(pt_x, pt_y, "black","#FF00FF");
 
     /// **************** DRAW OUTER **************** ///
@@ -477,17 +477,19 @@ void VibesMaze::draw_room_inner_outer(PaveIBEX *p) const{
                 }
             }
         }
-        if(!pt_x.empty())
+        if(m_export_outer && !pt_x.empty())
             this->drawPolygon(pt_x, pt_y, "black","blue");
     }
 
     // Draw Cone
-    if(m_type!=VIBES_MAZE_EULERIAN){
-        for(invariant::MazeIBEX* maze:m_maze_outer)
-            show_theta(p, maze);
+    if(m_enable_cones){
+        if(m_type!=VIBES_MAZE_EULERIAN){
+            for(invariant::MazeIBEX* maze:m_maze_outer)
+                show_theta(p, maze);
+        }
+        else
+            show_theta(p, m_eulerian_maze->get_maze_outer(0));
     }
-    else
-        show_theta(p, m_eulerian_maze->get_maze_outer(0));
 }
 
 void VibesMaze::show_maze_outer() const{
@@ -526,9 +528,9 @@ void VibesMaze::show_eulerian_maze() const{
     for(PaveIBEX *p:m_subpaving->get_paves()){
         draw_room_inner_outer(p);
     }
-//    for(PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
-//        draw_room_outer(p);
-//    }
+    //    for(PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
+    //        draw_room_outer(p);
+    //    }
 }
 
 void VibesMaze::show_maze_outer_inner() const{
@@ -549,19 +551,21 @@ void VibesMaze::show_maze_outer_inner() const{
     for(invariant::PaveIBEX *p:m_subpaving->get_paves_not_bisectable()){
         //        if(!p->is_infinite()){ /// ToDo : change if implementing infinite paves !
 
-        bool empty_outer = false;
-        for(invariant::MazeIBEX* maze:m_maze_outer){
-            invariant::RoomIBEX *r_outer = p->get_rooms()[maze];
-            if(r_outer->is_empty()){
-                empty_outer = true;
-                break;
+        if(m_export_outer){
+            bool empty_outer = false;
+            for(invariant::MazeIBEX* maze:m_maze_outer){
+                invariant::RoomIBEX *r_outer = p->get_rooms()[maze];
+                if(r_outer->is_empty()){
+                    empty_outer = true;
+                    break;
+                }
             }
+
+            if(empty_outer)
+                this->drawBox_with_scale(p->get_position(), "black","blue");
         }
 
-        if(empty_outer)
-            this->drawBox_with_scale(p->get_position(), "black","blue");
-
-        if(!m_both_wall){
+        if(m_export_inner && !m_both_wall){
             bool empty_inner = true;
             for(invariant::MazeIBEX* maze:m_maze_inner){
                 invariant::RoomIBEX *r_inner = p->get_rooms()[maze];
@@ -582,9 +586,9 @@ void VibesMaze::show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX* maze) co
     if(!m_enable_cones)
         return;
     IntervalVector position(hadamard_product(p->get_position()+m_offset, m_scale_factor));
-//    double size = 0.8*sqrt(pow(position[0].diam()/2.,2)+ pow(position[1].diam()/2., 2));
+    //    double size = 0.8*sqrt(pow(position[0].diam()/2.,2)+ pow(position[1].diam()/2., 2));
     double size = 0.8*min(position[0].diam(), position[1].diam())/2.;
-//    cout << "size = " << size << endl;
+    //    cout << "size = " << size << endl;
     invariant::RoomIBEX *r = p->get_rooms()[maze];
     //    invariant::DYNAMICS_SENS sens = r->get_maze()->get_dynamics()->get_sens();
 
@@ -872,7 +876,7 @@ void VibesMaze::set_axis_limits(const double start_x, const double inter_x, cons
     m_ipe_figure->set_graduation_parameters(start_x, inter_x, start_y, inter_y);
 }
 void VibesMaze::draw_axis(const std::string &name_x, const std::string &name_y){
-    m_ipe_figure->draw_axis("x_1", "x_2");
+    m_ipe_figure->draw_axis(name_x, name_y);
 }
 
 void VibesMaze::draw_text(const std::string &text, const double x, const double y){

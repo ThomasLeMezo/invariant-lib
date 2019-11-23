@@ -21,8 +21,8 @@ double friction = 0.1;
 Vector2d f(const Vector2d &x, const double &u, const bool &compressibility=false, const double &chi=1e-4)
 {
     Vector2d dx;
-    dx[0] = x[1]; // Depth
-    dx[1] = -0.001*u-friction*abs(x[1])*x[1]+(compressibility?(chi*(x[0]-depth_equilibrium)):0.0); // Velocity
+    dx(0) = x(1); // Depth
+    dx(1) = -0.001*u-friction*abs(x(1))*x(1)+(compressibility?(chi*(x(0)-depth_equilibrium)):0.0); // Velocity
     return dx;
 }
 
@@ -60,7 +60,7 @@ void example1()
         // Euler scheme
         Vector2d x(x_init);
         x1.push_back(0.0);
-        x2.push_back(x[0]);
+        x2.push_back(x(0));
         for(double t=t_init; t<max_t; t+=dt)
         {
             // Command
@@ -73,7 +73,7 @@ void example1()
 
             x += f(x, u)*dt;
             x1.push_back(t); // time
-            x2.push_back(x[0]); // depth
+            x2.push_back(x(0); // depth
         }
         fig.draw_curve(x1, x2);
 //        cout << x2.back() << endl;
@@ -117,8 +117,8 @@ void example2()
 
     // Euler scheme
     Vector2d x(x_init);
-    x1.push_back(x[0]);
-    x2.push_back(x[1]);
+    x1.push_back(x(0));
+    x2.push_back(x(1));
     for(double t=0.0; t<global_t_max; t+=dt)
     {
         // Command
@@ -128,8 +128,8 @@ void example2()
             u=-1;
 
         x += f(x, u)*dt;
-        x1.push_back(x[0]); // depth
-        x2.push_back(x[1]); // velocity
+        x1.push_back(x(0)); // depth
+        x2.push_back(x(1)); // velocity
         u_log.push_back(u);
     }
 
@@ -194,11 +194,11 @@ void example3()
 
     // Euler scheme
     Vector2d x(x_init);
-    x1.push_back(x[0]);
-    x2.push_back(x[1]);
+    x1.push_back(x(0));
+    x2.push_back(x(1));
     Vector2d x_compressibility(x_init);
-    x1_compressibility.push_back(x[0]);
-    x2_compressibility.push_back(x[1]);
+    x1_compressibility.push_back(x(0));
+    x2_compressibility.push_back(x(1));
     for(double t=0.0; t<global_t_max_simulation; t+=dt)
     {
         // Command
@@ -210,11 +210,11 @@ void example3()
         x += f(x, u)*dt;
         x_compressibility += f(x_compressibility, u, true)*dt;
 
-        x1.push_back(x[0]); // depth
-        x2.push_back(x[1]); // velocity
+        x1.push_back(x(0)); // depth
+        x2.push_back(x(1)); // velocity
         u_log.push_back(u);
-        x1_compressibility.push_back(x_compressibility[0]); // depth
-        x2_compressibility.push_back(x_compressibility[1]); // velocity
+        x1_compressibility.push_back(x_compressibility(0)); // depth
+        x2_compressibility.push_back(x_compressibility(1)); // velocity
     }
 
     size_t step = 0;
@@ -302,15 +302,15 @@ void example4()
 void simu1(const Vector2d &x_init, vector<double> &x1, vector<double> &x2, const double &t_end, const double &dt, const double &chi=1e-4){
   // Simu
   Vector2d x(x_init);
-  x1.push_back(x[0]);
-  x2.push_back(x[1]);
+  x1.push_back(x(0));
+  x2.push_back(x(1));
   for(double t=0.0; t<t_end; t+=dt)
   {
       x += f(x, 0.0, true, chi)*dt;
-//      cout << x[0] << endl;
+//      cout << x(0) << endl;
 
-      x1.push_back(x[0]); // depth
-      x2.push_back(x[1]); // velocity
+      x1.push_back(x(0)); // depth
+      x2.push_back(x(1)); // velocity
   }
 }
 

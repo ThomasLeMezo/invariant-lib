@@ -13,4 +13,6 @@ add_subdirectory(07_piston_kernel)
 add_subdirectory(08_piston_kernel_gradual)
 add_subdirectory(09_kernel_car)
 add_subdirectory(10_kernel_car2)
+add_subdirectory(11_piston_kernel_uncertain)
+add_subdirectory(12_piston_kernel_positive)
 
