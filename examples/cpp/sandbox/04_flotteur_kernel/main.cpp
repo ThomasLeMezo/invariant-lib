@@ -66,12 +66,12 @@ void example1()
     for(double t=0.0; t<global_t_max; t+=dt)
     {
         if(x(0)>69)
-            reached_limit |= true;
+            reached_limit = true;
         if(reached_limit)
             u=Vp.ub();
 
         x += f(x, u)*dt;
-        cout << k << " " << x(0) << " " << x(1) << endl;
+        cout << k << " " << x(0) << " " << x(1) << " " << u << endl;
         x1.push_back(x(0)); // depth
         x2.push_back(x(1)); // velocity
         u_log.push_back(u);
@@ -103,10 +103,10 @@ void example1()
     size_t id_circle, id_curve, id_text;
     for(double max_t = t_init; max_t <global_t_max; max_t +=dt_export)
     {
-        size_t vector_position = (size_t)round(max_t/dt)+1;
+        size_t vector_position = (size_t)round((max_t/(global_t_max+1))*x1.size())+1;
         vector<double> x1_sub(x1.begin(), x1.begin()+vector_position);
         vector<double> x2_sub(x2.begin(), x2.begin()+vector_position);
-        vector<double> u_log_sub(u2_log.begin(), u2_log.begin()+vector_position);
+        vector<double> u_log_sub(u_log.begin(), u_log.begin()+vector_position);
 
         std::stringstream fig_name;
         fig_name << directory << std::setfill('0') << std::setw(5) << step << ".ipe";
@@ -139,7 +139,7 @@ void example1()
 
     for(double max_t = t_init; max_t <global_t_max2; max_t +=dt_export2)
     {
-        size_t vector_position = (size_t)round(max_t/dt)+1;
+        size_t vector_position = (size_t)round((max_t/(global_t_max2+1))*y1.size())+1;
         vector<double> x1_sub(y1.begin(), y1.begin()+vector_position);
         vector<double> x2_sub(y2.begin(), y2.begin()+vector_position);
         vector<double> u_log_sub(u2_log.begin(), u2_log.begin()+vector_position);
@@ -168,6 +168,7 @@ void example1()
         fig.remove_object(id_text);
         step++;
     }
+
 }
 
 int main(int argc, char *argv[])
