@@ -13,7 +13,17 @@
 using namespace std;
 
 using namespace Eigen;
-double g, rho, m, diam, chi, Cf, A, B;
+// double g, rho, m, diam, chi, Cf, A, B;
+double g = 9.81;
+double rho = 1025.0;
+double m = 9.045*2.;
+double diam = 0.24;
+double chi = 2.15e-6;
+double Cf = M_PI*pow(diam/2.0,2);
+double A = g*rho/m;
+double B = 0.5*rho*Cf/m;
+
+ibex::Interval Vp(-2.148e-5, 1.503e-4);
 
 Vector2d f(const Vector2d &x, const double &u)
 {
@@ -23,20 +33,65 @@ Vector2d f(const Vector2d &x, const double &u)
     return dx;
 }
 
+void example2()
+{
+  const string directory = "/home/lemezoth/Videos/thesis/animation7/imgs/";
+
+  const double global_t_max = 100.0;
+  const double dt = 0.1;
+  double u = 0.0;
+
+  vector<double> x1, x2;
+
+  // Euler scheme
+  Vector2d x(6, 0.35);
+  u = Vp.lb();
+
+  x1.push_back(x(0));
+  x2.push_back(x(1));
+
+  size_t k = 0;
+//  bool reached_limit = false;
+  for(double t=0.0; t<global_t_max; t+=dt)
+  {
+//      if(x(0)>32)
+//          reached_limit = true;
+//      if(reached_limit)
+//          u=Vp.ub();
+
+      x += f(x, u)*dt;
+      cout << k << " " << x(0) << " " << x(1) << " " << u << endl;
+      x1.push_back(x(0)); // depth
+      x2.push_back(x(1)); // velocity
+      ++k;
+  }
+
+  ibex::IntervalVector frame(2);
+  frame[0] = ibex::Interval(-20, 80.0);
+  frame[1] = ibex::Interval(-0.4,0.4);
+  ipegenerator::Figure fig("/home/lemezoth/Documents/ensta/paper/thesis/presentation/imgs/ipe/piston_kernel_demo.ipe",frame,112,63);
+  fig.set_line_width(0.5);
+
+  fig.set_color_fill("gray");
+  fig.set_color_stroke("lightblue");
+  fig.set_color_type(ipegenerator::STROKE_AND_FILL);
+  fig.set_opacity(75);
+  fig.draw_circle_radius_final(x1.back(), x2.back(), 5.0);
+
+  fig.set_color_type(ipegenerator::STROKE_ONLY);
+  fig.set_opacity(100);
+  fig.draw_curve(x1, x2);
+
+  std::stringstream fig_name;
+  fig_name << directory << "piston_kernel_positive_traj" << ".pdf";
+  cout << fig_name.str() << endl;
+  fig.save_pdf(fig_name.str());
+
+}
+
 void example1()
 {
     const string directory = "/home/lemezoth/Videos/thesis/animation6/imgs/";
-
-    g = 9.81;
-    rho = 1025.0;
-    m = 9.045*2.;
-    diam = 0.24;
-    chi = 2.15e-6;
-    Cf = M_PI*pow(diam/2.0,2);
-    A = g*rho/m;
-    B = 0.5*rho*Cf/m;
-    // Command
-    ibex::Interval Vp(-2.148e-5, 1.503e-4);
 
     const Vector2d x_init(0.0, 0.0); // Depth, Velocity
     const double t_init = 0.0;
@@ -173,5 +228,6 @@ void example1()
 
 int main(int argc, char *argv[])
 {
-    example1();
+//    example1();
+    example2();
 }
