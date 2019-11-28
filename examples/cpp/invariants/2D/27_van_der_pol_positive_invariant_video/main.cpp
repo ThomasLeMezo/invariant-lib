@@ -29,6 +29,8 @@ void save_maze_image(invariant::Maze<> &maze, const int step, std::string direct
     v_maze.set_enable_white_boundary(false);
     v_maze.set_thickness_pen_factor(1e-4);
     v_maze.set_enable_vibes(false);
+    v_maze.set_number_digits_x(0);
+    v_maze.set_number_digits_y(0);
     v_maze.show();
 
     v_maze.draw_axis("x_1", "x_2");
@@ -49,6 +51,8 @@ void save_maze_image(invariant::Maze<> &maze_outer, invariant::Maze<> &maze_inne
     v_maze.set_enable_white_boundary(false);
     v_maze.set_thickness_pen_factor(1e-4);
     v_maze.set_enable_vibes(false);
+    v_maze.set_number_digits_x(0);
+    v_maze.set_number_digits_y(0);
     v_maze.show();
 
     v_maze.draw_axis("x_1", "x_2");
@@ -90,7 +94,7 @@ void example1(){
                 cout << nb_operation << endl;
                 if(nb_operation==0)
                     break;
-                save_maze_image(maze, k, "/home/lemezoth/Videos/invariant/imgs/");
+                save_maze_image(maze, k, "/home/lemezoth/Videos/thesis/invariant/imgs/");
             }
         }
         else
@@ -136,13 +140,13 @@ void example2(){
         subpaving.bisect();
         maze_outer.contract();
         maze_inner.contract();
-        save_maze_image(maze_outer, maze_inner, i, "/home/lemezoth/Videos/invariant/iterations/");
+        save_maze_image(maze_outer, maze_inner, i, "/home/lemezoth/Videos/thesis/invariant/iterations/");
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 }
 
 int main(int argc, char *argv[])
 {
-//    example1();
-    example2();
+    example1();
+//    example2();
 }

@@ -83,9 +83,9 @@ void example2()
   fig.draw_curve(x1, x2);
 
   std::stringstream fig_name;
-  fig_name << directory << "piston_kernel_positive_traj" << ".pdf";
+  fig_name << directory << "piston_kernel_positive_traj" << ".ipe";
   cout << fig_name.str() << endl;
-  fig.save_pdf(fig_name.str());
+  fig.save_ipe(fig_name.str());
 
 }
 
