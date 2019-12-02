@@ -123,9 +123,9 @@ void example2(){
 
     // ****** Dynamics ******* //
     ibex::Function f(x1, x2, Return(x2,
-                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
+                                    (1.0*(1.0-pow(x1, 2))*x2-x1)));
     ibex::Function f2(x1, x2, Return(x2,
-                                      (1.0*(1.0-pow(x1, 2))*x2-x1)));
+                                     (1.0*(1.0-pow(x1, 2))*x2-x1)));
     DynamicsFunction dyn_outer(&f, FWD); // Duplicate because of simultaneous access of f (semaphore on DynamicsFunction)
     DynamicsFunction dyn_inner(&f2, FWD);
 
@@ -145,8 +145,52 @@ void example2(){
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 }
 
+void example3(){
+    ibex::Variable x1, x2;
+
+    IntervalVector space(2);
+    space[0] = ibex::Interval(-3,3);
+    space[1] = ibex::Interval(-3,3);
+
+    // ****** Domain ******* //
+    invariant::SmartSubPaving<> subpaving(space);
+    invariant::Domain<> dom(&subpaving, FULL_WALL);
+
+    dom.set_border_path_in(true);
+    dom.set_border_path_out(false);
+
+    // ****** Dynamics ******* //
+    ibex::Function f(x1, x2, Return(x2,(1.0*(1.0-pow(x1, 2))*x2-x1)));
+    DynamicsFunction dyn(&f, FWD);
+
+    // ******* Maze ********* //
+    invariant::Maze<> maze(&dom, &dyn);
+
+    // ******* Algorithm ********* //
+    omp_set_num_threads(1);
+    double time_start = omp_get_wtime();
+    for(int i=0; i<11; i++){
+        cout << i << endl;
+        subpaving.bisect();
+        if(i==10){
+            for(size_t k=2; k<10000; k+=100){
+                int nb_operation = maze.contract(k);
+                cout << nb_operation << endl;
+                if(nb_operation==0)
+                    break;
+                save_maze_image(maze, k, "/home/lemezoth/Videos/thesis/invariant/imgs_inner/");
+            }
+        }
+        else
+            maze.contract();
+    }
+    cout << "TIME = " << omp_get_wtime() - time_start << endl;
+}
+
+
 int main(int argc, char *argv[])
 {
-    example1();
-//    example2();
+//    example1();
+    //    example2();
+    example3();
 }
