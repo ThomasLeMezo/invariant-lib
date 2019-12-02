@@ -347,6 +347,7 @@ void example5_1()
         std::stringstream fig_name;
         fig_name << directory << "flotteur" << std::setfill('0') << std::setw(5) << step << ".ipe";
         ipegenerator::Figure fig(frame);
+        fig.set_inverted_y();
         fig.set_scale_offset(false);
         fig.reset_scale(112/4.,63, true);
         fig.set_thickness_pen_factor(1e-3);
@@ -375,12 +376,11 @@ void example5_1()
         }
 
         // Last box
-        ;
         compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
         fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
         fig.draw_arrow(ipe::Vector(0.0, 0.0), ipe::Vector(0.0, 3.2));
-        fig.draw_text("z",0.0, 3.3, true);
+        fig.draw_text("z",0.0, 3.4, true);
         fig.draw_text("Water", x, 0.0);
 
         fig.save_ipe(fig_name.str());
@@ -407,7 +407,7 @@ void example5_2()
     const double width_max = 0.5;
     double x = 0.75;
     double max_depth = 3.0;
-    double compressibility_factor_water = 0.5;
+    double compressibility_factor_water = 0.7;
     double compressibility_factor_float = 0.1;
     double depth_eq = 1.5;
     depth_equilibrium = 1.5;
@@ -415,14 +415,15 @@ void example5_2()
     vector<double> x0, x1;
     simu1(Vector2d(2.0, 0.0),x0,x1,210.0, 1.0);
 
-    const int t1 = 4;
-    const int t2 = 8;
+    const int t1 = 1;
+    const int t2 = 6;
 
     for(double max_t = t_init; max_t<time_video; max_t +=dt_export)
     {
         std::stringstream fig_name;
         fig_name << directory << "flotteur" << std::setfill('0') << std::setw(5) << step << ".ipe";
         ipegenerator::Figure fig(frame);
+        fig.set_inverted_y();
         fig.set_scale_offset(false);
         fig.reset_scale(112/4.,63, true);
         fig.set_thickness_pen_factor(1e-3);
@@ -444,34 +445,35 @@ void example5_2()
             fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
             depth = 2.0;
+            compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
+            fig.set_color_type(ipegenerator::FILL_ONLY);
+            fig.set_color_fill("lightblue");
+            fig.draw_box(ipe::Vector(x, depth), compressibility, true);
+
             compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth)-compressibility_factor_float*(depth-depth_eq));
             fig.set_color_fill("gray");
             fig.set_color_type(ipegenerator::STROKE_AND_FILL);
             fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
-            compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
-            fig.set_color_type(ipegenerator::STROKE_ONLY);
-            fig.set_dashed("dashed");
-            fig.draw_box(ipe::Vector(x, depth), compressibility, true);
-
-            fig.set_dashed("");
             fig.draw_arrow(ipe::Vector(x, 1.5),ipe::Vector(x, depth));
         }
         else{
           depth = x0[round(((max_t-t2)/(time_video-t2+dt_export))*x0.size())];
-//          cout << depth << endl;
+
+          compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
+          fig.set_color_type(ipegenerator::FILL_ONLY);
+          fig.set_color_fill("lightblue");
+          fig.draw_box(ipe::Vector(x, depth), compressibility, true);
+
           compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth)-compressibility_factor_float*(depth-depth_eq));
           fig.set_color_fill("gray");
           fig.set_color_type(ipegenerator::STROKE_AND_FILL);
           fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
-          compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
-          fig.set_color_type(ipegenerator::STROKE_ONLY);
-          fig.set_dashed("dashed");
-          fig.draw_box(ipe::Vector(x, depth), compressibility, true);
         }
 
         fig.draw_text("More compressible", x, 0.0);
+        fig.draw_text("\\chi\\geq 0", x, 0.4, true);
 
         fig.save_ipe(fig_name.str());
         step++;
@@ -498,7 +500,7 @@ void example5_3()
     double x = 0.75;
     double max_depth = 3.0;
     double compressibility_factor_water = 0.5;
-    double compressibility_factor_float = -0.1;
+    double compressibility_factor_float = -0.2;
     double depth_eq = 1.5;
     depth_equilibrium = 1.5;
 
@@ -506,14 +508,15 @@ void example5_3()
     friction = 4.0;
     simu1(Vector2d(2.0, 0.0),x0,x1,1000.0, 1.0, -0.5e-3);
 
-    const int t1 = 2;
-    const int t2 = 4;
+    const int t1 = 1;
+    const int t2 = 6;
 
     for(double max_t = t_init; max_t<time_video; max_t +=dt_export)
     {
         std::stringstream fig_name;
         fig_name << directory << "flotteur" << std::setfill('0') << std::setw(5) << step << ".ipe";
         ipegenerator::Figure fig(frame);
+        fig.set_inverted_y();
         fig.set_scale_offset(false);
         fig.reset_scale(112/4.,63, true);
         fig.set_thickness_pen_factor(1e-3);
@@ -535,34 +538,40 @@ void example5_3()
             fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
             depth = 2.0;
-            compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth)-compressibility_factor_float*(depth-depth_eq));
-            fig.set_color_fill("gray");
-            fig.set_color_type(ipegenerator::STROKE_AND_FILL);
-            fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
             compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
             fig.set_color_type(ipegenerator::STROKE_ONLY);
-            fig.set_dashed("dashed");
+            fig.set_color_fill("lightblue");
             fig.draw_box(ipe::Vector(x, depth), compressibility, true);
+
+            compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth)-compressibility_factor_float*(depth-depth_eq));
+            fig.set_color_fill("gray");
+            fig.set_color_type(ipegenerator::STROKE_AND_FILL);
+            fig.set_opacity(50);
+            fig.draw_box(ipe::Vector(x, depth), compressibility, true);
+            fig.set_opacity(100);
 
             fig.set_dashed("");
             fig.draw_arrow(ipe::Vector(x, 1.5),ipe::Vector(x, depth));
         }
         else{
           depth = x0[round(((max_t-t2)/(time_video-t2+dt_export))*x0.size())];
-//          cout << depth << endl;
-          compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth)-compressibility_factor_float*(depth-depth_eq));
-          fig.set_color_fill("gray");
-          fig.set_color_type(ipegenerator::STROKE_AND_FILL);
-          fig.draw_box(ipe::Vector(x, depth), compressibility, true);
 
           compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth));
           fig.set_color_type(ipegenerator::STROKE_ONLY);
-          fig.set_dashed("dashed");
+          fig.set_color_fill("lightblue");
           fig.draw_box(ipe::Vector(x, depth), compressibility, true);
+
+          compressibility = width_max*(1-compressibility_factor_water*(depth/max_depth)-compressibility_factor_float*(depth-depth_eq));
+          fig.set_color_fill("gray");
+          fig.set_opacity(50);
+          fig.set_color_type(ipegenerator::STROKE_AND_FILL);
+          fig.draw_box(ipe::Vector(x, depth), compressibility, true);
+          fig.set_opacity(100);
         }
 
         fig.draw_text("Less compressible", x, 0.0);
+        fig.draw_text("\\chi\\leq 0", x, 0.4, true);
 
         fig.save_ipe(fig_name.str());
         step++;
@@ -574,11 +583,11 @@ void example5_3()
 
 int main(int argc, char *argv[])
 {
-    example1();
+//    example1();
 //    example2();
 //    example3();
 //    example4();
 //    example5_1();
 //    example5_2();
-//    example5_3();
+    example5_3();
 }
