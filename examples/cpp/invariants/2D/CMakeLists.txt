@@ -40,3 +40,7 @@ add_subdirectory(25_piston_uncertainty2)
 add_subdirectory(26_piston_stability2)
 
 add_subdirectory(27_van_der_pol_positive_invariant_video)
+
+add_subdirectory(28_kleene_ex1)
+add_subdirectory(28_kleene_ex2)
+add_subdirectory(28_kleene_ex3)

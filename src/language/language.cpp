@@ -19,6 +19,35 @@ namespace invariant {
 
 // To improve...
 
+void save_maze_image(invariant::MazeIBEX *maze_outer, invariant::MazeIBEX *maze_inner, std::string directory, std::string file_name){
+    std::vector<invariant::MazeIBEX*> list_outer{maze_outer};
+    std::vector<invariant::MazeIBEX*> list_inner{maze_inner};
+    save_maze_image(list_outer,list_inner,directory, file_name);
+}
+
+void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<invariant::MazeIBEX*> &maze_inner, std::string directory, std::string file_name){
+    VibesMaze v_maze(file_name, maze_outer, maze_inner);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
+
+    v_maze.set_ipe_ratio(100,80,false);
+
+    ibex::IntervalVector bounding_box = maze_outer[0]->get_bounding_box();
+
+    v_maze.set_axis_limits(bounding_box[0].lb(), bounding_box[0].diam()/4., bounding_box[1].lb(), bounding_box[1].diam()/4.);
+    v_maze.set_enable_white_boundary(false);
+    v_maze.set_thickness_pen_factor(1e-4);
+    v_maze.set_enable_vibes(true);
+    v_maze.set_number_digits_x(1);
+    v_maze.set_number_digits_y(1);
+    v_maze.show();
+
+    v_maze.draw_axis("x_1", "x_2");
+
+    v_maze.saveIpe(directory);
+}
+
+
 int invariant_PPL(ibex::IntervalVector &space, ibex::Function *f_dyn, size_t nb_steps, string file_name, size_t contraction_limit){
   // ****** Domain ******* //
   invariant::SmartSubPavingPPL paving(space);
@@ -94,9 +123,12 @@ int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dy
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
 //    v_maze.drawBox(space, "white[white]");
-    v_maze.show();
+//    v_maze.show();
 
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+
+    save_maze_image(&maze_outer, &maze_inner, "/home/lemezoth/Pictures/", file_name);
+
     vibes::endDrawing();
 
     return 0;
@@ -135,12 +167,14 @@ int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dy
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze(file_name, &maze_outer, &maze_inner);
-    v_maze.setProperties(0, 0, 1000, 800);
-    v_maze.set_enable_cone(false);
+//    VibesMaze v_maze(file_name, &maze_outer, &maze_inner);
+//    v_maze.setProperties(0, 0, 1000, 800);
+//    v_maze.set_enable_cone(false);
 //    v_maze.drawBox(space, "white[white]");
-    v_maze.show();
-    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+//    v_maze.show();
+//    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+
+    save_maze_image(&maze_outer, &maze_inner, "/home/lemezoth/Pictures/", file_name);
     vibes::endDrawing();
 
     return 0;
@@ -196,9 +230,10 @@ int largest_invariant(ibex::IntervalVector &space, ibex::Function *f_dyn_positiv
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
 //    v_maze.drawBox(space, "white[white]");
-    v_maze.show();
+//    v_maze.show();
 
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    save_maze_image(list_outer, list_inner,"/home/lemezoth/Pictures/", file_name);
     vibes::endDrawing();
 
     return 0;
@@ -250,9 +285,10 @@ int largest_positive_invariant(ibex::IntervalVector &space,
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
 //    v_maze.drawBox(space, "white[white]");
-    v_maze.show();
+//    v_maze.show();
 
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    save_maze_image(&maze_outer, &maze_inner, "/home/lemezoth/Pictures/", file_name);
     vibes::endDrawing();
 
     return 0;
@@ -306,9 +342,62 @@ int largest_positive_invariant(ibex::IntervalVector &space,
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
 //    v_maze.drawBox(space, "white[white]");
-    v_maze.show();
+//    v_maze.show();
 
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    save_maze_image(&maze_outer, &maze_inner, "/home/lemezoth/Pictures/", file_name);
+    vibes::endDrawing();
+
+    return 0;
+}
+
+int largest_positive_invariant(ibex::IntervalVector &space,
+                               ibex::Function* f_outer,
+                               vector<ibex::Function*> &f_inner,
+                               size_t nb_steps,
+                               std::string file_name
+                               ){
+    // ****** Domain ******* //
+//    omp_set_num_threads(1);
+    invariant::SmartSubPaving<> subpaving(space);
+
+    invariant::Domain<> dom_outer(&subpaving, FULL_DOOR);
+    dom_outer.set_border_path_in(false);
+    dom_outer.set_border_path_out(true);
+
+    invariant::Domain<> dom_inner(&subpaving, FULL_WALL);
+    dom_inner.set_border_path_in(true);
+    dom_inner.set_border_path_out(false);
+
+    // ****** Dynamics ******* //
+    invariant::DynamicsFunction dyn_outer(f_outer, FWD);
+    invariant::DynamicsFunction dyn_inner(f_inner, FWD);
+
+    // ******* Maze ********* //
+    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::Maze<> maze_inner(&dom_inner, &dyn_inner);
+
+    // ******* Algorithm ********* //
+    double time_start = omp_get_wtime();
+
+    for(size_t i=0; i<nb_steps; i++){
+     cout << i << endl;
+
+     subpaving.bisect();
+     maze_outer.contract();
+     maze_inner.contract();
+    }
+    cout << "TIME = " << omp_get_wtime() - time_start << endl;
+
+    vibes::beginDrawing();
+    VibesMaze v_maze(file_name, &maze_outer, &maze_inner);
+    v_maze.setProperties(0, 0, 1000, 800);
+    v_maze.set_enable_cone(false);
+//    v_maze.drawBox(space, "white[white]");
+//    v_maze.show();
+
+    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    save_maze_image(&maze_outer, &maze_inner, "/home/lemezoth/Pictures/", file_name);
     vibes::endDrawing();
 
     return 0;
