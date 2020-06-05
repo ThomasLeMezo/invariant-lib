@@ -47,6 +47,28 @@ void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<
     v_maze.saveIpe(directory);
 }
 
+void save_maze_image(invariant::MazeIBEX *maze_outer, std::string directory, std::string file_name){
+    VibesMaze v_maze(file_name, maze_outer);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
+
+    v_maze.set_ipe_ratio(100,80,false);
+
+    ibex::IntervalVector bounding_box = maze_outer->get_bounding_box();
+
+    v_maze.set_axis_limits(bounding_box[0].lb(), bounding_box[0].diam()/4., bounding_box[1].lb(), bounding_box[1].diam()/4.);
+    v_maze.set_enable_white_boundary(false);
+    v_maze.set_thickness_pen_factor(1e-4);
+    v_maze.set_enable_vibes(true);
+    v_maze.set_number_digits_x(1);
+    v_maze.set_number_digits_y(1);
+    v_maze.show();
+
+    v_maze.draw_axis("x_1", "x_2");
+
+    v_maze.saveIpe(directory);
+}
+
 
 int invariant_PPL(ibex::IntervalVector &space, ibex::Function *f_dyn, size_t nb_steps, string file_name, size_t contraction_limit){
   // ****** Domain ******* //

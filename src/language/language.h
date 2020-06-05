@@ -11,8 +11,11 @@
 
 namespace invariant {
 
+ void save_maze_image(MazeIBEX* maze_outer, std::string directory, std::string file_name);
  void save_maze_image(MazeIBEX* maze_outer, MazeIBEX* maze_inner, std::string directory, std::string file_name);
  void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<invariant::MazeIBEX*> &maze_inner, std::string directory, std::string file_name);
+
+
 
  int largest_positive_invariant(ibex::IntervalVector &space,
                                 ibex::Function *f_dyn,
