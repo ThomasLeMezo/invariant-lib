@@ -6,6 +6,8 @@
 
 #include "ibex_SepFwdBwd.h"
 
+#include "language.h"
+
 #include <iostream>
 #include "vibes/vibes.h"
 #include <cstring>
@@ -45,8 +47,8 @@ int main(int argc, char *argv[])
     ibex::Variable x1, x2;
 
     IntervalVector space(2);
-    space[0] = ibex::Interval(0,2.2);
-    space[1] = ibex::Interval(-5,5);
+    space[0] = ibex::Interval(0,12);
+    space[1] = ibex::Interval(-20, 20);
 
     // ****** Domain *******
     invariant::SmartSubPaving<> paving(space);
@@ -55,15 +57,16 @@ int main(int argc, char *argv[])
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
-    x1_c = 2.0;
+    double x1_c, x2_c, r;
+    x1_c = 10.0;
     x2_c = 0.0;
-    r = 0.05;
+    r = 1.0;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LT); // LT, LEQ, EQ, GEQ, GT)
     dom.set_sep(&s);
 
     // ****** Dynamics *******
-    ibex::Function f(x1, x2, Return(x2,-9.81-1*x2));
+    ibex::Function f(x1, x2, Return(x2,-30-1.0*x2));
     DynamicsFunction dyn(&f, FWD);
 
     // Hybrid
@@ -73,12 +76,12 @@ int main(int argc, char *argv[])
     ibex::SepFwdBwd sep_zero(f_sep_guard, GEQ);
     dom.set_sep_zero(&sep_zero);
 
-    ibex::Function f_reset_pos(x1, x2, Return(x1, -x2));
-    ibex::Function f_reset_neg(x1, x2, Return(x1, -x2));
+    ibex::Function f_reset_pos(x1, x2, Return(x1, -0.75*x2));
+    ibex::Function f_reset_neg(x1, x2, Return(x1, -0.75*x2));
     dyn.add_hybrid_condition(&sep_guard, &f_reset_pos, &f_reset_neg);
 
     // ******* Maze *********
-    invariant::Maze<> maze(&dom, &dyn);
+    invariant::MazeIBEX maze(&dom, &dyn);
 
     omp_set_num_threads(1);
     double time_start = omp_get_wtime();
@@ -91,13 +94,20 @@ int main(int argc, char *argv[])
 
     cout << paving << endl;
 
+
     vibes::beginDrawing();
-    VibesMaze v_maze("hybrid_ball", &maze);
-    v_maze.setProperties(0, 0, 1000, 800);
-    v_maze.set_enable_cone(false);
-    v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
-    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+
+    // VibesMaze v_maze("hybrid_ball", &maze);
+    // v_maze.setProperties(0, 0, 1000, 800);
+    // v_maze.set_enable_cone(false);
+    // v_maze.show();
+    // v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
+    // v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+
+    string file_name = "hybrid_ball";
+    string path_file = "/home/lemezoth/Pictures/";
+    save_maze_image(&maze, path_file, file_name);
+    vibes::endDrawing();
 
     save_maze_image(maze,0, "/home/lemezoth/");
 

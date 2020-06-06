@@ -5,20 +5,21 @@
 # Sources
 
   set(SRC
-	 main.cpp
+	main.cpp
   )
 
   set(HEADERS
 
   )
 
-  add_executable(2D_hybrid_ball ${SRC})
+		add_executable(2D_invariant_kleene_ex2 ${SRC})
 
-  target_link_libraries(2D_hybrid_ball
-	 ${LIBS}
-	 invariant-core
-   invariant-graphics
-   invariant-language
+		target_link_libraries(2D_invariant_kleene_ex2
+    ${LIBS}
+    invariant-core
+    
+    invariant-graphics
+	invariant-language
   )
 
 
