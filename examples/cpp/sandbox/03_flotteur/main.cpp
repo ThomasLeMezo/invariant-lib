@@ -27,6 +27,7 @@ Vector2d f(const Vector2d &x, const double &u, const bool &compressibility=false
     return dx;
 }
 
+// Float principle
 void example1()
 {
     const string directory = "/home/lemezoth/Videos/thesis/animation1/imgs/";
@@ -109,6 +110,7 @@ void example1()
 
 }
 
+// Float trajectory state space (without compressibility)
 void example2()
 {
     const string directory = "/home/lemezoth/Videos/thesis/animation2/imgs/";
@@ -180,6 +182,7 @@ void example2()
 
 }
 
+// Float trajectory state space (with compressibility)
 void example3()
 {
     const string directory = "/home/lemezoth/Videos/thesis/animation3/imgs/";
@@ -217,7 +220,7 @@ void example3()
 //            u=-1;
 
         x += f(x, u)*dt;
-        x_compressibility += f(x_compressibility, u, true)*dt;
+        x_compressibility += f(x_compressibility, u, true)*1.2*dt;
 
         x1.push_back(x(0)); // depth
         x2.push_back(x(1)); // velocity
@@ -574,9 +577,9 @@ void example5_3()
 
 int main(int argc, char *argv[])
 {
-    example1();
+//    example1();
 //    example2();
-//    example3();
+    example3();
 //    example4();
 //    example5_1();
 //    example5_2();

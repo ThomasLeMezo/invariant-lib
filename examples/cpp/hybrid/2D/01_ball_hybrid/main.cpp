@@ -15,6 +15,31 @@ using namespace std;
 using namespace ibex;
 using namespace invariant;
 
+double x1_c, x2_c, r;
+
+void save_maze_image(invariant::Maze<> &maze, const int step, std::string directory){
+    std::stringstream fig_name;
+    fig_name << "hybrid" << std::setfill('0') << std::setw(5) << step;
+    VibesMaze v_maze(fig_name.str(), &maze);
+    v_maze.setProperties(0, 0, 1024, 1024);
+    v_maze.set_enable_cone(false);
+
+    v_maze.set_ipe_ratio(112,63,false);
+    v_maze.set_axis_limits(0, 0.5, -5, 1);
+    v_maze.set_enable_white_boundary(false);
+    v_maze.set_thickness_pen_factor(1e-4);
+    v_maze.set_enable_vibes(false);
+    v_maze.set_number_digits_x(1);
+    v_maze.set_number_digits_y(0);
+    v_maze.show();
+
+    v_maze.draw_axis("x_1", "x_2");
+    v_maze.draw_text(std::to_string(step), 0.0, 3.2);
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
+
+    v_maze.saveIpe(directory);
+}
+
 int main(int argc, char *argv[])
 {
     ibex::Variable x1, x2;
@@ -30,7 +55,6 @@ int main(int argc, char *argv[])
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
 
-    double x1_c, x2_c, r;
     x1_c = 2.0;
     x2_c = 0.0;
     r = 0.05;
@@ -72,8 +96,10 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+
+    save_maze_image(maze,0, "/home/lemezoth/");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(0.05);
