@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 //    VibesMaze v_maze("car_kernel_"+to_string(limit1[0].lb()), &maze_outer, &maze_inner);
     VibesMaze v_maze("car_kernel_u"+to_string(u.lb()), &maze_outer, &maze_inner);
     v_maze.show();
-    v_maze.drawBox(limit1, "red[]");
+    v_maze.drawBox(limit1, "red", "");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
     vibes::endDrawing();

@@ -45,7 +45,7 @@ for i in range(20):
 visu = VibesMaze("Zang basin of Capture", maze_outer, maze_inner)
 visu.setProperties(0,0,1024,1024)
 visu.show()
-visu.drawCircle(0.852505, 0.0, 0.8, "red[]");
-visu.drawCircle(-0.852505, 0.0, 0.8, "red[]");
+visu.drawCircle(0.852505, 0.0, 0.8, "red", "");
+visu.drawCircle(-0.852505, 0.0, 0.8, "red", "");
 
 

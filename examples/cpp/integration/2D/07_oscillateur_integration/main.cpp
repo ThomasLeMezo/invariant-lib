@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
-    v_maze.drawCircle(-2, 4, 0.3, "balck[red]");
+    v_maze.drawCircle(-2, 4, 0.3, "black", "red");
 
 //    VibesMaze v_maze_inner("inner", &maze_inner);
 //    v_maze_inner.setProperties(0, 0, 1024, 1024);

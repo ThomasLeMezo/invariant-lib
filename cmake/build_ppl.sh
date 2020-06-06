@@ -8,7 +8,7 @@
 
 if [ ! -e "$HOME/gmp/lib/libgmp.so" ]; then
   echo 'Installing GMP-lib...';
-  GMP_VERSION="6.1.2"
+  GMP_VERSION="6.2.0"
   GMP_FILE_NAME=gmp-${GMP_VERSION}
   GMP_ARCHIVE_NAME=${GMP_FILE_NAME}.tar.xz
 

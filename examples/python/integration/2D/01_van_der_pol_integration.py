@@ -39,6 +39,6 @@ for i in range(15):
 visu = VibesMaze("Van Der Pol Basin of Capture", maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-visu.drawCircle(-2, 4, 0.3, "black[red]");
+visu.drawCircle(-2, 4, 0.3, "black", "red");
 
 

@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
 
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 

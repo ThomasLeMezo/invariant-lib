@@ -16,10 +16,9 @@ if(WITH_3D)
   add_executable(3D_invariant_hindmarsh_rose ${SRC})
 
   target_link_libraries(3D_invariant_hindmarsh_rose
-    ${LIBS}
     invariant-core
-    
     invariant-graphics-3D
+    ${LIBS}
   )
 
 endif()

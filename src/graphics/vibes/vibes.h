@@ -81,9 +81,6 @@ namespace vibes {
      * A class to hold any type supported by vibes properties system, an to provide JSON serialization
      */
     class Value {
-        enum value_type_enum{
-            vt_none, vt_integer, vt_string, vt_decimal, vt_array, vt_object
-        } _type;
 
         union {
         int _integer;
@@ -93,6 +90,10 @@ namespace vibes {
         std::string _string;
         std::vector<Value> _array;
 
+        enum value_type_enum{
+            vt_none, vt_integer, vt_string, vt_decimal, vt_array, vt_object
+        } _type;
+        
     public:
         Value() : _type(vt_none) {}
         Value(int i) : _integer(i), _type(vt_integer) {}
@@ -200,6 +201,7 @@ namespace vibes {
   void func_name(T1 a, T2 b, T3 c, T4 d, T5 e, T6 f, Params params); \
   inline void func_name(T1 a, T2 b, T3 c, T4 d, T5 e, T6 f, \
               const std::string &format=std::string(), Params params=Params()) {func_name(a,b,c,d,e,f,(params,VIBES_COLOR_PARAM_NAME,format));}
+
 
   /** @defgroup connection Starting and ending VIBes
    *
@@ -341,6 +343,9 @@ namespace vibes {
 
   /// Draw a 2-D submarine (type AUV) at position (cx,cy)
   VIBES_FUNC_COLOR_PARAM_4(drawAUV,const double &,cx, const double &,cy, const double &,rot, const double &,length)
+
+  /// Draw a 2-D tank at position (cx,cy)
+  VIBES_FUNC_COLOR_PARAM_4(drawTank,const double &,cx, const double &,cy, const double &,rot, const double &,length)
 
   /// Draw a sector (part of an ellipse) at position (cx, cy) with axis (a, b) and angular bounds (startAngle, endAngle)
   VIBES_FUNC_COLOR_PARAM_6(drawSector, const double &,cx, const double &,cy,
@@ -533,3 +538,4 @@ namespace vibes {
 #endif //#ifdef VIBES_GENERATE_vibesXXX_MACROS
 
 #endif //#ifndef VIBES_CPP_API_H
+

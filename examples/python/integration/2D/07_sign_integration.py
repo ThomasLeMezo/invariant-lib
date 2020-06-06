@@ -41,6 +41,6 @@ for i in range(18):
 visu = VibesMaze("Intergation sign", maze_outer, maze_inner)
 visu.setProperties(0,0,1024,1024)
 visu.show()
-visu.drawCircle(0, 2, 1, "black[red]");
+visu.drawCircle(0, 2, 1, "black", "red");
 
 

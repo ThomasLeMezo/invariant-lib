@@ -6,13 +6,13 @@
 
 #set -x # debugging
 
-if [ ! -e "$HOME/vtk/lib/libvtkCommonCore-8.2.a" ]; then
+if [ ! -e "$HOME/vtk/lib/libvtkCommonCore-9.0.a" ]; then
   echo 'Installing VTK-lib...';
   # git clone https://gitlab.kitware.com/vtk/vtk
   # cd vtk
-  # git checkout v8.2.0
+  # git checkout v9.0
   
-  VTK_MAJOR_VERSION=8.2
+  VTK_MAJOR_VERSION=9.0
   VTK_SUB_VERSION=0
   VTK_VERSION=${VTK_MAJOR_VERSION}.${VTK_SUB_VERSION}
   VTK_FILE_NAME=VTK-${VTK_VERSION}

@@ -45,6 +45,6 @@ print("elapsed_time = ", elapsed_time)
 visu = VibesMaze("Van Der Pol Basin of Capture", maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-visu.drawCircle(0.0, 0.0, 0.4, "black[red]");
+visu.drawCircle(0.0, 0.0, 0.4, "black", "red");
 
 

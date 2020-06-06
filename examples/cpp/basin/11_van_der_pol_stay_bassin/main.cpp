@@ -116,10 +116,10 @@ int main(int argc, char *argv[]){
     cout << subpaving << endl;
 
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "r[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "");
 
     v_maze_basin.show();
-    v_maze_basin.drawCircle(x1_c, x2_c, r, "r[]");
+    v_maze_basin.drawCircle(x1_c, x2_c, r, "red", "");
     v_maze_basin.save_stat_to_file("stat.txt");
 
 //    IntervalVector position_info(2);

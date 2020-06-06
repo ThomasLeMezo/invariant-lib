@@ -102,6 +102,7 @@ endif()
   target_link_libraries(invariant-graphics
       ${LIBS}
       invariant-core
+      ${IPEGENERATOR_LIBRARIES}
   )
 
     target_include_directories(invariant-graphics

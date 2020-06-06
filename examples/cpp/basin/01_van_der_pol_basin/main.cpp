@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
 
 
-    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
+    v_maze.drawCircle(x1_c, x2_c, r, "black", "red");
     vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol_basin.svg", "Van Der Pol Basin");
     vibes::endDrawing();
 

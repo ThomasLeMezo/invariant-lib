@@ -71,10 +71,10 @@ int main(int argc, char *argv[])
     SepMaze<> sepMaze(&maze);
 
     cout << "box = " << box_in << endl;
-//    vibes::drawBox(box_in, "red[]");
+//    vibes::drawBox(box_in, "red", "");
     sepMaze.separate(box_in, box_out);
-    vibes::drawBox(box_in, "red[]");
-    vibes::drawBox(box_out, "green[]");
+    v_maze.drawBox(box_in, "red", "");
+    v_maze.drawBox(box_out, "green", "");
 
     cout << "in = " << box_in << endl;
     cout << "out = " << box_out << endl;

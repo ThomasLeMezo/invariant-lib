@@ -8,7 +8,7 @@ SCRIPT="$(readlink -f "$0")"
 INVARIANTLIB_DIR="$(dirname "$SCRIPT")"
 
 cd ..
-sh $INVARIANTLIB_DIR/cmake/build_Ibex4pyIbex.sh # Benoit Desrochers version
+sh $INVARIANTLIB_DIR/cmake/build_ibex.sh
 sh $INVARIANTLIB_DIR/cmake/build_VTK.sh
 sh $INVARIANTLIB_DIR/cmake/build_ppl.sh
 sh $INVARIANTLIB_DIR/cmake/build_netcdf.sh
@@ -34,6 +34,7 @@ cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
   	  -DWITH_PROJ4=ON\
   	  -DWITH_EXAMPLES=ON \
 	  -DWITH_PPL=ON \
+	  -DWITH_IPEGENERATOR=ON \
 	  $INVARIANTLIB_DIR
 if [ -z "$1" ]; then
 	make -j4

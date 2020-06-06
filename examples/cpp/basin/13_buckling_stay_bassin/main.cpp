@@ -120,21 +120,21 @@ int main(int argc, char *argv[]){
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "r[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "");
 
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
     v_maze_basin.setProperties(0, 0, 1000, 800);
     v_maze_basin.set_enable_cone(false);
     v_maze_basin.show();
-    v_maze_basin.drawCircle(x1_c, x2_c, r, "r[]");
+    v_maze_basin.drawCircle(x1_c, x2_c, r, "red", "");
 
     v_maze_basin.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 //    v_maze_basin_inner.setProperties(0, 0, 512, 512);
 //    v_maze_basin_inner.set_enable_cone(false);
 //    v_maze_basin_inner.show();
-//    v_maze_basin_inner.drawCircle(x1_c, x2_c, r, "r[]");
+//    v_maze_basin_inner.drawCircle(x1_c, x2_c, r, "red", "");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(-0.5);

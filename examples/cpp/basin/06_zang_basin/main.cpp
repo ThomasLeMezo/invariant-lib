@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "black[r]");
+    v_maze.drawCircle(x1_c, x2_c, r, "black","red");
 
     vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/zang_basin.svg", "Zang Basin");
 

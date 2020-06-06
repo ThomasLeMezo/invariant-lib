@@ -1,4 +1,5 @@
 #include "domain.h"
+#include <omp.h>
 
 namespace invariant {
 
@@ -213,7 +214,7 @@ void Domain<_Tp>::contract_separator(Maze<_Tp> *maze, Pave_node<_Tp> *pave_node,
         contract_separator(maze, pave_node->get_children().first, output, SEP_INSIDE, sep);
 #pragma omp task
         contract_separator(maze, pave_node->get_children().second, output, SEP_INSIDE, sep);
-#pragma taskwait
+#pragma omp taskwait
       }
       else if(x_out.is_empty()){
         // Completly outside the constraint

@@ -286,7 +286,7 @@ void VtkMaze3D::show_maze(const string &file_name){
 
         vtkSmartPointer<vtkUnstructuredGrid> ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ugrid->SetPoints(points);
-        ugrid->InsertNextCell(VTK_POLYHEDRON, nb_points, pointIds, nb_doors, faces->GetPointer());
+        ugrid->InsertNextCell(VTK_POLYHEDRON, nb_points, pointIds/*, nb_doors, faces->GetPointer()*/); // ToDo : bug fix with VTK9.0 ?
 
         // ********** Surface **************
         // Create the convex hull of the pointcloud (delaunay + outer surface)

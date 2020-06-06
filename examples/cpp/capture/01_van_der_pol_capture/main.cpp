@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1048, 1048);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
-    v_maze.drawCircle(xB_c, yB_c, rB, "green[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
+    v_maze.drawCircle(xB_c, yB_c, rB, "green", "");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(-2);

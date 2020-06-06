@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     v_maze.set_scale(1., 100);
     v_maze.set_enable_cone(false);
     v_maze.show();
-    v_maze.drawBox(no_go_zone, "red[]");
+    v_maze.drawBox(no_go_zone, "red", "");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
     vibes::endDrawing();

@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("vdp_capture", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.show();
-    v_maze.drawCircle(x1_c, x2_c, r, "red[red]");
-    v_maze.drawCircle(xB_c, yB_c, rB, "green[]");
+    v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
+    v_maze.drawCircle(xB_c, yB_c, rB, "green", "");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 //    IntervalVector position_info(2);

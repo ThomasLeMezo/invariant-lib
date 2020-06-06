@@ -7,7 +7,6 @@
 
 
 if(WITH_NETCDF AND WITH_3D)
-  include(${VTK_USE_FILE})
 
   set(SRC
     main.cpp

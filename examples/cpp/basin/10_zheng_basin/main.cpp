@@ -120,9 +120,9 @@ int main(int argc, char *argv[])
 //    position_info[1] = ibex::Interval(1.34);
 //    v_maze.get_room_info(&maze_inner, position_info);
 
-////    v_maze.drawCircle(x1_c, x2_c, r, "black[red]");
-    v_maze.drawBox(box1, "red[]");
-//    v_maze.drawBox(box2, "red[]");
+////    v_maze.drawCircle(x1_c, x2_c, r, "black", "red");
+    v_maze.drawBox(box1, "red", "");
+//    v_maze.drawBox(box2, "red", "");
     vibes::saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/van_der_pol2_basin.svg", "Van Der Pol 2 Basin");
     vibes::endDrawing();
 

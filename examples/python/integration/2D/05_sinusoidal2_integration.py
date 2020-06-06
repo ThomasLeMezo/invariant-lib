@@ -39,4 +39,4 @@ for i in range(18):
 visu = VibesMaze("Sinusoidal 2 Intergation", maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-visu.drawCircle(1, 1, 1, "black[red]");
+visu.drawCircle(1, 1, 1, "black", "red");

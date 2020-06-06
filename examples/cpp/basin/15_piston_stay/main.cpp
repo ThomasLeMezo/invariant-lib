@@ -127,7 +127,7 @@ int main(int argc, char *argv[]){
     v_maze.set_enable_cone(true);
 //    v_maze.set_offset(-15., 0.);
     v_maze.show();
-    v_maze.drawBox(target, "r[]");
+    v_maze.drawBox(target, "red", "");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 //    VibesMaze v_maze_basin("piston_stay", &maze_outer_basin, &maze_inner_basin);

@@ -39,4 +39,4 @@ for i in range(18):
 visu = VibesMaze("Genesio system", maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-visu.drawCircle(0.0, 0.0, 3, "black[red]");
+visu.drawCircle(0.0, 0.0, 3, "black", "red");

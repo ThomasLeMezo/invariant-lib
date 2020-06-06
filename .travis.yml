@@ -25,6 +25,9 @@ matrix:
         - libboost-all-dev
         - sqlite3
         - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
   - os: linux
     language: python
     env: PYTHON=3.4 CPP_VERSION=11 GCC=4.8
@@ -48,6 +51,9 @@ matrix:
         - libboost-all-dev
         - sqlite3
         - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
   - os: linux
     language: python
     env: PYTHON=3.5 CPP_VERSION=11 GCC=4.8
@@ -71,6 +77,9 @@ matrix:
         - libboost-all-dev
         - sqlite3
         - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
   - os: linux
     language: python
     env: PYTHON=3.6 CPP_VERSION=11 GCC=4.8
@@ -94,6 +103,9 @@ matrix:
         - libboost-all-dev
         - sqlite3
         - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
 cache:
   directories:
   - "$HOME/ibex"
@@ -136,7 +148,7 @@ before_install:
     source venv/bin/activate;
   fi
 install:
-- sh ./cmake/build_Ibex4pyIbex.sh
+- sh ./cmake/build_ibex.sh
 - sh ./cmake/build_ppl.sh
 - sh ./cmake/build_VTK.sh
 - sh ./cmake/build_netcdf.sh
@@ -150,7 +162,7 @@ script:
   -DPPL_ROOT=${HOME}/ppl -DGMP_ROOT=${HOME}/gmp -DNETCDF_ROOT=${HOME}/netcdf -DPROJ4_ROOT=${HOME}/proj4
   -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP_VERSION -DCMAKE_BUILD_TYPE=RELEASE
   -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=ON -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=ON
-  -DWITH_PYIBEX_VERSION=ON -DWITH_PPL=ON -DWITH_PROJ4=ON -DWITH_EXAMPLES=OFF ${TRAVIS_BUILD_DIR}
+  -DWITH_PYIBEX_VERSION=ON -DWITH_PPL=ON -DWITH_PROJ4=ON -DWITH_EXAMPLES=OFF -DWITH_IPEGENERATOR=OFF ${TRAVIS_BUILD_DIR}
 - make -j2
 - make pip_package
 deploy:

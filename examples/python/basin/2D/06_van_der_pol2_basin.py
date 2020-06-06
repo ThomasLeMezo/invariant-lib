@@ -70,11 +70,11 @@ visu.show()
 x1_c = -0.8;
 x2_c = 0.5;
 r = 0.2;
-visu.drawBox(x1_c-r, x1_c+r, x2_c-r, x2_c+r, "black[red]");
+visu.drawBox(x1_c-r, x1_c+r, x2_c-r, x2_c+r, "black", "red");
 
 x1_c2 = 1.0;
 x2_c2 = 0.0;
 r2 = 0.4;
-visu.drawBox(x1_c2-r2, x1_c2+r2, x2_c2-r2, x2_c2+r2, "black[red]");
+visu.drawBox(x1_c2-r2, x1_c2+r2, x2_c2-r2, x2_c2+r2, "black", "red");
 
 

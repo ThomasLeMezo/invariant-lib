@@ -39,4 +39,4 @@ for i in range(15):
 visu = VibesMaze("Synchronous generator Basin of Capture", maze_outer, maze_inner)
 visu.setProperties(0,0,512,512)
 visu.show()
-visu.drawCircle(0.0, 0.0, 0.4, "black[red]");
+visu.drawCircle(0.0, 0.0, 0.4, "black", "red");

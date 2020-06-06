@@ -118,14 +118,14 @@ int main(int argc, char *argv[])
     VibesMaze v_mazeA("graph_A", &maze_A, &maze_A_inner);
     v_mazeA.setProperties(0, 0, 512, 512);
     v_mazeA.show();
-    v_mazeA.drawCircle(xc_1, yc_1, r_1, "r[]");
-    v_mazeA.drawBox(box_B, "g[]");
+    v_mazeA.drawCircle(xc_1, yc_1, r_1, "red", "");
+    v_mazeA.drawBox(box_B, "green", "");
 
     VibesMaze v_mazeB("graph_B", &maze_B, &maze_B_inner);
     v_mazeB.setProperties(600, 0, 512, 512);
     v_mazeB.show();
-    v_mazeB.drawBox(box_B, "r[]");
-    v_mazeB.drawCircle(xc_1, yc_1, r_1, "g[]");
+    v_mazeB.drawBox(box_B, "red", "");
+    v_mazeB.drawCircle(xc_1, yc_1, r_1, "green","");
 
 //    IntervalVector position_info(2);
 //    position_info[0] = ibex::Interval(1.26);

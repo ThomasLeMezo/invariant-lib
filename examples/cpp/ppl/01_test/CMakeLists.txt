@@ -5,7 +5,6 @@
 # Sources
 
 if(WITH_PPL)
-  include(${VTK_USE_FILE})
 
   set(SRC
     main.cpp

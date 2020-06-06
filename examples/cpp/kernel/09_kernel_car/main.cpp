@@ -114,9 +114,9 @@ int main(int argc, char *argv[])
 //    v_maze.set_enable_cone(true);
     v_maze.show();
     if(constraint>0)
-        v_maze.drawBox(min_velocity, "red[]");
+        v_maze.drawBox(min_velocity, "red", "");
     if(constraint>1)
-        v_maze.drawBox(limit1, "red[]");
+        v_maze.drawBox(limit1, "red", "");
     v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
     vibes::endDrawing();

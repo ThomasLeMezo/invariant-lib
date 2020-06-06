@@ -61,9 +61,9 @@ int main(int argc, char *argv[])
 //        v_maze.setProperties(0, 0, 512, 512);
 //        v_maze.show();
 
-//        v_maze.drawBox(box_C, "r[]");
-//        v_maze.drawBox(box_B, "r[]");
-//        v_maze.drawCircle(xc_1, yc_1, r_1, "r[]");
+//        v_maze.drawBox(box_C, "red", "");
+//        v_maze.drawBox(box_B, "red", "");
+//        v_maze.drawCircle(xc_1, yc_1, r_1, "red", "");
 
 ////        if(i==3){
 ////            IntervalVector position_info(2);
@@ -77,9 +77,9 @@ int main(int argc, char *argv[])
     VibesMaze v_maze_eulerian("Eulerian", &eulerian_maze);
     v_maze_eulerian.setProperties(0, 0, 1024, 1024);
     v_maze_eulerian.show();
-    v_maze_eulerian.drawBox(box_C, "r[]");
-    v_maze_eulerian.drawBox(box_B, "r[]");
-    v_maze_eulerian.drawCircle(xc_1, yc_1, r_1, "r[]");
+    v_maze_eulerian.drawBox(box_C, "red", "");
+    v_maze_eulerian.drawBox(box_B, "red", "");
+    v_maze_eulerian.drawCircle(xc_1, yc_1, r_1, "red", "");
 
     vibes::endDrawing();
 }

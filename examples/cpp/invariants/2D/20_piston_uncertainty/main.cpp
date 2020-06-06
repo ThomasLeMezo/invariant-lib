@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     double alpha = 1.0;
     double gamma = beta/alpha;
 
-    double r = -1.0;
+    // double r = -1.0;
     double l = 10.;
 //    cout << "l1 = " << l1 << endl;
 //    cout << "l2 = " << l2 << endl;

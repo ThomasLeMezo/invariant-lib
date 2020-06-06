@@ -67,9 +67,9 @@ int main(int argc, char *argv[])
     v_maze_eulerian.setProperties(0, 0, 1000, 800);
     v_maze_eulerian.set_enable_cone(false);
     v_maze_eulerian.show();
-    v_maze_eulerian.drawBox(box_C, "r[]");
-    v_maze_eulerian.drawBox(box_B, "r[]");
-    v_maze_eulerian.drawCircle(xc_1, yc_1, r_1, "r[]");
+    v_maze_eulerian.drawBox(box_C, "red", "");
+    v_maze_eulerian.drawBox(box_B, "red", "");
+    v_maze_eulerian.drawCircle(xc_1, yc_1, r_1, "red", "");
     vibes::drawBox(space, "black[]");
     v_maze_eulerian.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 

@@ -214,13 +214,8 @@ void VibesMaze::draw_room_outer(PaveIBEX *p) const{
         invariant::RoomIBEX *r = p->get_rooms()[maze];
         if(!r->get_hybrid_door_guards().empty()){
             for(std::pair<ibex::Sep*, ibex::IntervalVector> g:r->get_hybrid_door_guards()){
-<<<<<<< HEAD
-              if(!g.second.is_empty())
+              if(!g.second.is_empty() /*&& !g.second.is_flat()*/)
                 this->drawBox_with_scale(g.second, "black","green");
-=======
-                if(!g.second.is_flat())
-                    this->drawBox_with_scale(g.second, "black","green");
->>>>>>> 82b7101e4b20a191eb04e4e078596957ce49221d
             }
         }
     }
