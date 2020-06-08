@@ -884,6 +884,10 @@ void VibesMaze::draw_text(const std::string &text, const double x, const double 
     m_ipe_figure->draw_text(text, x, y);
 }
 
+void VibesMaze::set_current_layer(const std::string &layer_name){
+    m_ipe_figure->set_current_layer(layer_name);
+}
+
 #endif
 
 //namespace vibes{

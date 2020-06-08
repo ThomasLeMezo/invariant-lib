@@ -133,6 +133,7 @@ public:
     void set_axis_limits(const double start_x, const double inter_x, const double start_y, const double inter_y);
     void draw_axis(const std::string &name_x, const std::string &name_y);
     void draw_text(const std::string &text, const double x, const double y);
+    void set_current_layer(const std::string &layer_name);
 #endif
 
 private:

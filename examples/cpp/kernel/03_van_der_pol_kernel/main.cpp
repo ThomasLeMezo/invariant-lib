@@ -88,7 +88,23 @@ int main(int argc, char *argv[])
     VibesMaze v_maze("van_der_pol_kernel", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
+
+    // For IPE
+    v_maze.set_ipe_ratio(150,150,false);
+    ibex::IntervalVector bounding_box = maze_outer.get_bounding_box();
+    v_maze.set_axis_limits(bounding_box[0].lb(), bounding_box[0].diam()/6., bounding_box[1].lb(), bounding_box[1].diam()/6.);
+    v_maze.set_enable_white_boundary(false);
+    v_maze.set_thickness_pen_factor(1e-4);
+    v_maze.set_enable_vibes(true);
+    v_maze.set_number_digits_x(1);
+    v_maze.set_number_digits_y(1);
+
     v_maze.show();
+    v_maze.draw_axis("x_1", "x_2");
+    v_maze.set_current_layer("data");
+
+    v_maze.drawCircle(0,0,r,"red","");
+    v_maze.savePdf("");
 //    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
 //    VibesMaze v_maze2("graph_2", &maze_inner);

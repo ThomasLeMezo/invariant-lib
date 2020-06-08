@@ -26,6 +26,7 @@ void save_maze_image(invariant::MazeIBEX *maze_outer, invariant::MazeIBEX *maze_
 }
 
 void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<invariant::MazeIBEX*> &maze_inner, std::string directory, std::string file_name){
+    vibes::beginDrawing();
     VibesMaze v_maze(file_name, maze_outer, maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
@@ -45,9 +46,11 @@ void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<
     v_maze.draw_axis("x_1", "x_2");
 
     v_maze.saveIpe(directory);
+    vibes::endDrawing();
 }
 
 void save_maze_image(invariant::MazeIBEX *maze_outer, std::string directory, std::string file_name){
+    vibes::beginDrawing();
     VibesMaze v_maze(file_name, maze_outer);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
@@ -67,6 +70,7 @@ void save_maze_image(invariant::MazeIBEX *maze_outer, std::string directory, std
     v_maze.draw_axis("x_1", "x_2");
 
     v_maze.saveIpe(directory);
+    vibes::endDrawing();
 }
 
 
@@ -188,7 +192,7 @@ int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dy
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    vibes::beginDrawing();
+
 //    VibesMaze v_maze(file_name, &maze_outer, &maze_inner);
 //    v_maze.setProperties(0, 0, 1000, 800);
 //    v_maze.set_enable_cone(false);
@@ -197,7 +201,6 @@ int largest_positive_invariant(ibex::IntervalVector &space, ibex::Function *f_dy
 //    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
 
     save_maze_image(&maze_outer, &maze_inner, "/home/lemezoth/Pictures/", file_name);
-    vibes::endDrawing();
 
     return 0;
 }
