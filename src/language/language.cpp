@@ -29,7 +29,7 @@ void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<
     vibes::beginDrawing();
     VibesMaze v_maze(file_name, maze_outer, maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
-    v_maze.set_enable_cone(false);
+    v_maze.set_enable_cone(true);
 
     v_maze.set_ipe_ratio(100,80,false);
 
