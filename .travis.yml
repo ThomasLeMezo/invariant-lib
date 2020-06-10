@@ -146,11 +146,11 @@ before_install:
     source venv/bin/activate;
   fi
 install:
-- sh ./cmake/build_ibex.sh
-- sh ./cmake/build_ppl.sh
-- sh ./cmake/build_VTK.sh
-- sh ./cmake/build_netcdf.sh
-- sh ./cmake/build_proj4.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_ibex.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_ppl.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_VTK.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_netcdf.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_proj4.sh
 script:
 - cd ${TRAVIS_BUILD_DIR}
 - echo ${TRAVIS_BUILD_DIR}
