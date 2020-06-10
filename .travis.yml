@@ -106,6 +106,32 @@ matrix:
         - hdf5-tools
         - libomp-dev
         - libcurl4-gnutls-dev
+  - os: linux
+    language: python
+    env: PYTHON=3.8 CPP_VERSION=11 GCC=4.8
+    python: '3.8'
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
 cache:
   directories:
   - "$HOME/ibex"
