@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ibex/ibex.h>
+#include <ibex.h>
 
 #include <vibes/vibes.h>
 #include <VibesFigure.h>
@@ -112,8 +112,8 @@ int main(int argc, char *argv[]){
   vibes::drawLine(x_ub, y_ub);
   vibes::drawLine(x_lb, y_lb);
 
-  vibes::drawLine(vector<double>{-10, 10}, vector<double>{20.*tick_to_volume*1e6, 20.*tick_to_volume*1e6}, "red", "");
-  vibes::drawLine(vector<double>{-10, 10}, vector<double>{-20.*tick_to_volume*1e6, -20.*tick_to_volume*1e6}, "red", "");
+  vibes::drawLine(vector<double>{-10, 10}, vector<double>{20.*tick_to_volume*1e6, 20.*tick_to_volume*1e6}, "red[]");
+  vibes::drawLine(vector<double>{-10, 10}, vector<double>{-20.*tick_to_volume*1e6, -20.*tick_to_volume*1e6}, "red[]");
 
 //  ibex::IntervalVector u_max2(2);
 //  u_max2[0] = ibex::Interval(-10,10);

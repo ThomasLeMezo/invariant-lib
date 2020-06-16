@@ -18,7 +18,7 @@ double g = 9.81;
 double rho = 1025.0;
 double m = 9.045*2.;
 double diam = 0.24;
-double chi = 2.15e-6;
+double chi_param = 2.15e-6;
 double Cf = M_PI*pow(diam/2.0,2);
 double A = g*rho/m;
 double B = 0.5*rho*Cf/m;
@@ -29,7 +29,7 @@ Vector2d f(const Vector2d &x, const double &u)
 {
     Vector2d dx;
     dx[0] = x[1]; // Depth
-    dx[1] = -A*(u-chi*x[0])-B*abs(x[1])*x[1];
+    dx[1] = -A*(u-chi_param*x[0])-B*abs(x[1])*x[1];
     return dx;
 }
 
