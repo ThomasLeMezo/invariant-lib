@@ -775,6 +775,10 @@ void VibesMaze::ipe_color_converter(const std::string &color_stroke, const std::
     std::string color_stroke_tmp(color_stroke), color_fill_tmp(color_fill);
     if(color_stroke_tmp=="#FF00FF")
         color_stroke_tmp="magenta";
+//    if(color_fill_tmp=="#FF8C8C"){
+//        color_fill_tmp="pink";
+//        m_ipe_figure->set_current_layer("initial_condition");
+//    }
     if(color_fill_tmp=="#FF00FF"){
         color_fill_tmp="magenta";
         m_ipe_figure->set_current_layer("inner");
@@ -785,6 +789,7 @@ void VibesMaze::ipe_color_converter(const std::string &color_stroke, const std::
     else if(color_fill_tmp=="yellow"){
         m_ipe_figure->set_current_layer("uncertain");
     }
+
 
     if(color_stroke_tmp!="" && color_fill_tmp!="")
         m_ipe_figure->set_color_type(ipegenerator::STROKE_AND_FILL);

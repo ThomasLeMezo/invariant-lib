@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.2.2)
 # Settings
 set(CMAKE_CXX_STANDARD 11)
 set(PACKAGE_NAME      invariant-lib)
-set(PACKAGE_VERSION "0.4")
+set(PACKAGE_VERSION "0.5")
 project(${PACKAGE_NAME})
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
@@ -59,6 +59,10 @@ endif()
 
 #####################################################
 ############## IBEX-lib package #####################
+
+if(NOT IBEX_ROOT)
+  set(IBEX_ROOT "$ENV{HOME}/ibex/")
+endif()
 
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}:${IBEX_ROOT}/share/ibex/")
 find_package (IBEX REQUIRED)
