@@ -3,28 +3,16 @@
 # ==================================================================
 
 language: c++
-sudo: false
-# addons:
-#   apt:
-#     sources:
-#     - deadsnakes
-#     - chef-current-precise
-
-#     packages:
-#     - cmake
-#     - python3.5
-
 matrix:
   include:
   # One environment for python binding:
-  - sudo: true
-    services:
+  - services:
     - docker
     env: DOCKER_IMAGE=benensta/pyibex-docker
     install:
     - docker pull $DOCKER_IMAGE
     script:
-    # - chmod a+x scripts/docker_build.sh
+    - chmod a+x scripts/docker_build.sh
     - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker_build.sh
     - ls wheelhouse
 
@@ -40,12 +28,6 @@ notifications:
   email: false
 
 install:
-  # For documentation
-  # - sudo apt-get install python3.5 python3-setuptools python3-pip
-  # - sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.5 1 # using python3 as default version
-  # - sudo python3 -m pip install sphinx_rtd_theme breathe sphinx-tabs
-  # - sudo apt-get install python3-sphinx doxygen graphviz
-
   - sh ${TRAVIS_BUILD_DIR}/cmake/build_ibex.sh
   - sh ${TRAVIS_BUILD_DIR}/cmake/build_ppl.sh
   - sh ${TRAVIS_BUILD_DIR}/cmake/build_VTK.sh
