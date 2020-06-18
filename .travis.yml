@@ -6,14 +6,15 @@ language: c++
 matrix:
   include:
   # One environment for python binding:
-  - services:
+  - sudo: true
+    services:
     - docker
     env: DOCKER_IMAGE=benensta/pyibex-docker
     install:
     - docker pull $DOCKER_IMAGE
     script:
     - chmod a+x scripts/docker_build.sh
-    - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker_build.sh
+    - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker/build_pybinding.sh
     - ls wheelhouse
 
 cache:
