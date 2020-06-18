@@ -24,8 +24,7 @@ matrix:
     install:
       - docker pull $DOCKER_IMAGE
     script:
-      - chmod a+x scripts/docker/build_pybinding.sh
-      - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker/build_pybinding.sh
+      - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker_build.sh
       - ls wheelhouse
 
 cache:
@@ -36,6 +35,8 @@ cache:
     - "$HOME/vtk"
     - "$HOME/netcdf"
     - "$HOME/proj4"
+notifications:
+  email: false
 
 install:
   # For documentation
@@ -69,7 +70,7 @@ deploy:
     secure: kMncW4gGYNViQI6AvJUCPpcXYBAHNHd2m1khqXtt8t/EpJpBPVe+h8AaRnuc2yocCYCHKGI6wMo72pCVO7ieqULK4Kni8et5hSZUCUanISOO4zbBTVpj/WjNyXd11y4tHBVKu0ifMmCRud8j1nG/+wSAiujtzuKbHboQUsapoWqmOKDgYGnR3faGHmOGb9BQX6wzNOB52MSx3TgK4CRceyDuteT66PfZdbBsSoDiVdeIBjLWwVzZh0aqLt0y96NQvVoGvGA8TWQcNY3Ba+ZVukaHPijamhgSoqc9q/JhU/uih2aqYlQk5I+4hn23igjOuSqHbhTUfNfwCWr1Bdq4bl+Iw/zAUzz5FyooP6DDiMVc6R51T1KcUxNorHKRqm+oL7v7vq0jPrOnOfUmoRBIik2LViWUEeqnzwhhoVa4rZGzVEHyDgjBgiLs0ZVYR9UOC4roUQZJ2DnC9Tc+VYIWW/F9meSw/w46QzQSAgPji0FLHYbrOq6m9IxoGwkYbJf8K2JmrXrvCEQQcHruL4MPQo2Ob4+NNRKYwez7+s4d7Ozh0INhGUGTGaSRYTKer5TDTN/ETdWVn7fWwUUEryqIZULWRXH0xBBxAhBhKSbKoRRGs86f+fwGuxVX2KlkXSroNX4G9G7dWBn+XVIY8Wmkz+RA67crzrXPxNRFquYnaJk=
   file_glob: true
   file: "${TRAVIS_BUILD_DIR}/build/build-release/pyinvariant-*.whl"
-  skip_cleanup: true
+  cleanup: true
   overwrite: true
   on:
     repo: ThomasLeMezo/invariant-lib
