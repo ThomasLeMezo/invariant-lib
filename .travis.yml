@@ -3,29 +3,30 @@
 # ==================================================================
 
 language: c++
+sudo: false
+# addons:
+#   apt:
+#     sources:
+#     - deadsnakes
+#     - chef-current-precise
 
-addons:
-  apt:
-    sources:
-    - deadsnakes
-    - chef-current-precise
-
-    packages:
-    - cmake
-    - python3.5
+#     packages:
+#     - cmake
+#     - python3.5
 
 matrix:
   include:
   # One environment for python binding:
-  - sudo: false
+  - sudo: true
     services:
-      - docker
+    - docker
     env: DOCKER_IMAGE=benensta/pyibex-docker
     install:
-      - docker pull $DOCKER_IMAGE
+    - docker pull $DOCKER_IMAGE
     script:
-      - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker_build.sh
-      - ls wheelhouse
+    # - chmod a+x scripts/docker_build.sh
+    - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker_build.sh
+    - ls wheelhouse
 
 cache:
   directories:
@@ -40,7 +41,7 @@ notifications:
 
 install:
   # For documentation
-  - sudo apt-get install python3.5 python3-setuptools python3-pip
+  # - sudo apt-get install python3.5 python3-setuptools python3-pip
   # - sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.5 1 # using python3 as default version
   # - sudo python3 -m pip install sphinx_rtd_theme breathe sphinx-tabs
   # - sudo apt-get install python3-sphinx doxygen graphviz
@@ -70,7 +71,7 @@ deploy:
     secure: kMncW4gGYNViQI6AvJUCPpcXYBAHNHd2m1khqXtt8t/EpJpBPVe+h8AaRnuc2yocCYCHKGI6wMo72pCVO7ieqULK4Kni8et5hSZUCUanISOO4zbBTVpj/WjNyXd11y4tHBVKu0ifMmCRud8j1nG/+wSAiujtzuKbHboQUsapoWqmOKDgYGnR3faGHmOGb9BQX6wzNOB52MSx3TgK4CRceyDuteT66PfZdbBsSoDiVdeIBjLWwVzZh0aqLt0y96NQvVoGvGA8TWQcNY3Ba+ZVukaHPijamhgSoqc9q/JhU/uih2aqYlQk5I+4hn23igjOuSqHbhTUfNfwCWr1Bdq4bl+Iw/zAUzz5FyooP6DDiMVc6R51T1KcUxNorHKRqm+oL7v7vq0jPrOnOfUmoRBIik2LViWUEeqnzwhhoVa4rZGzVEHyDgjBgiLs0ZVYR9UOC4roUQZJ2DnC9Tc+VYIWW/F9meSw/w46QzQSAgPji0FLHYbrOq6m9IxoGwkYbJf8K2JmrXrvCEQQcHruL4MPQo2Ob4+NNRKYwez7+s4d7Ozh0INhGUGTGaSRYTKer5TDTN/ETdWVn7fWwUUEryqIZULWRXH0xBBxAhBhKSbKoRRGs86f+fwGuxVX2KlkXSroNX4G9G7dWBn+XVIY8Wmkz+RA67crzrXPxNRFquYnaJk=
   file_glob: true
   file: "${TRAVIS_BUILD_DIR}/build/build-release/pyinvariant-*.whl"
-  cleanup: true
+  cleanup: false
   overwrite: true
   on:
     repo: ThomasLeMezo/invariant-lib
