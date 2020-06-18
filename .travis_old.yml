@@ -1,0 +1,202 @@
+language: cpp
+sudo: false
+matrix:
+  include:
+  - os: linux
+    language: pyhton
+    env: PYTHON=2.7 CPP_VERSION=11 GCC=4.8
+    python: '2.7'
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
+  - os: linux
+    language: python
+    env: PYTHON=3.4 CPP_VERSION=11 GCC=4.8
+    python: '3.4'
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
+  - os: linux
+    language: python
+    env: PYTHON=3.5 CPP_VERSION=11 GCC=4.8
+    python: '3.5'
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
+  - os: linux
+    language: python
+    env: PYTHON=3.6 CPP_VERSION=11 GCC=4.8
+    python: '3.6'
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
+  - os: linux
+    language: python
+    env: PYTHON=3.8 CPP_VERSION=11 GCC=4.8
+    python: '3.8'
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kubuntu-backports
+        - deadsnakes
+        - george-edison55-precise-backports
+        packages:
+        - g++-4.8
+        - cmake
+        - cmake-data
+        - pkg-config
+        - netcdf-bin
+        - proj-bin
+        - libnetcdf-dev
+        - libproj-dev
+        - libboost-all-dev
+        - sqlite3
+        - libgl1-mesa-dev
+        - hdf5-tools
+        - libomp-dev
+        - libcurl4-gnutls-dev
+cache:
+  directories:
+  - "$HOME/ibex"
+  - "$HOME/ppl"
+  - "$HOME/gmp"
+  - "$HOME/vtk"
+  - "$HOME/netcdf"
+  - "$HOME/proj4"
+notifications:
+  email: false
+before_install:
+- export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/ibex
+- |
+  # Configure build variables
+  if [ -z "$GCC" ]; then export GCC=4.8; fi
+  export CXX=g++-$GCC CC=gcc-$GCC;
+
+  if [ -n "$CPP_VERSION" ]; then export CPP_VERSION=-std=c++$CPP_VERSION; fi
+
+  if [ "${PYTHON:0:1}" = "3" ]; then export PY=3; fi
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      if [ "$PY" = "3" ]; then
+        pip install --upgrade pip auditwheel twine;
+      else
+        pip install --upgrade pip auditwheel twine;
+      fi
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    brew update;
+    brew install gcc48;
+    if [ "$PY" = "3" ]; then
+      brew install python$PY;
+    else
+      curl -fsSL -O https://bootstrap.pypa.io/get-pip.py;
+      sudo -H python get-pip.py;
+    fi
+    pip$PY install --upgrade pip virtualenv auditwheel twine;
+    python$PY -m virtualenv venv;
+    source venv/bin/activate;
+  fi
+install:
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_ibex.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_ppl.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_VTK.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_netcdf.sh
+- sh ${TRAVIS_BUILD_DIR}/cmake/build_proj4.sh
+script:
+- cd ${TRAVIS_BUILD_DIR}
+- echo ${TRAVIS_BUILD_DIR}
+- mkdir -p build/build-release
+- cd build/build-release
+- cmake -DCMAKE_INSTALL_PREFIX=${HOME} -DIBEX_ROOT=${HOME}/ibex -DVTK_ROOT=${HOME}/vtk
+  -DPPL_ROOT=${HOME}/ppl -DGMP_ROOT=${HOME}/gmp -DNETCDF_ROOT=${HOME}/netcdf -DPROJ4_ROOT=${HOME}/proj4
+  -DPYBIND11_PYTHON_VERSION=$PYTHON -DPYBIND11_CPP_STANDARD=$CPP_VERSION -DCMAKE_BUILD_TYPE=RELEASE
+  -DBUILD_TESTS=OFF -DWITH_PYTHON=ON -DWITH_3D=ON -DWITH_GRAPHIZ=OFF -DWITH_NETCDF=ON
+  -DWITH_PYIBEX_VERSION=ON -DWITH_PPL=ON -DWITH_PROJ4=ON -DWITH_EXAMPLES=OFF -DWITH_IPEGENERATOR=OFF ${TRAVIS_BUILD_DIR}
+- make
+- make pip_package
+deploy:
+  provider: releases
+  api_key:
+    secure: kMncW4gGYNViQI6AvJUCPpcXYBAHNHd2m1khqXtt8t/EpJpBPVe+h8AaRnuc2yocCYCHKGI6wMo72pCVO7ieqULK4Kni8et5hSZUCUanISOO4zbBTVpj/WjNyXd11y4tHBVKu0ifMmCRud8j1nG/+wSAiujtzuKbHboQUsapoWqmOKDgYGnR3faGHmOGb9BQX6wzNOB52MSx3TgK4CRceyDuteT66PfZdbBsSoDiVdeIBjLWwVzZh0aqLt0y96NQvVoGvGA8TWQcNY3Ba+ZVukaHPijamhgSoqc9q/JhU/uih2aqYlQk5I+4hn23igjOuSqHbhTUfNfwCWr1Bdq4bl+Iw/zAUzz5FyooP6DDiMVc6R51T1KcUxNorHKRqm+oL7v7vq0jPrOnOfUmoRBIik2LViWUEeqnzwhhoVa4rZGzVEHyDgjBgiLs0ZVYR9UOC4roUQZJ2DnC9Tc+VYIWW/F9meSw/w46QzQSAgPji0FLHYbrOq6m9IxoGwkYbJf8K2JmrXrvCEQQcHruL4MPQo2Ob4+NNRKYwez7+s4d7Ozh0INhGUGTGaSRYTKer5TDTN/ETdWVn7fWwUUEryqIZULWRXH0xBBxAhBhKSbKoRRGs86f+fwGuxVX2KlkXSroNX4G9G7dWBn+XVIY8Wmkz+RA67crzrXPxNRFquYnaJk=
+  file_glob: true
+  file: "${TRAVIS_BUILD_DIR}/build/build-release/pyinvariant-*.whl"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    repo: ThomasLeMezo/invariant-lib
+    tags: true
