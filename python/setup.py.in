@@ -33,7 +33,7 @@ setup(
   include_package_data=True,
   # zip_safe=False,
   install_requires=[
-      'pyibex>=1.6.4',
+      'pyibex==1.8.1',
   ],
   distclass=BinaryDistribution
 )
