@@ -33,7 +33,7 @@ for PYBIN in /opt/python/cp3*/bin; do
                       -DWITH_PROJ4=ON \
                       -DWITH_EXAMPLES=OFF \
                       -DWITH_IPEGENERATOR=OFF \
-                      ${TRAVIS_BUILD_DIR}
+                      /io
   make
 
   make pip_package
@@ -43,7 +43,6 @@ for PYBIN in /opt/python/cp3*/bin; do
   done
   
   "${PYBIN}/python" -m pip install pyinvariant --no-deps --no-index -f /io/wheelhouse
-  (cd "$HOME"; "${PYBIN}/python" -m unittest discover tubex_lib.tests)
   cd /io
   rm -fr build_dir
 
