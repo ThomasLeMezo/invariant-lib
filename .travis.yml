@@ -9,9 +9,9 @@ matrix:
   - sudo: true
     services:
     - docker
-    env: DOCKER_IMAGE=thomaslemezo/invariant-lib
+    env: DOCKER_IMAGE=thomaslemezo/invariant-lib:1.0
     install:
-    - docker pull $DOCKER_IMAGE:1.0
+    - docker pull $DOCKER_IMAGE
     script:
     - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker/build_pybinding.sh
     - ls wheelhouse
