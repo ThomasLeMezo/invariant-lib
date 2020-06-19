@@ -13,7 +13,6 @@ matrix:
     install:
     - docker pull $DOCKER_IMAGE:1.0
     script:
-    - chmod a+x scripts/docker_build.sh
     - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker/build_pybinding.sh
     - ls wheelhouse
 
