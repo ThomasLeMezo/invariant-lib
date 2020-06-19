@@ -11,7 +11,7 @@ matrix:
     - docker
     env: DOCKER_IMAGE=thomaslemezo/invariant-lib
     install:
-    - docker pull $DOCKER_IMAGE
+    - docker pull $DOCKER_IMAGE:1.0
     script:
     - chmod a+x scripts/docker_build.sh
     - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /io/scripts/docker/build_pybinding.sh
