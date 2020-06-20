@@ -6,10 +6,9 @@ language: cpp
 matrix:
   include:
   # One environment for python binding:
-  - sudo: true
-    services:
+  - services:
     - docker
-    env: DOCKER_IMAGE=thomaslemezo/invariant-lib:1.0
+    env: DOCKER_IMAGE=thomaslemezo/invariant-lib
     install:
     - docker pull $DOCKER_IMAGE
     script:

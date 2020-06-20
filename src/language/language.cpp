@@ -31,6 +31,7 @@ void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
 
+    #ifdef WITH_IPEGENERATOR
     v_maze.set_ipe_ratio(100,80,false);
 
     ibex::IntervalVector bounding_box = maze_outer[0]->get_bounding_box();
@@ -41,11 +42,14 @@ void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<
     v_maze.set_enable_vibes(true);
     v_maze.set_number_digits_x(1);
     v_maze.set_number_digits_y(1);
+#endif
     v_maze.show();
 
+    #ifdef WITH_IPEGENERATOR
     v_maze.draw_axis("x_1", "x_2");
 
     v_maze.saveIpe(directory);
+#endif
     vibes::endDrawing();
 }
 
@@ -55,6 +59,7 @@ void save_maze_image(invariant::MazeIBEX *maze_outer, std::string directory, std
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
 
+    #ifdef WITH_IPEGENERATOR
     v_maze.set_ipe_ratio(100,80,false);
 
     ibex::IntervalVector bounding_box = maze_outer->get_bounding_box();
@@ -65,13 +70,18 @@ void save_maze_image(invariant::MazeIBEX *maze_outer, std::string directory, std
     v_maze.set_enable_vibes(true);
     v_maze.set_number_digits_x(1);
     v_maze.set_number_digits_y(1);
+    #endif
+
     v_maze.show();
 
+    #ifdef WITH_IPEGENERATOR
     v_maze.draw_axis("x_1", "x_2");
 
     v_maze.saveIpe(directory);
+    #endif
     vibes::endDrawing();
 }
+
 
 
 int invariant_PPL(ibex::IntervalVector &space, ibex::Function *f_dyn, size_t nb_steps, string file_name, size_t contraction_limit){
