@@ -39,6 +39,9 @@ target_link_libraries(pyinvariant PRIVATE
 target_include_directories(pyinvariant
     PUBLIC ${IBEX_INCLUDE_DIRS}
     PUBLIC ${VTK_INCLUDE_DIRS}
+    PUBLIC ${NETCDF_INCLUDE_DIRS}
+    PUBLIC ${PROJ4_INCLUDE_DIR}
+    PUBLIC ${SQLITE3_INCLUDE_DIRS}
 )
 
 # Copie des fichiers .so dans le module python

@@ -12,7 +12,7 @@ class BinaryDistribution(Distribution):
 
 setup(
   name='pyinvariant',
-  version='${PACKAGE_VERSION}',
+  version='${PYINVARIANT_PACKAGE_VERSION}',
   author='Thomas Le Mézo',
   author_email='thomas.le_mezo@ensta-bretagne.org',
   url='https://github.com/ThomasLeMezo/invariant-lib',
