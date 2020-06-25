@@ -5,9 +5,7 @@ set -e -x
 cd $HOME
 for PYBIN in /opt/python/cp3*/bin; do
   
-  #if [ "${PYBIN}" != "/opt/python/cp36-cp36m/bin" ]; then
-  #  continue
-  #fi
+  if [ "${PYBIN}" != "/opt/python/cp39-cp39/bin" ]; then
 
   "${PYBIN}/python" -m pip install --upgrade pip
   "${PYBIN}/python" -m pip install pyibex==1.8.1
@@ -45,5 +43,7 @@ for PYBIN in /opt/python/cp3*/bin; do
   "${PYBIN}/python" -m pip install pyinvariant --no-deps --no-index -f /io/wheelhouse
   cd /io
   rm -fr build_dir
+
+  fi
 
 done

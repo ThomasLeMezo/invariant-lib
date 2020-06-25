@@ -146,4 +146,6 @@ using namespace ibex;
         py::arg("sep_outer") = (ibex::Sep*)nullptr,
         py::arg("f_inner") = std::vector<ibex::Function*>()
         );
+
+  m.def("largest_invariant", &largest_invariant);
 }
