@@ -18,7 +18,7 @@ set(SRC
   serialization/ibex_serialization.cpp
 
   definition/dynamics.cpp
-  definition/dynamicsFuction.cpp
+  definition/dynamicsFunction.cpp
   definition/dynamicsinclusionfunction.cpp
   definition/domain.cpp
 

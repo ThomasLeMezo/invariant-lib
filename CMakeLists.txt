@@ -50,7 +50,7 @@ endif()
 #####################################################
 # OpenMP library
 find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
+if(OpenMP_FOUND)
  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
  message(STATUS "[OPENMP] OK")
@@ -65,7 +65,7 @@ if(NOT IBEX_ROOT)
   set(IBEX_ROOT "$ENV{HOME}/ibex/")
 endif()
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}:${IBEX_ROOT}/share/ibex/")
+set(CMAKE_PREFIX_PATH "${IBEX_ROOT}/share/ibex:${CMAKE_PREFIX_PATH}")
 find_package (IBEX REQUIRED)
 message (STATUS "Found Ibex version ${IBEX_VERSION}")
 message(STATUS ${IBEX_INCLUDES})
