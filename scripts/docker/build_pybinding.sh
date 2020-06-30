@@ -20,7 +20,7 @@ for PYBIN in /opt/python/cp3*/bin; do
                       -DPROJ4_ROOT=${HOME}/proj4 \
                       -DPYTHON_EXECUTABLE=${PYBIN}/python \
                       -DPYBIND11_CPP_STANDARD=$CPP_VERSION \
-                      -DCMAKE_BUILD_TYPE=RELEASE \
+                      -DCMAKE_BUILD_TYPE=DEBUG \
                       -DBUILD_TESTS=OFF \
                       -DWITH_PYTHON=ON \
                       -DWITH_3D=ON \
