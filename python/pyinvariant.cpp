@@ -65,16 +65,20 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-  py::class_<invariant::Dynamics> dynamics(m, "Dynamics");
-  py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
-          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(),
+  py::class_<invariant::Dynamics>(m, "Dynamics")
+//          .def(py::init<invariant::DYNAMICS_SENS>(), "DYNAMICS_SENS"_a=FWD)
+          .def("eval", &invariant::Dynamics::eval, "Eval the vf", "position"_a);
+
+  py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction")
+          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
                "f"_a,
                "DYNAMICS_SENS"_a=FWD,
-               "multi_threaded"_a=false)
-          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(),
+               "multi_threaded"_a=true)
+          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
                "f_list"_a,
                "DYNAMICS_SENS"_a=FWD,
                "multi_threaded"_a=false)
+          .def("eval", &invariant::DynamicsFunction::eval, "Eval the vf", "position"_a)
   ;
 
   py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")
