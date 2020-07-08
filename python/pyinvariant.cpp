@@ -71,12 +71,12 @@ using namespace ibex;
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(),
                "f"_a,
                "DYNAMICS_SENS"_a=FWD,
-               "multi_threaded"_a=false)
-          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(),
+               "multi_threaded"_a=true)
+          .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
                "f_list"_a,
                "DYNAMICS_SENS"_a=FWD,
                "multi_threaded"_a=false)
-          .def("eval", &invariant::DynamicsFunction::eval, "Eval de position", "position"_a)
+          .def("eval", &invariant::DynamicsFunction::eval, "Eval position", "position"_a)
   ;
 
   py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")

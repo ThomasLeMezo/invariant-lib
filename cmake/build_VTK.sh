@@ -17,10 +17,8 @@ if [ ! -e "$HOME/vtk/lib/libvtkCommonCore-${VTK_MAJOR_VERSION}.a" ]; then
   echo 'Installing VTK-lib...';
 
   echo "http://www.vtk.org/files/release/${VTK_MAJOR_VERSION}/${VTK_ARCHIVE_NAME}"
-  if [ ! -e "${VTK_ARCHIVE_NAME}" ]; then
-    wget http://www.vtk.org/files/release/${VTK_MAJOR_VERSION}/${VTK_ARCHIVE_NAME}
-    tar xf ${VTK_ARCHIVE_NAME}
-  fi
+  wget http://www.vtk.org/files/release/${VTK_MAJOR_VERSION}/${VTK_ARCHIVE_NAME}
+  tar xf ${VTK_ARCHIVE_NAME}
   cd ${VTK_FILE_NAME}
 
   mkdir -p build
