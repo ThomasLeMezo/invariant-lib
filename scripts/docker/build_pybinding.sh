@@ -40,7 +40,7 @@ for PYBIN in /opt/python/cp3*/bin; do
     auditwheel repair "$whl" -w /io/wheelhouse/
   done
   
-  "${PYBIN}/python" -m pip install pyinvariant --no-deps --no-index -f /io/wheelhouse
+  "${PYBIN}/python" -m pip install pyinvariant --force-reinstall --no-deps --no-index -f /io/wheelhouse
   cd /io
   rm -fr build_dir
 

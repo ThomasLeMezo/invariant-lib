@@ -34,6 +34,7 @@ cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
   	  -DWITH_PROJ4=ON\
   	  -DWITH_EXAMPLES=ON \
   	  -DWITH_PPL=ON \
+  	  -DWITH_IPEGENERATOR=ON \
 	  $INVARIANTLIB_DIR
 
 if [ -z "$1" ]; then
