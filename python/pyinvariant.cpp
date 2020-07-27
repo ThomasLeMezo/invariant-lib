@@ -65,7 +65,7 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-  py::object function_pyibex = (py::object) py::module::import("pyibex").attr("Function");
+  //py::object function_pyibex = (py::object) py::module::import("pyibex").attr("Function");
   py::class_<invariant::Dynamics> dynamics(m, "Dynamics");
   py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
@@ -79,10 +79,10 @@ using namespace ibex;
           .def("eval", &invariant::DynamicsFunction::eval, "Eval position", "position"_a)
   ;
 
-  py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function_pyibex)
-            .def(py::init<>())
-            .def("push_back", &invariant::SpaceFunction::push_back)
-    ;
+  // py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function_pyibex)
+  //           .def(py::init<>())
+  //           .def("push_back", &invariant::SpaceFunction::push_back)
+  //   ;
 
   // ********* Maze *********
   py::class_<invariant::MazeIBEX>(m, "Maze")

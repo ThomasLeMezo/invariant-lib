@@ -20,7 +20,7 @@ public:
      * @brief Dynamics constructor
      * @param functions
      */
-    DynamicsFunction(const std::vector<ibex::Function *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+    DynamicsFunction(const std::vector<ibex::Function *> &functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 //    DynamicsFunction(const std::vector<SpaceFunction *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
@@ -32,18 +32,12 @@ public:
 //    DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 //    DynamicsFunction(SpaceFunction *f1, SpaceFunction *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
+//    DynamicsFunction(ibex::Function &f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+
     /**
      * @brief Dynamics destructor
      */
     ~DynamicsFunction();
-
-    /**
-     * @brief init
-     * @param functions
-     * @param sens
-     * @param taylor
-     */
-    void init(const std::vector<ibex::Function*> functions);
 
     /**
      * @brief Eval the vector field from the state space
@@ -90,6 +84,14 @@ private:
 //     * @param function
 //     */
 //    void add_function_d1(ibex::Function* f);
+
+    /**
+     * @brief init
+     * @param functions
+     * @param sens
+     * @param taylor
+     */
+    void initalize_function(const std::vector<ibex::Function*>& functions);
 
     /**
      * @brief compute taylor functions

@@ -5,15 +5,15 @@ using namespace ibex;
 using namespace std;
 namespace invariant {
 
-DynamicsFunction::DynamicsFunction(const vector<Function*> functions, const DYNAMICS_SENS sens, bool multi_threaded):
+DynamicsFunction::DynamicsFunction(const vector<Function*> &functions, const DYNAMICS_SENS sens, bool multi_threaded):
     Dynamics(sens)
 {
     m_multi_threaded = multi_threaded;
-    init(functions);
+    initalize_function(functions);
 
 }
 
-void DynamicsFunction::init(const vector<Function*> functions){
+void DynamicsFunction::initalize_function(const vector<Function*> &functions){
     if(m_multi_threaded){
         m_num_threads = omp_get_max_threads();
         cout << "Maximum nb thread = " << m_num_threads << endl;
@@ -31,10 +31,11 @@ void DynamicsFunction::init(const vector<Function*> functions){
         }
     }
     else{
-        m_functions.push_back(vector<Function*>());
-        for(Function* f:functions){
-            m_functions[0].push_back(f);
-        }
+        m_functions.push_back(functions);
+//        m_functions.push_back(vector<Function*>());
+//        for(Function* f:functions){
+
+//        }
         omp_init_lock(&m_lock_dynamics);
     }
 
@@ -52,7 +53,7 @@ DynamicsFunction::DynamicsFunction(Function *f, const DYNAMICS_SENS sens, bool m
 {
     m_multi_threaded = multi_threaded;
     vector<Function*> functions{f};
-    init(functions);
+    initalize_function(functions);
 }
 
 DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
@@ -62,15 +63,25 @@ DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SE
     vector<Function*> functions;
     functions.push_back(f1);
     functions.push_back(f2);
-    init(functions);
+    initalize_function(functions);
 }
+
+//DynamicsFunction::DynamicsFunction(Function &f, const DYNAMICS_SENS sens, bool multi_threaded):
+//    Dynamics(sens)
+//{
+//    ibex::IntervalVector iv_test = {ibex::Interval(-1,1), ibex::Interval(-1,1)};
+//    cout << "test_df" << f.eval_vector(iv_test) << endl;
+//    m_multi_threaded = multi_threaded;
+//    vector<Function*> functions{&f};
+//    initalize_function(functions);
+//}
 
 //DynamicsFunction::DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens, bool multi_threaded):
 //    Dynamics(sens)
 //{
 //    m_multi_threaded = multi_threaded;
 //    vector<Function*> functions{f};
-//    init(functions);
+//    initalize_function(functions);
 //}
 
 //DynamicsFunction::DynamicsFunction(SpaceFunction *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
@@ -80,7 +91,7 @@ DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SE
 //    vector<Function*> functions;
 //    functions.push_back(f1);
 //    functions.push_back(f2);
-//    init(functions);
+//    initalize_function(functions);
 //}
 
 void DynamicsFunction::compute_taylor(bool taylor){
