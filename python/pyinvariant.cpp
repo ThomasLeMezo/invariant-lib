@@ -25,6 +25,7 @@ using namespace pybind11::literals;
 using namespace invariant;
 using namespace ibex;
 
+py::module pyibex = py::module::import("pyibex");
 
  PYBIND11_MODULE(pyinvariant, m){
    m.doc() = "Python binding of invariant-lib";
@@ -65,13 +66,17 @@ using namespace ibex;
     ;
 
   // ********* Dynamics Function *********
-  //py::object function_pyibex = (py::object) py::module::import("pyibex").attr("Function");
+    
   py::class_<invariant::Dynamics> dynamics(m, "Dynamics");
-  py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction"/*, dynamics*/)
+  py::class_<invariant::DynamicsFunction, invariant::Dynamics>(m, "DynamicsFunction")
+          .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
+                "f"_a,
+               "DYNAMICS_SENS"_a=FWD,
+               "multi_threaded"_a=false)
           .def(py::init<ibex::Function*, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
                "f"_a,
                "DYNAMICS_SENS"_a=FWD,
-               "multi_threaded"_a=true)
+               "multi_threaded"_a=false)
           .def(py::init<std::vector<ibex::Function*>, invariant::DYNAMICS_SENS, bool>(), py::keep_alive<1,2>(),
                "f_list"_a,
                "DYNAMICS_SENS"_a=FWD,
@@ -79,10 +84,10 @@ using namespace ibex;
           .def("eval", &invariant::DynamicsFunction::eval, "Eval position", "position"_a)
   ;
 
-  // py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function_pyibex)
-  //           .def(py::init<>())
-  //           .def("push_back", &invariant::SpaceFunction::push_back)
-  //   ;
+  py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function_pyibex)
+            .def(py::init<>())
+            .def("push_back", &invariant::SpaceFunction::push_back)
+    ;
 
   // ********* Maze *********
   py::class_<invariant::MazeIBEX>(m, "Maze")

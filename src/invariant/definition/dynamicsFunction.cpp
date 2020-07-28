@@ -38,8 +38,6 @@ void DynamicsFunction::initalize_function(const vector<Function*> &functions){
 //        }
         omp_init_lock(&m_lock_dynamics);
     }
-
-    //compute_taylor(taylor);
 }
 
 //DynamicsFunction::DynamicsFunction(const vector<SpaceFunction *> functions, const DYNAMICS_SENS sens, bool multi_threaded):
@@ -66,33 +64,23 @@ DynamicsFunction::DynamicsFunction(Function *f1, Function *f2, const DYNAMICS_SE
     initalize_function(functions);
 }
 
-//DynamicsFunction::DynamicsFunction(Function &f, const DYNAMICS_SENS sens, bool multi_threaded):
-//    Dynamics(sens)
-//{
-//    ibex::IntervalVector iv_test = {ibex::Interval(-1,1), ibex::Interval(-1,1)};
-//    cout << "test_df" << f.eval_vector(iv_test) << endl;
-//    m_multi_threaded = multi_threaded;
-//    vector<Function*> functions{&f};
-//    initalize_function(functions);
-//}
+DynamicsFunction::DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens, bool multi_threaded):
+    Dynamics(sens)
+{
+    m_multi_threaded = multi_threaded;
+    vector<Function*> functions{f};
+    initalize_function(functions);
+}
 
-//DynamicsFunction::DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens, bool multi_threaded):
-//    Dynamics(sens)
-//{
-//    m_multi_threaded = multi_threaded;
-//    vector<Function*> functions{f};
-//    initalize_function(functions);
-//}
-
-//DynamicsFunction::DynamicsFunction(SpaceFunction *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
-//    Dynamics(sens)
-//{
-//    m_multi_threaded = multi_threaded;
-//    vector<Function*> functions;
-//    functions.push_back(f1);
-//    functions.push_back(f2);
-//    initalize_function(functions);
-//}
+DynamicsFunction::DynamicsFunction(SpaceFunction *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
+    Dynamics(sens)
+{
+    m_multi_threaded = multi_threaded;
+    vector<Function*> functions;
+    functions.push_back(f1);
+    functions.push_back(f2);
+    initalize_function(functions);
+}
 
 void DynamicsFunction::compute_taylor(bool taylor){
     if(taylor){

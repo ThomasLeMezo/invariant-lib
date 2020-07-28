@@ -21,7 +21,7 @@ public:
      * @param functions
      */
     DynamicsFunction(const std::vector<ibex::Function *> &functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
-//    DynamicsFunction(const std::vector<SpaceFunction *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+    DynamicsFunction(const std::vector<SpaceFunction *> functions, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
      * @brief Dynamics constructor
@@ -29,10 +29,8 @@ public:
      */
     DynamicsFunction(ibex::Function *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
     DynamicsFunction(ibex::Function *f1, ibex::Function *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
-//    DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
-//    DynamicsFunction(SpaceFunction *f1, SpaceFunction *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
-
-//    DynamicsFunction(ibex::Function &f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+    DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
+    DynamicsFunction(SpaceFunction *f1, SpaceFunction *f2, const DYNAMICS_SENS sens=FWD, bool multi_threaded=true);
 
     /**
      * @brief Dynamics destructor
@@ -73,17 +71,6 @@ public:
     std::map<ibex::Sep*, std::array<ibex::Function*, 2>> get_hybrid_reset() override;
 
 private:
-//    /**
-//     * @brief add_function_d1
-//     * @param functions_list
-//     */
-//    void add_function_d1(std::vector<ibex::Function *> &functions_list);
-
-//    /**
-//     * @brief add_function_d1
-//     * @param function
-//     */
-//    void add_function_d1(ibex::Function* f);
 
     /**
      * @brief init
