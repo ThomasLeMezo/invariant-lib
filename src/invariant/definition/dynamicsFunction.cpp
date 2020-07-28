@@ -72,15 +72,15 @@ DynamicsFunction::DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens, b
     initalize_function(functions);
 }
 
-DynamicsFunction::DynamicsFunction(SpaceFunction *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
-    Dynamics(sens)
-{
-    m_multi_threaded = multi_threaded;
-    vector<Function*> functions;
-    functions.push_back(f1);
-    functions.push_back(f2);
-    initalize_function(functions);
-}
+//DynamicsFunction::DynamicsFunction(SpaceFunction *f1, Function *f2, const DYNAMICS_SENS sens, bool multi_threaded):
+//    Dynamics(sens)
+//{
+//    m_multi_threaded = multi_threaded;
+//    vector<Function*> functions;
+//    functions.push_back(f1);
+//    functions.push_back(f2);
+//    initalize_function(functions);
+//}
 
 void DynamicsFunction::compute_taylor(bool taylor){
     if(taylor){
