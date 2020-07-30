@@ -84,7 +84,7 @@ py::module pyibex = py::module::import("pyibex");
           .def("eval", &invariant::DynamicsFunction::eval, "Eval position", "position"_a)
   ;
 
-  py::class_<invariant::SpaceFunction>(m, "SpaceFunction", function_pyibex)
+  py::class_<invariant::SpaceFunction, ibex::Function>(m, "SpaceFunction")
             .def(py::init<>())
             .def("push_back", &invariant::SpaceFunction::push_back)
     ;
@@ -150,8 +150,8 @@ py::module pyibex = py::module::import("pyibex");
         "f_outer"_a,
         "nb_steps"_a,
         "file_name"_a,
-        py::arg("sep_outer") = (ibex::Sep*)nullptr,
-        py::arg("f_inner") = std::vector<ibex::Function*>()
+        py::arg("f_inner") = std::vector<ibex::Function*>(),
+        py::arg("sep_outer") = (ibex::Sep*)nullptr
         );
 
   m.def("largest_invariant", &largest_invariant);

@@ -13,7 +13,7 @@ dom.set_border_path_out(False)
 
 # Create the Dynamics
 f = Function("x[2]", "(x[1],(1.0*(1.0-x[0]^2))*x[1]-x[0])")
-dyn = DynamicsFunction(f, FWD_BWD)
+dyn = DynamicsFunction(f, FWD_BWD, False)
 
 # Create the Maze associated with the Domain and the dynamics
 maze = Maze(dom, dyn)

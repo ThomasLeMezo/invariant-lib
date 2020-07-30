@@ -13,7 +13,6 @@ for PYBIN in /opt/python/cp3*/bin; do
   mkdir -p build_dir && cd build_dir
 
   /usr/local/bin/cmake -DCMAKE_INSTALL_PREFIX=${HOME} \
-                      -DIBEX_ROOT=${HOME}/ibex-lib \
                       -DVTK_ROOT=${HOME}/vtk \
                       -DPPL_ROOT=${HOME}/ppl \
                       -DGMP_ROOT=${HOME}/gmp \
