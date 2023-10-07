@@ -34,6 +34,11 @@ const std::vector<ibex::IntervalVector> DynamicsInclusionFunction::eval(const ib
 //    return
 //}
 
+const std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>> DynamicsInclusionFunction::eval_jac(const ibex::IntervalVector &position) {
+      return std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>>();
+}
+
+
 void DynamicsInclusionFunction::set_inclusion_parameter(const ibex::IntervalVector &parameter){
     m_inclusion_parameter = parameter;
 }

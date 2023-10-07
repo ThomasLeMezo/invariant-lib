@@ -48,6 +48,50 @@ void Door<ibex::IntervalVector>::synchronize(){
     omp_unset_lock(&m_lock_read);
 }
 
+/// ******************  invariant::ExpBox ****************** ///
+
+template <>
+void Door<invariant::ExpBox>::set_empty_private_output(){
+    m_output_private->set_empty();
+}
+
+template <>
+void Door<invariant::ExpBox>::set_empty_private_input(){
+    m_input_private->set_empty();
+}
+
+template <> Door<invariant::ExpBox>::Door(invariant::Face<invariant::ExpBox> *face, invariant::Room<invariant::ExpBox> *room):
+    m_input_public(face->get_position()),
+    m_output_public(face->get_position())
+{
+    m_input_private = new invariant::ExpBox(face->get_position());
+    m_output_private = new invariant::ExpBox(face->get_position());
+
+    m_face = face;
+    m_room = room;
+    omp_init_lock(&m_lock_read);
+}
+
+template <>
+void Door<invariant::ExpBox>::set_input_private
+			(const invariant::ExpBox& iv_input){
+    *m_input_private = iv_input;
+}
+
+template <>
+void Door<invariant::ExpBox>::set_output_private
+			(const invariant::ExpBox& iv_output){
+    *m_output_private = iv_output;
+}
+
+template <>
+void Door<invariant::ExpBox>::synchronize(){
+    omp_set_lock(&m_lock_read);
+    m_input_public = *m_input_private;
+    m_output_public = *m_output_private;
+    omp_unset_lock(&m_lock_read);
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>

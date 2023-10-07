@@ -23,6 +23,7 @@ namespace invariant {
 template <typename _Tp> class Pave;
 using PavePPL = Pave<Parma_Polyhedra_Library::C_Polyhedron>;
 using PaveIBEX = Pave<ibex::IntervalVector>;
+using PaveEXP = Pave<ExpBox>;
 
 template <typename _Tp> class SmartSubPaving;
 template <typename _Tp> class Room;

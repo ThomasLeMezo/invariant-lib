@@ -629,10 +629,12 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
             _Tp in_tmp_IN(input_global_door);
             _Tp out_tmp_IN(r_adj->get_initial_door_output());
             if(!out_tmp_IN.is_empty()){
-                if(local_pave)
+                if(local_pave) {
                     contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_bwd(n_vf), BWD);
-                else
+                }
+                else {
                     contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_bwd, BWD);
+                }
                 in_return |= in_tmp_IN ;
             }
         }
@@ -640,10 +642,11 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
             _Tp out_tmp_OUT(output_global_door);
             _Tp in_tmp_OUT(r_adj->get_initial_door_input());
             if(!in_tmp_OUT.is_empty()){
-                if(local_pave)
+                if(local_pave) {
                     contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                else
+            } else {
                     contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
+            }
                 out_return |= out_tmp_OUT;
             }
         }
@@ -710,10 +713,11 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
 
                             // Avoid degenerated case of out_tmp_IN (when own_surface reduce out_tmp_IN to dim-2 => border)
                             if(!out_tmp_IN.is_empty() && get_nb_dim_flat(out_tmp_IN)<2){
-                                if(local_pave)
+                                if(local_pave) {
                                     contract_flow(in_tmp_IN, out_tmp_IN, get_one_vector_fields_typed_bwd(n_vf), BWD); // The vector is fwd but we need to contract the input
-                                else
+                                } else {
                                     contract_flow(in_tmp_IN, out_tmp_IN, vec_field_typed_neighbors_bwd, BWD);
+                                }
                                 in_return |= in_tmp_IN ;
                             }
 
@@ -728,10 +732,11 @@ void Room<_Tp>::contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_ret
                                 in_tmp_OUT &= d_adj->get_input();
 
                             if(!in_tmp_OUT.is_empty() && (get_nb_dim_flat(in_tmp_OUT)<2)){
-                                if(local_pave)
+                                if(local_pave) {
                                     contract_flow(in_tmp_OUT, out_tmp_OUT, get_one_vector_fields_typed_fwd(n_vf), FWD);
-                                else
+                                } else {
                                     contract_flow(in_tmp_OUT, out_tmp_OUT, vec_field_typed_neighbors_fwd, FWD);
+                                }
                                 out_return |= out_tmp_OUT;
                             }
                         }

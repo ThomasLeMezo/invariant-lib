@@ -24,8 +24,13 @@ int main(int argc, char *argv[])
     space[1] = ibex::Interval(-3,3);
 
     // ****** Domain ******* //
+#if 0
     invariant::SmartSubPaving<> paving(space);
     invariant::Domain<> dom(&paving, FULL_DOOR);
+#else
+    invariant::SmartSubPavingEXP paving(space);
+    invariant::DomainEXP dom(&paving, FULL_DOOR);
+#endif
 
     dom.set_border_path_in(false);
     dom.set_border_path_out(false);
@@ -36,12 +41,16 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn(&f, FWD_BWD);
 
     // ******* Maze ********* //
+#if 0
     invariant::Maze<> maze(&dom, &dyn);
+#else
+    invariant::Maze<ExpBox> maze(&dom, &dyn);
+#endif
     maze.set_enable_contract_vector_field(true);
 
     // ******* Display ********* //
     vibes::beginDrawing();
-    VibesMaze v_maze("VanDerPolInvariant", &maze);
+    VibesMazeEXP v_maze("VanDerPolInvariantExp", &maze);
     v_maze.setProperties(0, 0, 1024, 1024);
 
     // ******* Algorithm ********* //

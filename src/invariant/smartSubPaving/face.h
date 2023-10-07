@@ -19,6 +19,7 @@ namespace invariant {
 
 using FacePPL = Face<Parma_Polyhedra_Library::C_Polyhedron>;
 using FaceIBEX = Face<ibex::IntervalVector>;
+using FaceEXP = Face<invariant::ExpBox>;
 
 template <typename _Tp> class Pave;
 template <typename _Tp> class Door;

@@ -19,25 +19,30 @@
     #include <ipegenerator/figure.h>
 #endif
 
+template <typename _Tp> class VibesMaze;
+using VibesMazeIBEX = VibesMaze<ibex::IntervalVector>;
+using VibesMazeEXP = VibesMaze<invariant::ExpBox>;
+
+template <typename _Tp=ibex::IntervalVector>
 class VibesMaze: public VibesFigure
 {
 
 public:
     enum VIBES_MAZE_TYPE{VIBES_MAZE_INNER, VIBES_MAZE_OUTER, VIBES_MAZE_OUTER_AND_INNER, VIBES_MAZE_EULERIAN};
 public:
-    VibesMaze(const std::string& figure_name, invariant::SmartSubPavingIBEX *g);
-    VibesMaze(const std::string& figure_name, invariant::MazeIBEX* maze, VIBES_MAZE_TYPE type=VIBES_MAZE_OUTER);
-    VibesMaze(const std::string& figure_name, invariant::MazeIBEX* outer, invariant::MazeIBEX* inner, bool both_wall=false);
-    VibesMaze(const std::string& figure_name, std::vector<invariant::MazeIBEX*> &outer, std::vector<invariant::MazeIBEX*> &inner, bool both_wall=false);
-    VibesMaze(const std::string& figure_name, invariant::EulerianMazeIBEX* e);
+    VibesMaze(const std::string& figure_name, invariant::SmartSubPaving<_Tp> *g);
+    VibesMaze(const std::string& figure_name, invariant::Maze<_Tp>* maze, VIBES_MAZE_TYPE type=VIBES_MAZE_OUTER);
+    VibesMaze(const std::string& figure_name, invariant::Maze<_Tp>* outer, invariant::Maze<_Tp>* inner, bool both_wall=false);
+    VibesMaze(const std::string& figure_name, std::vector<invariant::Maze<_Tp>*> &outer, std::vector<invariant::Maze<_Tp>*> &inner, bool both_wall=false);
+    VibesMaze(const std::string& figure_name, invariant::EulerianMaze<_Tp>* e);
     ~VibesMaze();
 
     virtual void show() const;
 
-    void get_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector& position) const;
-    void get_room_info(invariant::MazeIBEX *maze, double x, double y) const;
+    void get_room_info(invariant::Maze<_Tp> *maze, const ibex::IntervalVector& position) const;
+    void get_room_info(invariant::Maze<_Tp> *maze, double x, double y) const;
 
-    void show_room_info(invariant::MazeIBEX *maze, const ibex::IntervalVector &position);
+    void show_room_info(invariant::Maze<_Tp> *maze, const ibex::IntervalVector &position);
 
     /**
      * @brief drawCircle for easier integration with the python binding
@@ -55,8 +60,9 @@ public:
      * @param box
      * @param params
      */
-    void drawBox(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string& color_fill="") const;
-    void drawBox_with_scale(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string& color_fill="") const;
+    void drawBox_iv(const ibex::IntervalVector &box, const std::string &color_stroke="", const std::string& color_fill="") const;
+    void drawBox(const _Tp &box, const std::string &color_stroke="", const std::string& color_fill="") const;
+    void drawBox_with_scale(const _Tp &box, const std::string &color_stroke="", const std::string& color_fill="") const;
     void drawPolygon(const std::vector<double> &x, const std::vector<double> &y, const std::string &color_stroke="", const std::string& color_fill="") const;
     void drawSector(const double x, const double y, const double s_x, const double s_y, const double theta_min, const double theta_max, const std::string &color_stroke="", const std::string& color_fill="") const;
 
@@ -82,7 +88,7 @@ public:
      * @param inner
      * @return
      */
-    double get_volume_pave(invariant::PaveIBEX *p, const bool inner=false) const;
+    double get_volume_pave(invariant::Pave<_Tp> *p, const bool inner=false) const;
 
     /**
      * @brief add_stat
@@ -140,27 +146,27 @@ private:
     void show_graph() const;
     void show_maze_outer() const;
     void show_maze_inner() const;
-    void show_theta(invariant::PaveIBEX *p, invariant::MazeIBEX *maze) const;
+    void show_theta(invariant::Pave<_Tp> *p, invariant::Maze<_Tp> *maze) const;
 
     void show_maze_outer_inner() const;
 
     void show_eulerian_maze() const;
 
-    void draw_room_outer(invariant::PaveIBEX *p) const;
-    void draw_room_inner(invariant::PaveIBEX *p) const;
-    void draw_room_inner_outer(invariant::PaveIBEX *p) const;
+    void draw_room_outer(invariant::Pave<_Tp> *p) const;
+    void draw_room_inner(invariant::Pave<_Tp> *p) const;
+    void draw_room_inner_outer(invariant::Pave<_Tp> *p) const;
 
     std::string concat_color(const std::string &color_stroke, const std::string &color_fill) const;
 
     std::vector<ibex::Interval> compute_theta(ibex::Interval dx, ibex::Interval dy) const;
 private:
-    invariant::SmartSubPavingIBEX*   m_subpaving = nullptr;
+    invariant::SmartSubPaving<_Tp>*   m_subpaving = nullptr;
     double              m_overhead_factor;
 
 
-    std::vector<invariant::MazeIBEX*> m_maze_outer;
-    std::vector<invariant::MazeIBEX*> m_maze_inner;
-    invariant::EulerianMazeIBEX* m_eulerian_maze = nullptr;
+    std::vector<invariant::Maze<_Tp>*> m_maze_outer;
+    std::vector<invariant::Maze<_Tp>*> m_maze_inner;
+    invariant::EulerianMaze<_Tp>* m_eulerian_maze = nullptr;
 
     std::vector<std::tuple<int, int, bool>> m_oriented_path;
 
@@ -195,61 +201,77 @@ private:
 //    VIBES_FUNC_COLOR_PARAM_1(drawFace,const std::vector<invariant::FaceIBEX*> &, l_f)
 //}
 
-inline void VibesMaze::set_enable_cone(bool val){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_enable_cone(bool val){
     m_enable_cones = val;
 }
 
-inline void VibesMaze::set_scale(const double scale_x, const double scale_y){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_scale(const double scale_x, const double scale_y){
     m_scale_factor[0] = ibex::Interval(scale_x);
     m_scale_factor[1] = ibex::Interval(scale_y);
 }
 
-inline void VibesMaze::set_offset(const double offset_x, const double offset_y){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_offset(const double offset_x, const double offset_y){
     m_offset[0] = ibex::Interval(offset_x);
     m_offset[1] = ibex::Interval(offset_y);
 }
 
-inline void VibesMaze::set_enable_white_boundary(const bool &enable){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_enable_white_boundary(const bool &enable){
     m_enable_white_boundary = enable;
 }
 
-inline void VibesMaze::set_enable_vibes(const bool &enable){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_enable_vibes(const bool &enable){
     m_enable_show = enable;
 }
 
 #ifdef WITH_IPEGENERATOR
-inline void VibesMaze::set_ipe_ratio(const double width, const double height, const bool keep_ratio){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_ipe_ratio(const double width, const double height, const bool keep_ratio){
     m_ipe_figure->reset_scale(width, height, keep_ratio);
 }
 
-inline void VibesMaze::set_thickness_pen_factor(const double val){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_thickness_pen_factor(const double val){
     m_ipe_figure->set_thickness_pen_factor(val);
 }
 
-inline void VibesMaze::set_thickness_axis(const double val){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_thickness_axis(const double val){
     m_ipe_figure->set_thickness_axis(val);
 }
 
-inline void VibesMaze::set_number_digits_x(const size_t &val){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_number_digits_x(const size_t &val){
     m_ipe_figure->set_number_digits_axis_x(val);
 }
 
-inline void VibesMaze::set_number_digits_y(const size_t &val){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_number_digits_y(const size_t &val){
     m_ipe_figure->set_number_digits_axis_y(val);
 }
 
-inline void VibesMaze::set_enable_export_outer(const bool &enable){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_enable_export_outer(const bool &enable){
     m_export_outer = enable;
 }
 
-inline void VibesMaze::set_enable_export_inner(const bool &enable){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_enable_export_inner(const bool &enable){
     m_export_inner = enable;
 }
 
-inline void VibesMaze::set_enable_export_uncertain(const bool &enable){
+template <typename _Tp>
+inline void VibesMaze<_Tp>::set_enable_export_uncertain(const bool &enable){
     m_export_uncertain = enable;
 }
 
 #endif
+
+/* template */
+#include "vibesMaze.tpp"
 
 #endif // VibesMaze_H

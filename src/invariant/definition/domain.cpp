@@ -21,4 +21,19 @@ ibex::IntervalVector convert<ibex::IntervalVector>(const ppl::C_Polyhedron &p){
     return polyhedron_2_iv(p);
 }
 
+template<>
+invariant::ExpBox convert<invariant::ExpBox>(const ibex::IntervalVector &iv){
+    return ExpBox(iv);
+}
+
+template<>
+ibex::IntervalVector convert<ibex::IntervalVector>(const invariant::ExpBox &q){
+    return q.getBox();
+}
+
+template<>
+invariant::ExpBox convert<invariant::ExpBox>(const invariant::ExpBox &q){
+    return q;
+}
+
 }

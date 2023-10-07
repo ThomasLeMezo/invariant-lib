@@ -39,6 +39,42 @@ Face<ibex::IntervalVector>::Face(Pave<ibex::IntervalVector> *p):
     m_pave = p;
 }
 
+/// ******************  ExpBox : = IntervalVector ****************** ///
+
+template <>
+void Face<invariant::ExpBox>::serialize(std::ofstream& binFile) const{
+    // Face serialization
+    serializeIntervalVector(binFile, m_position);
+    serializeIntervalVector(binFile, m_orientation);
+}
+
+template <>
+void Face<invariant::ExpBox>::deserialize(std::ifstream& binFile){
+    m_position = deserializeIntervalVector(binFile);
+    m_orientation = deserializeIntervalVector(binFile);
+}
+
+template <>
+Face<invariant::ExpBox>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<invariant::ExpBox> *p):
+    m_position(position),
+    m_orientation(orientation),
+    m_normal(normal),
+    m_position_typed(position)
+{
+    m_pave = p;
+    omp_init_lock(&m_write_neighbors);
+}
+
+template <>
+Face<invariant::ExpBox>::Face(Pave<invariant::ExpBox> *p):
+    m_position(0),
+    m_orientation(0),
+    m_normal(0),
+    m_position_typed(m_position)
+{
+    m_pave = p;
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>

@@ -26,6 +26,7 @@ namespace invariant{
 
 using DomainPPL = Domain<Parma_Polyhedra_Library::C_Polyhedron>;
 using DomainIBEX = Domain<ibex::IntervalVector>;
+using DomainEXP = Domain<ExpBox>;
 
 
 
@@ -441,6 +442,8 @@ template <typename _Tp>
 _Tp convert(const ibex::IntervalVector &iv);
 template <typename _Tp>
 _Tp convert(const ppl::C_Polyhedron &p);
+template <typename _Tp>
+_Tp convert(const invariant::ExpBox &p);
 
 template <typename _Tp>
 Parma_Polyhedra_Library::Thread_Init* initialize_thread();

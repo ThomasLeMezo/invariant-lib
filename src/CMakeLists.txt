@@ -13,3 +13,4 @@
   add_subdirectory(invariant)
   add_subdirectory(graphics)
   add_subdirectory(language)
+  add_subdirectory(exp)

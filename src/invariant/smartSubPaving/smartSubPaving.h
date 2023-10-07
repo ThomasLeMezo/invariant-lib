@@ -19,6 +19,7 @@ namespace invariant {
 
 using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron>;
 using SmartSubPavingIBEX = SmartSubPaving<ibex::IntervalVector>;
+using SmartSubPavingEXP = SmartSubPaving<ExpBox>;
 
 enum BISECTION_STRATEGY{BISECTION_STANDARD, BISECTION_LB, BISECTION_UB, BISECTION_LB_UB};
 

@@ -24,6 +24,7 @@ namespace invariant {
 template <typename _Tp> class Door;
 using DoorPPL = Door<Parma_Polyhedra_Library::C_Polyhedron>;
 using DoorIBEX = Door<ibex::IntervalVector>;
+using DoorEXP = Door<invariant::ExpBox>;
 
 template <typename _Tp> class Face;
 template <typename _Tp> class Room;
@@ -477,6 +478,14 @@ inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorIBEX&
     return stream;
 }
 
+inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorEXP& d){
+    std::ostringstream input, output;
+    input << d.get_input();
+    output << d.get_output();
+    stream << std::left << "input = " << std::setw(46) << input.str() << " output = " << std::setw(46) << output.str();
+    return stream;
+}
+
 inline std::ostream& operator<<(std::ostream& stream, const invariant::DoorPPL& d){
     stream << "input = ";
     ppl::IO_Operators::operator <<(stream, d.get_input());
@@ -493,6 +502,10 @@ inline bool is_subset(const ppl::C_Polyhedron &p1, const ppl::C_Polyhedron &p2){
     return p2.contains(p1);
 }
 
+inline bool is_subset(const ExpBox &q1, const ExpBox &q2){
+    return q1.is_subset(q2);
+}
+
 inline void union_widening(ppl::C_Polyhedron* p1, const ppl::C_Polyhedron& p2){
     ppl::C_Polyhedron p_result(p2);
     p_result.BHRZ03_widening_assign(*p1);
@@ -501,6 +514,10 @@ inline void union_widening(ppl::C_Polyhedron* p1, const ppl::C_Polyhedron& p2){
 
 inline void union_widening(ibex::IntervalVector* iv1, const ibex::IntervalVector& iv2){
     *(iv1) |= iv2;
+}
+
+inline void union_widening(ExpBox* Q1, const ExpBox& Q2){
+    *(Q1) |= Q2;
 }
 
 }

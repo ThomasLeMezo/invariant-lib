@@ -39,6 +39,7 @@ namespace invariant {
 template <typename _Tp> class Room;
 using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron>;
 using RoomIBEX = Room<ibex::IntervalVector>;
+using RoomEXP = Room<invariant::ExpBox>;
 
 class Dynamics; // declared only for friendship
 template <typename _Tp> class Pave; // declared only for friendship
@@ -666,6 +667,8 @@ ibex::IntervalVector convert_iv(const ibex::IntervalVector &iv);
 
 ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p);
 
+ibex::IntervalVector convert_iv(const invariant::ExpBox &q);
+
 ///
 /// \brief Get the difference Hull a\b
 /// \param a
@@ -680,6 +683,7 @@ void set_empty(_Tp &T);
 
 int get_nb_dim_flat(const ibex::IntervalVector &iv);
 int get_nb_dim_flat(const ppl::C_Polyhedron &p);
+int get_nb_dim_flat(const ExpBox &Q);
 
 template<typename _Tp>
 std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r);
@@ -1003,6 +1007,12 @@ inline std::string print(const ibex::IntervalVector &iv){
 inline std::string print(const ppl::C_Polyhedron &p){
     std::ostringstream stream;
     ppl::IO_Operators::operator <<(stream, p);
+    return stream.str();
+}
+
+inline std::string print(const ExpBox &p){
+    std::ostringstream stream;
+    stream << p;
     return stream.str();
 }
 

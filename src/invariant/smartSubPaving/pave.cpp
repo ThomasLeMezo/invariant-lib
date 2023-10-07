@@ -22,6 +22,22 @@ void Pave<ibex::IntervalVector>::compute_typed_position(){
     m_position_typed = new ibex::IntervalVector(m_position);
 }
 
+/// ******************  invariant::ExpBox ****************** ///
+
+template<>
+int Pave<invariant::ExpBox>::get_dim_inter_boundary(const ibex::IntervalVector &box){
+    IntervalVector intersection(get_dim(), ibex::Interval::EMPTY_SET);
+    for(invariant::Face<invariant::ExpBox> *f:m_faces_vector){
+        intersection |= (box & f->get_position());
+    }
+    return m_dim - invariant::get_nb_dim_flat(intersection);
+}
+
+template<>
+void Pave<invariant::ExpBox>::compute_typed_position(){
+    m_position_typed = new invariant::ExpBox(m_position);
+}
+
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template<>

@@ -4,6 +4,7 @@ namespace invariant{
 // For shared library (instanciation)
 template class Maze<Parma_Polyhedra_Library::C_Polyhedron>;
 template class Maze<ibex::IntervalVector>;
+template class Maze<ExpBox>;
 
 template<>
 Parma_Polyhedra_Library::Thread_Init* initialize_thread<ppl::C_Polyhedron>(){
@@ -23,6 +24,11 @@ Parma_Polyhedra_Library::Thread_Init* initialize_thread<ibex::IntervalVector>(){
     return nullptr;
 }
 
+template<>
+Parma_Polyhedra_Library::Thread_Init* initialize_thread<ExpBox>(){
+    return nullptr;
+}
+
 template <>
 void delete_thread_init<ppl::C_Polyhedron>(Parma_Polyhedra_Library::Thread_Init* thread_init){
     if(thread_init!=nullptr)
@@ -31,6 +37,10 @@ void delete_thread_init<ppl::C_Polyhedron>(Parma_Polyhedra_Library::Thread_Init*
 
 template <>
 void delete_thread_init<ibex::IntervalVector>(Parma_Polyhedra_Library::Thread_Init* thread_init){
+}
+
+template <>
+void delete_thread_init<ExpBox>(Parma_Polyhedra_Library::Thread_Init* thread_init){
 }
 
 }

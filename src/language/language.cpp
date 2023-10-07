@@ -27,7 +27,7 @@ void save_maze_image(invariant::MazeIBEX *maze_outer, invariant::MazeIBEX *maze_
 
 void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<invariant::MazeIBEX*> &maze_inner, std::string directory, std::string file_name){
     vibes::beginDrawing();
-    VibesMaze v_maze(file_name, maze_outer, maze_inner);
+    VibesMazeIBEX v_maze(file_name, maze_outer, maze_inner);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
 
@@ -55,7 +55,7 @@ void save_maze_image(std::vector<invariant::MazeIBEX*> &maze_outer, std::vector<
 
 void save_maze_image(invariant::MazeIBEX *maze_outer, std::string directory, std::string file_name){
     vibes::beginDrawing();
-    VibesMaze v_maze(file_name, maze_outer);
+    VibesMazeIBEX v_maze(file_name, maze_outer);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.set_enable_cone(false);
 

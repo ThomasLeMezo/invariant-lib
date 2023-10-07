@@ -49,6 +49,8 @@ public:
      * @return
      */
 //    const std::vector<ibex::IntervalMatrix> eval_d1(const ibex::IntervalVector &position);
+    const std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>> eval_jac(const ibex::IntervalVector &position);
+
 
     /**
      * @brief set_inclusion_parameter

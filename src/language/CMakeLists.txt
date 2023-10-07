@@ -15,6 +15,8 @@ if(WITH_LANGUAGE)
   include_directories(../invariant/serialization)
   include_directories(../graphics/vibes)
   include_directories(../graphics)
+  include_directories(../exp)
+
 
     set(SRC_LANGUAGE
         language.cpp

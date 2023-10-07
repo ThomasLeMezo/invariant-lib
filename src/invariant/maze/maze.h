@@ -3,6 +3,7 @@
 
 #include <ibex_IntervalVector.h>
 #include <ppl.hh>
+#include "diff_expbox.h"
 
 #include <deque>
 #include <iostream>
@@ -21,6 +22,7 @@ namespace invariant {
 template <typename _Tp> class Maze;
 using MazePPL = Maze<Parma_Polyhedra_Library::C_Polyhedron>;
 using MazeIBEX = Maze<ibex::IntervalVector>;
+using MazeEXP = Maze<ExpBox>;
 
 class Dynamics; // declared only for friendship
 template <typename _Tp> class Room;
