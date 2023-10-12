@@ -22,17 +22,17 @@ ibex::IntervalVector convert<ibex::IntervalVector>(const ppl::C_Polyhedron &p){
 }
 
 template<>
-invariant::ExpBox convert<invariant::ExpBox>(const ibex::IntervalVector &iv){
-    return ExpBox(iv);
+invariant::ExpPoly convert<invariant::ExpPoly>(const ibex::IntervalVector &iv){
+    return ExpPoly(iv);
 }
 
 template<>
-ibex::IntervalVector convert<ibex::IntervalVector>(const invariant::ExpBox &q){
+ibex::IntervalVector convert<ibex::IntervalVector>(const invariant::ExpPoly &q){
     return q.getBox();
 }
 
 template<>
-invariant::ExpBox convert<invariant::ExpBox>(const invariant::ExpBox &q){
+invariant::ExpPoly convert<invariant::ExpPoly>(const invariant::ExpPoly &q){
     return q;
 }
 

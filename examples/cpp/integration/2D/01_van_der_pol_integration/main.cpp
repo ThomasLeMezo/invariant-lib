@@ -24,22 +24,22 @@ int main(int argc, char *argv[])
     space[1] = ibex::Interval(-3,3);
 
     // ****** Domain *******
-    invariant::SmartSubPaving<ExpBox> paving(space);
+    invariant::SmartSubPavingEXP paving(space);
 
 
-    invariant::Domain<ExpBox> dom_outer(&paving, FULL_WALL);
+    invariant::DomainEXP dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
     double x1_c, x2_c, r;
     x1_c = 1.0;
     x2_c = 1.0;
-    r = 0.2;
+    r = 0.0;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LT); // LT, LEQ, EQ, GEQ, GT)
     dom_outer.set_sep(&s);
 
-    invariant::Domain<ExpBox> dom_inner(&paving, FULL_DOOR);
+    invariant::DomainEXP dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze *********
-    invariant::Maze<ExpBox> maze_outer(&dom_outer, &dyn);
-    invariant::Maze<ExpBox> maze_inner(&dom_inner, &dyn);
+    invariant::MazeEXP maze_outer(&dom_outer, &dyn);
+    invariant::MazeEXP maze_inner(&dom_inner, &dyn);
 
     double time_start = omp_get_wtime();
     for(int i=0; i<15; i++){
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMazeEXP v_maze("vdp_fwdEXP", &maze_outer, &maze_inner);
+    VibesMazeEXP v_maze("vdp_fwdEXP", &maze_outer , &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(true);
     v_maze.show();
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
     IntervalVector position_info(2);
     position_info[0] = ibex::Interval(0.62);
-    position_info[1] = ibex::Interval(-1.525);
+    position_info[1] = ibex::Interval(-1.53);
     v_maze.show_room_info(&maze_outer, position_info);
 
 //    IntervalVector pave_in(2);

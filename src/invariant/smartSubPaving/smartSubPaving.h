@@ -17,17 +17,17 @@
 
 namespace invariant {
 
-using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron>;
-using SmartSubPavingIBEX = SmartSubPaving<ibex::IntervalVector>;
-using SmartSubPavingEXP = SmartSubPaving<ExpBox>;
+using SmartSubPavingPPL = SmartSubPaving<Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron>;
+using SmartSubPavingIBEX = SmartSubPaving<ibex::IntervalVector,ibex::IntervalVector,ibex::IntervalVector>;
+using SmartSubPavingEXP = SmartSubPaving<ibex::IntervalVector,ExpVF,ExpPoly>;
 
 enum BISECTION_STRATEGY{BISECTION_STANDARD, BISECTION_LB, BISECTION_UB, BISECTION_LB_UB};
 
-template <typename _Tp> class Pave;
-template <typename _Tp> class Pave_node;
-template <typename _Tp> class Maze;
+template <typename _TpR, typename _TpF, typename _TpD> class Pave;
+template <typename _TpR, typename _TpF, typename _TpD> class Pave_node;
+template <typename _TpR, typename _TpF, typename _TpD> class Maze;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _TpR=ibex::IntervalVector, typename _TpF=ibex::IntervalVector, typename _TpD=ibex::IntervalVector>
 class SmartSubPaving
 {
 public:
@@ -52,14 +52,14 @@ public:
      * @param a SmartSubPaving
      * @return true or false
      */
-    const bool is_equal(const SmartSubPaving<_Tp>& g) const;
+    const bool is_equal(const SmartSubPaving<_TpR,_TpF,_TpD>& g) const;
 
     /**
      * @brief Return the i-th Pave of the bisectable pave list
      * @param i
      * @return
      */
-    const Pave<_Tp>* operator[](std::size_t i) const;
+    const Pave<_TpR,_TpF,_TpD>* operator[](std::size_t i) const;
 
     /**
      * @brief Return the coordinates of the SmartSubPaving
@@ -71,7 +71,7 @@ public:
      * @brief Return the list of Paves of the SmartSubPaving
      * @return A list of pointer to the paves
      */
-    const std::vector<Pave<_Tp> *>& get_paves() const;
+    const std::vector<Pave<_TpR,_TpF,_TpD> *>& get_paves() const;
 
     /**
      * @brief serialize a Pave
@@ -101,7 +101,7 @@ public:
      * @brief Add Paves to the SmartSubPaving list
      * @param p
      */
-    void add_paves(Pave<_Tp> *p);
+    void add_paves(Pave<_TpR,_TpF,_TpD> *p);
 
     /**
      * @brief Get the number of Paves in the bisectable and not_bisectable list
@@ -119,26 +119,26 @@ public:
      * @brief Get the list of all paves that are not bisectable
      * @return
      */
-    const std::vector<Pave<_Tp> *>& get_paves_not_bisectable() const;
+    const std::vector<Pave<_TpR,_TpF,_TpD> *>& get_paves_not_bisectable() const;
 
     /**
      * @brief Getter to the root of the tree pave node
      * @return
      */
-    Pave_node<_Tp> *get_tree() const;
+    Pave_node<_TpR,_TpF,_TpD> *get_tree() const;
 
     /**
      * @brief Getter to the vector of mazes
      * @return
      */
-    const std::vector<Maze<_Tp> *>& get_mazes() const;
+    const std::vector<Maze<_TpR,_TpF,_TpD> *>& get_mazes() const;
 
     /**
      * @brief Add a new maze to the vector of mazes
      * @param maze
      * @param room
      */
-    void add_maze(Maze<_Tp> * maze);
+    void add_maze(Maze<_TpR,_TpF,_TpD> * maze);
 
     /**
      * @brief Get info of all room inside position
@@ -146,7 +146,7 @@ public:
      * @param position
      * @return
      */
-    void get_room_info(Maze<_Tp>* maze, const ibex::IntervalVector &position, std::vector<Pave<_Tp> *> &pave_list) const;
+    void get_room_info(Maze<_TpR,_TpF,_TpD>* maze, const ibex::IntervalVector &position, std::vector<Pave<_TpR,_TpF,_TpD> *> &pave_list) const;
 
     /**
      * @brief Delete a pave for memory optimization
@@ -204,23 +204,23 @@ public:
      * @brief set the bisection tree
      * @param bisect_tree
      */
-    void set_bisection_tree(BooleanTree<_Tp> *bisect_tree);
+    void set_bisection_tree(BooleanTree<_TpR,_TpF,_TpD> *bisect_tree);
 
     /**
      * @brief get bisect tree
      * @return
      */
-    BooleanTree<_Tp>* get_bisect_tree() const;
+    BooleanTree<_TpR,_TpF,_TpD>* get_bisect_tree() const;
 
 protected:
     /** Class Variable **/
     mutable ibex::IntervalVector    m_position; // SmartSubPaving coordinates
-    std::vector<Pave<_Tp>*>         m_paves; // Paves of the SmartSubPaving
-    std::vector<Pave<_Tp>*>         m_paves_removed; // Paves of the SmartSubPaving
+    std::vector<Pave<_TpR,_TpF,_TpD>*>         m_paves; // Paves of the SmartSubPaving
+    std::vector<Pave<_TpR,_TpF,_TpD>*>         m_paves_removed; // Paves of the SmartSubPaving
     mutable unsigned char           m_dim = 0; // Dimension of the space
-    mutable Pave_node<_Tp>*         m_tree = nullptr; // Root of the pave node tree
+    mutable Pave_node<_TpR,_TpF,_TpD>*         m_tree = nullptr; // Root of the pave node tree
 
-    std::vector<Maze<_Tp>*>         m_mazes;
+    std::vector<Maze<_TpR,_TpF,_TpD>*>         m_mazes;
 
     std::vector<double> m_ratio_dimension;
     std::vector<double> m_limit_bisection;
@@ -230,7 +230,7 @@ protected:
 
     omp_lock_t m_write_add_pave;
 
-    BooleanTree<_Tp> *m_bisection_tree = nullptr;
+    BooleanTree<_TpR,_TpF,_TpD> *m_bisection_tree = nullptr;
 
     int m_bisection_step = 0;
 };
@@ -241,121 +241,121 @@ protected:
      * @param SmartSubPaving
      * @return
      */
-template<typename _Tp>
-    std::ostream& operator<< (std::ostream& stream, const SmartSubPaving<_Tp>& g);
+template<typename _TpR,typename _TpF,typename _TpD>
+    std::ostream& operator<< (std::ostream& stream, const SmartSubPaving<_TpR,_TpF,_TpD>& g);
 
 }
 
 /// ***** Inline functions *****///
 
 namespace invariant{
-template<typename _Tp>
-inline Pave_node<_Tp>* SmartSubPaving<_Tp>::get_tree() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline Pave_node<_TpR,_TpF,_TpD>* SmartSubPaving<_TpR,_TpF,_TpD>::get_tree() const{
     return m_tree;
 }
 
-template<typename _Tp>
-inline const std::vector<Pave<_Tp> *> &SmartSubPaving<_Tp>::get_paves_not_bisectable() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const std::vector<Pave<_TpR,_TpF,_TpD> *> &SmartSubPaving<_TpR,_TpF,_TpD>::get_paves_not_bisectable() const{
     return m_paves_removed;
 }
 
-template<typename _Tp>
-inline const size_t SmartSubPaving<_Tp>::size() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const size_t SmartSubPaving<_TpR,_TpF,_TpD>::size() const{
     return m_paves.size() + m_paves_removed.size();
 }
 
-template<typename _Tp>
-inline const size_t SmartSubPaving<_Tp>::size_active() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const size_t SmartSubPaving<_TpR,_TpF,_TpD>::size_active() const{
     return m_paves.size();
 }
 
-template<typename _Tp>
-inline const Pave<_Tp>* SmartSubPaving<_Tp>::operator[](std::size_t i) const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const Pave<_TpR,_TpF,_TpD>* SmartSubPaving<_TpR,_TpF,_TpD>::operator[](std::size_t i) const{
     return m_paves[i];
 }
 
-template<typename _Tp>
-inline const unsigned char& SmartSubPaving<_Tp>::dim() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const unsigned char& SmartSubPaving<_TpR,_TpF,_TpD>::dim() const{
     return m_dim;
 }
 
-template<typename _Tp>
-inline std::ostream& operator<< (std::ostream& stream, const SmartSubPaving<_Tp>& g) {
+template<typename _TpR,typename _TpF,typename _TpD>
+inline std::ostream& operator<< (std::ostream& stream, const SmartSubPaving<_TpR,_TpF,_TpD>& g) {
     stream << "GRAPH : " << g.get_position() << " - " << g.get_paves().size() << " paves";
     return stream;
 }
-template<typename _Tp>
-inline const ibex::IntervalVector& SmartSubPaving<_Tp>::get_position() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const ibex::IntervalVector& SmartSubPaving<_TpR,_TpF,_TpD>::get_position() const{
     return m_position;
 }
 
-template<typename _Tp>
-inline const std::vector<Pave<_Tp> *> &SmartSubPaving<_Tp>::get_paves() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const std::vector<Pave<_TpR,_TpF,_TpD> *> &SmartSubPaving<_TpR,_TpF,_TpD>::get_paves() const{
     return m_paves;
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::add_paves(Pave<_Tp> *p){
+template<typename _TpR,typename _TpF,typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::add_paves(Pave<_TpR,_TpF,_TpD> *p){
     omp_set_lock(&m_write_add_pave);
     m_paves.push_back(p);
     omp_unset_lock(&m_write_add_pave);
 }
 
-template<typename _Tp>
-inline const std::vector<Maze<_Tp> *>& SmartSubPaving<_Tp>::get_mazes() const{
+template<typename _TpR,typename _TpF,typename _TpD>
+inline const std::vector<Maze<_TpR,_TpF,_TpD> *>& SmartSubPaving<_TpR,_TpF,_TpD>::get_mazes() const{
     return m_mazes;
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::add_maze(Maze<_Tp> * maze){
+template<typename _TpR,typename _TpF,typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::add_maze(Maze<_TpR,_TpF,_TpD> * maze){
     m_mazes.push_back(maze);
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_limit_bisection(const std::vector<double> &limit_bisection){
+template<typename _TpR,typename _TpF,typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::set_limit_bisection(const std::vector<double> &limit_bisection){
     if(limit_bisection.size() != m_dim)
         throw std::runtime_error("in [paving.cpp/set_limit_bisection] dimensions doesn't match");
     else
         m_limit_bisection = limit_bisection;
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_ratio_bisection(const std::vector<double> &ratio_bisection){
+template<typename _TpR,typename _TpF,typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::set_ratio_bisection(const std::vector<double> &ratio_bisection){
     if(ratio_bisection.size() != m_dim)
         throw std::runtime_error("in [paving.cpp/set_limit_bisection] dimensions doesn't match");
     else
         m_ratio_dimension = ratio_bisection;
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_enable_bisection_strategy(const int &dim, const BISECTION_STRATEGY &bisection_type){
+template<typename _TpR,typename _TpF,typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::set_enable_bisection_strategy(const int &dim, const BISECTION_STRATEGY &bisection_type){
     m_bisection_strategy[dim] = bisection_type;
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_bisection_strategy_slice(const int &dim, const double &val){
+template<typename _TpR, typename _TpF, typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::set_bisection_strategy_slice(const int &dim, const double &val){
     m_bisection_strategy_slice[dim] = val;
 }
 
-template<typename _Tp>
-inline const std::vector<double>& SmartSubPaving<_Tp>::get_limit_bisection() const{
+template<typename _TpR, typename _TpF, typename _TpD>
+inline const std::vector<double>& SmartSubPaving<_TpR,_TpF,_TpD>::get_limit_bisection() const{
     return m_limit_bisection;
 }
 
-template<typename _Tp>
-inline void SmartSubPaving<_Tp>::set_bisection_tree(BooleanTree<_Tp> *bisect_tree){
+template<typename _TpR, typename _TpF, typename _TpD>
+inline void SmartSubPaving<_TpR,_TpF,_TpD>::set_bisection_tree(BooleanTree<_TpR,_TpF,_TpD> *bisect_tree){
     m_bisection_tree = bisect_tree;
 }
 
-template<typename _Tp>
-inline BooleanTree<_Tp>* SmartSubPaving<_Tp>::get_bisect_tree() const{
+template<typename _TpR, typename _TpF, typename _TpD>
+inline BooleanTree<_TpR,_TpF,_TpD>* SmartSubPaving<_TpR,_TpF,_TpD>::get_bisect_tree() const{
     return m_bisection_tree;
 }
 
-template <typename _Tp>
+template <typename _TpD>
 Parma_Polyhedra_Library::Thread_Init* initialize_thread();
 
-template <typename _Tp>
+template <typename _TpD>
 void delete_thread_init(Parma_Polyhedra_Library::Thread_Init* thread_init);
 
 }

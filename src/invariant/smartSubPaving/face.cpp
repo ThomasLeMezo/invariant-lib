@@ -6,20 +6,20 @@ namespace invariant{
 /// ******************  ibex::IntervalVector ****************** ///
 
 template <>
-void Face<ibex::IntervalVector>::serialize(std::ofstream& binFile) const{
+void FaceIBEX::serialize(std::ofstream& binFile) const{
     // Face serialization
     serializeIntervalVector(binFile, m_position);
     serializeIntervalVector(binFile, m_orientation);
 }
 
 template <>
-void Face<ibex::IntervalVector>::deserialize(std::ifstream& binFile){
+void FaceIBEX::deserialize(std::ifstream& binFile){
     m_position = deserializeIntervalVector(binFile);
     m_orientation = deserializeIntervalVector(binFile);
 }
 
 template <>
-Face<ibex::IntervalVector>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<ibex::IntervalVector> *p):
+FaceIBEX::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, PaveIBEX *p):
     m_position(position),
     m_orientation(orientation),
     m_normal(normal),
@@ -30,7 +30,7 @@ Face<ibex::IntervalVector>::Face(const ibex::IntervalVector &position, const ibe
 }
 
 template <>
-Face<ibex::IntervalVector>::Face(Pave<ibex::IntervalVector> *p):
+FaceIBEX::Face(PaveIBEX *p):
     m_position(0),
     m_orientation(0),
     m_normal(0),
@@ -42,20 +42,20 @@ Face<ibex::IntervalVector>::Face(Pave<ibex::IntervalVector> *p):
 /// ******************  ExpBox : = IntervalVector ****************** ///
 
 template <>
-void Face<invariant::ExpBox>::serialize(std::ofstream& binFile) const{
+void FaceEXP::serialize(std::ofstream& binFile) const{
     // Face serialization
     serializeIntervalVector(binFile, m_position);
     serializeIntervalVector(binFile, m_orientation);
 }
 
 template <>
-void Face<invariant::ExpBox>::deserialize(std::ifstream& binFile){
+void FaceEXP::deserialize(std::ifstream& binFile){
     m_position = deserializeIntervalVector(binFile);
     m_orientation = deserializeIntervalVector(binFile);
 }
 
 template <>
-Face<invariant::ExpBox>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<invariant::ExpBox> *p):
+FaceEXP::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, PaveEXP *p):
     m_position(position),
     m_orientation(orientation),
     m_normal(normal),
@@ -66,7 +66,7 @@ Face<invariant::ExpBox>::Face(const ibex::IntervalVector &position, const ibex::
 }
 
 template <>
-Face<invariant::ExpBox>::Face(Pave<invariant::ExpBox> *p):
+FaceEXP::Face(PaveEXP *p):
     m_position(0),
     m_orientation(0),
     m_normal(0),
@@ -78,7 +78,7 @@ Face<invariant::ExpBox>::Face(Pave<invariant::ExpBox> *p):
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
-Face<ppl::C_Polyhedron>::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, Pave<ppl::C_Polyhedron> *p):
+FacePPL::Face(const ibex::IntervalVector &position, const ibex::IntervalVector &orientation, const ibex::IntervalVector &normal, PavePPL *p):
     m_position(position),
     m_orientation(orientation),
     m_normal(normal)
@@ -89,7 +89,7 @@ Face<ppl::C_Polyhedron>::Face(const ibex::IntervalVector &position, const ibex::
 }
 
 template <>
-Face<ppl::C_Polyhedron>::Face(Pave<ppl::C_Polyhedron> *p):
+FacePPL::Face(PavePPL *p):
     m_position(0),
     m_orientation(0),
     m_normal(0)

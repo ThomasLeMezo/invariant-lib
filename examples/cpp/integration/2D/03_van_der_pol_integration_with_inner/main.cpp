@@ -29,10 +29,10 @@ int main(int argc, char *argv[])
     space[0] = ibex::Interval(-3,3);
     space[1] = ibex::Interval(-3,3);
 
-    invariant::SmartSubPaving<> paving(space);
+    invariant::SmartSubPavingEXP paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain<> dom_outer(&paving, FULL_WALL);
+    invariant::DomainEXP dom_outer(&paving, FULL_WALL);
     double x1_c, x2_c, r;
 //    x1_c = -2.0;
 //    x2_c = 4;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     // ****** Domain Inner ******* //
-    invariant::Domain<> dom_inner(&paving, FULL_DOOR);
+    invariant::DomainEXP dom_inner(&paving, FULL_DOOR);
     SepNot s_inner(s_outer); // LT, LEQ, EQ, GEQ, GT
     dom_inner.set_sep_input(&s_inner);
     dom_inner.set_border_path_in(true);
@@ -57,10 +57,10 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn(&f, FWD);
 
     // ******* Mazes ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn);
+    invariant::MazeEXP maze_outer(&dom_outer, &dyn);
+    invariant::MazeEXP maze_inner(&dom_inner, &dyn);
 
-    invariant::BooleanTreeInterIBEX bisection_tree(&maze_outer, &maze_inner);
+    invariant::BooleanTreeInterEXP bisection_tree(&maze_outer, &maze_inner);
     paving.set_bisection_tree(&bisection_tree);
 
     // ******* Algorithm ********* //
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     }
     cout << "TIME = " << omp_get_wtime() - time_start << endl;
 
-    VibesMaze v_maze("SmartSubPaving", &maze_outer, &maze_inner);
+    VibesMazeEXP v_maze("SmartSubPavingEXP", &maze_outer, &maze_inner);
     v_maze.setProperties(0, 0, 1048, 1048);
     v_maze.set_enable_cone(false);
     v_maze.show();

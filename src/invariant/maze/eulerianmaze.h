@@ -14,11 +14,12 @@
 
 namespace invariant {
 
-template <typename _Tp> class EulerianMaze;
-using EulerianMazePPL = EulerianMaze<Parma_Polyhedra_Library::C_Polyhedron>;
-using EulerianMazeIBEX = EulerianMaze<ibex::IntervalVector>;
+template <typename _TpR, typename _TpF, typename _TpD> class EulerianMaze;
+using EulerianMazePPL = EulerianMaze<Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron>;
+using EulerianMazeIBEX = EulerianMaze<ibex::IntervalVector,ibex::IntervalVector,ibex::IntervalVector>;
+using EulerianMazeEXP = EulerianMaze<ibex::IntervalVector,ExpVF,ExpPoly>;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _TpR=ibex::IntervalVector, typename _TpF=ibex::IntervalVector, typename _TpD=ibex::IntervalVector>
 class EulerianMaze
 {
 private:
@@ -56,50 +57,50 @@ public:
      * @param id
      * @return
      */
-    Maze<_Tp> * get_maze_outer(size_t id);
+    Maze<_TpR,_TpF,_TpD> * get_maze_outer(size_t id);
 
     /**
      * @brief get_maze_inner
      * @param id
      * @return
      */
-    Maze<_Tp> * get_maze_inner(size_t id);
+    Maze<_TpR,_TpF,_TpD> * get_maze_inner(size_t id);
 
     /**
      * @brief get_maze_inner
      * @return
      */
-    std::vector<Maze<_Tp>*> get_maze_inner();
+    std::vector<Maze<_TpR,_TpF,_TpD>*> get_maze_inner();
 
     /**
      * @brief get_maze_outer
      * @return
      */
-    std::vector<Maze<_Tp>*> get_maze_outer();
+    std::vector<Maze<_TpR,_TpF,_TpD>*> get_maze_outer();
 
     /**
      * @brief get_maze_outer_fwd
      * @return
      */
-    std::vector<Maze<_Tp>*> get_maze_outer_fwd();
+    std::vector<Maze<_TpR,_TpF,_TpD>*> get_maze_outer_fwd();
 
     /**
      * @brief get_maze_outer_bwd
      * @return
      */
-    std::vector<Maze<_Tp>*> get_maze_outer_bwd();
+    std::vector<Maze<_TpR,_TpF,_TpD>*> get_maze_outer_bwd();
 
     /**
      * @brief get_maze_inner_fwd
      * @return
      */
-    std::vector<Maze<_Tp>*> get_maze_inner_fwd();
+    std::vector<Maze<_TpR,_TpF,_TpD>*> get_maze_inner_fwd();
 
     /**
      * @brief get_maze_inner_bwd
      * @return
      */
-    std::vector<Maze<_Tp>*> get_maze_inner_bwd();
+    std::vector<Maze<_TpR,_TpF,_TpD>*> get_maze_inner_bwd();
 
     /**
      * @brief get_number_separators
@@ -111,74 +112,74 @@ public:
      * @brief get_paving
      * @return
      */
-    SmartSubPaving<_Tp> * get_paving();
+    SmartSubPaving<_TpR,_TpF,_TpD> * get_paving();
 
 private:
     std::vector<ibex::Sep*> m_separator_list;
 
-    SmartSubPaving<_Tp> *m_paving=nullptr;
+    SmartSubPaving<_TpR,_TpF,_TpD> *m_paving=nullptr;
     std::vector<DynamicsFunction*> m_dyn_list;
 
-    std::vector<Domain<_Tp>*> m_dom_list;
+    std::vector<Domain<_TpR,_TpF,_TpD>*> m_dom_list;
 
-    std::vector<Maze<_Tp>*> m_maze_outer_list;
-    std::vector<Maze<_Tp>*> m_maze_inner_list;
+    std::vector<Maze<_TpR,_TpF,_TpD>*> m_maze_outer_list;
+    std::vector<Maze<_TpR,_TpF,_TpD>*> m_maze_inner_list;
 
-    std::vector<Maze<_Tp>*> m_maze_outer_fwd_list;
-    std::vector<Maze<_Tp>*> m_maze_inner_fwd_list;
-    std::vector<Maze<_Tp>*> m_maze_outer_bwd_list;
-    std::vector<Maze<_Tp>*> m_maze_inner_bwd_list;
+    std::vector<Maze<_TpR,_TpF,_TpD>*> m_maze_outer_fwd_list;
+    std::vector<Maze<_TpR,_TpF,_TpD>*> m_maze_inner_fwd_list;
+    std::vector<Maze<_TpR,_TpF,_TpD>*> m_maze_outer_bwd_list;
+    std::vector<Maze<_TpR,_TpF,_TpD>*> m_maze_inner_bwd_list;
 
-    std::vector<Domain<_Tp>*> m_dom_outer_fwd_list;
-    std::vector<Domain<_Tp>*> m_dom_outer_bwd_list;
-    std::vector<Domain<_Tp>*> m_dom_inner_fwd_list;
-    std::vector<Domain<_Tp>*> m_dom_inner_bwd_list;
+    std::vector<Domain<_TpR,_TpF,_TpD>*> m_dom_outer_fwd_list;
+    std::vector<Domain<_TpR,_TpF,_TpD>*> m_dom_outer_bwd_list;
+    std::vector<Domain<_TpR,_TpF,_TpD>*> m_dom_inner_fwd_list;
+    std::vector<Domain<_TpR,_TpF,_TpD>*> m_dom_inner_bwd_list;
 
     std::vector<ibex::Sep*> m_sep_not_list;
 
-    std::vector<BooleanTree<_Tp>*> m_boolean_tree_list;
+    std::vector<BooleanTree<_TpR,_TpF,_TpD>*> m_boolean_tree_list;
 
     bool m_copy_function = true;
     bool m_with_inner = true;
 };
 
-template<typename _Tp>
-size_t EulerianMaze<_Tp>::get_number_maze() const{
+template<typename _TpR, typename _TpF, typename _TpD>
+size_t EulerianMaze<_TpR,_TpF,_TpD>::get_number_maze() const{
     return m_maze_outer_list.size();
 }
 
-template<typename _Tp>
-SmartSubPaving<_Tp>* EulerianMaze<_Tp>::get_paving(){
+template<typename _TpR, typename _TpF, typename _TpD>
+SmartSubPaving<_TpR,_TpF,_TpD>* EulerianMaze<_TpR,_TpF,_TpD>::get_paving(){
     return m_paving;
 }
 
-template<typename _Tp>
-std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer(){
+template<typename _TpR, typename _TpF, typename _TpD>
+std::vector<Maze<_TpR,_TpF,_TpD>*> EulerianMaze<_TpR,_TpF,_TpD>::get_maze_outer(){
     return m_maze_outer_list;
 }
 
-template<typename _Tp>
-std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer_fwd(){
+template<typename _TpR, typename _TpF, typename _TpD>
+std::vector<Maze<_TpR,_TpF,_TpD>*> EulerianMaze<_TpR,_TpF,_TpD>::get_maze_outer_fwd(){
     return m_maze_outer_fwd_list;
 }
 
-template<typename _Tp>
-std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_outer_bwd(){
+template<typename _TpR, typename _TpF, typename _TpD>
+std::vector<Maze<_TpR,_TpF,_TpD>*> EulerianMaze<_TpR,_TpF,_TpD>::get_maze_outer_bwd(){
     return m_maze_outer_bwd_list;
 }
 
-template<typename _Tp>
-std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_inner_fwd(){
+template<typename _TpR, typename _TpF, typename _TpD>
+std::vector<Maze<_TpR,_TpF,_TpD>*> EulerianMaze<_TpR,_TpF,_TpD>::get_maze_inner_fwd(){
     return m_maze_inner_fwd_list;
 }
 
-template<typename _Tp>
-std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_inner_bwd(){
+template<typename _TpR, typename _TpF, typename _TpD>
+std::vector<Maze<_TpR,_TpF,_TpD>*> EulerianMaze<_TpR,_TpF,_TpD>::get_maze_inner_bwd(){
     return m_maze_inner_bwd_list;
 }
 
-template<typename _Tp>
-std::vector<Maze<_Tp>*> EulerianMaze<_Tp>::get_maze_inner(){
+template<typename _TpR, typename _TpF, typename _TpD>
+std::vector<Maze<_TpR,_TpF,_TpD>*> EulerianMaze<_TpR,_TpF,_TpD>::get_maze_inner(){
     return m_maze_inner_list;
 }
 

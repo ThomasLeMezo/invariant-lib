@@ -9,39 +9,39 @@ namespace invariant{
 /// ******************  ibex::IntervalVector ****************** ///
 
 template<>
-int Pave<ibex::IntervalVector>::get_dim_inter_boundary(const ibex::IntervalVector &box){
+int PaveIBEX::get_dim_inter_boundary(const ibex::IntervalVector &box){
     IntervalVector intersection(get_dim(), ibex::Interval::EMPTY_SET);
-    for(invariant::Face<ibex::IntervalVector> *f:m_faces_vector){
+    for(invariant::FaceIBEX *f:m_faces_vector){
         intersection |= (box & f->get_position());
     }
     return m_dim - invariant::get_nb_dim_flat(intersection);
 }
 
 template<>
-void Pave<ibex::IntervalVector>::compute_typed_position(){
+void PaveIBEX::compute_typed_position(){
     m_position_typed = new ibex::IntervalVector(m_position);
 }
 
 /// ******************  invariant::ExpBox ****************** ///
 
 template<>
-int Pave<invariant::ExpBox>::get_dim_inter_boundary(const ibex::IntervalVector &box){
+int PaveEXP::get_dim_inter_boundary(const ibex::IntervalVector &box){
     IntervalVector intersection(get_dim(), ibex::Interval::EMPTY_SET);
-    for(invariant::Face<invariant::ExpBox> *f:m_faces_vector){
+    for(invariant::FaceEXP *f:m_faces_vector){
         intersection |= (box & f->get_position());
     }
     return m_dim - invariant::get_nb_dim_flat(intersection);
 }
 
 template<>
-void Pave<invariant::ExpBox>::compute_typed_position(){
-    m_position_typed = new invariant::ExpBox(m_position);
+void PaveEXP::compute_typed_position(){
+    m_position_typed = new ibex::IntervalVector(m_position);
 }
 
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template<>
-void Pave<ppl::C_Polyhedron>::compute_typed_position(){
+void PavePPL::compute_typed_position(){
     m_position_typed = new ppl::C_Polyhedron(iv_2_polyhedron(m_position));
     m_position_typed->minimized_constraints();
 }

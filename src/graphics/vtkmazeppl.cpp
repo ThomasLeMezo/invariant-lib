@@ -233,19 +233,19 @@ void VtkMazePPL::show_maze(invariant::MazePPL *maze, string comment, bool comple
 }
 
 void VtkMazePPL::show_room_info(invariant::MazePPL *maze, ibex::IntervalVector position){
-    std::vector<invariant::Pave<Parma_Polyhedra_Library::C_Polyhedron>*> pave_list;
+    std::vector<invariant::PavePPL*> pave_list;
     maze->get_subpaving()->get_room_info(maze, position, pave_list);
     vector<string> name_files;
 
-    for(invariant::Pave<Parma_Polyhedra_Library::C_Polyhedron>* p:pave_list){
+    for(invariant::PavePPL* p:pave_list){
         stringstream file_name;
         file_name << p->get_position();
         name_files.push_back(file_name.str());
     }
 
     for(size_t i=0; i<pave_list.size(); i++){
-        invariant::Pave<Parma_Polyhedra_Library::C_Polyhedron> *p = pave_list[i];
-        invariant::Room<Parma_Polyhedra_Library::C_Polyhedron> *r = p->get_rooms()[maze];
+        invariant::PavePPL *p = pave_list[i];
+        invariant::RoomPPL *r = p->get_rooms()[maze];
 
         /// ************ Draw Paves ************
         vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();

@@ -16,12 +16,12 @@ ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p){
     return polyhedron_2_iv(p);
 }
 
-ibex::IntervalVector convert_iv(const ExpBox &q){
+ibex::IntervalVector convert_iv(const ExpPoly &q){
     return q.getBox();
 }
 
 template<>
-void Room<ibex::IntervalVector>::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
+void RoomIBEX::contract_flow(ibex::IntervalVector &in, ibex::IntervalVector &out, const ibex::IntervalVector &vect, const DYNAMICS_SENS &sens){
     // Contraction with Taylor 0 order
     // assert 0 not in v.
 
@@ -102,7 +102,7 @@ int get_nb_dim_flat(const ibex::IntervalVector &iv){
 }
 
 template <>
-void Room<ibex::IntervalVector>::compute_vector_field_typed(){
+void RoomIBEX::compute_vector_field_typed(){
     m_vector_fields_typed_fwd = m_vector_fields;
     for(ibex::IntervalVector &vect:m_vector_fields){
         m_vector_fields_typed_bwd.push_back(-vect);
@@ -110,7 +110,7 @@ void Room<ibex::IntervalVector>::compute_vector_field_typed(){
 }
 
 template <>
-const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull() const{
+const ibex::IntervalVector RoomIBEX::get_hull() const{
     ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
     for(FaceIBEX *f:get_pave()->get_faces_vector()){
         DoorIBEX *d = f->get_doors()[m_maze];
@@ -120,7 +120,7 @@ const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull() const{
 }
 
 template <>
-const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull_typed() const{
+const ibex::IntervalVector RoomIBEX::get_hull_typed() const{
     ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
     for(FaceIBEX *f:get_pave()->get_faces_vector()){
         DoorIBEX *d = f->get_doors()[m_maze];
@@ -136,57 +136,61 @@ const ibex::IntervalVector Room<ibex::IntervalVector>::get_hull_typed() const{
 
 /// ******************  invariant::ExpBox ****************** ///
 
-int get_nb_dim_flat(const ExpBox &Q){
-    return get_nb_dim_flat(Q.getBox()); /* TODO : à revoir ? */
+int get_nb_dim_flat(const ExpPoly &Q){
+    int r = Q.get_not_flat_dim();
+    if (r<0) r=0;
+    return Q.get_dim()-r;
 }
 
 template <>
-ExpBox get_empty_door_container<ExpBox>(int dim){
-    return ExpBox(dim, true);
+ExpPoly get_empty_door_container<ExpPoly>(int dim){
+    return ExpPoly(dim, true);
 }
 
 template <>
-ExpBox get_full_door_container<ExpBox>(int dim){
-    return ExpBox(dim, false);
+ExpPoly get_full_door_container<ExpPoly>(int dim){
+    return ExpPoly(dim, false);
 }
 
 template <>
-void set_empty<ExpBox>(ExpBox &T){
+void set_empty<ExpPoly>(ExpPoly &T){
     T.set_empty();
 }
 
+#if 0
 template <>
-ExpBox get_diff_hull<ExpBox>(const ExpBox &a, const ExpBox &b){
+ExpPoly get_diff_hull<ExpPoly>(const ExpPoly &a, const ExpPoly &b){
     return diff_hull(a,b);
 }
+#endif
 
 template <>
-void Room<ExpBox>::compute_vector_field_typed(){
+void RoomEXP::compute_vector_field_typed(){
     ibex::IntervalVector position(m_pave->get_position());
     // Contract position according to father_hull to get a better vector field approximation
     if(m_maze->get_contract_vector_field() && m_is_father_hull){
         position &= convert_iv(*m_father_hull);
     }
 
-    const std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>> vecJac = m_maze->get_dynamics()->eval_jac(position);
+    const std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>> vecJac = m_maze->get_dynamics()->eval_jac(position); /* TODO : have eval_jac with a polyhedron ? */
 
     int nb = m_vector_fields.size();
     for (int i=0;i<nb;i++) {
        if (vecJac.size()>i) {
           const std::pair<ibex::Matrix,ibex::IntervalVector> &p  = vecJac[i];
-          ExpBox vfield(position,m_vector_fields[i],p);
+          ExpVF vfield(position,m_vector_fields[i],p);
           m_vector_fields_typed_fwd.push_back(vfield);
-          m_vector_fields_typed_bwd.push_back(ExpBox(vfield,-1.0));
+          m_vector_fields_typed_bwd.push_back(ExpVF(vfield,-1.0));
        } else {
-          ExpBox vfield(position,m_vector_fields[i]);
+          ExpVF vfield(m_vector_fields[i]);
           m_vector_fields_typed_fwd.push_back(vfield);
-          m_vector_fields_typed_bwd.push_back(ExpBox(vfield,-1.0));
+          m_vector_fields_typed_bwd.push_back(ExpVF(vfield,-1.0));
        }
    }
 }
 
 template <>
-const ibex::IntervalVector Room<ExpBox>::get_hull() const{
+const ibex::IntervalVector RoomEXP::get_hull() const{
     ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
     for(FaceEXP *f:get_pave()->get_faces_vector()){
         DoorEXP *d = f->get_doors()[m_maze];
@@ -196,8 +200,8 @@ const ibex::IntervalVector Room<ExpBox>::get_hull() const{
 }
 
 template <>
-const ExpBox Room<ExpBox>::get_hull_typed() const{
-    ExpBox result(m_pave->get_position().size(), true);
+const ExpPoly RoomEXP::get_hull_typed() const{
+    ExpPoly result(m_pave->get_position().size(), true);
     for(FaceEXP *f:get_pave()->get_faces_vector()){
         DoorEXP *d = f->get_doors()[m_maze];
         result |= d->get_hull();
@@ -210,7 +214,7 @@ const ExpBox Room<ExpBox>::get_hull_typed() const{
 }
 
 template<>
-void Room<ExpBox>::contract_flow(ExpBox &in, ExpBox &out, const ExpBox &vect, const DYNAMICS_SENS &sens){
+void RoomEXP::contract_flow(ExpPoly &in, ExpPoly &out, const ExpVF &vect, const DYNAMICS_SENS &sens){
     // Contraction with Taylor 0 order
     // assert 0 not in v.
 
@@ -263,7 +267,7 @@ void Room<ExpBox>::contract_flow(ExpBox &in, ExpBox &out, const ExpBox &vect, co
 /// ******************  ppl::C_Polyhedron ****************** ///
 
 template <>
-void Room<ppl::C_Polyhedron>::compute_vector_field_typed(){
+void RoomPPL::compute_vector_field_typed(){
     for(ibex::IntervalVector &vect:m_vector_fields){
         m_vector_fields_typed_fwd.push_back(iv_2_polyhedron(vect));
         m_vector_fields_typed_bwd.push_back(iv_2_polyhedron(-vect));
@@ -271,7 +275,7 @@ void Room<ppl::C_Polyhedron>::compute_vector_field_typed(){
 }
 
 template<>
-void Room<ppl::C_Polyhedron>::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ppl::C_Polyhedron &vect, const DYNAMICS_SENS &sens){
+void RoomPPL::contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ppl::C_Polyhedron &vect, const DYNAMICS_SENS &sens){
     if(sens == FWD){
         if(vect.is_empty() || in.is_empty())
             out = ppl::C_Polyhedron(out.space_dimension(), ppl::EMPTY);
@@ -317,7 +321,7 @@ int get_nb_dim_flat(const ppl::C_Polyhedron &p){
 }
 
 template <>
-const ibex::IntervalVector Room<ppl::C_Polyhedron>::get_hull() const{
+const ibex::IntervalVector RoomPPL::get_hull() const{
     ibex::IntervalVector result(m_pave->get_position().size(), ibex::Interval::EMPTY_SET);
     for(FacePPL *f:get_pave()->get_faces_vector()){
         DoorPPL *d = f->get_doors()[m_maze];
@@ -327,7 +331,7 @@ const ibex::IntervalVector Room<ppl::C_Polyhedron>::get_hull() const{
 }
 
 template <>
-const ppl::C_Polyhedron Room<ppl::C_Polyhedron>::get_hull_typed() const{
+const ppl::C_Polyhedron RoomPPL::get_hull_typed() const{
     if(m_contain_zero)
         return m_pave->get_position_typed();
     else{
@@ -357,8 +361,8 @@ ppl::C_Polyhedron convert_vec_field<ppl::C_Polyhedron>(const ibex::IntervalVecto
 }
 
 template<>
-ExpBox convert_vec_field<ExpBox>(const ibex::IntervalVector &vect){
-    return ExpBox(vect,vect); /* TODO : correct vect field must be in a room */
+ExpVF convert_vec_field<ExpVF>(const ibex::IntervalVector &vect){
+    return ExpVF(vect); 
 }
 
 }

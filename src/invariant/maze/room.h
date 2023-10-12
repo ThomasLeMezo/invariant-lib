@@ -1,11 +1,11 @@
 #ifndef FUNCTION_TOOLS
 #define FUNCTION_TOOLS
 namespace invariant {
-template <typename _Tp>
-_Tp get_empty_door_container(int dim);
+template <typename _TpD>
+_TpD get_empty_door_container(int dim);
 
-template <typename _Tp>
-_Tp get_full_door_container(int dim);
+template <typename _TpD>
+_TpD get_full_door_container(int dim);
 }
 #endif
 
@@ -36,19 +36,19 @@ namespace ppl=Parma_Polyhedra_Library;
 
 namespace invariant {
 
-template <typename _Tp> class Room;
-using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron>;
-using RoomIBEX = Room<ibex::IntervalVector>;
-using RoomEXP = Room<invariant::ExpBox>;
+template <typename _TpR, typename _TpF, typename _TpD> class Room;
+using RoomPPL = Room<Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron>;
+using RoomIBEX = Room<ibex::IntervalVector,ibex::IntervalVector,ibex::IntervalVector>;
+using RoomEXP = Room<ibex::IntervalVector,ExpVF,ExpPoly>;
 
 class Dynamics; // declared only for friendship
-template <typename _Tp> class Pave; // declared only for friendship
-template <typename _Tp> class Maze;
-template <typename _Tp> class Face;
-template <typename _Tp> class Door;
-template <typename _Tp> class Domain;
+template <typename _TpR, typename _TpF, typename _TpD> class Pave; // declared only for friendship
+template <typename _TpR, typename _TpF, typename _TpD> class Maze;
+template <typename _TpR, typename _TpF, typename _TpD> class Face;
+template <typename _TpR, typename _TpF, typename _TpD> class Door;
+template <typename _TpR, typename _TpF, typename _TpD> class Domain;
 
-template <typename _Tp=ibex::IntervalVector>
+template <typename _TpR, typename _TpF, typename _TpD=ibex::IntervalVector>
 class Room
 {
 public:
@@ -57,7 +57,7 @@ public:
      * @param p
      * @param f_vect
      */
-    Room(Pave<_Tp> *p, Maze<_Tp> *m, Dynamics *dynamics);
+    Room(Pave<_TpR,_TpF,_TpD> *p, Maze<_TpR,_TpF,_TpD> *m, Dynamics *dynamics);
 
     /**
      * @brief Room destructor
@@ -68,7 +68,7 @@ public:
      * @brief Room
      * @param r
      */
-//    Room(const Room<_Tp> &r);
+//    Room(const Room<_TpR,_TpD,_TpD> &r);
 
     /**
      * @brief reset
@@ -84,13 +84,13 @@ public:
      * @brief Getter to the associated Pave
      * @return
      */
-    Pave<_Tp>* get_pave() const;
+    Pave<_TpR,_TpF,_TpD>* get_pave() const;
 
     /**
      * @brief Getter to the associated Maze
      * @return
      */
-    Maze<_Tp>* get_maze() const;
+    Maze<_TpR,_TpF,_TpD>* get_maze() const;
 
     /**
      * @brief Set all the private output doors to empty
@@ -148,13 +148,13 @@ public:
      * @brief Return a list of neighbor Rooms that need an update according after contraction
      * @param list_rooms
      */
-    void analyze_change(std::vector<Room<_Tp> *> &list_rooms) const;
+    void analyze_change(std::vector<Room<_TpR,_TpF,_TpD> *> &list_rooms) const;
 
     /**
      * @brief Get the list of all the not removed neighbors of this room
      * @param list_rooms
      */
-    void get_all_active_neighbors(std::vector<Room<_Tp> *> &list_rooms) const;
+    void get_all_active_neighbors(std::vector<Room<_TpR,_TpF,_TpD> *> &list_rooms) const;
 
     /**
      * @brief Reset deque state to false
@@ -201,8 +201,8 @@ public:
      * @return
      */
     ibex::IntervalVector get_one_vector_fields(int n_vf) const;
-    const _Tp& get_one_vector_fields_typed_fwd(int n_vf) const;
-    const _Tp& get_one_vector_fields_typed_bwd(int n_vf) const;
+    const _TpF& get_one_vector_fields_typed_fwd(int n_vf) const;
+    const _TpF& get_one_vector_fields_typed_bwd(int n_vf) const;
 
     /**
      * @brief Getter to one of the the vector fields zero evaluation
@@ -253,7 +253,7 @@ public:
      * @return
      */
     const ibex::IntervalVector get_hull() const;
-    const _Tp get_hull_typed() const;
+    const _TpD get_hull_typed() const;
 
     /**
      * @brief Get the complementary box convex hull of the polygon
@@ -282,7 +282,7 @@ public:
      * @brief Set the union of all the doors and the hull
      * @param hull
      */
-    void set_union_hull(const _Tp &hull);
+    void set_union_hull(const _TpD &hull);
 
     /**
      * @brief operator &=
@@ -290,10 +290,10 @@ public:
      * @param r2
      * @return
      */
-    friend Room<_Tp>& operator&=(Room<_Tp>& r1, const Room<_Tp>& r2){
-        for(Face<_Tp> *f:r1.get_pave()->get_faces_vector()){
-            Door<_Tp> *d1 = f->get_doors()[r1.get_maze()];
-            Door<_Tp> *d2 = f->get_doors()[r2.get_maze()];
+    friend Room<_TpR,_TpF,_TpD>& operator&=(Room<_TpR,_TpF,_TpD>& r1, const Room<_TpR,_TpF,_TpD>& r2){
+        for(Face<_TpR,_TpF,_TpD> *f:r1.get_pave()->get_faces_vector()){
+            Door<_TpR,_TpF,_TpD> *d1 = f->get_doors()[r1.get_maze()];
+            Door<_TpR,_TpF,_TpD> *d2 = f->get_doors()[r2.get_maze()];
             *d1 &= *d2;
         }
         return r1;
@@ -304,10 +304,10 @@ public:
      * @param r2
      * @return
      */
-    friend Room<_Tp>& operator|=(Room<_Tp>& r1, const Room<_Tp>& r2){
-        for(Face<_Tp> *f:r1.get_pave()->get_faces_vector()){
-            Door<_Tp> *d1 = f->get_doors()[r1.get_maze()];
-            Door<_Tp> *d2 = f->get_doors()[r2.get_maze()];
+    friend Room<_TpR,_TpF,_TpD>& operator|=(Room<_TpR,_TpF,_TpD>& r1, const Room<_TpR,_TpF,_TpD>& r2){
+        for(Face<_TpR,_TpF,_TpD> *f:r1.get_pave()->get_faces_vector()){
+            Door<_TpR,_TpF,_TpD> *d1 = f->get_doors()[r1.get_maze()];
+            Door<_TpR,_TpF,_TpD> *d2 = f->get_doors()[r2.get_maze()];
             *d1 |= *d2;
         }
         return r1;
@@ -322,7 +322,7 @@ public:
      * @brief add_hybrid_room_neg
      * @param r
      */
-    void add_hybrid_room_pos(Room<_Tp> *r, ibex::Sep* sep);
+    void add_hybrid_room_pos(Room<_TpR,_TpF,_TpD> *r, ibex::Sep* sep);
 
 protected:
     /**
@@ -351,7 +351,7 @@ protected:
      * @brief set full result
      * @param result_storage
      */
-    void set_full_result(const int n_vf, ResultStorage<_Tp> &result_storage);
+    void set_full_result(const int n_vf, ResultStorage<_TpD> &result_storage);
 
     /**
      * @brief Basic contraction between [in] and [out] according to a [vect].
@@ -359,7 +359,7 @@ protected:
      * @param out
      * @param vect
      */
-    void contract_flow(_Tp &in, _Tp &out, const _Tp &vect, const DYNAMICS_SENS &sens);
+    void contract_flow(_TpD &in, _TpD &out, const _TpF &vect, const DYNAMICS_SENS &sens);
 //    void contract_flow(ppl::C_Polyhedron &in, ppl::C_Polyhedron &out, const ibex::IntervalVector &vect);
 
     /**
@@ -377,21 +377,21 @@ protected:
      * @param out_return
      * @param in_return
      */
-    void contract_sliding_mode(int n_vf, int face, int sens, _Tp &out_return, _Tp &in_return);
+    void contract_sliding_mode(int n_vf, int face, int sens, _TpD &out_return, _TpD &in_return);
 
     /**
      * @brief compute_sliding_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_sliding_mode(const int n_vf, ResultStorage<_Tp> &result_storage);
+    void compute_sliding_mode(const int n_vf, ResultStorage<_TpD> &result_storage);
 
     /**
      * @brief compute_standard_mode
      * @param n_vf
      * @param out_results
      */
-    void compute_standard_mode(const int n_vf, ResultStorage<_Tp> &result_storage);
+    void compute_standard_mode(const int n_vf, ResultStorage<_TpD> &result_storage);
 
 public:
     /**
@@ -410,13 +410,13 @@ public:
      * @brief get vector fields typed fwd
      * @return
      */
-    const std::vector<_Tp>& get_vector_fields_typed_fwd() const;
+    const std::vector<_TpF>& get_vector_fields_typed_fwd() const;
 
     /**
      * @brief get_vector_fields_typed_bwd
      * @return
      */
-    const std::vector<_Tp>& get_vector_fields_typed_bwd() const;
+    const std::vector<_TpF>& get_vector_fields_typed_bwd() const;
 
     /**
      * @brief recompute_vector_field
@@ -439,25 +439,25 @@ public:
      * @brief set_initial_door_input
      * @param door
      */
-    void set_initial_door_input(const _Tp &door);
+    void set_initial_door_input(const _TpD &door);
 
     /**
      * @brief set_initial_door_output
      * @param door
      */
-    void set_initial_door_output(const _Tp &door);
+    void set_initial_door_output(const _TpD &door);
 
     /**
      * @brief get_initial_door_input
      * @return
      */
-    const _Tp& get_initial_door_input() const;
+    const _TpD& get_initial_door_input() const;
 
     /**
      * @brief get_initial_door_output
      * @return
      */
-    const _Tp& get_initial_door_output() const;
+    const _TpD& get_initial_door_output() const;
 
     /**
      * @brief set_full_initial_door_input
@@ -473,7 +473,7 @@ public:
      * @brief set_father_hull
      * @param hull
      */
-    void set_father_hull(const _Tp &hull);
+    void set_father_hull(const _TpD &hull);
 
     /**
      * @brief is_father_hull
@@ -485,7 +485,7 @@ public:
      * @brief get_father_hull
      * @return
      */
-    const _Tp& get_father_hull() const;
+    const _TpD& get_father_hull() const;
 
     /**
      * @brief is_first_contract
@@ -567,14 +567,14 @@ public:
     ibex::IntervalVector get_hybrid_door() const;
 
 protected:
-    Pave<_Tp>*   m_pave = nullptr; // pointer to the associated face
-    Maze<_Tp>*   m_maze = nullptr; // pointer to the associated maze
+    Pave<_TpR,_TpF,_TpD>*   m_pave = nullptr; // pointer to the associated face
+    Maze<_TpR,_TpF,_TpD>*   m_maze = nullptr; // pointer to the associated maze
     std::vector<ibex::IntervalVector> m_vector_fields; // Vector field of the Room
     std::vector<ibex::IntervalMatrix> m_vector_fields_d1; // Vector field of the Room
     ibex::IntervalVector m_vector_fields_union;
 
-    std::vector<_Tp> m_vector_fields_typed_fwd; // Typed Vector field of the Room
-    std::vector<_Tp> m_vector_fields_typed_bwd; // Typed Vector field of the Room
+    std::vector<_TpF> m_vector_fields_typed_fwd; // Typed Vector field of the Room
+    std::vector<_TpF> m_vector_fields_typed_bwd; // Typed Vector field of the Room
 
     std::vector<bool>    m_vector_field_zero;
     bool            m_contain_zero_coordinate = false;
@@ -601,8 +601,8 @@ protected:
     // Initial condition
     bool    m_is_initial_door_input = false;
     bool    m_is_initial_door_output = false;
-    _Tp*    m_initial_door_input = nullptr;
-    _Tp*    m_initial_door_output = nullptr;
+    _TpD*    m_initial_door_input = nullptr;
+    _TpD*    m_initial_door_output = nullptr;
 
     // Hybrid condition
     std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_guard_position;
@@ -614,14 +614,14 @@ protected:
     std::map<ibex::Sep*, ibex::IntervalVector>      m_hybrid_reset_door_private;
     ibex::IntervalVector                            *m_hybrid_door = nullptr;
 
-    std::map<ibex::Sep*,std::vector<Room<_Tp>*>>    m_hybrid_rooms_pos;
-    std::map<ibex::Sep*,std::vector<Room<_Tp>*>>    m_hybrid_rooms_neg;
+    std::map<ibex::Sep*,std::vector<Room<_TpR,_TpF,_TpD>*>>    m_hybrid_rooms_pos;
+    std::map<ibex::Sep*,std::vector<Room<_TpR,_TpF,_TpD>*>>    m_hybrid_rooms_neg;
     omp_lock_t                                      m_lock_hybrid_read;
     bool                                            m_is_hybrid_list = false;
 
     // Valid hull
     bool m_is_father_hull = false;
-    _Tp* m_father_hull = nullptr;
+    _TpD* m_father_hull = nullptr;
 
     // To Be Removed
     size_t     m_nb_contract = 0;
@@ -667,7 +667,7 @@ ibex::IntervalVector convert_iv(const ibex::IntervalVector &iv);
 
 ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p);
 
-ibex::IntervalVector convert_iv(const invariant::ExpBox &q);
+ibex::IntervalVector convert_iv(const invariant::ExpPoly &q);
 
 ///
 /// \brief Get the difference Hull a\b
@@ -675,29 +675,29 @@ ibex::IntervalVector convert_iv(const invariant::ExpBox &q);
 /// \param b
 /// \return
 ///
-template <typename _Tp>
-_Tp get_diff_hull(const _Tp &a, const _Tp &b);
+template <typename _TpR>
+_TpR get_diff_hull(const _TpR &a, const _TpR &b);
 
-template <typename _Tp>
-void set_empty(_Tp &T);
+template <typename _TpD>
+void set_empty(_TpD &T);
 
 int get_nb_dim_flat(const ibex::IntervalVector &iv);
 int get_nb_dim_flat(const ppl::C_Polyhedron &p);
-int get_nb_dim_flat(const ExpBox &Q);
+int get_nb_dim_flat(const ExpPoly &Q);
 
-template<typename _Tp>
-std::ostream& operator<< (std::ostream& stream, const Room<_Tp>& r);
+template<typename _TpR, typename _TpF, typename _TpD>
+std::ostream& operator<< (std::ostream& stream, const Room<_TpR,_TpF,_TpD>& r);
 
-template<typename _Tp>
-_Tp convert_vec_field(const ibex::IntervalVector &vect);
+template<typename _TpF>
+_TpF convert_vec_field(const ibex::IntervalVector &vect);
 
-template <typename _Tp>
-inline Pave<_Tp>* Room<_Tp>::get_pave() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline Pave<_TpR,_TpF,_TpD>* Room<_TpR,_TpF,_TpD>::get_pave() const{
     return m_pave;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_first_contract(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::reset_first_contract(){
     m_first_contract = true;
     m_full=true;
     m_full_first_eval=true;
@@ -707,8 +707,8 @@ inline void Room<_Tp>::reset_first_contract(){
     reset_init_door_output();
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_init_door_input(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::reset_init_door_input(){
     if(m_is_initial_door_input){
         delete(m_initial_door_input);
         m_initial_door_input = nullptr;
@@ -716,8 +716,8 @@ inline void Room<_Tp>::reset_init_door_input(){
     }
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_init_door_output(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::reset_init_door_output(){
     if(m_is_initial_door_output){
         delete(m_initial_door_output);
         m_initial_door_output = nullptr;
@@ -725,136 +725,136 @@ inline void Room<_Tp>::reset_init_door_output(){
     }
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_initial_door_input() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_initial_door_input() const{
     return m_is_initial_door_input;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_initial_door_output() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_initial_door_output() const{
     return m_is_initial_door_output;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_initial_door_input(const _Tp &door){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_initial_door_input(const _TpD &door){
     if(!m_is_initial_door_output || !m_is_initial_door_input)
         m_maze->add_initial_room(this);
 
     m_is_initial_door_input = true;
     if(m_initial_door_input == nullptr){
-        m_initial_door_input = new _Tp(door);
+        m_initial_door_input = new _TpD(door);
     }
     else{
         *m_initial_door_input = door;
     }
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_initial_door_output(const _Tp &door){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_initial_door_output(const _TpD &door){
     if(!m_is_initial_door_output || !m_is_initial_door_input)
         m_maze->add_initial_room(this);
 
     m_is_initial_door_output = true;
     if(m_initial_door_output == nullptr){
-        m_initial_door_output = new _Tp(door);
+        m_initial_door_output = new _TpD(door);
     }
     else{
         *m_initial_door_output = door;
     }
 }
 
-template <typename _Tp>
-inline const _Tp& Room<_Tp>::get_initial_door_input() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline const _TpD& Room<_TpR,_TpF,_TpD>::get_initial_door_input() const{
     return *m_initial_door_input;
 }
 
-template <typename _Tp>
-inline const _Tp& Room<_Tp>::get_initial_door_output() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline const _TpD& Room<_TpR,_TpF,_TpD>::get_initial_door_output() const{
     return *m_initial_door_output;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_full_initial_door_input(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_full_initial_door_input(){
     if(!m_is_initial_door_output || !m_is_initial_door_input)
         m_maze->add_initial_room(this);
 
     m_is_initial_door_input = true;
     if(m_initial_door_input == nullptr){
-        m_initial_door_input = new _Tp(m_pave->get_position_typed());
+        m_initial_door_input = new _TpD(m_pave->get_position_typed());
     }
     else{
         *m_initial_door_input = m_pave->get_position_typed();
     }
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_full_initial_door_output(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_full_initial_door_output(){
     if(!m_is_initial_door_output || !m_is_initial_door_input)
         m_maze->add_initial_room(this);
 
     m_is_initial_door_output = true;
     if(m_initial_door_output == nullptr){
-        m_initial_door_output = new _Tp(m_pave->get_position_typed());
+        m_initial_door_output = new _TpD(m_pave->get_position_typed());
     }
     else{
         *m_initial_door_output = m_pave->get_position_typed();
     }
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_father_hull(const _Tp &hull){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_father_hull(const _TpD &hull){
     m_is_father_hull = true;
     if(m_father_hull == nullptr){
-        m_father_hull = new _Tp(hull);
+        m_father_hull = new _TpD(hull);
     }
     else{
         *m_father_hull = hull;
     }
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_father_hull() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_father_hull() const{
     return m_is_father_hull;
 }
 
-template <typename _Tp>
-inline const _Tp& Room<_Tp>::get_father_hull() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline const _TpD& Room<_TpR,_TpF,_TpD>::get_father_hull() const{
     return *m_father_hull;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_hybrid_door(const ibex::IntervalVector &iv){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_hybrid_door(const ibex::IntervalVector &iv){
     if(m_hybrid_door == nullptr)
         m_hybrid_door = new ibex::IntervalVector(iv);
     else
         *m_hybrid_door = iv;
 }
 
-template <typename _Tp>
-inline ibex::IntervalVector Room<_Tp>::get_hybrid_door() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline ibex::IntervalVector Room<_TpR,_TpF,_TpD>::get_hybrid_door() const{
     if(m_hybrid_door!=nullptr)
         return *m_hybrid_door;
     else
         return ibex::IntervalVector(m_pave->get_dim(),ibex::Interval::EMPTY_SET);
 }
 
-template <typename _Tp>
-inline Maze<_Tp>* Room<_Tp>::get_maze() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline Maze<_TpR,_TpF,_TpD>* Room<_TpR,_TpF,_TpD>::get_maze() const{
     return m_maze;
 }
 
-template <typename _Tp>
-const std::vector<_Tp>& Room<_Tp>::get_vector_fields_typed_fwd() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+const std::vector<_TpF>& Room<_TpR,_TpF,_TpD>::get_vector_fields_typed_fwd() const{
     return m_vector_fields_typed_fwd;
 }
 
-template <typename _Tp>
-const std::vector<_Tp>& Room<_Tp>::get_vector_fields_typed_bwd() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+const std::vector<_TpF>& Room<_TpR,_TpF,_TpD>::get_vector_fields_typed_bwd() const{
     return m_vector_fields_typed_bwd;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_in_deque(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_in_deque(){
     bool result;
     omp_set_lock(&m_lock_deque);
     result = m_in_deque;
@@ -862,8 +862,8 @@ inline bool Room<_Tp>::is_in_deque(){
     return result;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::set_in_queue(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::set_in_queue(){
     bool result = false;
     omp_set_lock(&m_lock_deque);
     if(!m_in_deque && !m_removed){
@@ -874,120 +874,120 @@ inline bool Room<_Tp>::set_in_queue(){
     return result;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_deque(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::reset_deque(){
     omp_set_lock(&m_lock_deque);
     m_in_deque = false;
     omp_unset_lock(&m_lock_deque);
 }
 
-template <typename _Tp>
-inline std::vector<ibex::IntervalVector> Room<_Tp>::get_vector_fields() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline std::vector<ibex::IntervalVector> Room<_TpR,_TpF,_TpD>::get_vector_fields() const{
     return m_vector_fields;
 }
 
-template <typename _Tp>
-inline std::vector<ibex::IntervalMatrix> Room<_Tp>::get_vector_fields_d() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline std::vector<ibex::IntervalMatrix> Room<_TpR,_TpF,_TpD>::get_vector_fields_d() const{
     return m_vector_fields_d1;
 }
 
 
-template <typename _Tp>
-inline void Room<_Tp>::lock_contraction(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::lock_contraction(){
     omp_set_lock(&m_lock_contraction);
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::unlock_contraction(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::unlock_contraction(){
     omp_unset_lock(&m_lock_contraction);
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_removed() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_removed() const{
     return m_removed;
 }
 
-template <typename _Tp>
-inline size_t Room<_Tp>::get_nb_contractions() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline size_t Room<_TpR,_TpF,_TpD>::get_nb_contractions() const{
     return m_nb_contract;
 }
 
-template <typename _Tp>
-inline std::vector<bool> Room<_Tp>::get_vector_fields_zero(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline std::vector<bool> Room<_TpR,_TpF,_TpD>::get_vector_fields_zero(){
     return m_vector_field_zero;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::get_contain_zero_coordinate() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::get_contain_zero_coordinate() const{
     return m_contain_zero_coordinate;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::get_contain_zero() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::get_contain_zero() const{
     return m_contain_zero;
 }
 
-template <typename _Tp>
-inline const _Tp& Room<_Tp>::get_one_vector_fields_typed_fwd(int n_vf) const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline const _TpF& Room<_TpR,_TpF,_TpD>::get_one_vector_fields_typed_fwd(int n_vf) const{
     return m_vector_fields_typed_fwd[n_vf];
 }
 
-template <typename _Tp>
-inline const _Tp& Room<_Tp>::get_one_vector_fields_typed_bwd(int n_vf) const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline const _TpF& Room<_TpR,_TpF,_TpD>::get_one_vector_fields_typed_bwd(int n_vf) const{
     return m_vector_fields_typed_bwd[n_vf];
 }
 
-template <typename _Tp>
-inline ibex::IntervalVector Room<_Tp>::get_one_vector_fields(int n_vf) const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline ibex::IntervalVector Room<_TpR,_TpF,_TpD>::get_one_vector_fields(int n_vf) const{
     return m_vector_fields[n_vf];
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::set_union_hull(const _Tp &hull){
-    for(Face<_Tp> *f:m_pave->get_faces_vector()){
-        Door<_Tp> *d = f->get_doors()[m_maze];
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::set_union_hull(const _TpD &hull){
+    for(Face<_TpR,_TpF,_TpD> *f:m_pave->get_faces_vector()){
+        Door<_TpR,_TpF,_TpD> *d = f->get_doors()[m_maze];
         d->set_union_hull(hull);
     }
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_first_contract() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_first_contract() const{
     return m_first_contract;
 }
 
-template <typename _Tp>
-inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_Tp>::get_hybrid_door_guards(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_TpR,_TpF,_TpD>::get_hybrid_door_guards(){
     return m_hybrid_guard_door;
 }
 
-template <typename _Tp>
-inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_Tp>::get_hybrid_door_position(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline std::map<ibex::Sep*, ibex::IntervalVector> Room<_TpR,_TpF,_TpD>::get_hybrid_door_position(){
     return m_hybrid_guard_position;
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_contract_vector_field() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_contract_vector_field() const{
     return m_contract_vector_field;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_hybrid_doors(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::reset_hybrid_doors(){
     m_hybrid_rooms_neg.clear();
     m_hybrid_rooms_pos.clear();
 }
 
-template <typename _Tp>
-inline bool Room<_Tp>::is_hybrid_list() const{
+template <typename _TpR, typename _TpF, typename _TpD>
+inline bool Room<_TpR,_TpF,_TpD>::is_hybrid_list() const{
     return m_is_hybrid_list;
 }
 
-template <typename _Tp>
-inline void Room<_Tp>::reset_hybrid_list(){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void Room<_TpR,_TpF,_TpD>::reset_hybrid_list(){
     m_is_hybrid_list = false;
 }
 
-template <typename _Tp>
-inline ibex::IntervalVector Room<_Tp>::get_hybrid_reset_door(ibex::Sep *sep){
+template <typename _TpR, typename _TpF, typename _TpD>
+inline ibex::IntervalVector Room<_TpR,_TpF,_TpD>::get_hybrid_reset_door(ibex::Sep *sep){
     ibex::IntervalVector tmp(m_pave->get_dim(), ibex::Interval::EMPTY_SET);
     omp_set_lock(&m_lock_hybrid_read);
     if(!m_hybrid_reset_door.empty()){
@@ -1010,7 +1010,7 @@ inline std::string print(const ppl::C_Polyhedron &p){
     return stream.str();
 }
 
-inline std::string print(const ExpBox &p){
+inline std::string print(const ExpPoly &p){
     std::ostringstream stream;
     stream << p;
     return stream.str();

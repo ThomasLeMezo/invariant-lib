@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
     space[1] = ibex::Interval(-6,6);
 
     // ****** Domain *******
-    invariant::SmartSubPaving<> paving(space);
-    invariant::Domain<> dom(&paving, FULL_WALL);
+    invariant::SmartSubPavingEXP paving(space);
+    invariant::DomainEXP dom(&paving, FULL_WALL);
 
     double x1_c, x2_c, r;
     x1_c = -2.0;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze *********
-    invariant::Maze<> maze(&dom, &dyn);
+    invariant::MazeEXP maze(&dom, &dyn);
 
     double time_start = omp_get_wtime();
     for(int i=0; i<14; i++){
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze);
+    VibesMazeEXP v_maze("SmartSubPavingEXP", &maze);
     v_maze.setProperties(0, 0, 512, 512);
     v_maze.show();
 

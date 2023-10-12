@@ -40,20 +40,20 @@ VtkMaze3D::VtkMaze3D(const std::string &file_name, bool memory_optimization){
     m_memory_optimization = memory_optimization;
 }
 
-void VtkMaze3D::show_room_info(invariant::Maze<ibex::IntervalVector> *maze, ibex::IntervalVector position){
-    std::vector<invariant::Pave<ibex::IntervalVector>*> pave_list;
+void VtkMaze3D::show_room_info(invariant::MazeIBEX *maze, ibex::IntervalVector position){
+    std::vector<invariant::PaveIBEX*> pave_list;
     maze->get_subpaving()->get_room_info(maze, position, pave_list);
     vector<string> name_files;
 
-    for(invariant::Pave<ibex::IntervalVector>* p:pave_list){
+    for(invariant::PaveIBEX* p:pave_list){
         stringstream file_name;
         file_name << p->get_position();
         name_files.push_back(file_name.str());
     }
 
     for(size_t i=0; i<pave_list.size(); i++){
-        invariant::Pave<ibex::IntervalVector> *p = pave_list[i];
-        invariant::Room<ibex::IntervalVector> *r = p->get_rooms()[maze];
+        invariant::PaveIBEX *p = pave_list[i];
+        invariant::RoomIBEX *r = p->get_rooms()[maze];
 
         /// ************ Draw Paves ************
         vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();
@@ -156,20 +156,20 @@ void VtkMaze3D::show_room_info(invariant::Maze<ibex::IntervalVector> *maze, ibex
     }
 }
 
-void VtkMaze3D::show_room_info(invariant::Maze<invariant::ExpBox> *maze, ibex::IntervalVector position){
-    std::vector<invariant::Pave<ExpBox>*> pave_list;
+void VtkMaze3D::show_room_info(invariant::MazeEXP *maze, ibex::IntervalVector position){
+    std::vector<invariant::PaveEXP*> pave_list;
     maze->get_subpaving()->get_room_info(maze, position, pave_list);
     vector<string> name_files;
 
-    for(invariant::Pave<ExpBox>* p:pave_list){
+    for(invariant::PaveEXP* p:pave_list){
         stringstream file_name;
         file_name << p->get_position();
         name_files.push_back(file_name.str());
     }
 
     for(size_t i=0; i<pave_list.size(); i++){
-        invariant::Pave<ExpBox> *p = pave_list[i];
-        invariant::Room<ExpBox> *r = p->get_rooms()[maze];
+        invariant::PaveEXP *p = pave_list[i];
+        invariant::RoomEXP *r = p->get_rooms()[maze];
 
         /// ************ Draw Paves ************
         vtkSmartPointer<vtkCubeSource> cubedata = vtkSmartPointer<vtkCubeSource>::New();

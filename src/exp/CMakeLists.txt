@@ -7,10 +7,12 @@
 
 set(SRC
   diff_expbox.cpp
+  expbox_util.cpp
 )
 
 set(HEADERS
   diff_expbox.h
+  expbox_util.h
 )
 
 file(COPY ${HEADERS} DESTINATION ${HEADERS_DIR})
