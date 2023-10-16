@@ -220,47 +220,12 @@ void RoomEXP::contract_flow(ExpPoly &in, ExpPoly &out, const ExpVF &vect, const 
 
     // out = in + alpha*v => c=out-in
     // in = out - alpha*v => c=in-out
-    int dim = out.get_dim();
-    ibex::IntervalVector c(dim);
-    ibex::Interval alpha(ibex::Interval::POS_REALS);
-    if(sens==FWD)
-        c=out.getBox()-in.getBox();
-    else if(sens==BWD)
-        c=in.getBox()-out.getBox();
-
-    const ibex::IntervalVector vectVF = vect.getVF();
-    for(int i=0; i<vectVF.size(); i++){
-        if(!(c[i]==ibex::Interval::ZERO && ibex::Interval::ZERO.is_subset(vectVF[i])))
-            alpha &= ((c[i]/(vectVF[i] & ibex::Interval::POS_REALS)) & ibex::Interval::POS_REALS) | ((c[i]/(vectVF[i] & ibex::Interval::NEG_REALS)) & ibex::Interval::POS_REALS);
-            if (alpha.is_empty()) break;
-    }
-    if(m_maze->get_domain()->get_init()==FULL_DOOR && alpha==ibex::Interval::ZERO) // To check ?
-        alpha.set_empty();
-
-    if (alpha.is_empty()) {
-        if (sens==FWD) { out.set_empty(); return; }
-        else if (sens==BWD) { in.set_empty(); return; }
-    }
     if (sens==FWD) {
-        vect.contract_flow(in, out, alpha);
+        vect.contract_flow(in, out);
     } else {
-        vect.contract_flow(out, in, alpha);
+        vect.contract_flow(out, in);
     }
 
-    // Contraction with Taylor 1 order
-    // ToDo : implement with several vector fields...
-//    if(in.size()==2 && !in.is_empty() && !out.is_empty() && m_vector_fields_d1.size()>0){
-//        ibex::IntervalMatrix jac=m_vector_fields_d1[0];
-//        ibex::IntervalVector vect_d(2);
-//        vect_d[0] = jac[0][0]*vect[0] + 0.5*jac[0][1]*vect[1];
-//        vect_d[1] = jac[1][1]*vect[1] + 0.5*jac[1][0]*vect[0];
-//        ibex::IntervalVector vect_in = m_maze->get_dynamics()->eval(in)[0];
-
-//        if(sens==FWD)
-//            out &= taylor_contrat_box(out, vect_d, vect_in, in);
-//        else if(sens==BWD)
-//            in &= taylor_contrat_box(in, vect_d, -vect_in, out);
-//    }
 }
 
 

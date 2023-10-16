@@ -6,6 +6,7 @@
 #include <iostream>
 #include <ctime>
 #include <vector>
+#include <map>
 #include <list>
 #include <cmath>
 #include <ibex.h>
@@ -13,6 +14,64 @@
 using namespace ibex;
 
 namespace invariant {
+
+class ExpPoly;
+/* gestion des contraintes du polyèdre */
+struct CstVect {
+   int bdim; /* dim of greatest value (always between 0.5 and 1) */
+   double vdim; /* its value */
+   Vector vect;  /* the constraint */
+
+   CstVect(int bdim, double vdim, const Vector &vect);
+   friend bool operator==(const CstVect &lhs, const CstVect& rhs);
+};
+
+CstVect traduit_vect(const IntervalVector &box,
+			const Vector &v, Interval &bounds);
+
+inline bool operator==(const CstVect &lhs, const CstVect& rhs) {
+   return (lhs.bdim==rhs.bdim && lhs.vdim==rhs.vdim &&
+          lhs.vect==rhs.vect);
+}
+      
+
+struct CstVectComp {
+inline bool operator()(const CstVect& lhs, const CstVect& rhs) const
+    {
+        if (lhs.bdim<rhs.bdim) return true;
+        else if (lhs.bdim>rhs.bdim) return false;
+        if (lhs.vdim<rhs.vdim) return true;
+        else if (lhs.vdim>rhs.vdim) return false;
+        for (int i=0;i<lhs.vect.size();i++) 
+           if (lhs.vect[i]<rhs.vect[i]) return true;
+           else if (lhs.vect[i]>rhs.vect[i]) return false;
+        return false;
+    }
+};
+
+struct CstVectMap : std::map<CstVect,Interval,CstVectComp> {
+//      CstVectMap();
+//      CstVectMap(const CstVectMap &cvm);
+      
+      bool and_constraint(const IntervalVector &box,
+			  const Vector &v, const Interval &bds);
+#if 0
+      bool and_constraint(const IntervalVector &box,
+			  const Vector &v, Interval &&i);
+#endif
+      bool and_constraint(const IntervalVector &box,
+			  const CstVect &v, const Interval &bounds);
+#if 0
+      bool and_constraint(const IntervalVector &box,
+			  const CstVect &&v, Interval &&i);
+      bool and_constraint(const IntervalVector &box,
+			  CstVect &&v, const Interval &i);
+      bool and_constraint(const IntervalVector &box,
+			  CstVect &&v, Interval &&i);
+#endif
+      friend class ExpPoly;
+};
+
 
 /** representation of polyhedron with ivbox and interval constraints */
 class ExpPoly
@@ -49,6 +108,8 @@ class ExpPoly
       ExpPoly &operator|=(const IntervalVector &iv); /* non optimal union */
       ExpPoly &operator&=(const ExpPoly &Q);
       ExpPoly &operator|=(const ExpPoly &Q); /* non optimal union */
+      ExpPoly &operator&=(ExpPoly &&Q);
+      ExpPoly &operator|=(ExpPoly &&Q); /* non optimal union */
       ExpPoly &operator&=(const std::vector<std::pair<IntervalVector, Interval>> &Res);
       void intersect_paral(const IntervalMatrix &M, const IntervalVector &V);
       ExpPoly &widen(const ExpPoly &Q);      /* union + widening */
@@ -81,10 +142,13 @@ class ExpPoly
       IntervalVector Box; /* bounding box */
       bool minimized;    /* are csts minimized */
       
-      std::vector<std::pair<Vector, Interval>> csts;
-
+      CstVectMap csts;
       void compute_dim_not_flat();
       
+      void add_cst(const Vector& V, const Interval& I);
+      void add_cst(Vector&& V, const Interval& I);
+      CstVect compute_key(const Vector& V);
+      CstVect compute_key(Vector&& V);
 };
 
 inline int ExpPoly::get_dim() const { return this->dim; }

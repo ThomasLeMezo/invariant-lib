@@ -13,12 +13,9 @@ Maze<_TpR,_TpF,_TpD>::Maze(invariant::Domain<_TpR,_TpF,_TpD> *domain, Dynamics *
     omp_init_lock(&m_initial_rooms_access);
     omp_init_lock(&m_hybrid_rooms_access);
 
-    std::cout << "oui ?\n";
     SmartSubPaving<_TpR,_TpF,_TpD> *g = domain->get_subpaving();
-    std::cout << "non !\n";
     for(Pave<_TpR,_TpF,_TpD>*p:g->get_paves()){
         Room<_TpR,_TpF,_TpD> *r = new Room<_TpR,_TpF,_TpD>(p, this, dynamics);
-        std::cout << "construction salle du pave " << p->get_position() << "\n";
         p->add_room(r);
     }
 

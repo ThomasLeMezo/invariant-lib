@@ -29,6 +29,90 @@ static inline void unit_ligne(IntervalVector &row, const Interval &piv, int col)
     row[col]=1.0;
 }
 
+CstVect::CstVect(int bdim, double vdim, const Vector &vect)  :
+     bdim(bdim), vdim(vdim), vect(vect) {
+}
+
+CstVect traduit_vect(const IntervalVector &box, const Vector &v,
+		Interval &bounds) {
+     CstVect ret(-1,0.0,v);
+     for (int i=0;i<box.size();i++) {
+         if (box[i].is_degenerated()) {
+            bounds -= ret.vect[i]*box[i];
+            ret.vect[i]=0.0;
+         }
+     }
+     for (int i=0;i<ret.vect.size();i++) {
+        double vl = fabs(ret.vect[i]);
+        if (vl>ret.vdim) { ret.bdim=i; ret.vdim=vl; }
+     }
+     double sgn=1.0;
+     if (ret.bdim>=0) {
+        if (ret.vect[ret.bdim]<0.0) sgn=-1.0;
+        double mant; int exp;
+        mant= frexp(ret.vect[ret.bdim],&exp);
+        for (int i=0;i<ret.vect.size();i++) 
+            ret.vect[i] = sgn*ldexp(ret.vect[i],1-exp);
+        bounds = Interval(ldexp(bounds.lb(),1-exp),ldexp(bounds.ub(),1-exp));
+        bounds *=sgn;
+     }
+     return ret;
+}
+
+bool CstVectMap::and_constraint(const IntervalVector &box,
+                          const Vector &v, const Interval &bds) {
+     Interval bounds(bds);
+     CstVect cv = traduit_vect(box,v,bounds);
+     return this->and_constraint(box,cv,bounds);
+} 
+
+static constexpr double threshold=0.01;
+
+bool CstVectMap::and_constraint(const IntervalVector &box,
+                          const CstVect &cv, const Interval &bounds) {
+     CstVectMap::iterator itlw = this->lower_bound(cv);
+     if (itlw!=this->end()) {
+        if (itlw->first==cv) {
+          if (itlw->second.is_subset(bounds)) return false;
+          itlw->second &= bounds;
+          return true;
+        } else if (itlw->first.bdim==cv.bdim) {
+          const Vector &v2 = itlw->first.vect;
+          double gap = 0.0;
+          for (int i=0;i<box.size();i++) {
+             gap += fabs(v2[i]-cv.vect[i]);
+             if (gap>threshold) break; /* FIXME : give a threshold */
+          }
+          if (gap<=threshold) {
+             Interval u = (bounds + (v2-cv.vect)*box);
+             if (itlw->second.is_subset(u)) return false;
+             itlw->second &= u;
+             return true;
+          }
+        } 
+    }
+    if (itlw!=this->begin()) {
+        itlw--;
+        if (itlw->first.bdim==cv.bdim) {
+          const Vector &v2 = itlw->first.vect;
+          double gap = 0.0;
+          for (int i=0;i<box.size();i++) {
+             gap += fabs(v2[i]-cv.vect[i]);
+             if (gap>threshold) break; /* FIXME : give a threshold */
+          } 
+          if (gap<=threshold) {
+             Interval u = (bounds + (v2-cv.vect)*box);
+             if (itlw->second.is_subset(u)) return false;
+             itlw->second &= u;
+             return true;
+          }
+        }
+    }
+    this->insert(itlw,std::make_pair(cv,bounds));
+    return true;
+} 
+
+
 /** utility function simplex_mat :
     apply the dual simplex on a matrix :
       the matrix used for the simplex :
@@ -194,7 +278,7 @@ static bool simplex_mat(int dim, int sz, IntervalMatrix &mat,
    @return result (empty si infaisable)
 **/
 Interval simplex_form(int dim, const IntervalVector &ivbox,
-     const std::vector<std::pair<Vector,Interval>> &csts,
+     const CstVectMap &csts,
      const Vector &obj, int maxit=10) {
    int sz = csts.size(); /* number of constraints, beside the ivbox */
    if (sz==0) return ivbox*obj;
@@ -209,11 +293,11 @@ Interval simplex_form(int dim, const IntervalVector &ivbox,
      */
    std::vector<int> basis(dim); /* the basis */
    int col=dim;
-   for (const std::pair<Vector,Interval> &cst : csts) {
+   for (const std::pair<const CstVect,Interval> &cst : csts) {
 //       std::cout << "contr " << cst.first << " " << cst.second << "\n";
        mat[dim][col]=cst.second;
        for (int i=0;i<dim;i++) {
-           mat[i][col]=cst.first[i];
+           mat[i][col]=cst.first.vect[i];
        }    
        col++;
    }
@@ -271,9 +355,11 @@ static void prepare_mat(int dim, int sz, IntervalMatrix &mat, std::vector<int> &
     returns -1 if the polyhedron is empty */
 int simplify_polyhedron(int dim, IntervalVector &ivbox,
      const std::vector<std::pair<IntervalVector,Interval>> &csts,
-     std::vector<std::pair<Vector,Interval>> &csts_res,
+     CstVectMap &csts_rs,
      int maxit=10) {
-   csts_res.clear();
+   
+   csts_rs.clear();
+   std::vector<std::pair<Vector,Interval>> csts_res;
    int sz = csts.size(); /* number of constraints, beside the ivbox */
    IntervalMatrix mat(dim+1,dim+sz+1,0.0); /* the "initial" matrix,
                                                reused several times */
@@ -369,31 +455,28 @@ int simplify_polyhedron(int dim, IntervalVector &ivbox,
        mat[dim][i]&= res;
        csts_it++;  
      }
-     int j=0;
      for (int i=0;i<csts_res.size();i++) {
         if (!csts_res[i].second.is_empty()) {
-           if (i!=j) csts_res[j]=csts_res[i];
-           j++;
+          csts_rs.and_constraint(ivbox,csts_res[i].first,csts_res[i].second);
         }
      }
-     csts_res.resize(j,std::pair<Vector,Interval>(Vector(dim),Interval::empty_set()));
      return nb_non_flat;
 }
 
 /* simplify the polyhedron, returns the number of non_flat variables, or -1
    for empty box */
 int simplify_polyhedron(int dim, IntervalVector &ivbox,
-     std::vector<std::pair<Vector,Interval>> &csts,
+     CstVectMap &csts,
      int maxit=10) {
    int sz = csts.size(); /* number of constraints, beside the ivbox */
    IntervalMatrix mat(dim+1,dim+sz+1,0.0); /* the "initial" matrix,
                                                reused several times */
    std::vector<int> basis(dim); /* the basis */
    int col=dim;
-   for (const std::pair<IntervalVector,Interval> &cst : csts) {
+   for (const std::pair<CstVect,Interval> &cst : csts) {
        mat[dim][col]=cst.second;
        for (int i=0;i<dim;i++) {
-           mat[i][col]=cst.first[i];
+           mat[i][col]=cst.first.vect[i];
        }    
        col++;
    }
@@ -426,35 +509,24 @@ int simplify_polyhedron(int dim, IntervalVector &ivbox,
 //       std::cout << "nouveau ivbox[i] " << ivbox[i] << "\n";
        mat[dim][i]=ivbox[i];
    }
-   /* now "flat" variables are removed from the constraints */
+   /* we cannot remove "new" flat variables from the constraints,
+      but it may not be needed */
    int nb_non_flat=0;
    for (int i=0;i<dim;i++) {
-      if (ivbox[i].is_degenerated()) {
-         int col=dim;
-         for (int j=0;j<csts.size();j++) {
-              double &v = csts[j].first[i];
-              Interval &R = csts[j].second;
-              R -= ivbox[i]*v;
-              mat[dim][col]=R;
-              v=0.0;
-              mat[i][col]=0.0;
-              col++;
-         }
-      } else nb_non_flat++;
+      if (!ivbox[i].is_degenerated()) nb_non_flat++;
    }
    if (nb_non_flat<=1) { csts.clear(); return nb_non_flat; }
    /* now we minimize and keep (or not) the different constraints */
-   std::vector<std::pair<Vector,Interval>>::iterator csts_it = 
-           csts.begin();
+   CstVectMap::iterator csts_it = csts.begin();
    for (int i=dim;i<dim+sz;i++) {
-       obj = (*csts_it).first;
+       obj = (*csts_it).first.vect;
 #if 0
        if (debug_simplify) {
           std::cout << std::setprecision(std::numeric_limits<double>::digits10+2);
           std::cout << "constraint " << (*csts_it).first << ":" << (*csts_it).second << "\n";
        }
 #endif
-       Interval act=(*csts_it).second;
+       Interval &act=(*csts_it).second;
        IntervalMatrix mat2(mat);
        Interval &result = mat2[dim][dim+sz];
        /* on supprime la colonne i */
@@ -488,30 +560,20 @@ int simplify_polyhedron(int dim, IntervalVector &ivbox,
        }
 #endif
        if (res.is_subset(act)) { /* the constraint is useless */
-          (*csts_it).second.set_empty();
           for (int j=0;j<=dim;j++) mat[j][i]=0.0;
-          csts_it++;
+          csts_it = csts.erase(csts_it);
           continue;
        }
-       (*csts_it).second &= res;
+       act &= res;
        mat[dim][i]&= res;
        csts_it++;  
      }
-     int j=0;
-     for (int i=0;i<csts.size();i++) {
-        if (!csts[i].second.is_empty()) {
-           if (i!=j) csts[j]=csts[i];
-           j++;
-        }
-     }
-     csts.resize(j,std::pair<Vector,Interval>(Vector(dim),Interval::empty_set()));
 #if 0
        if (debug_simplify) {
             std::cout << "size result : " << csts.size() << "\n";
        }
 #endif
      return nb_non_flat;
-
 }
 
 ExpPoly::ExpPoly(int dim, bool empty) :
@@ -535,8 +597,7 @@ ExpPoly::ExpPoly(const IntervalVector &Box, const std::vector<std::pair<Interval
       dim_not_flat = simplify_polyhedron(dim,this->Box,Csts,this->csts);
    } else {
       for (const std::pair<IntervalVector,Interval> &ct : Csts) {
-         this->csts.push_back(
-		std::pair<Vector,Interval>(ct.first.mid(), ct.second));
+         this->csts.and_constraint(Box,ct.first.mid(),ct.second);
       }
    }
 }
@@ -551,18 +612,16 @@ bool ExpPoly::is_subset (const ExpPoly &Q) const {
     /* A inclus dans Q si toutes les contraintes de Q sont inutiles */
     /* peut-être pas correct si (*this) n'est pas minimisé */
     if (!this->Box.is_subset(Q.Box)) return false;
-    for (const std::pair<Vector,Interval> &ct : Q.csts) {
-        const Vector &B = ct.first;
+    for (const std::pair<CstVect,Interval> &ct : Q.csts) {
+        const CstVect &C = ct.first;
         const Interval &Ret= ct.second; 
         /* check if already there */
-        bool ok=false;
-        for (int i=0;i<this->csts.size();i++) {
-            if (this->csts[i].first==B) { /* FIXME */
-               if (this->csts[i].second.is_subset(Ret)) { ok=true; break; }
-            }
+        const CstVectMap::const_iterator el = this->csts.find(C);
+        if (el!=this->csts.end()) {
+            Interval res = (*el).second;
+            if (el->second.is_subset(Ret)) continue;
         }
-        if (ok) continue;
-        Interval result = simplex_form(dim,this->Box,this->csts,B);
+        Interval result = simplex_form(dim,this->Box,this->csts,C.vect);
         if (!result.is_subset(Ret)) return false;
     }
     return true;
@@ -582,10 +641,10 @@ bool ExpPoly::is_superset (const IntervalVector &IV) const {
     /* A inclus dans Q si toutes les contraintes de Q sont inutiles */
     /* peut-être pas correct si (*this) n'est pas minimisé */
     if (!IV.is_subset(this->Box)) return false;
-    for (const std::pair<Vector,Interval> &ct : this->csts) {
-        const Vector &B = ct.first;
+    for (const std::pair<CstVect,Interval> &ct : this->csts) {
+        const CstVect &C = ct.first;
         const Interval &Ret= ct.second; 
-        if (!(B*IV).is_subset(Ret)) return false;
+        if (!(C.vect*IV).is_subset(Ret)) return false;
     }
     return true;
 }
@@ -603,55 +662,53 @@ void ExpPoly::compute_dim_not_flat() {
 void ExpPoly::minimize() {
     if (minimized) return;
     if (this->Box.is_empty()) { this->set_empty(); return; }
-    /* hack à revoir : on supprime les contraintes redondantes */
-    int supprime=0;
-    for (int i=this->csts.size()-1;i>=1;i--) {
-        for (int j=i-1;j>=0;j--) {
-           if (this->csts[i].first==this->csts[j].first) { /* FIXME */
-              Interval join = this->csts[i].second | this->csts[j].second;
-              this->csts[j].second=join;
-              this->csts[i].second.set_empty();
-              supprime++;
-              break;
-           }
-        }
-    }
-    if (supprime>0) {
-       int j=0;
-       for (int i=0;i<this->csts.size();i++) {
-          if (!this->csts[i].second.is_empty()) {
-             if (i!=j) this->csts[j]=this->csts[i];
-             j++;
-          }
-       }
-       this->csts.resize(j,std::pair<Vector,Interval>(Vector(dim),Interval::empty_set()));
-    }
+    if (this->csts.size()==0) { minimized=true; return; }
     dim_not_flat = simplify_polyhedron(dim,this->Box,this->csts);
-    minimized=true;
 }
 
 ExpPoly &ExpPoly::operator&=(const IntervalVector &iv) {
     if (this->Box.is_subset(iv)) return (*this);
     this->Box &= iv;
-    if (this->Box.is_empty()) { this->dim_not_flat=0; this->csts.clear();
+    if (this->Box.is_empty()) { this->dim_not_flat=-1; this->csts.clear();
 				 return (*this); }
     /* recompute dim_not_flat */
     this->compute_dim_not_flat();
-    if (dim_not_flat<=1 && this->csts.size()>0) { this->minimize(); return (*this); }
+    if (dim_not_flat<=1 && this->csts.size()>0) { minimized=false; this->minimize(); return (*this); }
     if (this->csts.size()>0) minimized=false;
     return (*this);
 }
 
 
 ExpPoly &ExpPoly::operator&=(const ExpPoly &Q) {
+    if (this->Box.is_unbounded()) {
+       (*this)=Q;
+       return (*this);
+    } 
     this->Box &= Q.Box;
     if (this->Box.is_empty()) { this->dim_not_flat=0; this->csts.clear();
 				 return (*this); }
     /* recompute dim_not_flat */
     this->compute_dim_not_flat();
     if (this->csts.size()+Q.csts.size()==0) return (*this);
-    this->csts.reserve(this->csts.size()+Q.csts.size());
-    for (auto &q : Q.csts) { this->csts.push_back(q); }
+    for (auto &q : Q.csts) { this->csts.and_constraint(this->Box,q.first, q.second); }
+    if (dim_not_flat<=1 && this->csts.size()>0) { 
+              this->minimized=false; this->minimize(); return (*this); 
+    }
+    if (this->csts.size()>0) minimized=false;
+    return (*this);
+}
+ExpPoly &ExpPoly::operator&=(ExpPoly &&Q) {
+    if (this->Box.is_unbounded()) {
+       (*this)=Q;
+       return (*this);
+    } 
+    this->Box &= Q.Box;
+    if (this->Box.is_empty()) { this->dim_not_flat=0; this->csts.clear();
+				 return (*this); }
+    /* recompute dim_not_flat */
+    this->compute_dim_not_flat();
+    if (this->csts.size()+Q.csts.size()==0) return (*this);
+    for (auto &q : Q.csts) { this->csts.and_constraint(this->Box,q.first,q.second); }
     if (dim_not_flat<=1 && this->csts.size()>0) { 
               this->minimized=false; this->minimize(); return (*this); 
     }
@@ -660,13 +717,16 @@ ExpPoly &ExpPoly::operator&=(const ExpPoly &Q) {
 }
 
 
-ExpPoly & ExpPoly::operator&=(const std::vector<std::pair<IntervalVector, Interval>> &Res) {
+ExpPoly & ExpPoly::operator&=
+	(const std::vector<std::pair<IntervalVector, Interval>> &Res) {
 //    this->csts.reserve(this->csts.size()+Res.size());
+    bool modified=false;
     for (auto &q : Res) { 
              Vector V(q.first.mid());
-             this->csts.push_back(std::pair<Vector,Interval>(V,
-			q.second+(q.first-V)*Box)); 
+             if (this->csts.and_constraint(this->Box, V,
+				 q.second+(q.first-V)*Box)) modified=true;
     }
+    if (!modified) return (*this);
     this->minimized=false;
 //    std::cout << "operator& avant minimize " << (*this) << "\n";
     this->minimize();
@@ -675,11 +735,12 @@ ExpPoly & ExpPoly::operator&=(const std::vector<std::pair<IntervalVector, Interv
 }
 
 void ExpPoly::intersect_paral(const IntervalMatrix &M, const IntervalVector &V) {
+    bool modified=false;
     for (int i=0;i<dim;i++) {
            Vector Z(M[i].mid());
-           this->csts.push_back(std::pair<Vector,Interval>(Z,
-			V[i]+(M[i]-Z)*Box)); 
+           if (this->csts.and_constraint(this->Box, Z,V[i]+(M[i]-Z)*Box)) modified=true;
     }
+    if (!modified) return;
     this->minimized=false;
 //    std::cout << "operator& avant minimize " << (*this) << "\n";
     this->minimize();
@@ -696,28 +757,39 @@ ExpPoly &ExpPoly::operator|=(const IntervalVector &iv) {
     }
     this->Box |= iv;
     this->compute_dim_not_flat();
+    bool modifie=false;
 //    if (this->csts.size()==0) return (*this);
-    for (std::pair<Vector,Interval> &ct : this->csts) {
-      const Vector& B = ct.first;
-      Interval& Ret= ct.second;
-      Interval resultB = B*iv;
+    CstVectMap::iterator ct_it = this->csts.begin();
+    while (ct_it != this->csts.end()) {
+      const CstVect& C = ct_it->first;
+      Interval& Ret= ct_it->second;
+      Interval resultB = C.vect*this->Box;
       if (Ret.is_subset(resultB)) {
-         Ret.set_empty();
-      } else Ret |= resultB;
+         ct_it = this->csts.erase(ct_it);
+         modifie=true;
+         continue;
+      } else if (!resultB.is_subset(Ret)) { 
+         Ret |= resultB;
+         modifie=true;
+      }
+      ct_it++;
     }
-    int j=0;
-    for (int i=0;i<this->csts.size();i++) {
-       if (!this->csts[i].second.is_empty()) {
-          this->csts[j]=this->csts[i];
-          j++;
-       }
-    }
-    this->csts.resize(j,std::pair<Vector,Interval>(Vector(dim),Interval::empty_set()));
-
-    if (this->csts.size()>0) minimized=false; /* pas minimisé mais presque ? */
+    if (modifie) {
+       minimized=(this->csts.size()==0);
+       if (!minimized) this->minimize();
+    }   
     return (*this);
 }
 
+ExpPoly &ExpPoly::operator|=(ExpPoly &&Q) {
+   if (Q.Box.is_empty()) return (*this);
+    if (this->Box.is_empty()) {
+       (*this) = Q;
+       return (*this);
+    }
+    (*this)|=static_cast<const ExpPoly &>(Q);
+    return (*this);
+}
 
 ExpPoly &ExpPoly::operator|=(const ExpPoly &Q) {
     if (Q.Box.is_empty()) return (*this);
@@ -731,11 +803,13 @@ ExpPoly &ExpPoly::operator|=(const ExpPoly &Q) {
     this->Box |= Q.Box;
     this->compute_dim_not_flat();
     if (this->csts.size()+Q.csts.size()==0) return (*this);
+#if 0
     if (this->csts.size()+Q.csts.size()>maxsize) {
        maxsize = this->csts.size()+Q.csts.size();
        std::cout << "new size : " << maxsize << " : " << (*this) << "\n" << Q << "\n";
     debug_simplify=true;
     }
+#endif
 //    bool debug=false;
 //    if (this->csts.size()+Q.csts.size()>10) {
 //    std::cout << "operator| " << this->dim << " " << this->dim_not_flat << " " << this->Box << " " << this->csts.size() << " " << Q.csts.size() << "\n";
@@ -743,24 +817,27 @@ ExpPoly &ExpPoly::operator|=(const ExpPoly &Q) {
 //    }
 //    bool filtre=false;
 //    if (this->csts.size()>4) filtre=true;
-    std::vector<std::pair<Vector,Interval>> nw;
-    for (const std::pair<Vector,Interval> &ct : this->csts) {
-      const Vector& B = ct.first;
+    CstVectMap nw;
+    for (const std::pair<CstVect,Interval> &ct : this->csts) {
+      const CstVect& C = ct.first;
       const Interval& Ret= ct.second;
-//      std::cout << "cstThis " << ct.first << " " << ct.second << "\n";
-      Interval result = simplex_form(dim,this->Box,Q.csts,B);
-//      if (!Ret.is_subset(result)) {
-         nw.push_back(std::pair<Vector,Interval>(B,Ret | result));
-//      } 
+      const CstVectMap::const_iterator el = Q.csts.find(C);
+      if (el!=Q.csts.end()) {
+         nw.and_constraint(this->Box, C,Ret | el->second); continue;
+      }
+      Interval result = simplex_form(dim,this->Box,Q.csts,C.vect);
+      nw.and_constraint(this->Box,C,Ret | result);
     }
 //    if (filtre) {
-    for (const std::pair<Vector,Interval> &ct : Q.csts) {
-      const Vector& B = ct.first;
+    for (const std::pair<CstVect,Interval> &ct : Q.csts) {
+      const CstVect& C = ct.first;
       const Interval& Ret= ct.second;
+      const CstVectMap::const_iterator el = this->csts.find(C);
+      if (el!=this->csts.end()) continue;
 //      std::cout << "cstQ " << ct.first << " " << ct.second << "\n";
-      Interval result = simplex_form(dim,this->Box,this->csts,B);
-//      if (!Ret.is_subset(result)) {
-         nw.push_back(std::pair<Vector,Interval>(B,Ret | result));
+      Interval result = simplex_form(dim,this->Box,this->csts,C.vect);
+//     if (!Ret.is_subset(result)) {
+       nw.and_constraint(this->Box, C,Ret | result);
 //      } 
     }
 //    }
@@ -781,9 +858,6 @@ ExpPoly &ExpPoly::operator|=(const ExpPoly &Q) {
 //    if (debug) std::cout << "après minimize : " << this->csts.size() << "\n";
     return (*this);
 }
-
-
-
 
 /* constraint-based => hard to produce a good widening... */
 ExpPoly &ExpPoly::widen(const ExpPoly &Q) {
@@ -809,15 +883,16 @@ ExpPoly &ExpPoly::widen(const ExpPoly &Q) {
        this->minimized=true;
        return (*this);
     }
-    for (std::pair<Vector,Interval> &ct : this->csts) {
-      Vector& B = ct.first;
-      Interval& Ret= ct.second;
-      Interval join = simplex_form(dim,this->Box,Q.csts,B);
+    CstVectMap::iterator ct_it = this->csts.begin();
+    while (ct_it != this->csts.end()) {
+      const CstVect& C = ct_it->first;
+      Interval& Ret= ct_it->second;
+      Interval join = simplex_form(dim,this->Box,Q.csts,C.vect);
       join |= Ret;
       double a = join.rad();
       if (join.lb()!=Ret.lb()) join|=(join.lb()-a);
       if (join.ub()!=Ret.ub()) join|=(join.ub()+a);
-      ct.second = join;
+      ct_it->second = join;
     }
     this->minimized=false;
     this->minimize();
@@ -835,7 +910,8 @@ ExpPoly operator|(const ExpPoly &C1, const ExpPoly &C2) {
    return A;
 }
 
-std::vector<std::pair<IntervalVector,Interval>> ExpPoly::build_constraints_for_propag
+std::vector<std::pair<IntervalVector,Interval>> 
+		ExpPoly::build_constraints_for_propag
 			(const Vector &C, const Vector &Z1) const {
    std::vector<std::pair<IntervalVector,Interval>> result;
    int flat_dim=-1;
@@ -843,9 +919,9 @@ std::vector<std::pair<IntervalVector,Interval>> ExpPoly::build_constraints_for_p
        if (Box[i].is_degenerated() && Z1[i]!=0.0) { flat_dim=i; break; }
    }
    if (flat_dim==-1)  {
-        for (const std::pair<Vector,Interval>&q: this->csts) {
+        for (const std::pair<CstVect,Interval>&q: this->csts) {
            result.push_back(std::pair<IntervalVector,Interval>
-		(IntervalVector(q.first),q.second));
+		(IntervalVector(q.first.vect),q.second));
         }
         for (int i=0;i<dim;i++) {
            IntervalVector V(dim,0.0);
@@ -869,8 +945,8 @@ std::vector<std::pair<IntervalVector,Interval>> ExpPoly::build_constraints_for_p
            resform = Box[i]*V[i]+V[flat_dim]*Box[flat_dim];
            result.push_back(std::pair<IntervalVector,Interval>(V,resform));
    }
-   for (const std::pair<Vector,Interval>&q: this->csts) {
-       IntervalVector V(q.first);
+   for (const std::pair<CstVect,Interval>&q: this->csts) {
+       IntervalVector V(q.first.vect);
        Interval Coef = V*Dir;
        Coef /= Dir[flat_dim];
        V[flat_dim] -= Coef;
@@ -930,8 +1006,8 @@ IntervalVector operator+(const ExpPoly &C, const IntervalVector &V) {
 
 std::ostream& operator<< (std::ostream &str, const ExpPoly& C) {
    str << "Poly(" << C.Box ;
-   for (const std::pair<Vector,Interval>&c : C.csts) {
-       str << "; " << c.first << ":" << c.second;
+   for (const std::pair<CstVect,Interval>&c : C.csts) {
+       str << "; " << c.first.vect << ":" << c.second;
    }
    str << "). ";
    return str;

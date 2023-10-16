@@ -24,7 +24,7 @@ class ExpVF {
      ExpVF (const ExpVF &VF, double sens);
     
      const IntervalVector& getVF() const;
-     void contract_flow(const ExpPoly &Start, ExpPoly &End, const Interval& tim) const;
+     void contract_flow(const ExpPoly &Start, ExpPoly &End) const;
 
    private :
      unsigned int dim; /* dimension of the space */
