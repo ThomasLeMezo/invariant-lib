@@ -116,7 +116,7 @@ public:
      * @brief Getter to the maze/door map
      * @return
      */
-    std::map<Maze<_TpR,_TpF,_TpD> *, Door<_TpR,_TpF,_TpD> *> get_doors();
+    std::map<Maze<_TpR,_TpF,_TpD> *, Door<_TpR,_TpF,_TpD> *> get_doors() const;
 
     /**
      * @brief Add a new door to the map
@@ -226,7 +226,7 @@ const bool Face<_TpR,_TpF,_TpD>::is_equal(const Face<_TpR,_TpF,_TpD>& f) const{
 }
 
 template <typename _TpR, typename _TpF, typename _TpD>
-std::map<Maze<_TpR,_TpF,_TpD> *, Door<_TpR,_TpF,_TpD> *> Face<_TpR,_TpF,_TpD>::get_doors(){
+std::map<Maze<_TpR,_TpF,_TpD> *, Door<_TpR,_TpF,_TpD> *> Face<_TpR,_TpF,_TpD>::get_doors() const {
     return m_doors;
 }
 

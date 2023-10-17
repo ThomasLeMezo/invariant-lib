@@ -861,7 +861,7 @@ ExpPoly &ExpPoly::operator|=(const ExpPoly &Q) {
 
 /* constraint-based => hard to produce a good widening... */
 ExpPoly &ExpPoly::widen(const ExpPoly &Q) {
-//    std::cout << "widen " << (*this).csts.size() << " " << Q.csts.size() << "\n";
+    std::cout << "widen " << (*this).csts.size() << " " << Q.csts.size() << "\n";
     if (Q.Box.is_empty()) return (*this);
     if (this->Box.is_empty()) {
        this->Box = Q.Box;
@@ -1013,36 +1013,109 @@ std::ostream& operator<< (std::ostream &str, const ExpPoly& C) {
    return str;
 }
 
+void ExpPoly::vertices2D(std::vector<double>&X, std::vector<double>&Y) {
+   assert(dim==2);
+   X.clear(); Y.clear();
+   /* on retrie les contraintes selon un angle */
+   std::map<double,double> rwcsts;
+   /* d'abord les bornes */
+   rwcsts.insert(std::pair<double,double>(atan2(0.0,1.0),Box[0].ub()));
+   rwcsts.insert(std::pair<double,double>(atan2(1.0,0.0),Box[1].ub()));
+   rwcsts.insert(std::pair<double,double>(atan2(0.0,-1.0),-Box[0].lb()));
+   rwcsts.insert(std::pair<double,double>(atan2(-1.0,0.0),-Box[1].lb()));
+   for (const std::pair<CstVect,Interval>&c : this->csts) {
+      double ang = atan2(c.first.vect[1],c.first.vect[0]);
+      double nrm = sqrt(c.first.vect[1]*c.first.vect[1]+
+			c.first.vect[0]*c.first.vect[0]);
+      rwcsts.insert(std::pair<double,double>(ang,c.second.ub()/nrm));
+      ang=atan2(-c.first.vect[1],-c.first.vect[0]);
+      rwcsts.insert(std::pair<double,double>(ang,-c.second.lb()/nrm));
+   }
+   std::map<double,double>::iterator it1=rwcsts.begin();
+   std::map<double,double>::iterator it2=it1; it2++;
+   double px, py;
+   bool ok=true;
+   while (ok) {
+     double px = (it1->second*sin(it2->first)-it2->second*sin(it1->first))/
+                    sin(it2->first-it1->first);
+     double py = (it1->second*cos(it2->first)-it2->second*cos(it1->first))/
+                    sin(it1->first-it2->first);
+     X.push_back(px);
+     Y.push_back(py);
+     ok=false;
+     while (it2!=rwcsts.begin() && !ok) {
+        it1++; it2++; if (it2==rwcsts.end()) it2=rwcsts.begin();
+        if (cos(it2->first)*px+sin(it2->first)*py<it2->second) ok=true;
+     }
+   }
+}
+
+void ExpPoly::vertices3Dfaces(std::vector<double>&X, std::vector<double>&Y,
+		const CstVect &vct, double sgn) {
+   assert(dim==2);
+   X.clear(); Y.clear();
+   /* on retrie les contraintes selon un angle */
+   std::map<double,double> rwcsts;
+   /* d'abord les bornes */
+   rwcsts.insert(std::pair<double,double>(atan2(0.0,1.0),Box[0].ub()));
+   rwcsts.insert(std::pair<double,double>(atan2(1.0,0.0),Box[1].ub()));
+   rwcsts.insert(std::pair<double,double>(atan2(0.0,-1.0),-Box[0].lb()));
+   rwcsts.insert(std::pair<double,double>(atan2(-1.0,0.0),-Box[1].lb()));
+   for (const std::pair<CstVect,Interval>&c : this->csts) {
+      double ang = atan2(c.first.vect[1],c.first.vect[0]);
+      double nrm = sqrt(c.first.vect[1]*c.first.vect[1]+
+			c.first.vect[0]*c.first.vect[0]);
+      rwcsts.insert(std::pair<double,double>(ang,c.second.ub()/nrm));
+      ang=atan2(-c.first.vect[1],-c.first.vect[0]);
+      rwcsts.insert(std::pair<double,double>(ang,-c.second.lb()/nrm));
+   }
+   std::map<double,double>::iterator it1=rwcsts.begin();
+   std::map<double,double>::iterator it2=it1; it2++;
+   double px, py;
+   bool ok=true;
+   while (ok) {
+     double px = (it1->second*sin(it2->first)-it2->second*sin(it1->first))/
+                    sin(it2->first-it1->first);
+     double py = (it1->second*cos(it2->first)-it2->second*cos(it1->first))/
+                    sin(it1->first-it2->first);
+     X.push_back(px);
+     Y.push_back(py);
+     ok=false;
+     while (it2!=rwcsts.begin() && !ok) {
+        it1++; it2++; if (it2==rwcsts.end()) it2=rwcsts.begin();
+        if (cos(it2->first)*px+sin(it2->first)*py<it2->second) ok=true;
+     }
+   }
+}
 
 }
 
-#if 0
+#define TEST_POLY	0
+#if (TEST_POLY)
 using namespace invariant;
 
 /* test de simplex_form */
 int main() {
-   IntervalVector ivbox(3);
-   ivbox[0]=Interval(-4,-1); ivbox[1]=Interval(1,4); ivbox[2]=Interval(-6,-1);
+   IntervalVector ivbox(2);
+   ivbox[0]=Interval(-4,-1); ivbox[1]=Interval(-4,4); 
    std::vector<std::pair<IntervalVector,Interval>> csts;
  
-   IntervalVector cst(3); cst[0]=1; cst[1]=-1; cst[2]=-1.5;
-   csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-5.25,4.3)));
-   cst[0]=-2; cst[1]=-1; cst[2]=0.5;
-   csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-5,2)));
-   cst[0]=-1.5; cst[1]=Interval(1.4,1.6); cst[2]=Interval(0.8,0.8);
-   csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-1.5,4)));
+   IntervalVector cst(2); cst[0]=1; cst[1]=-1; 
+   csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-3,3)));
+   cst[0]=-2; cst[1]=-1; 
+   csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-5,4)));
+   cst[0]=1; cst[1]=2;
+   csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-0.4,1)));
 
-   Vector obj(3);
-   obj[0]=2; obj[1]=1; obj[2]=-0.5;
-   
-   double result;
-   std::vector<std::pair<Vector,Interval>> cst_res;
-   bool r = simplify_polyhedron(3,ivbox,csts,cst_res, 1000);
-   std::cout << r << "\n"; 
-   std::cout << ivbox << "\n"; 
-   for (auto a : cst_res) {
-     std::cout << a.first << " in " << a.second << "\n";
+   ExpPoly ep(ivbox,csts,false);
+ 
+   std::cout << ep << "\n";
+   std::vector<double> X,Y;
+   ep.vertices2D(X,Y);
+   for (int i=0;i<X.size();i++) {
+       std::cout << "(" << X[i] << "," << Y[i] << ")," ;
    }
+   std::cout << "\n";
    return 0;
 
 }

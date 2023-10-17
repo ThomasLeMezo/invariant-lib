@@ -399,69 +399,26 @@ ExpVF::ExpVF (const ExpVF &EVF, double sens) :
 }
 
 
-
-void ExpVF::contract_flow(const ExpPoly &Start, ExpPoly &End) const {
-   /* calcul naïf du temps */
-    IntervalVector c = End.getBox()-Start.getBox();
-    Interval alpha(Interval::pos_reals());
-    for(int i=0; i<dim; i++){
-        if(!(c[i]==Interval::zero() && this->VF[i].contains(0.0)))
-            alpha &= ((c[i]/(this->VF[i] & Interval::pos_reals())) & Interval::pos_reals()) | ((c[i]/(this->VF[i] & Interval::neg_reals())) & Interval::pos_reals());
-            if (alpha.is_empty()) break;
-    }
-    if (alpha==Interval::zero()) alpha.set_empty();
-//    if(m_maze->get_domain()->get_init()==FULL_DOOR && alpha==ibex::Interval::ZERO) // To check ?  // FIXME: what does it meant?
-//        alpha.set_empty();
-
-   if (alpha.is_empty()) {  End.set_empty(); return; }
-
-   Interval &tim=alpha;
-//   std::cout << "c : " << c << " VF : " << VF << " time : " << tim << "\n";
-
-   IntervalVector basicFlow = Start+tim*this->VF;  /* TODO : better ! */
-   End &= basicFlow;
-   if (End.is_empty() || this->constant_field || (infinite_norm(A)*tim.mag()>=0.8) || (tim==Interval::zero()))
-      return;
-/* refine time ? */
-#define REFINE_TIME	1
+std::vector<std::pair<IntervalVector, Interval>> ExpVF::build_flow(const ExpPoly &StartR, ExpPoly &End, Interval tim) const {
+   /* a small "backward to refine start */
 #define BACKWARD_REFINE	1
-#if (REFINE_TIME) 
-   c = End.getBox()- Start.getBox();
-   for (int i=0; i<dim; i++){
-       Interval den = (A*(Start.getBox()-C)+Z1+this->V)[i] & this->VF[i];
-       if (den.contains(0.0)) continue;
-       Interval num = c[i];
-       Interval tim2 = (num/den)
-			*(1-Interval(0,2)*c[i]*(A*this->VF)[i]/sqr(den)) ;
-       if (!tim.is_subset(tim2)) {
-//           std::cout << "refine time : progres : " << tim << " " << tim2 << "\n";
-           tim &= tim2;
-       }
-   }
 #if (BACKWARD_REFINE)
-   basicFlow = Start+tim*this->VF;  /* TODO : better ! */
-   End &= basicFlow;
+   ExpPoly Start = StartR & this->basicFlow(End,-tim);
+#else
+   const ExpPoly &Start = StartR;
 #endif
-#endif
+
    double t_mid = tim.mid();
    Interval t_rad = tim-t_mid;
    Matrix Id = Matrix::eye(dim);
-
-#if 1
-   /* a small "backward to refine start */
-#if (BACKWARD_REFINE)
-   ExpPoly StartR = Start & (End.getBox()-tim*this->VF);
-#else
-   const ExpPoly &StartR = Start;
-#endif
    /* start relative au centre */
-   Vector SMid =  StartR.getBox().mid();
-   IntervalVector stRel = StartR.getBox() -  SMid;
+   Vector SMid =  Start.getBox().mid();
+   IntervalVector stRel = Start.getBox() -  SMid;
    /* récupération de Start sous une forme "adaptée" */
    Vector Z1p = A*(SMid-C)+Z1;
 
    std::vector<std::pair<IntervalVector, Interval>> lst =
-		 StartR.build_constraints_for_propag(C, Z1p);
+		 Start.build_constraints_for_propag(C, Z1p);
 //   std::cout << "constraints building " << Start << " " << Z1 << "\n";
 //   for (auto &q : lst) {
 //       std::cout << q.first << " (" << q.first*Z1 << ") "  << q.second << "\n";
@@ -496,8 +453,60 @@ void ExpVF::contract_flow(const ExpPoly &Start, ExpPoly &End) const {
 //       lst[i].second += lst[i].first*C;
        lst[i].first = lst[i].first*(rotA+Id);
    }
-   
-#else 
+   return lst;
+}
+
+Interval ExpVF::compute_basic_time(const ExpPoly &Start, const ExpPoly &End) const {
+   /* calcul naïf du temps */
+    IntervalVector c = End.getBox()-Start.getBox();
+    Interval alpha(Interval::pos_reals());
+    for(int i=0; i<dim; i++){
+        if(!(c[i]==Interval::zero() && this->VF[i].contains(0.0)))
+            alpha &= ((c[i]/(this->VF[i] & Interval::pos_reals())) & Interval::pos_reals()) | ((c[i]/(this->VF[i] & Interval::neg_reals())) & Interval::pos_reals());
+            if (alpha.is_empty()) return alpha;
+    }
+    if (alpha==Interval::zero()) return Interval::empty_set();
+    return alpha;
+}
+
+Interval ExpVF::refine_time(const ExpPoly &Start, const ExpPoly &End, Interval &tim) const {
+   IntervalVector c = End.getBox()- Start.getBox();
+   for (int i=0; i<dim; i++){
+       Interval den = (A*(Start.getBox()-C)+Z1+this->V)[i] & this->VF[i];
+       if (den.contains(0.0)) continue;
+       Interval num = c[i];
+       Interval tim2 = (num/den)
+			*(1-Interval(0,2)*c[i]*(A*this->VF)[i]/sqr(den)) ;
+       if (!tim.is_subset(tim2)) {
+//           std::cout << "refine time : progres : " << tim << " " << tim2 << "\n";
+           tim &= tim2;
+       }
+   }
+   return tim;
+}
+
+
+void ExpVF::contract_flow(const ExpPoly &Start, ExpPoly &End) const {
+   /* calcul naïf du temps */
+    Interval alpha = this->compute_basic_time(Start, End);
+
+    Interval &tim=alpha;
+//   std::cout << "c : " << c << " VF : " << VF << " time : " << tim << "\n";
+
+    IntervalVector basicFlow = this->basicFlow(Start,tim);  /* TODO : better ! */
+    End &= basicFlow;
+   if (End.is_empty() || this->constant_field || (infinite_norm(A)*tim.mag()>=0.8) || (tim==Interval::zero()))
+      return;
+/* refine time ? */
+#define REFINE_TIME	1
+#if (REFINE_TIME) 
+   tim = this->refine_time(Start,End,tim);
+#endif
+
+#if 1
+   std::vector<std::pair<IntervalVector, Interval>> lst = this->build_flow(Start, End, tim);
+   End &= lst;
+#else
    IntervalMatrix Zt = matrix_orthogonal(Z1);
    IntervalVector Y0 = Start.build_constraints_for_propag(Zt);
    IntervalMatrix Z = Zt.transpose();
@@ -510,11 +519,6 @@ void ExpVF::contract_flow(const ExpPoly &Start, ExpPoly &End) const {
    IntervalMatrix rotAinv = Zt*exp_mat(-t_mid*A);
    IntervalVector R3 = exp_mat_abs(ZTAZ,tim)*(rotAinv*this->V);
    IntervalVector Y = (Y0+R1+R2+R3+(rotAinv-Zt)*C);
-#endif
-
-#if 1
-   End &= lst;
-#else
    End.intersect_paral(rotAinv,Y);
 #endif
 }

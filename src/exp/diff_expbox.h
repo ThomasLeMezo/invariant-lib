@@ -24,6 +24,15 @@ class ExpVF {
      ExpVF (const ExpVF &VF, double sens);
     
      const IntervalVector& getVF() const;
+     std::vector<std::pair<IntervalVector, Interval>> 
+	     build_flow(const ExpPoly &Start, ExpPoly &End, Interval tim) const;
+
+     IntervalVector basicFlow
+	     (const ExpPoly &Start, const Interval& tim) const;
+     Interval compute_basic_time(const ExpPoly &Start, const ExpPoly &End) const;
+     Interval refine_time(const ExpPoly &Start, const ExpPoly &End, Interval &tim) const;
+
+
      void contract_flow(const ExpPoly &Start, ExpPoly &End) const;
 
    private :
@@ -40,6 +49,11 @@ class ExpVF {
 
 inline const IntervalVector& ExpVF::getVF() const {
      return this->VF;
+}
+inline IntervalVector ExpVF::basicFlow
+	     (const ExpPoly &Start, const Interval& tim) const {
+    return Start.getBox() + tim*this->VF;
+
 }
 
 }

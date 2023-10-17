@@ -175,6 +175,10 @@ void VibesMaze<_TpR,_TpF,_TpD>::draw_room_inner(Pave<_TpR,_TpF,_TpD> *p) const{
     // Draw Cone
     for(invariant::Maze<_TpR,_TpF,_TpD>* maze:m_maze_inner)
         show_theta(p, maze);
+    // Draw flows
+    for(invariant::Maze<_TpR,_TpF,_TpD>* maze:m_maze_inner)
+        show_flows(p, maze);
+  
 }
 
 template <typename _TpR, typename _TpF, typename _TpD>
@@ -228,6 +232,8 @@ void VibesMaze<_TpR,_TpF,_TpD>::draw_room_outer(Pave<_TpR,_TpF,_TpD> *p) const{
     // Draw Cone
     for(invariant::Maze<_TpR,_TpF,_TpD>* maze:m_maze_outer)
         show_theta(p, maze);
+    for(invariant::Maze<_TpR,_TpF,_TpD>* maze:m_maze_outer)
+        show_flows(p, maze);
 
     // Hybrid
     for(invariant::Maze<_TpR,_TpF,_TpD>* maze:m_maze_outer){

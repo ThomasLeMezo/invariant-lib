@@ -134,6 +134,9 @@ class ExpPoly
       friend IntervalVector operator+(const ExpPoly &C, const IntervalVector &V);
         
       friend std::ostream& operator<<(std::ostream& str, const ExpPoly& C);
+      
+      void vertices2D(std::vector<double>&x, std::vector<double>&y);
+
 
   private :
       int dim; /* dimension of the space */

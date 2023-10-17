@@ -43,6 +43,8 @@ public:
     void get_room_info(invariant::Maze<_TpR,_TpF,_TpD> *maze, double x, double y) const;
 
     void show_room_info(invariant::Maze<_TpR,_TpF,_TpD> *maze, const ibex::IntervalVector &position);
+    
+
 
     /**
      * @brief drawCircle for easier integration with the python binding
@@ -75,6 +77,12 @@ public:
      * @param val
      */
     void set_enable_cone(bool val);
+
+    /**
+     * @brief set_enable_flows
+     * @param val
+     */
+    void set_enable_flows(bool val);
 
     /**
      * @brief get_volume
@@ -147,6 +155,7 @@ private:
     void show_maze_outer() const;
     void show_maze_inner() const;
     void show_theta(invariant::Pave<_TpR,_TpF,_TpD> *p, invariant::Maze<_TpR,_TpF,_TpD> *maze) const;
+    void show_flows(invariant::Pave<_TpR,_TpF,_TpD> *p, invariant::Maze<_TpR,_TpF,_TpD> *maze) const;
 
     void show_maze_outer_inner() const;
 
@@ -174,6 +183,7 @@ private:
 
     bool m_both_wall = false;
     bool m_enable_cones = false;
+    bool m_enable_flows = false;
     bool m_enable_white_boundary = true;
 
     ibex::IntervalVector m_scale_factor;
@@ -204,6 +214,11 @@ private:
 template <typename _TpR, typename _TpF, typename _TpD>
 inline void VibesMaze<_TpR,_TpF,_TpD>::set_enable_cone(bool val){
     m_enable_cones = val;
+}
+
+template <typename _TpR, typename _TpF, typename _TpD>
+inline void VibesMaze<_TpR,_TpF,_TpD>::set_enable_flows(bool val){
+    m_enable_flows = val;
 }
 
 template <typename _TpR, typename _TpF, typename _TpD>
