@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
     dom_outer.set_border_path_out(false);
 
     double x1_c, x2_c, r;
-    x1_c = 1.0;
-    x2_c = 1.0;
-    r = 0.0;
+    x1_c = 2.5;
+    x2_c = 2.5;
+    r = 0.3;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LT); // LT, LEQ, EQ, GEQ, GT)
     dom_outer.set_sep(&s);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     invariant::MazeEXP maze_inner(&dom_inner, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<15; i++){
+    for(int i=0; i<17; i++){
         cout << i << endl;
         paving.bisect();
         maze_outer.contract();
@@ -66,17 +66,18 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMazeEXP v_maze("vdp_fwdEXP", &maze_outer , &maze_inner);
+    VibesMazeEXP v_maze("vdp_fwdEXP2", &maze_outer , &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
     v_maze.set_enable_cone(true);
+    v_maze.set_enable_flows(true);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
 
     v_maze.saveImage("./", ".svg");
 
     IntervalVector position_info(2);
-    position_info[0] = ibex::Interval(0.62);
-    position_info[1] = ibex::Interval(-1.53);
+    position_info[0] = ibex::Interval(2.795,2.805);
+    position_info[1] = ibex::Interval(-0.40,-0.39);
     v_maze.show_room_info(&maze_outer, position_info);
 
 //    IntervalVector pave_in(2);

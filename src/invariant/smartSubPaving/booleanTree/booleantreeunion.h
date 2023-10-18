@@ -31,8 +31,9 @@ public:
     bool eval_set_empty(Pave<_TpR,_TpF,_TpD> *pave);
 };
 
-using BooleanTreeUnionPPL = BooleanTreeUnion<Parma_Polyhedra_Library::C_Polyhedron>;
-using BooleanTreeUnionIBEX = BooleanTreeUnion<ibex::IntervalVector>;
+using BooleanTreeUnionPPL = BooleanTreeUnion<Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron,Parma_Polyhedra_Library::C_Polyhedron>;
+using BooleanTreeUnionIBEX = BooleanTreeUnion<ibex::IntervalVector,ibex::IntervalVector,ibex::IntervalVector>;
+using BooleanTreeUnionEXP = BooleanTreeUnion<ibex::IntervalVector,invariant::ExpVF,invariant::ExpPoly>;
 
 }
 
