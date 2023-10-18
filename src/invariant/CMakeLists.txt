@@ -11,6 +11,7 @@ include_directories(smartSubPaving)
 include_directories(smartSubPaving/booleanTree)
 include_directories(maze)
 include_directories(serialization)
+include_directories(../exp)
 
 set(SRC
   definition/spacefunction.cpp

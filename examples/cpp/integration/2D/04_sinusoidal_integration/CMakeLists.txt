@@ -19,6 +19,7 @@
 	invariant-core
 	
 	invariant-graphics
+	explib
   )
 
 

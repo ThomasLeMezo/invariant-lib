@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     space[0] = ibex::Interval(-1, 1);
     space[1] = ibex::Interval(-1, 1);
 
-    invariant::SmartSubPaving<> paving(space);
+    invariant::SmartSubPavingEXP paving(space);
 
     // ****** Domain Outer ******* //
-    invariant::Domain<> dom_outer(&paving, FULL_WALL);
+    invariant::DomainEXP dom_outer(&paving, FULL_WALL);
 
     double x1_0, x2_0, r;
     x1_0 = 0.0;
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn_outer(&f, FWD);
 
     // ******* Mazes ********* //
-    invariant::Maze<> maze_outer(&dom_outer, &dyn_outer);
+    invariant::MazeEXP maze_outer(&dom_outer, &dyn_outer);
 
     // ******* Algorithm ********* //
     double time_start = omp_get_wtime();
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("SmartSubPaving", &maze_outer);
+    VibesMazeEXP v_maze("SmartSubPaving", &maze_outer);
     v_maze.setProperties(0, 0, 1024, 1024);
     v_maze.show();
 

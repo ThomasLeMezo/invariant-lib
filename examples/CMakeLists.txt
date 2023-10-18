@@ -11,5 +11,6 @@ include_directories(${CMAKE_SOURCE_DIR}/src/tools/serialization)
 include_directories(${CMAKE_SOURCE_DIR}/src/invariant/definition/netcdf)
 include_directories(${CMAKE_SOURCE_DIR}/src/graphics)
 include_directories(${CMAKE_SOURCE_DIR}/src/language)
+include_directories(${CMAKE_SOURCE_DIR}/src/exp)
 
 add_subdirectory(cpp)

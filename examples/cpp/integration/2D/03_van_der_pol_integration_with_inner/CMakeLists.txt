@@ -17,7 +17,7 @@
   target_link_libraries(2D_integration_van_der_pol_with_inner
 	${LIBS}
 	invariant-core
-	
+	explib
 	invariant-graphics
   )
 

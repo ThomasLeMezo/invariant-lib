@@ -25,14 +25,25 @@ public:
     /**
      * @brief Export to a file the representation of a paving
      */
-    void show_graph(invariant::SmartSubPaving<ibex::IntervalVector> *subpaving);
+    void show_graph(invariant::SmartSubPavingIBEX *subpaving);
+    /**
+     * @brief Export to a file the representation of a paving
+     */
+    void show_graph(invariant::SmartSubPavingEXP *subpaving);
 
     /**
      * @brief Export to a file the representation of a maze
      * @param maze
      * @param comment
      */
-    void show_maze(invariant::Maze<ibex::IntervalVector> *maze, std::string comment="");
+    void show_maze(invariant::MazeIBEX *maze, std::string comment="");
+    /**
+     * @brief Export to a file the representation of a maze
+     * @param maze
+     * @param comment
+     */
+    void show_maze(invariant::MazeEXP *maze, std::string comment="");
+
 
     /**
      * @brief show_maze
@@ -45,13 +56,24 @@ public:
      * @param maze
      * @param position_info
      */
-    void show_room_info(invariant::Maze<ibex::IntervalVector> *maze, ibex::IntervalVector position);
+    void show_room_info(invariant::MazeIBEX *maze, ibex::IntervalVector position);
+    /**
+     * @brief Export to a file the representation of selected paves
+     * @param maze
+     * @param position_info
+     */
+    void show_room_info(invariant::MazeEXP *maze, ibex::IntervalVector position);
 
     /**
      * @brief serialize_maze
      * @param file_name
      */
-    void serialize_maze(const string &file_name, invariant::Maze<ibex::IntervalVector> *maze);
+    void serialize_maze(const string &file_name, invariant::MazeIBEX *maze);
+    /**
+     * @brief serialize_maze
+     * @param file_name
+     */
+    void serialize_maze(const string &file_name, invariant::MazeEXP *maze);
 
 private:
     std::string         m_file_name = "";

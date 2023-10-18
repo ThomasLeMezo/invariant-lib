@@ -53,6 +53,13 @@ public:
     const std::vector<ibex::IntervalMatrix> eval_d1(const ibex::IntervalVector &position);
 
     /**
+     * @brief Eval the jacobian + value
+     * @param position
+     * @return
+     */
+    const std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>> eval_jac(const ibex::IntervalVector &position);
+
+    /**
      * @brief add_hybrid_condition
      * @param f_guard
      * @param f_reset

@@ -29,9 +29,11 @@ void DynamicsFunction::initalize_function(const vector<Function*> &functions){
                 m_functions[n].push_back(f_new);
             }
         }
+        compute_taylor(true);
     }
     else{
         m_functions.push_back(functions);
+        compute_taylor(true);
 //        m_functions.push_back(vector<Function*>());
 //        for(Function* f:functions){
 
@@ -84,7 +86,7 @@ DynamicsFunction::DynamicsFunction(SpaceFunction *f, const DYNAMICS_SENS sens, b
 
 void DynamicsFunction::compute_taylor(bool taylor){
     if(taylor){
-        for(int n = 0; n<m_num_threads; n++){
+        for(int n = 0; n<m_functions.size(); n++){
             m_functions_d1.push_back(vector<Function*>());
             for(Function* f:m_functions[n]){
                 ibex::Function *f_diff = new ibex::Function(*f, ibex::Function::DIFF);
@@ -147,6 +149,36 @@ const std::vector<ibex::IntervalMatrix> DynamicsFunction::eval_d1(const ibex::In
         }
     }
     //    omp_unset_lock(&m_lock_dynamics);
+    return vector_field;
+}
+
+const std::vector<std::pair<ibex::Matrix,ibex::IntervalVector>> DynamicsFunction::eval_jac(const ibex::IntervalVector &position){
+    //    omp_set_lock(&m_lock_dynamics);
+    vector<std::pair<Matrix,IntervalVector>> vector_field;
+    size_t thread_id = 0;
+    if(m_multi_threaded)
+        thread_id = omp_get_thread_num();
+    else
+        omp_set_lock(&m_lock_dynamics);
+
+    if(!m_functions_d1.empty()){
+        int n = m_functions[thread_id].size();
+        assert(m_functions_d1[thread_id].size()==n);
+        for (int i=0;i<n;i++) {
+            Function*f_d1 = m_functions_d1[thread_id][i];
+            Function*f    = m_functions[thread_id][i];
+            IntervalMatrix jacobian= f_d1->eval_matrix(position);
+            Matrix jcenter = jacobian.mid();
+            jacobian = jacobian-jcenter;
+            IntervalVector fmid = f->eval_vector(position.mid());
+            fmid += jacobian * (position - position.mid());
+            vector_field.push_back(pair<Matrix,IntervalVector>
+					(jcenter,fmid));
+        }
+    }
+
+    if(!m_multi_threaded)
+        omp_unset_lock(&m_lock_dynamics);
     return vector_field;
 }
 

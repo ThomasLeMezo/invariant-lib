@@ -10,13 +10,13 @@
 
 namespace invariant {
 
-template <typename _Tp> class ResultStorage;
+template <typename _TpD> class ResultStorage;
 using ResultStoragePPL = ResultStorage<Parma_Polyhedra_Library::C_Polyhedron>;
 using ResultStorageIBEX = ResultStorage<ibex::IntervalVector>;
 
 class Dynamics; // declared only for friendship
 
-template <typename _Tp>
+template <typename _TpD>
 class ResultStorage
 {   
 public:
@@ -24,22 +24,22 @@ public:
 
 //    void test();
 
-    void push_back_input(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
-    void push_back_output(const _Tp &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
+    void push_back_input(const _TpD &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
+    void push_back_output(const _TpD &val, const size_t &face_in, const size_t &sens_in, const size_t &face_out, const size_t &sens_out, const size_t &n_vf);
 
-    void push_back_input_initial(const _Tp &val, const size_t &face, const size_t &sens, const size_t &n_vf);
-    void push_back_output_initial(const _Tp &val, const size_t &face, const size_t &sens, const size_t &n_vf);
+    void push_back_input_initial(const _TpD &val, const size_t &face, const size_t &sens, const size_t &n_vf);
+    void push_back_output_initial(const _TpD &val, const size_t &face, const size_t &sens, const size_t &n_vf);
 
-    _Tp get_output(const size_t &face, const size_t &sens);
-    _Tp get_output2(const size_t &face, const size_t &sens);
-    _Tp get_output3(const size_t &face, const size_t &sens);
-    _Tp get_input(const size_t &face, const size_t &sens);
-    _Tp get_input2(const size_t &face, const size_t &sens);
-    _Tp get_input3(const size_t &face, const size_t &sens);
+    _TpD get_output(const size_t &face, const size_t &sens);
+    _TpD get_output2(const size_t &face, const size_t &sens);
+    _TpD get_output3(const size_t &face, const size_t &sens);
+    _TpD get_input(const size_t &face, const size_t &sens);
+    _TpD get_input2(const size_t &face, const size_t &sens);
+    _TpD get_input3(const size_t &face, const size_t &sens);
 
 private:
     //
-    typedef std::vector< std::array<std::vector<_Tp>, 2>> sub_tab_type;
+    typedef std::vector< std::array<std::vector<_TpD>, 2>> sub_tab_type;
     typedef std::vector< std::array<sub_tab_type, 2>> tab_type;
 
     std::vector<std::vector<std::array<size_t, 2>>> m_intersection_list;

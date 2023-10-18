@@ -18,6 +18,7 @@
 	 ${LIBS}
 	 invariant-core
      invariant-graphics
+     explib
   )
 
 

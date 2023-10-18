@@ -24,22 +24,22 @@ int main(int argc, char *argv[])
     space[1] = ibex::Interval(-3,3);
 
     // ****** Domain *******
-    invariant::SmartSubPaving<> paving(space);
+    invariant::SmartSubPavingEXP paving(space);
 
 
-    invariant::Domain<> dom_outer(&paving, FULL_WALL);
+    invariant::DomainEXP dom_outer(&paving, FULL_WALL);
     dom_outer.set_border_path_in(false);
     dom_outer.set_border_path_out(false);
 
     double x1_c, x2_c, r;
-    x1_c = 1.0;
-    x2_c = 1.0;
-    r = 0.2;
+    x1_c = 2.5;
+    x2_c = 2.5;
+    r = 0.3;
     Function f_sep(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
     SepFwdBwd s(f_sep, LT); // LT, LEQ, EQ, GEQ, GT)
     dom_outer.set_sep(&s);
 
-    invariant::Domain<> dom_inner(&paving, FULL_DOOR);
+    invariant::DomainEXP dom_inner(&paving, FULL_DOOR);
     dom_inner.set_border_path_in(true);
     dom_inner.set_border_path_out(true);
     Function f_sep_inner(x1, x2, pow(x1-x1_c, 2)+pow(x2-x2_c, 2)-pow(r, 2));
@@ -51,11 +51,11 @@ int main(int argc, char *argv[])
     DynamicsFunction dyn(&f, FWD);
 
     // ******* Maze *********
-    invariant::Maze<> maze_outer(&dom_outer, &dyn);
-    invariant::Maze<> maze_inner(&dom_inner, &dyn);
+    invariant::MazeEXP maze_outer(&dom_outer, &dyn);
+    invariant::MazeEXP maze_inner(&dom_inner, &dyn);
 
     double time_start = omp_get_wtime();
-    for(int i=0; i<16; i++){
+    for(int i=0; i<17; i++){
         cout << i << endl;
         paving.bisect();
         maze_outer.contract();
@@ -66,18 +66,19 @@ int main(int argc, char *argv[])
     cout << paving << endl;
 
     vibes::beginDrawing();
-    VibesMaze v_maze("vdp_fwd", &maze_outer, &maze_inner);
+    VibesMazeEXP v_maze("vdp_fwdEXP2", &maze_outer , &maze_inner);
     v_maze.setProperties(0, 0, 1000, 800);
-    v_maze.set_enable_cone(false);
+    v_maze.set_enable_cone(true);
+    v_maze.set_enable_flows(true);
     v_maze.show();
     v_maze.drawCircle(x1_c, x2_c, r, "red", "red");
 
-    v_maze.saveImage("/home/lemezoth/workspaceQT/tikz-adapter/tikz/figs/svg/", ".svg");
+    v_maze.saveImage("./", ".svg");
 
-//    IntervalVector position_info(2);
-//    position_info[0] = ibex::Interval(3.1);
-//    position_info[1] = ibex::Interval(1.8);
-//    v_maze.show_room_info(&maze, position_info);
+    IntervalVector position_info(2);
+    position_info[0] = ibex::Interval(2.795,2.805);
+    position_info[1] = ibex::Interval(-0.40,-0.39);
+    v_maze.show_room_info(&maze_outer, position_info);
 
 //    IntervalVector pave_in(2);
 //    pave_in[0] = ibex::Interval(2.67188, 2.71875);

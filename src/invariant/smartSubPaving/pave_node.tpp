@@ -1,36 +1,36 @@
 #include "pave_node.h" // only for ide
 
 namespace invariant{
-template<typename _Tp>
-Pave_node<_Tp>::Pave_node(Pave<_Tp> *p):m_position(p->get_position())
+template<typename _TpR, typename _TpF, typename _TpD>
+Pave_node<_TpR,_TpF,_TpD>::Pave_node(Pave<_TpR,_TpF,_TpD> *p):m_position(p->get_position())
 {
     m_leaf = true;
     m_pave = p;
     m_border_pave = p->is_border();
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::add_child(Pave<_Tp> *p1, Pave<_Tp> *p2){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::add_child(Pave<_TpR,_TpF,_TpD> *p1, Pave<_TpR,_TpF,_TpD> *p2){
     m_leaf = false;
     m_pave = nullptr;
-    Pave_node<_Tp>* pn1 = new Pave_node<_Tp>(p1);
-    Pave_node<_Tp>* pn2 = new Pave_node<_Tp>(p2);
+    Pave_node<_TpR,_TpF,_TpD>* pn1 = new Pave_node<_TpR,_TpF,_TpD>(p1);
+    Pave_node<_TpR,_TpF,_TpD>* pn2 = new Pave_node<_TpR,_TpF,_TpD>(p2);
     m_children = std::make_pair(pn1, pn2);
 
     p1->set_pave_node(pn1);
     p2->set_pave_node(pn2);
 }
 
-template<typename _Tp>
-Pave_node<_Tp>::~Pave_node(){
+template<typename _TpR, typename _TpF, typename _TpD>
+Pave_node<_TpR,_TpF,_TpD>::~Pave_node(){
     if(m_leaf==false){
         delete(m_children.first);
         delete(m_children.second);
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_pave_outer(std::vector<Pave<_Tp>*> &l, const ibex::IntervalVector &box){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_pave_outer(std::vector<Pave<_TpR,_TpF,_TpD>*> &l, const ibex::IntervalVector &box){
     if(!(box & m_position).is_empty()){
         if(m_leaf)
             l.push_back(m_pave);
@@ -41,8 +41,8 @@ void Pave_node<_Tp>::get_intersection_pave_outer(std::vector<Pave<_Tp>*> &l, con
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_pave_inner(std::vector<Pave<_Tp>*> &l, const ibex::IntervalVector &box){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_pave_inner(std::vector<Pave<_TpR,_TpF,_TpD>*> &l, const ibex::IntervalVector &box){
     if(!(box & m_position).is_empty()){
         if(m_leaf){
             if(m_position.is_strict_interior_subset(box))
@@ -55,8 +55,8 @@ void Pave_node<_Tp>::get_intersection_pave_inner(std::vector<Pave<_Tp>*> &l, con
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_pave_outer(std::vector<Pave<_Tp>*> &l, ibex::Ctc &nc){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_pave_outer(std::vector<Pave<_TpR,_TpF,_TpD>*> &l, ibex::Ctc &nc){
     ibex::IntervalVector position(m_position);
     nc.contract(position);
 
@@ -71,8 +71,8 @@ void Pave_node<_Tp>::get_intersection_pave_outer(std::vector<Pave<_Tp>*> &l, ibe
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_pave_inner(std::vector<Pave<_Tp>*> &l, ibex::Ctc &nc){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_pave_inner(std::vector<Pave<_TpR,_TpF,_TpD>*> &l, ibex::Ctc &nc){
     ibex::IntervalVector position(m_position);
     nc.contract(position);
 
@@ -89,11 +89,11 @@ void Pave_node<_Tp>::get_intersection_pave_inner(std::vector<Pave<_Tp>*> &l, ibe
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_face_outer(std::vector<Face<_Tp>*> &l, const ibex::IntervalVector &box){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_face_outer(std::vector<Face<_TpR,_TpF,_TpD>*> &l, const ibex::IntervalVector &box){
     if(!(box & m_position).is_empty()){
         if(m_leaf){
-            for(Face<_Tp>*f:m_pave->get_faces_vector()){
+            for(Face<_TpR,_TpF,_TpD>*f:m_pave->get_faces_vector()){
                 if(!(f->get_position() & box).is_empty())
                     l.push_back(f);
             }
@@ -105,11 +105,11 @@ void Pave_node<_Tp>::get_intersection_face_outer(std::vector<Face<_Tp>*> &l, con
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, const ibex::IntervalVector &box){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_face_inner(std::vector<Face<_TpR,_TpF,_TpD>*> &l, const ibex::IntervalVector &box){
     if(!(box & m_position).is_empty()){
         if(m_leaf){
-            for(Face<_Tp>*f:m_pave->get_faces_vector()){
+            for(Face<_TpR,_TpF,_TpD>*f:m_pave->get_faces_vector()){
                 if(f->get_position().is_strict_interior_subset(box))
                     l.push_back(f);
             }
@@ -121,14 +121,14 @@ void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, con
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_face_outer(std::vector<Face<_Tp>*> &l, ibex::Ctc &nc){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_face_outer(std::vector<Face<_TpR,_TpF,_TpD>*> &l, ibex::Ctc &nc){
     ibex::IntervalVector position(m_position);
     nc.contract(position);
 
     if(!position.is_empty()){
         if(m_leaf){
-            for(Face<_Tp>*f:m_pave->get_faces_vector()){
+            for(Face<_TpR,_TpF,_TpD>*f:m_pave->get_faces_vector()){
                 ibex::IntervalVector f_position(f->get_position());
                 nc.contract(f_position);
                 if(!f_position.is_empty())
@@ -142,15 +142,15 @@ void Pave_node<_Tp>::get_intersection_face_outer(std::vector<Face<_Tp>*> &l, ibe
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, ibex::Ctc &nc){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_face_inner(std::vector<Face<_TpR,_TpF,_TpD>*> &l, ibex::Ctc &nc){
     ibex::IntervalVector position(m_position);
     nc.contract(position);
 
     if(!position.is_empty()){
         if(m_leaf){
             if(position == m_position){
-                for(Face<_Tp>*f:m_pave->get_faces_vector()){
+                for(Face<_TpR,_TpF,_TpD>*f:m_pave->get_faces_vector()){
                     ibex::IntervalVector f_position(f->get_position());
                     nc.contract(f_position);
                     if(f_position == f->get_position())
@@ -165,8 +165,8 @@ void Pave_node<_Tp>::get_intersection_face_inner(std::vector<Face<_Tp>*> &l, ibe
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_all_child_rooms(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_all_child_rooms(std::vector<Room<_TpR,_TpF,_TpD> *> &list_room, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(is_leaf()){
         if(!m_pave->get_rooms()[maze]->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
@@ -179,10 +179,10 @@ void Pave_node<_Tp>::get_all_child_rooms(std::vector<Room<_Tp> *> &list_room, Ma
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_all_child_rooms_not_empty(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_all_child_rooms_not_empty(std::vector<Room<_TpR,_TpF,_TpD> *> &list_room, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(is_leaf()){
-        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
         if(!r->is_empty() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
@@ -194,10 +194,10 @@ void Pave_node<_Tp>::get_all_child_rooms_not_empty(std::vector<Room<_Tp> *> &lis
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_all_child_rooms_not_empty_private(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_all_child_rooms_not_empty_private(std::vector<Room<_TpR,_TpF,_TpD> *> &list_room, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(is_leaf()){
-        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
         if(!r->is_empty_private() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
@@ -209,10 +209,10 @@ void Pave_node<_Tp>::get_all_child_rooms_not_empty_private(std::vector<Room<_Tp>
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_all_child_rooms_not_full(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_all_child_rooms_not_full(std::vector<Room<_TpR,_TpF,_TpD> *> &list_room, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(is_leaf()){
-        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
         if(!r->is_full() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
@@ -228,10 +228,10 @@ void Pave_node<_Tp>::get_all_child_rooms_not_full(std::vector<Room<_Tp> *> &list
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_all_child_rooms_not_full_private(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_all_child_rooms_not_full_private(std::vector<Room<_TpR,_TpF,_TpD> *> &list_room, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(is_leaf()){
-        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
         if(!r->is_full_private() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
@@ -247,11 +247,11 @@ void Pave_node<_Tp>::get_all_child_rooms_not_full_private(std::vector<Room<_Tp> 
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_all_child_rooms_inside_outside(std::vector<Room<_Tp> *> &list_room, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_all_child_rooms_inside_outside(std::vector<Room<_TpR,_TpF,_TpD> *> &list_room, Maze<_TpR,_TpF,_TpD> *maze) const{
     // ToDo : verify ? => why not called recursively ?
     if(is_leaf()){
-        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
         if(!r->is_full() && !r->is_removed())
             list_room.push_back(m_pave->get_rooms()[maze]);
     }
@@ -263,13 +263,13 @@ void Pave_node<_Tp>::get_all_child_rooms_inside_outside(std::vector<Room<_Tp> *>
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_bounding_fullness(Maze<_Tp> *maze, ibex::IntervalVector &result){
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_bounding_fullness(Maze<_TpR,_TpF,_TpD> *maze, ibex::IntervalVector &result){
     if(m_position.is_subset(result))
         return;
 
     if(is_leaf()){
-        Room<_Tp> *r = m_pave->get_rooms()[maze];
+        Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
         if(!r->is_empty())
             result |= r->get_hull();
     }
@@ -279,8 +279,8 @@ void Pave_node<_Tp>::get_bounding_fullness(Maze<_Tp> *maze, ibex::IntervalVector
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_border_paves(std::vector<Pave<_Tp>*>& pave_list) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_border_paves(std::vector<Pave<_TpR,_TpF,_TpD>*>& pave_list) const{
     if(is_leaf() && m_pave->is_border()){
         pave_list.push_back(m_pave);
     }
@@ -292,11 +292,11 @@ void Pave_node<_Tp>::get_border_paves(std::vector<Pave<_Tp>*>& pave_list) const{
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_polygon_not_empty(std::vector<Room<_Tp>*> &l, const ibex::IntervalVector &box, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_polygon_not_empty(std::vector<Room<_TpR,_TpF,_TpD>*> &l, const ibex::IntervalVector &box, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(!(box & m_position).is_empty()){
         if(m_leaf){
-            Room<_Tp> *r = m_pave->get_rooms()[maze];
+            Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
             if(!r->is_removed() && !r->is_empty()){
                 l.push_back(r);
             }
@@ -308,11 +308,11 @@ void Pave_node<_Tp>::get_intersection_polygon_not_empty(std::vector<Room<_Tp>*> 
     }
 }
 
-template<typename _Tp>
-void Pave_node<_Tp>::get_intersection_polygon_empty(std::vector<Room<_Tp>*> &l, const ibex::IntervalVector &box, Maze<_Tp> *maze) const{
+template<typename _TpR, typename _TpF, typename _TpD>
+void Pave_node<_TpR,_TpF,_TpD>::get_intersection_polygon_empty(std::vector<Room<_TpR,_TpF,_TpD>*> &l, const ibex::IntervalVector &box, Maze<_TpR,_TpF,_TpD> *maze) const{
     if(!(box & m_position).is_empty()){
         if(m_leaf){
-            Room<_Tp> *r = m_pave->get_rooms()[maze];
+            Room<_TpR,_TpF,_TpD> *r = m_pave->get_rooms()[maze];
             if(r->is_removed() || !r->is_full()){
                 l.push_back(r);
             }

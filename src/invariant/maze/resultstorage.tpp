@@ -33,7 +33,7 @@ ResultStorage<_Tp>::ResultStorage(const size_t &dim, const size_t &nb_vf){
 
     // Build intersection list
     std::vector<std::array<size_t, 2>> combination; // [face, sens]
-    for(size_t i=0; i<nb_vf ; i++)
+    for(size_t i=0; i<nb_vf+1 ; i++)
         combination.push_back(std::array<size_t, 2>{0,0});
     m_intersection_list.push_back(combination);
     for(size_t comb_face = 0; comb_face<pow(dim*2,nb_vf)-1; comb_face++){
