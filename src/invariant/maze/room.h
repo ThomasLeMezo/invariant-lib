@@ -669,6 +669,9 @@ ibex::IntervalVector convert_iv(const ppl::C_Polyhedron &p);
 
 ibex::IntervalVector convert_iv(const invariant::ExpPoly &q);
 
+template <typename _TpF>
+bool contains_v(const _TpF &iv, const ibex::Vector &vect);
+
 ///
 /// \brief Get the difference Hull a\b
 /// \param a
@@ -1020,6 +1023,9 @@ template <typename _Tp>
 _Tp convert(const ibex::IntervalVector &iv);
 template <typename _Tp>
 _Tp convert(const ppl::C_Polyhedron &p);
+
+ppl::C_Polyhedron operator-(const ppl::C_Polyhedron &p);
+
 
 }
 #include "room.tpp"

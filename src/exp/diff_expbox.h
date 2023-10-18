@@ -20,6 +20,7 @@ class ExpVF {
    public:
      ExpVF (const IntervalVector &Box, const IntervalVector &VF, 
                         const std::pair<Matrix, IntervalVector>& pair);
+     ExpVF (const IntervalVector &Box, const IntervalVector &VF);
      ExpVF (const IntervalVector &VF);
      ExpVF (const ExpVF &VF, double sens);
     
@@ -27,19 +28,23 @@ class ExpVF {
      std::vector<std::pair<IntervalVector, Interval>> 
 	     build_flow(const ExpPoly &Start, ExpPoly &End, Interval tim) const;
 
+     ExpVF &operator|= (const ExpVF &vf);
+     friend ExpVF operator-(const ExpVF &vf);
+
      IntervalVector basicFlow
 	     (const ExpPoly &Start, const Interval& tim) const;
      Interval compute_basic_time(const ExpPoly &Start, const ExpPoly &End) const;
      Interval refine_time(const ExpPoly &Start, const ExpPoly &End, Interval &tim) const;
-
-
      void contract_flow(const ExpPoly &Start, ExpPoly &End) const;
+
 
    private :
      unsigned int dim; /* dimension of the space */
      bool constant_field; /* is A = 0 ? */
 
+     IntervalVector Box; /* needed for union :( */
      IntervalVector VF;
+
      Vector C;      /* center of the box (needed if A!=0) */
      Matrix A;           /* room : dynamics */
      Vector Z1;          /* mean direction of VF (on the center)  */

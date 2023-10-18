@@ -182,7 +182,7 @@ void RoomEXP::compute_vector_field_typed(){
           m_vector_fields_typed_fwd.push_back(vfield);
           m_vector_fields_typed_bwd.push_back(ExpVF(vfield,-1.0));
        } else {
-          ExpVF vfield(m_vector_fields[i]);
+          ExpVF vfield(position,m_vector_fields[i]);
           m_vector_fields_typed_fwd.push_back(vfield);
           m_vector_fields_typed_bwd.push_back(ExpVF(vfield,-1.0));
        }
@@ -328,6 +328,33 @@ ppl::C_Polyhedron convert_vec_field<ppl::C_Polyhedron>(const ibex::IntervalVecto
 template<>
 ExpVF convert_vec_field<ExpVF>(const ibex::IntervalVector &vect){
     return ExpVF(vect); 
+}
+
+template<>
+bool contains_v<ibex::IntervalVector>(const ibex::IntervalVector &iv, const ibex::Vector &vect){
+    return iv.contains(vect);
+}
+
+template<>
+bool contains_v<ppl::C_Polyhedron> (const  ppl::C_Polyhedron &iv, const ibex::Vector &vect){
+    return polyhedron_2_iv(iv).contains(vect);
+}
+
+template<>
+bool contains_v<ExpVF> (const ExpVF &iv, const ibex::Vector &vect){
+    return iv.getVF().contains(vect);
+}
+
+/* FIXME : très "lourd"... est-ce qu'on considère les VF de PPL comme des
+   IntervalVector et on fait la transformation au dernier moment ? */
+ppl::C_Polyhedron operator-(const ppl::C_Polyhedron &p) {
+   ppl::C_Polyhedron p1(p);
+   for (int i=0;i<p.space_dimension();i++) {
+      ppl::Linear_Expression le;
+      le -= ppl::Variable(i);
+      p1.affine_image(ppl::Variable(i),le);
+   }
+   return p1;
 }
 
 }

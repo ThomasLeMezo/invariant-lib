@@ -378,24 +378,58 @@ static IntervalMatrix matrix_orthogonal(const Vector &V) {
 
 ExpVF::ExpVF(const IntervalVector &Box, const IntervalVector &VF,
 			 const std::pair<Matrix, IntervalVector>& pair) :
-    dim(Box.size()), A(pair.first), C(Box.mid()), Z1(Box.size()),
+    dim(Box.size()), Box(Box), A(pair.first), C(Box.mid()), Z1(Box.size()),
     V(pair.second), VF(VF), constant_field(false)
     {
       Z1 = V.mid();
       V = V-Z1;
 }
 
-ExpVF::ExpVF(const IntervalVector &VF) :
-    dim(VF.size()),
+ExpVF::ExpVF(const IntervalVector &Box, const IntervalVector &VF) :
+    dim(VF.size()), Box(VF),
     A(dim,dim,0.0), C(dim,0.0), Z1(VF.mid()), constant_field(true),
     V(VF-Z1), VF(VF)
     {
 }
 
+ExpVF::ExpVF(const IntervalVector &VF) :
+    dim(VF.size()), Box(VF),
+    A(dim,dim,0.0), C(dim,0.0), Z1(VF.mid()), constant_field(true),
+    V(VF-Z1), VF(VF)
+    {
+      assert(this->Box.is_empty());
+}
+
 ExpVF::ExpVF (const ExpVF &EVF, double sens) :
-    dim(EVF.dim), A(sens*EVF.A), C(EVF.C), Z1(sens*EVF.Z1),
+    dim(EVF.dim), Box(EVF.Box), A(sens*EVF.A), C(EVF.C), Z1(sens*EVF.Z1),
     V(sens*EVF.V), VF(sens*EVF.VF), constant_field(EVF.constant_field) {
 
+}
+
+ExpVF  & ExpVF::operator|=(const ExpVF &vf) {
+    if (this->Box.is_empty()) {
+       (*this)=vf;
+       return (*this);
+    }
+    if (vf.Box.is_empty()) return (*this);
+    this->VF |= vf.VF;
+    this->constant_field |= vf.constant_field;
+    if (this->constant_field) return (*this);
+    IntervalVector nBox = this->Box | vf.Box;
+    Vector nC = nBox.mid();
+    Matrix nA = 0.5*(vf.A+this->A);
+    IntervalVector V1 = this->Z1+(this->A-nA)*(this->Box-this->C)+nA*(nC-this->C)+this->V;;
+    V1 |= (vf.Z1+(vf.A-nA)*(vf.Box-vf.C)+nA*(nC-vf.C)+vf.V);
+    this->Z1 = V1.mid();
+    this->V = V1 - this->Z1;
+    this->A=nA;
+    this->C=nC;
+    this->Box = nBox;
+    return (*this);
+}
+
+ExpVF operator-(const ExpVF &vf) {
+    return ExpVF(vf,-1.0);
 }
 
 

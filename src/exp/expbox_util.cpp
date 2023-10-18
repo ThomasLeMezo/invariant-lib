@@ -66,7 +66,7 @@ bool CstVectMap::and_constraint(const IntervalVector &box,
      return this->and_constraint(box,cv,bounds);
 } 
 
-static constexpr double threshold=0.01;
+static constexpr double threshold=1e-10;
 
 bool CstVectMap::and_constraint(const IntervalVector &box,
                           const CstVect &cv, const Interval &bounds) {
@@ -266,6 +266,228 @@ static bool simplex_mat(int dim, int sz, IntervalMatrix &mat,
    return true;
 }
 
+/** use the simple matrix to generate a list of vertices from a 2D-facet
+ *  we start with a already optimal matrix and "turn" the basis . 
+ *  the ivbox enables to create the coordinates of the vertices ...
+ *  locked_basis = not movable basis (all except 2 ?) */
+static std::list<Vector>
+	generate_vertices(int dim, int sz, const IntervalVector &ivbox,
+			IntervalMatrix &mat, 
+			std::vector<int> &basis,
+                        const std::vector<bool> &locked_basis) {
+//   std::cout << "ivbox : " << ivbox << "\n";
+   std::list<Vector> lstret;
+   std::vector<bool> ibasis(2*(dim+sz),false);
+//   for (int i=0;i<dim;i++) ibasis[basis[i]]=true;
+   /* here we just "turn" around, hence a basic variable must stay twice */
+   int lastin= -1; /* at first we don't have a move */
+   /* we consider that the first movble dimension is the «~last in~» */
+   for (int i=0;i<dim;i++) {
+      if (locked_basis[i]) continue;
+      lastin=basis[i]; break; 
+   }
+   ibasis[lastin] = true;
+   bool fini=false;
+   double gain=1.0; /* gain>0 : sommet "utile" */
+   while (!fini) {
+      /* generate the first vertex */
+//      std::cout << "mat : " << mat << "\n";
+      Vector val(dim,0.0);
+      if (gain>1e-10) {
+        for (int i=0;i<dim;i++) {
+                 val[i]=ivbox[i].ub()-mat[dim][i].ub();
+                 if (!mat[dim][i].contains(0.0)) {
+                    std::cout << "pb matrice vertices\n";
+                 }
+	}
+//        std::cout << "gain = " << gain << " sommet : " << val << "\n";
+        if (ivbox.contains(val)) lstret.push_back(val);
+      }
+      /* identifying the exiting basis */
+      int basisout=-1;
+      int ncol=0;
+      for (int i=0;i<dim;i++) {
+          /* is this basis movable (not equality) ? */
+          if (locked_basis[i]) continue;
+          if (basis[i]==lastin) continue;
+          bool neg_basis = (basis[i]%2 == 1);
+          int col = basis[i]/2;
+          /* to modify the place, the last line must be modified,
+             __but__ all intervals must stay around 0... hence we try
+	     the minimum possible > 0 */
+          double bcoef=-1.0;
+          for (int j=0;j<dim+sz;j++) {
+	      if (mat[i][j].contains(0.0)) continue; /* not usable */
+              if (mat[i][j].lb()>0) {
+                 if (neg_basis) { /* we decrease mat[dim][col], so decrease 
+				     mat[dim][j], towards pos_basis */
+                     double coef = mat[dim][j].ub()/mat[i][j].lb();
+                     if (coef<bcoef || ncol==0) { ncol=j+1; bcoef=coef; }
+                 } else { /* towards neg_basis */
+                     double coef = -mat[dim][j].lb()/mat[i][j].lb();
+                     if (ncol==0 || coef<bcoef)
+					 { ncol=-j-1; bcoef=coef; }
+                 }
+              } else {
+                 if (neg_basis) { /* we decrease mat[dim][col], so increase
+				     mat[dim][j], towards neg_basis */
+                     double coef = mat[dim][j].lb()/mat[i][j].ub();
+                     if (coef<bcoef || ncol==0) { ncol=-j-1; bcoef=coef; }
+                 } else { /* towards pos_basis */
+                     double coef = -mat[dim][j].ub()/mat[i][j].ub();
+                     if (coef<bcoef || ncol==0) { ncol=j+1; bcoef=coef; }
+                 }
+              }
+          }
+          assert (ncol!=-1); /* can't find a move, theoretically not possible
+                              as it is bounded */
+          gain=bcoef; basisout=i; break; /* 2D => only one move ! */
+       }
+       /* maintenant on se contente de faire entrer/sortir ncol */
+       if (ncol<0) { /* on entre lambda en négatif */
+          ncol=-ncol-1;
+          /* division de la ligne */
+          basis[basisout]=2*ncol+1;
+          lastin = 2*ncol+1;
+          Interval valpivot=mat[basisout][ncol];
+          /* on calcul la nouvelle ligne */
+          unit_ligne(mat[basisout],valpivot,ncol);
+          /* puis on soustrait sur les autres lignes */
+          for (int row=0;row<dim;row++) {
+              if (row==basisout) continue;
+              annule_ligne(mat[basisout],mat[row],ncol);
+          }
+          /* objectif : annuler la lower bound */
+          annule_ligne_ub_lb(mat[basisout],mat[dim],ncol,false);
+       } else { /* lambda en positif */
+          ncol=ncol-1;
+          /* division de la ligne */
+          basis[basisout]=2*ncol;
+          lastin = 2*ncol;
+          Interval valpivot=mat[basisout][ncol];
+          /* on calcul la nouvelle ligne */
+          unit_ligne(mat[basisout],valpivot,ncol);
+          /* puis on annule les autres */
+          for (int row=0;row<dim;row++) {
+              if (row==basisout) continue;
+              annule_ligne(mat[basisout],mat[row],ncol);
+          }
+          /* objectif : annuler la upper bound */
+          annule_ligne_ub_lb(mat[basisout],mat[dim],ncol,true);
+       }
+       /* si on est sur la base initiale, on s'arrête... */
+       fini=ibasis[lastin];
+       ibasis[lastin]=true;
+   }
+   return lstret;
+}
+
+/* generate the facet of a polyhedron. with an extremal dimension */
+static std::list<Vector> 
+		generate_facet(const IntervalVector &ivbox,
+                 const CstVectMap &csts, int dm, bool upper) {
+    assert(ivbox.size()==3);
+    int sz = csts.size();
+    int dim = ivbox.size();
+    IntervalMatrix mat(dim+1,dim+sz+1,0.0);
+     /* the matrix used for the simplex :
+        line 0->dim-1 : rows (basis)
+        line dim : objective 
+        column 0->dim-1 : start with ivbox
+        column dim->dim+sz-1 constraints 
+        column dim+sz : lambdas
+          [dim][dim+sz] : -objectif
+     */
+    std::vector<int> basis(dim); /* the basis */
+    int col=dim;
+    for (const std::pair<const CstVect,Interval> &cst : csts) {
+//        std::cout << "contr " << cst.first << " " << cst.second << "\n";
+        mat[dim][col]=cst.second;
+        for (int i=0;i<dim;i++) {
+            mat[i][col]=cst.first.vect[i];
+        }    
+        col++;
+    }
+    for (int row=0;row<dim;row++) {
+        mat[row][row]=1.0;
+        mat[dim][row]=ivbox[row]; 
+      
+    }
+    for (int row=0;row<dim;row++) {
+        mat[row][dim+sz]=(row==dm ? (upper ? 1.0 : -1.0) : 0.0);
+        if (row!=dm || upper) { /* obj=0 ou 1 */
+           mat[dim] -= mat[dim][row].ub()*mat[row];
+           basis[row]=2*row;
+        } else {
+           mat[dim] -= mat[dim][row].lb()*mat[row];
+           basis[row]=2*row+1;
+        }
+    }
+    if (!simplex_mat(dim, sz, mat, basis,200)) 
+               { return std::list<Vector>(); }
+    if (basis[dm]/2 != dm) { /* pas une facette ? */
+               return std::list<Vector>(); }
+    std::vector<bool> locked(dim, false); 
+    locked[dm]=true;
+    return generate_vertices(dim,sz, ivbox, mat, basis, locked);
+}
+/* generate the facet of a polyhedron. with a existing constraint */
+static std::list<Vector> 
+		generate_facet(const IntervalVector &ivbox,
+                 const CstVectMap &csts, const CstVect &cstF, bool upper) {
+    assert(ivbox.size()==3);
+    int sz = csts.size();
+    int dim = ivbox.size();
+    IntervalMatrix mat(dim+1,dim+sz+1,0.0);
+     /* the matrix used for the simplex :
+        line 0->dim-1 : rows (basis)
+        line dim : objective 
+        column 0->dim-1 : start with ivbox
+        column dim->dim+sz-1 constraints 
+        column dim+sz : lambdas
+          [dim][dim+sz] : -objectif
+     */
+    std::vector<int> basis(dim); /* the basis */
+    int col=dim;
+    int colCst = -1;
+    for (const std::pair<const CstVect,Interval> &cst : csts) {
+//        std::cout << "contr " << cst.first << " " << cst.second << "\n";
+        if (cst.first==cstF) colCst = col;
+        mat[dim][col]=(cst.first!=cstF ? cst.second : 
+		Interval(upper ? cst.second.ub() : cst.second.lb()));
+        for (int i=0;i<dim;i++) {
+            mat[i][col]=cst.first.vect[i];
+        }    
+        col++;
+    }
+    for (int row=0;row<dim;row++) {
+        mat[row][row]=1.0;
+        mat[dim][row]=ivbox[row]; 
+      
+    }
+    for (int row=0;row<dim;row++) {
+        double cf = (upper ? 1.0 : -1.0)*cstF.vect[row];
+        mat[row][dim+sz]=cf;
+        if (cf>=0.0) { 
+           mat[dim] -= mat[dim][row].ub()*mat[row];
+           basis[row]=2*row;
+        } else {
+           mat[dim] -= mat[dim][row].lb()*mat[row];
+           basis[row]=2*row+1;
+        }
+    }
+    if (!simplex_mat(dim, sz, mat, basis,200)) 
+               { return std::list<Vector>(); }
+    int dm = -1;
+    for (int i=0;i<dim;i++) {
+       if (basis[i]/2==colCst) { dm=i; break; } 
+    }
+    if (dm==-1) { /* pas une facette ? */
+               return std::list<Vector>(); }
+    std::vector<bool> locked(dim, false); 
+    locked[dm]=true;
+    return generate_vertices(dim,sz, ivbox, mat, basis, locked);
+}
 
 /** get upper bound of a linear form on a polyhedron defined with intervals
    (simplex algorithm). The upper bound is guaranteed to be safe (>= the exact
@@ -861,7 +1083,7 @@ ExpPoly &ExpPoly::operator|=(const ExpPoly &Q) {
 
 /* constraint-based => hard to produce a good widening... */
 ExpPoly &ExpPoly::widen(const ExpPoly &Q) {
-    std::cout << "widen " << (*this).csts.size() << " " << Q.csts.size() << "\n";
+//    std::cout << "widen " << (*this).csts.size() << " " << Q.csts.size() << "\n";
     if (Q.Box.is_empty()) return (*this);
     if (this->Box.is_empty()) {
        this->Box = Q.Box;
@@ -1050,42 +1272,15 @@ void ExpPoly::vertices2D(std::vector<double>&X, std::vector<double>&Y) {
    }
 }
 
-void ExpPoly::vertices3Dfaces(std::vector<double>&X, std::vector<double>&Y,
-		const CstVect &vct, double sgn) {
-   assert(dim==2);
-   X.clear(); Y.clear();
-   /* on retrie les contraintes selon un angle */
-   std::map<double,double> rwcsts;
-   /* d'abord les bornes */
-   rwcsts.insert(std::pair<double,double>(atan2(0.0,1.0),Box[0].ub()));
-   rwcsts.insert(std::pair<double,double>(atan2(1.0,0.0),Box[1].ub()));
-   rwcsts.insert(std::pair<double,double>(atan2(0.0,-1.0),-Box[0].lb()));
-   rwcsts.insert(std::pair<double,double>(atan2(-1.0,0.0),-Box[1].lb()));
-   for (const std::pair<CstVect,Interval>&c : this->csts) {
-      double ang = atan2(c.first.vect[1],c.first.vect[0]);
-      double nrm = sqrt(c.first.vect[1]*c.first.vect[1]+
-			c.first.vect[0]*c.first.vect[0]);
-      rwcsts.insert(std::pair<double,double>(ang,c.second.ub()/nrm));
-      ang=atan2(-c.first.vect[1],-c.first.vect[0]);
-      rwcsts.insert(std::pair<double,double>(ang,-c.second.lb()/nrm));
-   }
-   std::map<double,double>::iterator it1=rwcsts.begin();
-   std::map<double,double>::iterator it2=it1; it2++;
-   double px, py;
-   bool ok=true;
-   while (ok) {
-     double px = (it1->second*sin(it2->first)-it2->second*sin(it1->first))/
-                    sin(it2->first-it1->first);
-     double py = (it1->second*cos(it2->first)-it2->second*cos(it1->first))/
-                    sin(it1->first-it2->first);
-     X.push_back(px);
-     Y.push_back(py);
-     ok=false;
-     while (it2!=rwcsts.begin() && !ok) {
-        it1++; it2++; if (it2==rwcsts.end()) it2=rwcsts.begin();
-        if (cos(it2->first)*px+sin(it2->first)*py<it2->second) ok=true;
-     }
-   }
+/** generate the facet of a 3D flat polyhedron */
+std::list<Vector> ExpPoly::facet3D() const {
+     if (!this->is_empty())
+       for (int i=0;i<dim;i++) {
+           if (this->Box[i].is_degenerated())
+              return generate_facet(this->getBox(),this->getCsts(),i,true);
+       }
+     /* did not work ? */
+     return std::list<Vector>();
 }
 
 }
@@ -1096,26 +1291,49 @@ using namespace invariant;
 
 /* test de simplex_form */
 int main() {
-   IntervalVector ivbox(2);
-   ivbox[0]=Interval(-4,-1); ivbox[1]=Interval(-4,4); 
+   IntervalVector ivbox(3);
+   ivbox[0]=Interval(-4,-1); ivbox[1]=Interval(-4,4);  ivbox[2]=Interval(-2,3);
    std::vector<std::pair<IntervalVector,Interval>> csts;
  
-   IntervalVector cst(2); cst[0]=1; cst[1]=-1; 
+   IntervalVector cst(3); cst[0]=1; cst[1]=-1;  cst[2]=0;
    csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-3,3)));
-   cst[0]=-2; cst[1]=-1; 
+   cst[0]=-2; cst[1]=-1;  cst[2]=0.5;
    csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-5,4)));
-   cst[0]=1; cst[1]=2;
+   cst[0]=1; cst[1]=2; cst[2]=-1;
    csts.push_back(std::pair<IntervalVector,Interval>(cst,Interval(-0.4,1)));
 
    ExpPoly ep(ivbox,csts,false);
  
    std::cout << ep << "\n";
-   std::vector<double> X,Y;
-   ep.vertices2D(X,Y);
-   for (int i=0;i<X.size();i++) {
-       std::cout << "(" << X[i] << "," << Y[i] << ")," ;
+   std::list<Vector> facet;
+   for (int j=0;j<3;j++) {
+     facet = generate_facet(ep.getBox(),ep.getCsts(),j,true);
+     std::cout << "facet : " << "\n";
+     for (int i=0;i<facet.size();i++) {
+        std::cout << "[" << facet[i][0] << "," << facet[i][1] << "," << facet[i][2] << "]," ;
+     }
+     std::cout << "\n";
+     facet = generate_facet(ep.getBox(),ep.getCsts(),j,false);
+     std::cout << "facet : " << "\n";
+     for (int i=0;i<facet.size();i++) {
+        std::cout << "[" << facet[i][0] << "," << facet[i][1] << "," << facet[i][2] << "]," ;
+     }
+     std::cout << "\n";
    }
-   std::cout << "\n";
+   for (auto &cst : ep.getCsts()) {
+     facet = generate_facet(ep.getBox(),ep.getCsts(),cst.first,true);
+     std::cout << "facet : " << "\n";
+     for (int i=0;i<facet.size();i++) {
+        std::cout << "[" << facet[i][0] << "," << facet[i][1] << "," << facet[i][2] << "]," ;
+     }
+     std::cout << "\n";
+     facet = generate_facet(ep.getBox(),ep.getCsts(),cst.first,false);
+     std::cout << "facet : " << "\n";
+     for (int i=0;i<facet.size();i++) {
+        std::cout << "[" << facet[i][0] << "," << facet[i][1] << "," << facet[i][2] << "]," ;
+     }
+     std::cout << "\n";
+   }
    return 0;
 
 }

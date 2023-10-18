@@ -560,9 +560,9 @@ void Room<_TpR,_TpF,_TpD>::contract_sliding_mode(int n_vf, int face, int sens, _
     m_maze->get_subpaving()->get_tree()->get_intersection_pave_outer(adjacent_paves, f_in->get_position());
 
     // Remove pave not in the zero(s) direction
-    ibex::IntervalVector vec_field_global(dim, ibex::Interval::EMPTY_SET);
-    ibex::IntervalVector vec_field_neighbors(dim, ibex::Interval::EMPTY_SET);
-    ibex::IntervalVector vec_field_local(dim, ibex::Interval::EMPTY_SET);
+    _TpF vec_field_global = convert_vec_field<_TpF>(IntervalVector(dim, ibex::Interval::EMPTY_SET));
+    _TpF vec_field_neighbors= convert_vec_field<_TpF>(IntervalVector(dim, ibex::Interval::EMPTY_SET));
+    _TpF vec_field_local = convert_vec_field<_TpF>(IntervalVector(dim, ibex::Interval::EMPTY_SET));
 
     std::vector<Pave<_TpR,_TpF,_TpD> *> adjacent_paves_valid;
     ibex::IntervalVector pave_extrude(f_in->get_position());
@@ -580,8 +580,8 @@ void Room<_TpR,_TpF,_TpD>::contract_sliding_mode(int n_vf, int face, int sens, _
         // Find adjacent paves that extrude this pave in the directions of zeros
         if(pave_adj==this->m_pave){
             adjacent_paves_valid.push_back(pave_adj);
-            vec_field_global |= this->get_one_vector_fields(n_vf);
-            vec_field_local |= this->get_one_vector_fields(n_vf);
+            vec_field_global |= this->get_one_vector_fields_typed_fwd(n_vf);
+            vec_field_local |= this->get_one_vector_fields_typed_fwd(n_vf);
         }
         else{
             ibex::IntervalVector inter_extrude = pave_adj->get_position() & pave_extrude;
@@ -590,15 +590,15 @@ void Room<_TpR,_TpF,_TpD>::contract_sliding_mode(int n_vf, int face, int sens, _
             if(get_nb_dim_flat(inter_extrude)==get_nb_dim_flat(pave_extrude) && get_nb_dim_flat(inter)<dim){ // Key point : dim of the intersection equal to dim of the extrude pave
                 adjacent_paves_valid.push_back(pave_adj);
                 Room<_TpR,_TpF,_TpD> *room_n= pave_adj->get_rooms()[m_maze];
-                vec_field_global |= room_n->get_one_vector_fields(n_vf);
-                vec_field_neighbors |= room_n->get_one_vector_fields(n_vf);
+                vec_field_global |= room_n->get_one_vector_fields_typed_fwd(n_vf);
+                vec_field_neighbors |= room_n->get_one_vector_fields_typed_fwd(n_vf);
             }
         }
     }
     //    if(vec_field_neighbors.is_empty())
     //        std::cout << "ERROR" << std::endl;
 
-    ibex::IntervalVector zero(dim, ibex::Interval::ZERO);
+    ibex::Vector zero(dim, 0.0);
     /** -> ToDo: check validity of the test
      * Was vec_field_global before or it is not accurate as to get a cycle (that stay in the pave) we must have a zero
      * in the neighbors or in the local pave.
@@ -606,7 +606,7 @@ void Room<_TpR,_TpF,_TpD>::contract_sliding_mode(int n_vf, int face, int sens, _
      * This must be check when there is a command...
      *
     */
-    if(zero.is_subset(vec_field_neighbors) || zero.is_subset(vec_field_local)){ // Case no contraction (if there is a possible cycle) or border face
+    if(contains_v<_TpF>(vec_field_neighbors,zero) || contains_v<_TpF>(vec_field_local,zero)){ // Case no contraction (if there is a possible cycle) or border face
         in_return = input_global_door;
         out_return = output_global_door;
         return;
@@ -615,8 +615,8 @@ void Room<_TpR,_TpF,_TpD>::contract_sliding_mode(int n_vf, int face, int sens, _
     /// ************* Compute Consistency *************
     /// For each Pave, propagate OUT -> IN
 
-    _TpF vec_field_typed_neighbors_fwd = convert_vec_field<_TpF>(vec_field_neighbors);
-    _TpF vec_field_typed_neighbors_bwd = convert_vec_field<_TpF>(-vec_field_neighbors);
+    _TpF &vec_field_typed_neighbors_fwd = vec_field_neighbors;
+    _TpF vec_field_typed_neighbors_bwd = -vec_field_neighbors;
 
     for(Pave<_TpR,_TpF,_TpD> *pave_adj:adjacent_paves_valid){
         bool local_pave = false;

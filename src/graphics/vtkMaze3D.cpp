@@ -692,6 +692,19 @@ void VtkMaze3D::show_maze(invariant::MazeEXP *maze, std::string comment){
                     if(!d->is_empty()){
                         nb_faces++;
 
+			std::list<Vector> l1 = d->get_input().facet3D();
+                        for (Vector &p : l1) {
+                               points->InsertNextPoint(p[0], p[1], p[2]);
+//				std::cout << "point : " << p << "\n";
+                               nb_points++;
+                        }
+			l1 = d->get_output().facet3D();
+                        for (Vector &p : l1) {
+                               points->InsertNextPoint(p[0], p[1], p[2]);
+//				std::cout << "point : " << p << "\n";
+                               nb_points++;
+                        }
+#if 0
                         IntervalVector iv = d->get_input().getBox() | d->get_output().getBox();
                         IntervalVector orientation = f->get_orientation();
                         int val_max[3] = {2, 2, 2};
@@ -714,6 +727,7 @@ void VtkMaze3D::show_maze(invariant::MazeEXP *maze, std::string comment){
                                 }
                             }
                         }
+#endif
                     }
 
                 }
@@ -745,7 +759,7 @@ void VtkMaze3D::show_maze(invariant::MazeEXP *maze, std::string comment){
                     // Create the convex hull of the pointcloud (delaunay + outer surface)
                     vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer< vtkDelaunay3D >::New();
                     delaunay->SetInputData(polydata_points);
-                    delaunay->SetTolerance(0.0);
+                    delaunay->SetTolerance(0.0001);
                     delaunay->Update();
 
                     vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();

@@ -24,6 +24,7 @@ struct CstVect {
 
    CstVect(int bdim, double vdim, const Vector &vect);
    friend bool operator==(const CstVect &lhs, const CstVect& rhs);
+   friend bool operator!=(const CstVect &lhs, const CstVect& rhs);
 };
 
 CstVect traduit_vect(const IntervalVector &box,
@@ -32,6 +33,10 @@ CstVect traduit_vect(const IntervalVector &box,
 inline bool operator==(const CstVect &lhs, const CstVect& rhs) {
    return (lhs.bdim==rhs.bdim && lhs.vdim==rhs.vdim &&
           lhs.vect==rhs.vect);
+}
+inline bool operator!=(const CstVect &lhs, const CstVect& rhs) {
+   return (lhs.bdim!=rhs.bdim || lhs.vdim!=rhs.vdim &&
+          lhs.vect!=rhs.vect);
 }
       
 
@@ -89,6 +94,7 @@ class ExpPoly
       int get_dim() const;
       int get_not_flat_dim() const; 
       const IntervalVector &getBox() const;
+      const CstVectMap &getCsts() const;
 
       /* comparaison */
       bool is_empty() const;
@@ -136,6 +142,7 @@ class ExpPoly
       friend std::ostream& operator<<(std::ostream& str, const ExpPoly& C);
       
       void vertices2D(std::vector<double>&x, std::vector<double>&y);
+      std::list<Vector> facet3D() const;
 
 
   private :
@@ -157,6 +164,7 @@ class ExpPoly
 inline int ExpPoly::get_dim() const { return this->dim; }
 inline int ExpPoly::get_not_flat_dim() const { return this->dim_not_flat; }
 inline const IntervalVector &ExpPoly::getBox() const { return this->Box; }
+inline const CstVectMap &ExpPoly::getCsts() const { return this->csts; }
 inline bool ExpPoly::is_empty() const { return this->Box.is_empty(); }
 inline bool ExpPoly::is_flat() const { std::cout << "isflat " << this->dim_not_flat << " " << this->dim << "\n"; return this->dim_not_flat<this->dim; }
 inline bool ExpPoly::is_bounded() const {return !this->Box.is_unbounded(); }
